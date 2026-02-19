@@ -88,7 +88,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
     enum class TapType {
         None,
-        DeleteEnumArea,
+        EditEnumArea,
         CreateEnumAreaLocation,
         AddHousehold,
         CreateEnumAreaBoundary
@@ -157,8 +157,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         {
             TileServer.stopServer()
         }
-
-        binding.mapOverlayView.visibility = View.GONE
 
         binding.addHouseholdButton.backgroundTintList?.let {
             defaultColorList = it
@@ -244,6 +242,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                             binding.mapOverlayView.visibility = View.VISIBLE
                             binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
                             binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                            Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_boundary), Toast.LENGTH_SHORT).show()
                         }
                         ConfirmationDialog.ButtonPress.Right -> {
                             currentTapType = TapType.CreateEnumAreaLocation
@@ -288,7 +287,9 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                                 InputDialog.Action.DidCancel -> {
                                     binding.createEnumAreaButton.backgroundTintList = defaultColorList
                                 }
-                                InputDialog.Action.DidEnterText -> {createEnumArea( TapType.CreateEnumAreaBoundary, text )}
+                                InputDialog.Action.DidEnterText -> {
+                                    createEnumArea( TapType.CreateEnumAreaBoundary, text )
+                                }
                                 InputDialog.Action.DidPressQRButton -> {
                                     val intent = Intent(context, CameraXLivePreviewActivity::class.java)
                                     getResult.launch(intent)
@@ -300,6 +301,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             }
         }
 
+        binding.mapOverlayView.visibility = View.GONE
         binding.mapOverlayView.setOnTouchListener(this)
 
         binding.mapTileCacheButton.setOnClickListener {
@@ -320,12 +322,12 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         binding.editLocationButton.setOnClickListener {
             if (currentTapType == TapType.None)
             {
-                currentTapType = TapType.DeleteEnumArea
+                currentTapType = TapType.EditEnumArea
                 binding.mapOverlayView.visibility = View.VISIBLE
                 binding.editLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.select_ea), Toast.LENGTH_SHORT).show()
             }
-            else if (currentTapType == TapType.DeleteEnumArea)
+            else if (currentTapType == TapType.EditEnumArea)
             {
                 currentTapType = TapType.None
                 binding.mapOverlayView.visibility = View.GONE
@@ -343,7 +345,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             else if (currentTapType == TapType.AddHousehold)
             {
                 currentTapType = TapType.None
-                binding.mapOverlayView.visibility = View.VISIBLE
+                binding.mapOverlayView.visibility = View.GONE
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
         }
@@ -635,7 +637,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
                 when( currentTapType )
                 {
-                    TapType.DeleteEnumArea -> {
+                    TapType.EditEnumArea -> {
                         findEnumAreaOfLocation(
                             getAllEnumAreas(),
                             LatLng(point.latitude(), point.longitude())
@@ -812,6 +814,20 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             }
         }
 
+        if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
+        {
+            selectedEnumArea?.let { selectedEnumArea ->
+                presentStrataSelectionDialog( selectedEnumArea )
+            }
+        }
+        else
+        {
+            presentMBTilesDialog()
+        }
+    }
+
+    fun presentMBTilesDialog()
+    {
         ConfirmationDialog( activity, "",
             resources.getString(R.string.attach_mbtiles_question),
             resources.getString(R.string.no),
@@ -869,35 +885,32 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 enumArea.mbTilesPath = ""
             }
             resources.getString(R.string.select_strata) -> {
-                val study = config.studies.first()
-
-                DropdownDialog(requireActivity(), resources.getString(R.string.select_strata), study.stratas ) { strata ->
-                    strata?.let { strata ->
-                        enumArea.strataUuid = strata.uuid
-                        if (enumArea.name.contains("[") && enumArea.name.contains("]"))
-                        {
-                            enumArea.name = enumArea.name.replace(Regex("\\[.*?]"), "[" + strata.name + "]")
-                        }
-                        else
-                        {
-                            enumArea.name = enumArea.name + "-[" + strata.name + "]"
-                        }
-                        refreshMap()
-                    }
-                }
+                presentStrataSelectionDialog( enumArea )
             }
             else -> {}
         }
     }
 
-//    override fun didCancelConfirmation()
-//    {
-//        binding.mapOverlayView.visibility = View.GONE
-//        binding.deleteButton.backgroundTintList = defaultColorList
-//        binding.mapTileCacheButton.backgroundTintList = defaultColorList
-//        binding.addHouseholdButton.backgroundTintList = defaultColorList
-//        binding.createEnumAreaButton.backgroundTintList = defaultColorList
-//    }
+    fun presentStrataSelectionDialog( enumArea: EnumArea )
+    {
+        val study = config.studies.first()
+
+        DropdownDialog(requireActivity(), resources.getString(R.string.select_strata), study.stratas ) { strata ->
+            strata?.let { strata ->
+                enumArea.strataUuid = strata.uuid
+                if (enumArea.name.contains("[") && enumArea.name.contains("]"))
+                {
+                    enumArea.name = enumArea.name.replace(Regex("\\[.*?]"), "[" + strata.name + "]")
+                }
+                else
+                {
+                    enumArea.name = enumArea.name + "-[" + strata.name + "]"
+                }
+                refreshMap()
+                presentMBTilesDialog()
+            }
+        }
+    }
 
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {

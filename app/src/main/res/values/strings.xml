@@ -432,6 +432,7 @@
     <string name="select_strata">"Select Strata"</string>
     <string name="strata_name">"Strata Name"</string>
     <string name="delete_strata_message">"Are you sure you want to permanently delete this strata?"</string>
+    <string name="define_boundary">"Tap the map to define the boundary"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

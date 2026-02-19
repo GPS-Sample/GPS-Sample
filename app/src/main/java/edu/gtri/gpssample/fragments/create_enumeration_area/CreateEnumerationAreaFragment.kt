@@ -96,19 +96,14 @@ class CreateEnumerationAreaFragment : Fragment(),
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     private var editMode = false
-    private var addHousehold = false
     private var features = JSONArray()
-    private var createMapTileCache = false
     private val binding get() = _binding!!
     private var showCurrentLocation = false
-    private var createEnumAreaLocation = false
-    private var createEnumAreaBoundary = false
     private var inputDialog: InputDialog? = null
     private var selectedEnumArea: EnumArea? = null
     private val polygonHashMap = HashMap<String,Any>()
     private var checkboxDialog: CheckboxDialog? = null
     private var point: com.mapbox.geojson.Point? = null
-    private val pointHashMap = HashMap<Long,Location>()
     private var propertySelections = ArrayList<String>()
     private val unsavedEnumAreas = ArrayList<EnumArea>()
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
@@ -122,9 +117,18 @@ class CreateEnumerationAreaFragment : Fragment(),
     private var polygonAnnotationManager: PolygonAnnotationManager? = null
     private var polylineAnnotationManager: PolylineAnnotationManager? = null
     private var polylineAnnotation: PolylineAnnotation? = null
-
     private val kEnumAreaNameTag: Int = 0
     private val kEnumAreaLengthTag: Int = 1
+
+    enum class TapType {
+        None,
+        EditEnumArea,
+        CreateEnumAreaLocation,
+        AddHousehold,
+        CreateEnumAreaBoundary
+    }
+
+    private var currentTapType = TapType.None
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -247,7 +251,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.importButton.setOnClickListener {
-            if (createEnumAreaBoundary || createEnumAreaLocation || addHousehold || createMapTileCache)
+            if (currentTapType != TapType.None)
             {
                 return@setOnClickListener
             }
@@ -279,14 +283,43 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.createEnumAreaButton.setOnClickListener {
-            if (addHousehold || createMapTileCache)
+            if (currentTapType == TapType.None)
             {
-                return@setOnClickListener
+                ConfirmationDialog( activity,
+                    resources.getString(R.string.creation_options), "",
+                    resources.getString(R.string.set_boundary),
+                    resources.getString(R.string.set_location),
+                    null, true ) { buttonPressed, tag ->
+                    when( buttonPressed )
+                    {
+                        ConfirmationDialog.ButtonPress.Left -> {
+                            currentTapType = TapType.CreateEnumAreaBoundary
+                            droppedPointAnnotations.clear()
+                            binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
+                            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                            Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_boundary), Toast.LENGTH_SHORT).show()
+                        }
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            currentTapType = TapType.CreateEnumAreaLocation
+                            droppedPointAnnotations.clear()
+                            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                            refreshMap()
+                            Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
+                        }
+                        ConfirmationDialog.ButtonPress.None -> {
+                        }
+                    }
+                }
             }
-
-            if (createEnumAreaBoundary)
+            else if (currentTapType == TapType.CreateEnumAreaLocation)
             {
-                createEnumAreaBoundary = false
+                currentTapType = TapType.None
+                binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
+                binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
+            }
+            else if (currentTapType == TapType.CreateEnumAreaBoundary)
+            {
+                currentTapType = TapType.None
 
                 if (droppedPointAnnotations.size > 2)
                 {
@@ -337,44 +370,19 @@ class CreateEnumerationAreaFragment : Fragment(),
                     binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
                 }
             }
-            else
-            {
-                ConfirmationDialog( activity,
-                    resources.getString(R.string.creation_options), "",
-                    resources.getString(R.string.set_boundary),
-                    resources.getString(R.string.set_location),
-                    null, true ) { buttonPressed, tag ->
-                    when( buttonPressed )
-                    {
-                        ConfirmationDialog.ButtonPress.Left -> {
-                            createEnumAreaBoundary = true
-                            droppedPointAnnotations.clear()
-                            binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
-                            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                        }
-                        ConfirmationDialog.ButtonPress.Right -> {
-                            createEnumAreaLocation = true
-                            droppedPointAnnotations.clear()
-                            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                            refreshMap()
-                        }
-                        ConfirmationDialog.ButtonPress.None -> {
-                        }
-                    }
-                }
-
-            }
         }
 
+        binding.mapOverlayView.visibility = View.GONE
         binding.mapOverlayView.setOnTouchListener(this)
 
         binding.mapTileCacheButton.setOnClickListener {
-            if (createEnumAreaBoundary || createEnumAreaLocation || addHousehold || createMapTileCache)
+            if (currentTapType != TapType.None)
             {
                 return@setOnClickListener
             }
 
             val mapTileRegions = getAllMapTileRegions()
+
             if (mapTileRegions.isNotEmpty())
             {
                 busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
@@ -386,21 +394,32 @@ class CreateEnumerationAreaFragment : Fragment(),
             defaultColorList = it
         }
 
-        binding.addHouseholdButton.setOnClickListener {
-            if (createEnumAreaBoundary || createEnumAreaLocation || createMapTileCache)
+        binding.editLocationButton.setOnClickListener {
+            if (currentTapType == TapType.None)
             {
-                return@setOnClickListener
+                currentTapType = TapType.EditEnumArea
+                binding.mapOverlayView.visibility = View.VISIBLE
+                binding.editLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.select_ea), Toast.LENGTH_SHORT).show()
             }
+            else if (currentTapType == TapType.EditEnumArea)
+            {
+                currentTapType = TapType.None
+                binding.mapOverlayView.visibility = View.GONE
+                binding.editLocationButton.setBackgroundTintList( defaultColorList );
+            }
+        }
 
-            if (addHousehold)
+        binding.addHouseholdButton.setOnClickListener {
+            if (currentTapType == TapType.None)
             {
-                addHousehold = false
-                binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
-            }
-            else
-            {
-                addHousehold = true
+                currentTapType = TapType.AddHousehold
                 binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+            else if (currentTapType == TapType.AddHousehold)
+            {
+                currentTapType = TapType.None
+                binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
         }
 
@@ -658,14 +677,15 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         if (editMode)
         {
-            if (createEnumAreaBoundary)
+            if (currentTapType == TapType.CreateEnumAreaBoundary)
             {
                 droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, point, R.drawable.location_blue ))
                 return true
             }
-            else if (createEnumAreaLocation)
+            else if (currentTapType == TapType.CreateEnumAreaLocation)
             {
                 this.point = point
+                currentTapType = TapType.None
                 binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
                 val inputDialog = InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaLengthTag ) { action, text, tag ->
                     when (action) {
@@ -724,29 +744,29 @@ class CreateEnumerationAreaFragment : Fragment(),
                 inputDialog.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
                 return true
             }
-            else if (addHousehold)
+            else if (currentTapType == TapType.AddHousehold)
             {
-                addHousehold = false
+                currentTapType = TapType.None
+                binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
                 createLocation( point.latitude(), point.longitude(), point.altitude())
                 refreshMap()
-                binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
                 return true
             }
-            else
-            {
-                val items = ArrayList<String>()
-                items.add( resources.getString(R.string.rename ))
-                items.add( resources.getString(R.string.delete ))
-                items.add( resources.getString(R.string.attach_mbtiles ))
-                items.add( resources.getString(R.string.detach_mbtiles ))
-
-                findEnumAreaOfLocation( getAllEnumAreas(), LatLng( point.latitude(), point.longitude()))?.let { enumArea ->
-                    MultiConfirmationDialog( activity, resources.getString(R.string.select_task),
-                        "", items, enumArea, this)
-                }
-
-                return true
-            }
+//            else
+//            {
+//                val items = ArrayList<String>()
+//                items.add( resources.getString(R.string.rename ))
+//                items.add( resources.getString(R.string.delete ))
+//                items.add( resources.getString(R.string.attach_mbtiles ))
+//                items.add( resources.getString(R.string.detach_mbtiles ))
+//
+//                findEnumAreaOfLocation( getAllEnumAreas(), LatLng( point.latitude(), point.longitude()))?.let { enumArea ->
+//                    MultiConfirmationDialog( activity, resources.getString(R.string.select_task),
+//                        "", items, enumArea, this)
+//                }
+//
+//                return true
+//            }
         }
 
         return false
@@ -1026,6 +1046,48 @@ class CreateEnumerationAreaFragment : Fragment(),
     override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
     {
         p1?.let { p1 ->
+            if (p1.action == MotionEvent.ACTION_UP) {
+                val point = MapManager.instance().getLocationFromPixelPoint(binding.mapboxMapView, p1)
+
+                when( currentTapType )
+                {
+                    TapType.EditEnumArea -> {
+                        findEnumAreaOfLocation(
+                            getAllEnumAreas(),
+                            LatLng(point.latitude(), point.longitude())
+                        )?.let { enumArea ->
+                            currentTapType = TapType.None
+                            binding.mapOverlayView.visibility = View.GONE
+                            binding.editLocationButton.backgroundTintList = defaultColorList
+
+                            val items = ArrayList<String>()
+                            items.add(resources.getString(R.string.rename))
+                            items.add(resources.getString(R.string.delete))
+                            items.add(resources.getString(R.string.attach_mbtiles))
+                            items.add(resources.getString(R.string.detach_mbtiles))
+
+                            if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
+                            {
+                                items.add(resources.getString(R.string.select_strata))
+                            }
+
+                            MultiConfirmationDialog(
+                                activity, resources.getString(R.string.select_task),
+                                "", items, enumArea, this
+                            )
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        }
+
+        return true
+    }
+
+    fun onTouchXXX(p0: View?, p1: MotionEvent?): Boolean
+    {
+        p1?.let { p1 ->
             if (p1.action == MotionEvent.ACTION_UP)
             {
                 polyLinePoints.clear()
@@ -1075,8 +1137,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     fun createEnumArea( name: String )
     {
-        createEnumAreaBoundary = false
-        createEnumAreaLocation = false
+        currentTapType = TapType.None
 
         val vertices = ArrayList<LatLon>()
 
@@ -1108,6 +1169,20 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         refreshMap()
 
+        if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
+        {
+            selectedEnumArea?.let { selectedEnumArea ->
+                presentStrataSelectionDialog( selectedEnumArea )
+            }
+        }
+        else
+        {
+            presentMBTilesDialog()
+        }
+    }
+
+    fun presentMBTilesDialog()
+    {
         ConfirmationDialog( activity, "",
             resources.getString(R.string.attach_mbtiles_question),
             resources.getString(R.string.no),
@@ -1168,7 +1243,31 @@ class CreateEnumerationAreaFragment : Fragment(),
                 enumArea.mbTilesSize = 0
                 enumArea.mbTilesPath = ""
             }
+            resources.getString(R.string.select_strata) -> {
+                presentStrataSelectionDialog( enumArea )
+            }
             else -> {}
+        }
+    }
+
+    fun presentStrataSelectionDialog( enumArea: EnumArea )
+    {
+        val study = config.studies.first()
+
+        DropdownDialog(requireActivity(), resources.getString(R.string.select_strata), study.stratas ) { strata ->
+            strata?.let { strata ->
+                enumArea.strataUuid = strata.uuid
+                if (enumArea.name.contains("[") && enumArea.name.contains("]"))
+                {
+                    enumArea.name = enumArea.name.replace(Regex("\\[.*?]"), "[" + strata.name + "]")
+                }
+                else
+                {
+                    enumArea.name = enumArea.name + "-[" + strata.name + "]"
+                }
+                refreshMap()
+                presentMBTilesDialog()
+            }
         }
     }
 

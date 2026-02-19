@@ -238,6 +238,7 @@ class WalkEnumerationAreaFragment : Fragment(),
                 }
                 else
                 {
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
                     binding.mapOverlayView.visibility = View.VISIBLE
                     binding.addPointButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
@@ -473,7 +474,38 @@ class WalkEnumerationAreaFragment : Fragment(),
             binding.addPointButton.isEnabled = false
             binding.deletePointButton.isEnabled = false
 
+            if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
+            {
+                selectedEnumArea?.let { selectedEnumArea ->
+                    presentStrataSelectionDialog( selectedEnumArea )
+                }
+            }
+
             refreshMap()
+        }
+    }
+
+    fun presentStrataSelectionDialog( enumArea: EnumArea )
+    {
+        val study = config.studies.first()
+
+        DropdownDialog(requireActivity(), resources.getString(R.string.select_strata), study.stratas ) { strata ->
+            strata?.let { strata ->
+                enumArea.strataUuid = strata.uuid
+
+                if (enumArea.name.contains("[") && enumArea.name.contains("]"))
+                {
+                    enumArea.name = enumArea.name.replace(Regex("\\[.*?]"), "[" + strata.name + "]")
+                }
+                else
+                {
+                    enumArea.name = enumArea.name + "-[" + strata.name + "]"
+                }
+
+                DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+
+                refreshMap()
+            }
         }
     }
 
