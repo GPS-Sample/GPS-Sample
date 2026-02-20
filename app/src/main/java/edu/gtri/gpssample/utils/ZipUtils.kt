@@ -1,9 +1,11 @@
 package edu.gtri.gpssample.utils
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import edu.gtri.gpssample.BuildConfig
@@ -221,6 +223,79 @@ object ZipUtils
                 activity.runOnUiThread {
                     completion( null, null )
                 }
+            }
+        }.start()
+    }
+
+    fun exportToPublicDownloads(
+        activity: Activity,
+        config: Config,
+        fileName: String,
+        shouldPackMinimal: Boolean,
+        completion: (Boolean) -> Unit
+    ) {
+        Log.d("EXPORT", "Starting export")
+        Thread {
+            try {
+                val justFileName = File(fileName).name
+
+                val zipName = "$justFileName.zip"
+
+                val values = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, zipName)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "application/zip")
+                    put(
+                        MediaStore.MediaColumns.RELATIVE_PATH,
+                        Environment.DIRECTORY_DOWNLOADS + "/GPSSample/Configurations"
+                    )
+                }
+
+                val resolver = activity.contentResolver
+                val uri = resolver.insert(
+                    MediaStore.Files.getContentUri("external"),
+                    values
+                ) ?: throw Exception("Failed to create MediaStore entry")
+
+                resolver.openOutputStream(uri)?.use { outputStream ->
+                    ZipOutputStream(BufferedOutputStream(outputStream)).use { zipOut ->
+
+                        // ---- CONFIG JSON ----
+                        val packedConfig =
+                            if (shouldPackMinimal) config.packMinimal()
+                            else config.pack()
+
+                        val configEntry = ZipEntry("$fileName.json")
+                        zipOut.putNextEntry(configEntry)
+                        zipOut.write(packedConfig.toByteArray())
+                        zipOut.closeEntry()
+
+                        // ---- IMAGE JSON (if exists) ----
+                        val imageList = ImageList(config.uuid, ArrayList<Image>())
+
+                        for (enumArea in config.enumAreas) {
+                            for (location in enumArea.locations) {
+                                ImageDAO.instance().getImage(location)?.let {
+                                    imageList.images.add(it)
+                                }
+                            }
+                        }
+
+                        if (imageList.images.isNotEmpty()) {
+                            val payload = imageList.pack(config.encryptionPassword)
+
+                            val imageEntry = ZipEntry("$justFileName-img.json")
+                            zipOut.putNextEntry(imageEntry)
+                            zipOut.write(payload.toByteArray())
+                            zipOut.closeEntry()
+                        }
+                    }
+                }
+
+                activity.runOnUiThread { completion(true) }
+
+            } catch (ex: Exception) {
+                Log.d("xxx", ex.stackTraceToString())
+                activity.runOnUiThread { completion(false) }
             }
         }.start()
     }

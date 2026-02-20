@@ -205,16 +205,33 @@ class ConfigurationFragment : Fragment(),
                             {
                                 ConfirmationDialog.ButtonPress.Left -> {
                                     sharedViewModel.currentConfiguration?.value?.let { config ->
-                                        ZipUtils.exportToDefaultLocation( activity!!, config, getPathName(), false, { success ->
-                                            if (success)
-                                            {
-                                                Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
-                                            }
-                                            else
-                                            {
-                                                NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
-                                            }
-                                        } )
+
+                                        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q)
+                                        {
+                                            ZipUtils.exportToPublicDownloads( activity!!, config, getPathName(), false, { success ->
+                                                if (success)
+                                                {
+                                                    Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                                }
+                                                else
+                                                {
+                                                    NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                                }
+                                            })
+                                        }
+                                        else
+                                        {
+                                            ZipUtils.exportToDefaultLocation( activity!!, config, getPathName(), false, { success ->
+                                                if (success)
+                                                {
+                                                    Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                                }
+                                                else
+                                                {
+                                                    NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                                }
+                                            } )
+                                        }
                                     }
                                 }
                                 ConfirmationDialog.ButtonPress.Right -> {
