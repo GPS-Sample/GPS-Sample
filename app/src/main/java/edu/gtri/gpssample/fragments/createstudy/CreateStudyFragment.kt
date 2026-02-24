@@ -46,14 +46,9 @@ import java.util.*
 enum class DeleteMode(val value : Int)
 {
     deleteStudyTag (1),
-    deleteFieldTag (2),
-    deleteRuleTag (3),
-    deleteFilterTag (4),
-    saveTag (4)
-
 }
 
-class CreateStudyFragment : Fragment(), CreateStrataAdapter.CreateStrataAdapterDelegate
+class CreateStudyFragment : Fragment()
 {
     private lateinit var study: Study
     private var _binding: FragmentCreateStudyBinding? = null
@@ -87,7 +82,16 @@ class CreateStudyFragment : Fragment(), CreateStrataAdapter.CreateStrataAdapterD
         createStudyAdapter.shouldAddField = this::shouldAddField
         createStudyAdapter.shouldAddRule = this::shouldAddRule
         createStudyAdapter.shouldAddFilter = this::shouldAddFilter
-        createStudyAdapter.setExpandableListViewHeight = this::setExpandableListViewHeight
+
+        createStrataAdapter = CreateStrataAdapter(activity!!)
+        createStrataAdapter.didSelectStrata = this::didSelectStrata
+        createStrataAdapter.didSelectField = this::didSelectField
+        createStrataAdapter.didSelectRule = this::didSelectRule
+        createStrataAdapter.didSelectFilter = this::didSelectFilter
+        createStrataAdapter.shouldAddStrata = this::shouldAddStrata
+        createStrataAdapter.shouldAddField = this::shouldAddField
+        createStrataAdapter.shouldAddRule = this::shouldAddRule
+        createStrataAdapter.shouldAddFilter = this::shouldAddFilter
 
 //        createStudyAdapter.didDeleteField = this::didDeleteField
 //        createStudyAdapter.didDeleteRule = this::didDeleteRule
@@ -120,10 +124,16 @@ class CreateStudyFragment : Fragment(), CreateStrataAdapter.CreateStrataAdapterD
             binding.deleteImageView.visibility = View.GONE
         }
 
-        binding.expandableListView.setAdapter(createStudyAdapter)
-        binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
+        if (study.samplingMethod == SamplingMethod.Strata)
+        {
+            binding.expandableListView.setAdapter(createStrataAdapter)
+        }
+        else
+        {
+            binding.expandableListView.setAdapter(createStudyAdapter)
+        }
 
-        setExpandableListViewHeight()
+        binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
 
         binding.deleteImageView.setOnClickListener {
             ConfirmationDialog(activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_study_message), resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
@@ -145,36 +155,20 @@ class CreateStudyFragment : Fragment(), CreateStrataAdapter.CreateStrataAdapterD
             updateStudy()
         }
 
-        createStrataAdapter = CreateStrataAdapter(study.stratas, this )
-
-        val strataRecyclerView= view.findViewById<RecyclerView>(R.id.strata_recycler_view )
-        strataRecyclerView.itemAnimator = DefaultItemAnimator()
-        strataRecyclerView.adapter = createStrataAdapter
-        strataRecyclerView.layoutManager = LinearLayoutManager(activity )
-        strataRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
-
-        val addStrataButton= view.findViewById<Button>( R.id.add_strata_button )
-
-        addStrataButton.setOnClickListener {
-            val strata = Strata(study.uuid,"", 0, SampleType.NumberHouseholds )
-
-            AddStrataDialog(requireActivity(), strata ) { buttonPressed ->
-                if (buttonPressed == AddStrataDialog.ButtonPress.Save)
-                {
-                    if (!study.stratas.contains( strata ))
-                    {
-                        study.stratas.add( strata )
-                        createStrataAdapter.updateStratas(study.stratas )
-                    }
-                }
-            }
-        }
-
         sharedViewModel.createStudyModel.samplingMethod.observe( this, androidx.lifecycle.Observer { samplingMethod ->
             when(study.samplingMethod)
             {
-                SamplingMethod.SimpleRandom -> binding.sampleSizeTextView.text = resources.getString(R.string.simple_random_sampling_label)
-                SamplingMethod.Cluster -> binding.sampleSizeTextView.text = resources.getString(R.string.cluster_sampling_label)
+                SamplingMethod.SimpleRandom -> {
+                    binding.expandableListView.setAdapter(createStudyAdapter)
+                    binding.sampleSizeTextView.text = resources.getString(R.string.simple_random_sampling_label)
+                }
+                SamplingMethod.Cluster -> {
+                    binding.expandableListView.setAdapter(createStudyAdapter)
+                    binding.sampleSizeTextView.text = resources.getString(R.string.cluster_sampling_label)
+                }
+                SamplingMethod.Strata -> {
+                    binding.expandableListView.setAdapter(createStrataAdapter)
+                }
                 else -> {}
             }
         })
@@ -187,35 +181,21 @@ class CreateStudyFragment : Fragment(), CreateStrataAdapter.CreateStrataAdapterD
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
             createStudyAdapter.updateStudy( study )
+            createStrataAdapter.updateStudy( study )
         }
     }
 
-    fun setExpandableListViewHeight() {
+    private fun shouldAddStrata()
+    {
+        val strata = Strata(study.uuid,"", 0, SampleType.NumberHouseholds )
 
-        val adapter = binding.expandableListView.expandableListAdapter ?: return
-
-        var totalHeight = 0
-
-        for (i in 0 until adapter.groupCount)
-        {
-            val groupView = adapter.getGroupView(i, false, null, binding.expandableListView)
-            groupView.measure(0, 0)
-            totalHeight += groupView.measuredHeight
-
-            if (binding.expandableListView.isGroupExpanded(i))
+        AddStrataDialog(requireActivity(), strata, false ) { buttonPressed ->
+            if (buttonPressed == AddStrataDialog.ButtonPress.Save)
             {
-                for (j in 0 until adapter.getChildrenCount(i))
-                {
-                    val childView = adapter.getChildView(i, j, false, null, binding.expandableListView)
-                    childView.measure(0, 0)
-                    totalHeight += childView.measuredHeight
-                }
+                study.stratas.add( strata )
+                createStrataAdapter.updateStudy( study )
             }
         }
-
-        binding.expandableListView.layoutParams.height = totalHeight
-
-        binding.fragmentRootLayout.requestLayout()
     }
 
     private fun shouldAddField()
@@ -252,6 +232,21 @@ class CreateStudyFragment : Fragment(), CreateStrataAdapter.CreateStrataAdapterD
                 sharedViewModel.createFilterModel.createNewFilter()
                 sharedViewModel.createFilterModel.createFilterAdapter.updateRules(null)
                 findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
+            }
+        }
+    }
+
+    private fun didSelectStrata( strata: Strata )
+    {
+        AddStrataDialog(requireActivity(), strata, true ) { buttonPressed ->
+            if (buttonPressed == AddStrataDialog.ButtonPress.Save)
+            {
+                createStrataAdapter.updateStudy( study )
+            }
+            else if (buttonPressed == AddStrataDialog.ButtonPress.Delete)
+            {
+                study.stratas.remove( strata )
+                createStrataAdapter.updateStudy( study )
             }
         }
     }
@@ -318,37 +313,37 @@ class CreateStudyFragment : Fragment(), CreateStrataAdapter.CreateStrataAdapterD
         findNavController().popBackStack()
     }
 
-    override fun strataEditButtonPressed( strata: Strata )
-    {
-        AddStrataDialog(requireActivity(), strata ) { buttonPressed ->
-            if (buttonPressed == AddStrataDialog.ButtonPress.Save)
-            {
-                if (!study.stratas.contains( strata ))
-                {
-                    study.stratas.add( strata )
-                }
+//    override fun strataEditButtonPressed( strata: Strata )
+//    {
+//        AddStrataDialog(requireActivity(), strata ) { buttonPressed ->
+//            if (buttonPressed == AddStrataDialog.ButtonPress.Save)
+//            {
+//                if (!study.stratas.contains( strata ))
+//                {
+//                    study.stratas.add( strata )
+//                }
+//
+//                createStrataAdapter.updateStratas(study.stratas )
+//            }
+//        }
+//    }
 
-                createStrataAdapter.updateStratas(study.stratas )
-            }
-        }
-    }
-
-    override fun strataDeleteButtonPressed( strata: Strata )
-    {
-        ConfirmationDialog(activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_strata_message), resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
-            when( buttonPressed )
-            {
-                ConfirmationDialog.ButtonPress.Left -> {
-                }
-                ConfirmationDialog.ButtonPress.Right -> {
-                    study.stratas.remove(strata )
-                    createStrataAdapter.updateStratas(study.stratas )
-                }
-                ConfirmationDialog.ButtonPress.None -> {
-                }
-            }
-        }
-    }
+//    override fun strataDeleteButtonPressed( strata: Strata )
+//    {
+//        ConfirmationDialog(activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_strata_message), resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
+//            when( buttonPressed )
+//            {
+//                ConfirmationDialog.ButtonPress.Left -> {
+//                }
+//                ConfirmationDialog.ButtonPress.Right -> {
+//                    study.stratas.remove(strata )
+//                    createStrataAdapter.updateStratas(study.stratas )
+//                }
+//                ConfirmationDialog.ButtonPress.None -> {
+//                }
+//            }
+//        }
+//    }
 
     override fun onDestroyView()
     {

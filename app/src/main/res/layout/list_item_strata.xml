@@ -21,51 +21,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <FrameLayout
-                android:background="@color/primary"
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="50dp">
 
-                <ImageView
-                    android:id="@+id/edit_image_view"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="start"
-                    app:srcCompat="@drawable/edit_white"/>
+                <TextView
+                    android:text="@string/strata_name"
+                    android:textColor="@color/primary"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
-                <ImageView
-                    android:id="@+id/delete_image_view"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="end"
-                    app:srcCompat="@drawable/delete_white"/>
-            </FrameLayout>
-
-            <TextView
-                android:text="@string/strata_name"
-                android:textColor="@color/primary"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <EditText
-                android:id="@+id/strata_name_edit_text"
-                android:inputType="none"
-                android:focusable="false"
-                android:imeOptions="actionDone"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="0dp"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"/>
+                <TextView
+                    style="?attr/editTextStyle"
+                    android:id="@+id/strata_name_text_view"
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="0dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -84,13 +65,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="50dp"/>
 
-                <EditText
-                    android:text="1"
-                    android:id="@+id/sample_size_edit_text"
-                    android:inputType="none"
-                    android:focusable="false"
-                    android:imeOptions="actionDone"
+                <TextView
+                    style="?attr/editTextStyle"
+                    android:id="@+id/sample_size_text_view"
                     android:gravity="center"
+                    android:focusable="false"
+                    android:clickable="false"
                     android:layout_marginStart="0dp"
                     android:layout_marginEnd="0dp"
                     android:layout_width="60dp"

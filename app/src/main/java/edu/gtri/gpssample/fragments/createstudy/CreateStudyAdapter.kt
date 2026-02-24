@@ -28,8 +28,6 @@ class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
     lateinit var didSelectRule: ((rule: Rule) -> Unit)
     lateinit var didSelectFilter: ((filter: Filter) -> Unit)
 
-    lateinit var setExpandableListViewHeight: (() -> Unit)
-
     lateinit var shouldAddField: (() -> Unit)
     lateinit var shouldAddRule: (() -> Unit)
     lateinit var shouldAddFilter: (() -> Unit)
@@ -202,10 +200,6 @@ class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
         {
             upImageView.visibility = View.GONE
             downImageView.visibility = View.VISIBLE
-        }
-
-        view.post {
-            setExpandableListViewHeight()
         }
 
         val addButton = view.findViewById<ImageView>(R.id.add_button)

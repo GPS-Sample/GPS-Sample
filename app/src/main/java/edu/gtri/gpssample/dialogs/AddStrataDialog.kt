@@ -10,6 +10,7 @@ package edu.gtri.gpssample.dialogs
 import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.SampleType
@@ -20,13 +21,14 @@ class AddStrataDialog
     enum class ButtonPress {
         Cancel,
         Save,
+        Delete
     }
 
     var strataNameEditText: EditText
     var sampleSizeEditText: EditText
     var strataSpinner: Spinner
 
-    constructor(context: Context, strata: Strata, completion: ((buttonPressed: ButtonPress )->Unit))
+    constructor(context: Context, strata: Strata, showDeleteButton: Boolean, completion: ((buttonPressed: ButtonPress )->Unit))
     {
         val inflater = LayoutInflater.from(context)
 
@@ -57,6 +59,18 @@ class AddStrataDialog
 
         val cancelButton = view.findViewById<Button>(R.id.cancel_button)
         val saveButton = view.findViewById<Button>(R.id.save_button)
+
+        val deleteImageView = view.findViewById<ImageView>(R.id.delete_image_view )
+
+        if (!showDeleteButton)
+        {
+            deleteImageView.visibility = View.GONE
+        }
+
+        deleteImageView.setOnClickListener {
+            alertDialog.dismiss()
+            completion( ButtonPress.Delete )
+        }
 
         cancelButton.setOnClickListener {
             alertDialog.dismiss()

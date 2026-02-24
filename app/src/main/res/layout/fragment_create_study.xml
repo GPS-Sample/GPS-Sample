@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".fragments.createstudy.CreateStudyFragment">
-
+    tools:context=".fragments.createstudy.CreateStudyFragment"
+    >
     <data>
         <import type="android.view.View" />
         <variable
@@ -15,173 +15,155 @@
             name="createStudyFragment"
             type="edu.gtri.gpssample.fragments.createstudy.CreateStudyFragment" />
     </data>
-
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/fragment_root_layout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/fragment_root_layout"
-            android:orientation="vertical"
+        <FrameLayout
+            android:background="@color/primary"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="50dp">
 
-            <FrameLayout
-                android:background="@color/primary"
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/edit_image_view"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="start"
+                app:srcCompat="@drawable/edit_white"/>
+
+            <ImageView
+                android:id="@+id/delete_image_view"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                app:srcCompat="@drawable/delete_white"/>
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center_vertical"
+            android:text="@string/study_name"
+            android:textSize="17sp"
+            android:textColor="@color/primary_textcolor" />
+
+        <EditText
+            android:id="@+id/study_name_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:hint="@string/enter_study_name"
+            android:imeOptions="actionDone"
+            android:inputType="textCapWords"
+            android:text="@={viewModel.createStudyModel.currentStudy.name}" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:text="@string/sampling_method"
+            android:textColor="@color/primary_textcolor"
+            android:textSize="17sp" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/spinner_frame">
+
+            <Spinner
+                android:id="@+id/sampling_method_spinner"
                 android:layout_width="match_parent"
-                android:layout_height="50dp">
+                android:layout_height="match_parent"
+                android:entries="@{viewModel.createStudyModel.samplingMethods}"
+                android:selectedItemPosition="@={viewModel.createStudyModel.samplingMethodPosition}"
+                android:onItemSelected="@{viewModel.createStudyModel::onSamplingMethodSelected}"
+                android:contentDescription="@string/sampling_method"/>
+        </FrameLayout>
 
-                <ImageView
-                    android:visibility="gone"
-                    android:id="@+id/edit_image_view"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="start"
-                    app:srcCompat="@drawable/edit_white"/>
+        <TextView
+            android:id="@+id/sample_size_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center_vertical"
+            android:textSize="17sp"
+            android:textColor="@color/primary_textcolor"
+            android:text="asdf adsf asdf adsf asdf asdf asdf asdf adsf asdf adfs "
+            android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}" />
 
-                <ImageView
-                    android:id="@+id/delete_image_view"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="end"
-                    app:srcCompat="@drawable/delete_white"/>
-            </FrameLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/study_name"
-                android:textSize="17sp"
-                android:textColor="@color/primary_textcolor" />
+        <LinearLayout
+            android:id="@+id/sample_size_layout"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}">
 
             <EditText
-                android:id="@+id/study_name_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:hint="@string/enter_study_name"
+                android:id="@+id/sample_size_edit_text"
+                android:gravity="center"
+                android:inputType="number"
                 android:imeOptions="actionDone"
-                android:inputType="textCapWords"
-                android:text="@={viewModel.createStudyModel.currentStudy.name}" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/sampling_method"
-                android:textColor="@color/primary_textcolor"
-                android:textSize="17sp" />
+                android:text="@={viewModel.createStudyModel.currentSampleSize}"
+                android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}" />
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:background="@drawable/spinner_frame">
+                android:background="@drawable/spinner_frame"
+                android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}">
 
                 <Spinner
-                    android:id="@+id/sampling_method_spinner"
+                    android:id="@+id/sampling_type_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:entries="@{viewModel.createStudyModel.samplingMethods}"
-                    android:selectedItemPosition="@={viewModel.createStudyModel.samplingMethodPosition}"
-                    android:onItemSelected="@{viewModel.createStudyModel::onSamplingMethodSelected}"
-                    android:contentDescription="@string/sampling_method"/>
+                    android:entries="@{viewModel.createStudyModel.SampleTypes}"
+                    android:selectedItemPosition="@={viewModel.createStudyModel.samplingTypePosition}"
+                    android:onItemSelected="@{viewModel.createStudyModel::onSampleTypeSelected}"
+                    android:contentDescription="@string/sampling_type"/>
             </FrameLayout>
-
-            <include
-                layout="@layout/layout_strata"
-                app:viewModel="@{viewModel}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <LinearLayout
-                android:visibility="@{viewModel.createStudyModel.strataVisibility ? View.GONE : View.VISIBLE}"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/sample_size_text_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:gravity="center_vertical"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor"
-                    android:text="asdf adsf asdf adsf asdf asdf asdf asdf adsf asdf adfs "
-                    android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}" />
-
-                <LinearLayout
-                    android:id="@+id/sample_size_layout"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-
-                    <EditText
-                        android:id="@+id/sample_size_edit_text"
-                        android:gravity="center"
-                        android:inputType="number"
-                        android:imeOptions="actionDone"
-                        android:layout_width="100dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:text="@={viewModel.createStudyModel.currentSampleSize}"
-                        android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}" />
-
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
-                        android:background="@drawable/spinner_frame"
-                        android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}"
-                        >
-                        <Spinner
-                            android:id="@+id/sampling_type_spinner"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:entries="@{viewModel.createStudyModel.SampleTypes}"
-                            android:selectedItemPosition="@={viewModel.createStudyModel.samplingTypePosition}"
-                            android:onItemSelected="@{viewModel.createStudyModel::onSampleTypeSelected}"
-                            android:contentDescription="@string/sampling_type"/>
-                    </FrameLayout>
-                </LinearLayout>
-            </LinearLayout>
-
-            <ExpandableListView
-                android:id="@+id/expandable_list_view"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="20dp"/>
-
-            <Button
-                android:id="@+id/save_button"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_margin="20dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="@string/save" />
         </LinearLayout>
-    </ScrollView>
+
+        <ExpandableListView
+            android:id="@+id/expandable_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/save" />
+    </LinearLayout>
 </layout>
