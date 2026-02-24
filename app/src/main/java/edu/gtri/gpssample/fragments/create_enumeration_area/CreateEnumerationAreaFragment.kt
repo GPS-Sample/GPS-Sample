@@ -85,7 +85,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     OnCameraChangeListener,
     MapManager.MapTileCacheDelegate,
     CheckboxDialog.CheckboxDialogDelegate,
-    DropdownDialog.DropdownDialogDelegate,
     SelectionDialog.SelectionDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     MultiConfirmationDialog.MulitConfirmationDialogDelegate
@@ -1254,7 +1253,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         val study = config.studies.first()
 
-        DropdownDialog(requireActivity(), resources.getString(R.string.select_strata), study.stratas ) { strata ->
+        DropdownDialog(requireActivity(), resources.getString(R.string.select_strata), study.stratas, null ) { strata ->
             strata?.let { strata ->
                 enumArea.strataUuid = strata.uuid
                 if (enumArea.name.contains("[") && enumArea.name.contains("]"))
@@ -1311,22 +1310,40 @@ class CreateEnumerationAreaFragment : Fragment(),
             {
                 data?.data?.let { uri ->
                     activity!!.getContentResolver().openInputStream(uri)?.let {
-                        val text = it.bufferedReader().readText()
+                        val json = it.bufferedReader().readText()
 
-                        val featureCollection = FeatureCollection.fromJson( text )
+                        val featureCollection = FeatureCollection.fromJson( json )
 
                         if (featureCollection.features.isNotEmpty())
                         {
                             val feature = featureCollection.features[0]
 
                             feature.geometry?.let { geometry ->
-                                val keys = ArrayList(feature.properties.keys)
+                                val items = ArrayList(feature.properties.keys)
                                 when (geometry) {
                                     is MultiPolygon -> {
-                                        DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), keys, text, this )
+                                        DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), items ) { propertySelection ->
+                                            if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
+                                            {
+                                                DropdownDialog(requireActivity(), resources.getString(R.string.select_the_strata_identifier), items ) { strataSelection ->
+                                                    if (strataSelection.isNotEmpty())
+                                                    {
+                                                        processGeoJson( json, propertySelection, strataSelection )
+                                                    }
+                                                    else
+                                                    {
+                                                        processGeoJson( json, propertySelection )
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                processGeoJson( json, propertySelection )
+                                            }
+                                        }
                                     }
                                     is Point -> {
-                                        checkboxDialog = CheckboxDialog( activity!!, resources.getString(R.string.select_the_hh_identifiers), keys, text, feature, this )
+                                        checkboxDialog = CheckboxDialog( activity!!, resources.getString(R.string.select_the_hh_identifiers), items, json, feature, this )
                                     }
                                     else -> {}
                                 }
@@ -1334,7 +1351,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                         }
                         else
                         {
-                            dropdownDidSelectSaveButton( text, "" )
+                            processGeoJson( json, "" )
                         }
                     }
                 }
@@ -1349,60 +1366,63 @@ class CreateEnumerationAreaFragment : Fragment(),
     override fun checkboxDialogDidSelectSaveButton( json: String, selections: ArrayList<String> )
     {
         propertySelections = selections
-        dropdownDidSelectSaveButton( json, "" )
+        processGeoJson( json, "" )
     }
 
     override fun checkboxDialogDidSelectCancelButton()
     {
     }
 
-    override fun dropdownDidSelectSaveButton( json: String, response: String )
+    fun processGeoJson( json: String, nameKey: String, strataKey: String = "" )
     {
-        activity!!.runOnUiThread {
-            busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )
+        if (json.isEmpty())
+        {
         }
+        else
+        {
+            activity!!.runOnUiThread {
+                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )
+            }
 
-        Thread {
-            try
-            {
-                parseGeoJson( json, response )
-
-                if (showCurrentLocation && unsavedEnumAreas.isNotEmpty())
+            Thread {
+                try
                 {
-                    activity!!.runOnUiThread {
-                        showCurrentLocation = false
-                        binding.mapboxMapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
-                        binding.mapboxMapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-                        binding.mapboxMapView.gestures.removeOnMoveListener(onMoveListener)
-                        binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                    parseGeoJson( json, nameKey, strataKey )
+
+                    if (showCurrentLocation && unsavedEnumAreas.isNotEmpty())
+                    {
+                        activity!!.runOnUiThread {
+                            showCurrentLocation = false
+                            binding.mapboxMapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+                            binding.mapboxMapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+                            binding.mapboxMapView.gestures.removeOnMoveListener(onMoveListener)
+                            binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                        }
                     }
                 }
-            }
-            catch( ex: Exception)
-            {
-                activity!!.runOnUiThread {
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                catch( ex: Exception)
+                {
+                    activity!!.runOnUiThread {
+                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                    }
                 }
-            }
-
-            busyIndicatorDialog?.let {
-                activity!!.runOnUiThread {
-                    it.alertDialog.cancel()
+                finally
+                {
+                    busyIndicatorDialog?.let { busyIndicatorDialog ->
+                        activity!!.runOnUiThread {
+                            busyIndicatorDialog.alertDialog.cancel()
+                        }
+                    }
                 }
-            }
-        }.start()
-    }
-
-    override fun dropdownDidSelectCancelButton( json: String )
-    {
-        dropdownDidSelectSaveButton( json, "" )
+            }.start()
+        }
     }
 
     data class PointWithProperty( var point: Point, var property: String )
     {
     }
 
-    fun parseGeoJson( text: String, nameKey: String )
+    fun parseGeoJson( text: String, nameKey: String, strataKey: String )
     {
         val points = ArrayList<PointWithProperty>()
         val featureCollection = FeatureCollection.fromJson( text )
@@ -1413,6 +1433,12 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             feature.getStringProperty(nameKey)?.let {
                 name = it
+            }
+
+            var strataName = ""
+
+            feature.getStringProperty(strataKey)?.let {
+                strataName = it
             }
 
             feature.geometry?.let { geometry ->
@@ -1435,6 +1461,33 @@ class CreateEnumerationAreaFragment : Fragment(),
                         val mapTileRegion = MapTileRegion( northEast, southWest )
 
                         val enumArea = EnumArea(config.uuid, "", name, "", 0, vertices, mapTileRegion )
+
+                        var strata: Strata? = null
+
+                        if (strataName.isNotEmpty())
+                        {
+                            val study = config.studies.first()
+
+                            for (aStrata in study.stratas)
+                            {
+                                if (aStrata.name.lowercase() == strataName.lowercase())
+                                {
+                                    strata = aStrata
+                                }
+                            }
+                        }
+
+                        strata?.let { strata ->
+                            enumArea.strataUuid = strata.uuid
+                            if (enumArea.name.contains("[") && enumArea.name.contains("]"))
+                            {
+                                enumArea.name = enumArea.name.replace(Regex("\\[.*?]"), "[" + strata.name + "]")
+                            }
+                            else
+                            {
+                                enumArea.name = enumArea.name + "-[" + strata.name + "]"
+                            }
+                        }
 
                         unsavedEnumAreas.add(enumArea)
                     }

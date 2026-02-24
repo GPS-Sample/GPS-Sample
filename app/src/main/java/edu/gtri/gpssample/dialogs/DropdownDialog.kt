@@ -19,13 +19,7 @@ import java.util.ArrayList
 
 class DropdownDialog
 {
-    interface DropdownDialogDelegate
-    {
-        fun dropdownDidSelectSaveButton( json: String, response: String )
-        fun dropdownDidSelectCancelButton( json: String )
-    }
-
-    constructor( context: Context?, title: String?, items: ArrayList<String>, json: String, delegate: DropdownDialogDelegate )
+    constructor( context: Context?, title: String?, items: ArrayList<String>, completion: ((selection: String )->Unit) )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -46,17 +40,17 @@ class DropdownDialog
         val secondButton = view.findViewById<Button>(R.id.right_button)
 
         firstButton.setOnClickListener {
-            delegate.dropdownDidSelectCancelButton( json )
+            completion( "" )
             alertDialog.dismiss()
         }
 
         secondButton.setOnClickListener {
-            delegate.dropdownDidSelectSaveButton( json, spinner.selectedItem as String )
+            completion( spinner.selectedItem as String )
             alertDialog.dismiss()
         }
     }
 
-    constructor( context: Context?, title: String?, stratas: ArrayList<Strata>, completion: ((selection: Strata? )->Unit))
+    constructor( context: Context?, title: String?, stratas: ArrayList<Strata>, tag: Any?, completion: ((selection: Strata? )->Unit))
     {
         val inflater = LayoutInflater.from(context)
 

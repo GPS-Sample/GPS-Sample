@@ -489,7 +489,7 @@ class WalkEnumerationAreaFragment : Fragment(),
     {
         val study = config.studies.first()
 
-        DropdownDialog(requireActivity(), resources.getString(R.string.select_strata), study.stratas ) { strata ->
+        DropdownDialog(requireActivity(), resources.getString(R.string.select_strata), study.stratas, null ) { strata ->
             strata?.let { strata ->
                 enumArea.strataUuid = strata.uuid
 
