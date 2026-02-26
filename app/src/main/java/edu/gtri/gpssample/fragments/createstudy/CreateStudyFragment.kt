@@ -9,7 +9,9 @@ package edu.gtri.gpssample.fragments.createstudy
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
+import android.util.SparseArray
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -57,6 +59,8 @@ class CreateStudyFragment : Fragment()
     private lateinit var createStrataAdapter: CreateStrataAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
 
+    private var expandableListState: SparseArray<Parcelable>? = null
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -92,6 +96,11 @@ class CreateStudyFragment : Fragment()
         createStrataAdapter.shouldAddField = this::shouldAddField
         createStrataAdapter.shouldAddRule = this::shouldAddRule
         createStrataAdapter.shouldAddFilter = this::shouldAddFilter
+
+        sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
+            createStudyAdapter.updateStudy( study )
+            createStrataAdapter.updateStudy( study )
+        }
 
 //        createStudyAdapter.didDeleteField = this::didDeleteField
 //        createStudyAdapter.didDeleteRule = this::didDeleteRule
@@ -133,6 +142,10 @@ class CreateStudyFragment : Fragment()
             binding.expandableListView.setAdapter(createStudyAdapter)
         }
 
+        expandableListState?.let {
+            binding.expandableListView.restoreHierarchyState(it)
+        }
+
         binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
 
         binding.deleteImageView.setOnClickListener {
@@ -169,20 +182,26 @@ class CreateStudyFragment : Fragment()
                 SamplingMethod.Strata -> {
                     binding.expandableListView.setAdapter(createStrataAdapter)
                 }
-                else -> {}
+                else -> {
+                }
+            }
+
+            expandableListState?.let {
+                binding.expandableListView.restoreHierarchyState(it)
             }
         })
     }
+
     override fun onResume()
     {
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateStudyFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
-            createStudyAdapter.updateStudy( study )
-            createStrataAdapter.updateStudy( study )
-        }
+//        sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
+//            createStudyAdapter.updateStudy( study )
+//            createStrataAdapter.updateStudy( study )
+//        }
     }
 
     private fun shouldAddStrata()
@@ -348,6 +367,9 @@ class CreateStudyFragment : Fragment()
     override fun onDestroyView()
     {
         super.onDestroyView()
+
+        expandableListState = SparseArray()
+        binding.expandableListView.saveHierarchyState(expandableListState)
 
         _binding = null
     }
