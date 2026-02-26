@@ -425,6 +425,15 @@
     <string name="enable_background_activity_title">"Включение фоновой активности"</string>
     <string name="enable_background_activity_body">"1. Нажмите кнопку ОТКРЫТЬ НАСТРОЙКИ \n2. Найдите GPSSample в списке.\n3.Включите РАЗРЕШИТЬ ФОНОВУЮ АКТИВНОСТЬ.\n4. Вернитесь в это приложение."</string>
     <string name="open_settings">"Откройте настройки"</string>
+    <string name="note">"Примечание"</string>
+    <string name="edit_location">"Изменить местоположение"</string>
+    <string name="select_strata">"Выбрать слой"</string>
+    <string name="delete_strata_message">""Вы уверены, что хотите окончательно удалить этот слой?""</string>
+    <string name="define_boundary">""Нажмите на карту, чтобы определить границы""</string>
+    <string name="select_the_strata_identifier">"Выбрать переменную имени слоя"</string>
+    <string name="strata_name">"Имя слоя"</string>
+    <string name="add_strata">"Добавить слой"</string>
+    <string name="strata">"Страта"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

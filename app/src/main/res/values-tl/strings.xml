@@ -425,6 +425,15 @@
     <string name="enable_background_activity_title">"Paganahin ang Aktibidad sa Background"</string>
     <string name="enable_background_activity_body">"1. Pindutin ang buton na BUKASIN ANG MGA SETTING\n2. Hanapin ang GPSSample sa listahan.\n3. Paganahin ang PAHINTULOT SA AKTIBIDAD SA BACKGROUND.\n4. Bumalik sa app na ito."</string>
     <string name="open_settings">"Buksan ang Mga Setting"</string>
+    <string name="note">"Paalala"</string>
+    <string name="edit_location">"I-edit ang Lokasyon"</string>
+    <string name="select_strata">"Piliin ang Strata"</string>
+    <string name="delete_strata_message">"Sigurado ka bang gusto mong permanenteng burahin ang strata na ito?"</string>
+    <string name="define_boundary">"I-tap ang mapa para tukuyin ang hangganan"</string>
+    <string name="select_the_strata_identifier">"Piliin ang variable ng pangalan ng strata"</string>
+    <string name="strata_name">"Pangalan ng strata"</string>
+    <string name="add_strata">"Magdagdag ng Strata"</string>
+    <string name="strata">"Strata"</string>
     <string-array name="forgot_pin_questions">
         <item>"Panggitnang pangalan ng ama"</item>
         <item>"Pangalan ng dalaga ng ina"</item>

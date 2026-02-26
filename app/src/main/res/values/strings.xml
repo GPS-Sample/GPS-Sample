@@ -425,17 +425,15 @@
     <string name="enable_background_activity_title">"Enable Background Activity"</string>
     <string name="enable_background_activity_body">"1. Tap the OPEN SETTINGS button\n2. Find GPSSample in the list.\n3. Enable ALLOW BACKGROUND ACTIVITY.\n4. Return to this app."</string>
     <string name="open_settings">"Open Settings"</string>
-
     <string name="note">"Note"</string>
     <string name="edit_location">"Edit Location"</string>
-    <string name="add_strata">"Add Strata"</string>
     <string name="select_strata">"Select Strata"</string>
-    <string name="strata_name">"Strata Name"</string>
     <string name="delete_strata_message">"Are you sure you want to permanently delete this strata?"</string>
     <string name="define_boundary">"Tap the map to define the boundary"</string>
     <string name="select_the_strata_identifier">"Select the strata name variable"</string>
-    <string name="stratas">"Stratas"</string>
-
+    <string name="strata_name">"Strata Name"</string>
+    <string name="add_strata">"Add Strata"</string>
+    <string name="strata">"Strata"</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

@@ -425,6 +425,15 @@
     <string name="enable_background_activity_title">"Aktifkan Aktivitas Latar Belakang"</string>
     <string name="enable_background_activity_body">"1. Ketuk tombol BUKA PENGATURAN\n2. Temukan GPSSample dalam daftar.\n3. Aktifkan IZINKAN AKTIVITAS LATAR BELAKANG.\n4. Kembali ke aplikasi ini."</string>
     <string name="open_settings">"Buka Pengaturan"</string>
+    <string name="note">"Catatan"</string>
+    <string name="edit_location">"Edit Lokasi"</string>
+    <string name="select_strata">"Pilih Lapisan"</string>
+    <string name="delete_strata_message">"Apakah Anda yakin ingin menghapus lapisan ini secara permanen?"</string>
+    <string name="define_boundary">"Ketuk peta untuk menentukan batas"</string>
+    <string name="select_the_strata_identifier">"Pilih variabel nama lapisan"</string>
+    <string name="strata_name">"Nama lapisan"</string>
+    <string name="add_strata">"Tambahkan Strata"</string>
+    <string name="strata">"Lapisan"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>

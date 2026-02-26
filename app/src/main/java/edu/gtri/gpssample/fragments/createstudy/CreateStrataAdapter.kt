@@ -219,7 +219,7 @@ class CreateStrataAdapter(var context: Context) : BaseExpandableListAdapter()
 
         when( groupPosition )
         {
-            0 -> listTitleTextView.text = context.getString(R.string.stratas)
+            0 -> listTitleTextView.text = context.getString(R.string.strata)
             1 -> listTitleTextView.text = context.getString(R.string.fields)
             2 -> listTitleTextView.text = context.getString(R.string.rules)
             3 -> listTitleTextView.text = context.getString(R.string.filters)

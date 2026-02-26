@@ -425,6 +425,15 @@
     <string name="enable_background_activity_title">"Ativar atividade em segundo plano"</string>
     <string name="enable_background_activity_body">"1. Toque no botão ABRIR CONFIGURAÇÕES \n2. Encontre GPSSample na lista.\n3. Ative PERMITIR ATIVIDADE EM SEGUNDO PLANO.\n4. Volte para este aplicativo."</string>
     <string name="open_settings">"Abrir configurações"</string>
+    <string name="note">"Nota"</string>
+    <string name="edit_location">"Editar localização"</string>
+    <string name="select_strata">"Selecionar estrato"</string>
+    <string name="delete_strata_message">"Tem a certeza de que deseja eliminar permanentemente este estrato?"</string>
+    <string name="define_boundary">"Toque no mapa para definir os limites"</string>
+    <string name="select_the_strata_identifier">"Selecionar a variável do nome do estrato"</string>
+    <string name="strata_name">"Nome do estrato"</string>
+    <string name="add_strata">"Adicionar estratificação"</string>
+    <string name="strata">"Estratos"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>
