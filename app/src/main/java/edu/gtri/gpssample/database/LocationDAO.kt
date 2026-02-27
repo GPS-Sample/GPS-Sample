@@ -41,6 +41,11 @@ class LocationDAO(private var dao: DAO)
         }
         else
         {
+            if (location.altitude.isNaN())
+            {
+                location.altitude = 0.0
+            }
+
             val values = ContentValues()
             putLocation( location, values )
             if (dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values) < 0)
