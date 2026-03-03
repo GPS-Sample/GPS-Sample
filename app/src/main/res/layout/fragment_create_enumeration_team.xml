@@ -1,146 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragments.create_enumeration_team.CreateEnumerationTeamFragment">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <TextView
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:gravity="center_vertical"
-        android:textColor="@color/primary"
-        android:text="@string/team_name"
-        android:textSize="17sp"
-        android:textStyle="bold" />
-
-    <EditText
-        android:id="@+id/team_name_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:hint="@string/enter_team_name"
-        android:imeOptions="actionDone"
-        android:inputType="textCapWords"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:gravity="center_vertical"
-        android:text="@string/assign_households"
-        android:textColor="@color/primary"
-        android:textSize="17sp"
-        android:textStyle="bold" />
-
-    <FrameLayout
-        android:layout_weight="1"
-        android:layout_width="match_parent"
-        android:layout_height="0dp">
-
-        <com.mapbox.maps.MapView
-            android:id="@+id/mapbox_map_view"
-            android:visibility="visible"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </com.mapbox.maps.MapView>
-
-        <org.osmdroid.views.MapView
-            android:id="@+id/osm_map_view"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </org.osmdroid.views.MapView>
-
-        <ImageView
-            android:id="@+id/north_up_image_view"
-            android:visibility="gone"
-            android:layout_marginTop="40dp"
-            android:layout_marginEnd="20dp"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="top|end"
-            app:srcCompat="@drawable/compass_icon"/>
+        android:layout_height="match_parent"
+        tools:context=".fragments.create_enumeration_team.CreateEnumerationTeamFragment">
 
         <TextView
-            android:id="@+id/osm_label"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginStart="10dp"
-            android:gravity="center_vertical|center_horizontal"
-            android:layout_gravity="bottom|start"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:text="OSM"
-            android:textStyle="normal" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/primary"
+            android:text="@string/team_name"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/team_name_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:hint="@string/enter_team_name"
+            android:imeOptions="actionDone"
+            android:inputType="textCapWords"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:gravity="center_vertical"
+            android:text="@string/assign_households"
+            android:textColor="@color/primary"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <FrameLayout
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp">
+
+            <com.mapbox.maps.MapView
+                android:id="@+id/mapbox_map_view"
+                android:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </com.mapbox.maps.MapView>
+
+            <org.osmdroid.views.MapView
+                android:id="@+id/osm_map_view"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </org.osmdroid.views.MapView>
+
+            <ImageView
+                android:id="@+id/north_up_image_view"
+                android:visibility="gone"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="20dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="top|end"
+                app:srcCompat="@drawable/compass_icon"/>
+
+            <TextView
+                android:id="@+id/osm_label"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_gravity="bottom|start"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:text="OSM"
+                android:textStyle="normal" />
+
+            <View
+                android:id="@+id/map_overlay_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </View>
+        </FrameLayout>
 
         <View
-            android:id="@+id/map_overlay_view"
+            android:background="@color/primary"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </View>
+            android:layout_height="2dp"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/draw_polygon_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:background="@drawable/draw" />
+        </LinearLayout>
+
+        <View
+            android:background="@color/primary"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/cancel_button"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/cancel" />
+
+            <Button
+                android:id="@+id/save_button"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/save" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/busy_view"
+        android:visibility="gone"
+        android:background="@color/light_gray"
+        android:alpha=".5"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/device_progress_bar"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center" />
     </FrameLayout>
-
-    <View
-        android:background="@color/primary"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"/>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/draw_polygon_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="5dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:background="@drawable/draw" />
-    </LinearLayout>
-
-    <View
-        android:background="@color/primary"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"/>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/cancel_button"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/cancel" />
-
-        <Button
-            android:id="@+id/save_button"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/save" />
-    </LinearLayout>
-
-</LinearLayout>
+</FrameLayout>

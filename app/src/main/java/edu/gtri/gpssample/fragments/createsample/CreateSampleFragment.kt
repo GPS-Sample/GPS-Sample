@@ -297,6 +297,8 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
                 }
             }
 
+            val markerProperties = ArrayList<MapManager.MarkerProperty>()
+
             for (location in enumArea.locations)
             {
                 if (!location.isLandmark && location.enumerationItems.isNotEmpty())
@@ -322,7 +324,7 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
                                 resourceId = R.drawable.home_light_blue
                             }
 
-                            MapManager.instance().createMarker( activity!!, mapView, location, resourceId, title )
+                            markerProperties.add( MapManager.MarkerProperty( location, resourceId, title ))
                         }
                     }
                     else
@@ -337,9 +339,14 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
                             }
                         }
 
-                        MapManager.instance().createMarker( activity!!, mapView, location, resourceId, title )
+                        markerProperties.add( MapManager.MarkerProperty( location, resourceId, title ))
                     }
                 }
+            }
+
+            if (markerProperties.isNotEmpty())
+            {
+                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties )
             }
         }
     }

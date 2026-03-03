@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -44,8 +45,21 @@ import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
 import com.mapbox.maps.StylePackLoadOptions
 import com.mapbox.maps.TilesetDescriptorOptions
+import com.mapbox.maps.extension.style.expressions.dsl.generated.get
+import com.mapbox.maps.extension.style.expressions.dsl.generated.has
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.extension.style.expressions.dsl.generated.literal
 import com.mapbox.maps.extension.style.expressions.generated.Expression
+import com.mapbox.maps.extension.style.expressions.generated.Expression.Companion.not
+import com.mapbox.maps.extension.style.image.image
+import com.mapbox.maps.extension.style.layers.addLayer
+import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
+import com.mapbox.maps.extension.style.layers.generated.circleLayer
+import com.mapbox.maps.extension.style.layers.generated.symbolLayer
+import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
+import com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor
+import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
+import com.mapbox.maps.extension.style.style
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.AnnotationConfig
 import com.mapbox.maps.plugin.annotation.annotations
@@ -67,8 +81,11 @@ import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.CollectionState
+import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.MapEngine
+import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Breadcrumb
 import edu.gtri.gpssample.database.models.Config
@@ -83,6 +100,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONObject
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.tileprovider.tilesource.XYTileSource
@@ -786,7 +805,6 @@ class MapManager
             mapView.invalidate()
 
             marker.setOnMarkerClickListener { clickedMarker, mapView ->
-                Log.d( "xxx", "marker.tapped" )
                 delegate?.onMarkerTapped( location )
                 true
             }
@@ -893,29 +911,222 @@ class MapManager
         }
     }
 
+    fun getResourceName(location: Location) : String
+    {
+        var resourceName = "home_black"
+
+        if (location.isLandmark) {
+            resourceName = "location_blue"
+        } else if (location.enumerationItems.size == 1) {
+            if (location.enumerationItems.isNotEmpty()) {
+                val enumerationItem = location.enumerationItems[0]
+
+                if (enumerationItem.samplingState == SamplingState.Sampled) {
+                    when (enumerationItem.collectionState) {
+                        CollectionState.Undefined -> resourceName = "home_light_blue"
+                        CollectionState.Incomplete -> resourceName = "home_orange"
+                        CollectionState.Complete -> resourceName = "home_purple"
+                    }
+                } else if (enumerationItem.enumerationState == EnumerationState.Undefined) {
+                    resourceName = "home_black"
+                } else if (enumerationItem.enumerationState == EnumerationState.Incomplete) {
+                    resourceName = "home_red"
+                } else if (enumerationItem.enumerationState == EnumerationState.Enumerated) {
+                    resourceName = "home_green"
+                }
+            }
+        }
+        else
+        {
+            for (enumerationItem in location.enumerationItems)
+            {
+                if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined) {
+                    resourceName = "home_light_blue"
+                    break
+                }
+            }
+
+            if (resourceName == "home_black") {
+                for (enumerationItem in location.enumerationItems) {
+                    if (enumerationItem.samplingState == SamplingState.Sampled) {
+                        if (enumerationItem.collectionState == CollectionState.Incomplete) {
+                            resourceName = "multi_home_orange"
+                            break
+                        } else if (enumerationItem.collectionState == CollectionState.Complete) {
+                            resourceName = "multi_home_purple"
+                        }
+                    } else if (enumerationItem.enumerationState == EnumerationState.Undefined) {
+                        resourceName = "multi_home_black"
+                    } else if (enumerationItem.enumerationState == EnumerationState.Incomplete) {
+                        resourceName = "multi_home_red"
+                        break
+                    } else if (enumerationItem.enumerationState == EnumerationState.Enumerated) {
+                        resourceName = "multi_home_green"
+                    }
+                }
+            }
+        }
+
+        return resourceName
+    }
+
+    fun createFeature( lat: Double, lon: Double, icon: String ) : JSONObject
+    {
+        val geometry = JSONObject()
+        geometry.put( "type", "Point" )
+
+        val coordinates = JSONArray()
+        coordinates.put( lon )
+        coordinates.put( lat )
+
+        geometry.put( "coordinates", coordinates )
+
+        val properties = JSONObject()
+        properties.put( "iconName", icon )
+        properties.put( "POI", icon )
+
+        val feature = JSONObject()
+        feature.put( "type", "Feature" )
+        feature.put( "geometry", geometry )
+        feature.put( "properties", properties )
+
+        return feature
+    }
+
+    fun loadMarkers( activity: Activity, mapView: MapView, enumAreas: ArrayList<EnumArea> )
+    {
+        val geoJson = JSONObject()
+        geoJson.put("type", "FeatureCollection")
+
+        val features = JSONArray()
+
+        for (enumArea in enumAreas)
+        {
+            for (location in enumArea.locations)
+            {
+                features.put(
+                    MapManager.instance().createFeature(
+                        location.latitude,
+                        location.longitude,
+                        MapManager.instance().getResourceName(location)))
+            }
+        }
+
+        geoJson.put("features", features)
+
+        loadMarkers( activity, mapView, geoJson.toString())
+    }
+
+    fun loadMarkers( context: Context, mapView: MapView, geoJson: String )
+    {
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
+        val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
+
+        mapView.getMapboxMap().loadStyle(style(mapStyle!!) {
+
+            TileServer.rasterSource?.let { +it }
+            TileServer.rasterLayer?.let { +it }
+
+            val iconNames = listOf(
+                "home_black", "home_blue", "home_green", "home_light_blue",
+                "home_orange", "home_purple", "home_red",
+                "multi_home_black", "multi_home_blue", "multi_home_green",
+                "multi_home_light_blue", "multi_home_orange",
+                "multi_home_purple", "multi_home_red"
+            )
+
+            iconNames.forEach { name ->
+                +image(name) {
+                    bitmap(BitmapFactory.decodeResource(context.resources, context.resources.getIdentifier(name, "drawable", context.packageName)))
+                }
+            }
+
+            +geoJsonSource("SOURCE_ID") {
+                data(geoJson)
+                cluster(true)
+                clusterRadius(50)
+                clusterMaxZoom(16)
+                build()
+            }
+
+            +circleLayer("CLUSTER_LAYER", "SOURCE_ID") {
+                filter(has("point_count"))
+                circleRadius(15.0)
+                circleColor(Color.BLUE)
+                circleOpacity(0.5)
+            }
+
+            +symbolLayer("CLUSTER_COUNT_LAYER", "SOURCE_ID") {
+                filter(has("point_count"))
+                textField(get("point_count"))
+                textSize(14.0)
+                textColor(Color.WHITE)
+                textAnchor(TextAnchor.CENTER)
+            }
+
+            +symbolLayer("UNCLUSTERED_LAYER", "SOURCE_ID") {
+                filter(not(has("point_count"))) // only single points
+                iconImage(get("iconName"))       // your property in GeoJSON
+                iconAllowOverlap(false)
+                iconIgnorePlacement(false)
+                iconAnchor(IconAnchor.CENTER)
+            }
+        })
+    }
+
     data class MarkerProperty( var location: Location, var resourceId: Int, var title: String )
     {
     }
 
-    fun loadMarkers( context: Context, mapView: org.osmdroid.views.MapView, markerProperties: ArrayList<MarkerProperty> )
+    fun loadMarkers( context: Context, mapView: View, markerProperties: ArrayList<MarkerProperty> )
     {
-        val clusterer = RadiusMarkerClusterer(context)
-        clusterer.textPaint.color = Color.WHITE
-
-        for (markerProperty in markerProperties)
+        if (mapView is org.osmdroid.views.MapView)
         {
-            val marker = Marker(mapView)
+            val clusterer = RadiusMarkerClusterer(context)
+            clusterer.textPaint.color = Color.WHITE
 
-            marker.position = GeoPoint(markerProperty.location.latitude, markerProperty.location.longitude)
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            marker.icon = ContextCompat.getDrawable(context, markerProperty.resourceId)
-            marker.title = markerProperty.title
+            for (markerProperty in markerProperties)
+            {
+                val marker = Marker(mapView)
 
-            clusterer.add(marker)
+                marker.position = GeoPoint(markerProperty.location.latitude, markerProperty.location.longitude)
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                marker.icon = ContextCompat.getDrawable(context, markerProperty.resourceId)
+                marker.title = markerProperty.title
+
+                delegate?.let { delegate ->
+                    marker.setOnMarkerClickListener { clickedMarker, mapView ->
+                        delegate.onMarkerTapped( markerProperty.location )
+                        true
+                    }
+                }
+
+                clusterer.add(marker)
+            }
+
+            mapView.overlays.add(clusterer)
+            mapView.invalidate()
         }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            val geoJson = JSONObject()
+            geoJson.put("type", "FeatureCollection")
 
-        mapView.overlays.add(clusterer)
-        mapView.invalidate()
+            val features = JSONArray()
+
+            for (markerProperty in markerProperties)
+            {
+                features.put(
+                    MapManager.instance().createFeature(
+                        markerProperty.location.latitude,
+                        markerProperty.location.longitude,
+                        MapManager.instance().getResourceName(markerProperty.location)))
+
+                geoJson.put("features", features)
+            }
+
+            loadMarkers( context, mapView, geoJson.toString())
+        }
     }
 
     fun setZoomLevel( mapView: View, zoomLevel: Double )

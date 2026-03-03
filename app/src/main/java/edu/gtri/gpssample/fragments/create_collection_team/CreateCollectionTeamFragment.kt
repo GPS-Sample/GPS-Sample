@@ -152,39 +152,48 @@ class CreateCollectionTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            val polygonPoints = ArrayList<LatLon>()
-            var creationDate = Date().time
+            binding.saveButton.isEnabled = false
+            binding.cancelButton.isEnabled = false
+            binding.busyView.visibility = View.VISIBLE
 
-            if (intersectionPolygon is MapManager.MapboxPolygon)
-            {
-                val mapboxPolygon = intersectionPolygon as MapManager.MapboxPolygon
-                mapboxPolygon.polygonAnnotation?.points?.map { points ->
-                    points.map { point ->
-                        polygonPoints.add( LatLon( creationDate++, point.latitude(), point.longitude()))
+            Thread {
+                val polygonPoints = ArrayList<LatLon>()
+                var creationDate = Date().time
+
+                if (intersectionPolygon is MapManager.MapboxPolygon)
+                {
+                    val mapboxPolygon = intersectionPolygon as MapManager.MapboxPolygon
+                    mapboxPolygon.polygonAnnotation?.points?.map { points ->
+                        points.map { point ->
+                            polygonPoints.add( LatLon( creationDate++, point.latitude(), point.longitude()))
+                        }
                     }
                 }
-            }
-            else if (intersectionPolygon is org.osmdroid.views.overlay.Polygon)
-            {
-                val osmPolygon = intersectionPolygon as org.osmdroid.views.overlay.Polygon
-                osmPolygon.points.map { point ->
-                    polygonPoints.add( LatLon( creationDate++, point.latitude, point.longitude ))
+                else if (intersectionPolygon is org.osmdroid.views.overlay.Polygon)
+                {
+                    val osmPolygon = intersectionPolygon as org.osmdroid.views.overlay.Polygon
+                    osmPolygon.points.map { point ->
+                        polygonPoints.add( LatLon( creationDate++, point.latitude, point.longitude ))
+                    }
                 }
-            }
 
-            if (polygonPoints.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_select_team_boundary), Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+                if (polygonPoints.isEmpty())
+                {
+                    enumArea.vertices.map {
+                        polygonPoints.add( LatLon( creationDate++, it.latitude, it.longitude ))
+                    }
+                }
 
-            val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam(
-                CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygonPoints, locationUuids ))
+                val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam(
+                    CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygonPoints, locationUuids ))
 
-            collectionTeam?.let { team ->
-                enumArea.collectionTeams.add(team)
-                findNavController().popBackStack()
-            }
+                collectionTeam?.let { team ->
+                    enumArea.collectionTeams.add(team)
+                    activity!!.runOnUiThread {
+                        findNavController().popBackStack()
+                    }
+                }
+            }.start()
         }
 
         binding.mapOverlayView.setOnTouchListener(this)
@@ -229,6 +238,8 @@ class CreateCollectionTeamFragment : Fragment(),
                 }
             }
 
+            val markerProperties = ArrayList<MapManager.MarkerProperty>()
+
             for (location in enumArea.locations)
             {
                 if (!location.isLandmark && location.enumerationItems.isNotEmpty())
@@ -242,7 +253,7 @@ class CreateCollectionTeamFragment : Fragment(),
                             if (!locationBelongsToTeam( location ))
                             {
                                 val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.home_light_blue, sampledItem.subAddress )
+                                markerProperties.add( MapManager.MarkerProperty( location, R.drawable.home_light_blue, sampledItem.subAddress ))
                             }
                         }
                     }
@@ -255,13 +266,18 @@ class CreateCollectionTeamFragment : Fragment(),
                                 if (!locationBelongsToTeam( location ))
                                 {
                                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                    MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.multi_home_light_blue, sampledItem.subAddress )
+                                    markerProperties.add( MapManager.MarkerProperty( location, R.drawable.multi_home_light_blue, sampledItem.subAddress ))
                                     break
                                 }
                             }
                         }
                     }
                 }
+            }
+
+            if (markerProperties.isNotEmpty())
+            {
+                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties )
             }
         }
     }

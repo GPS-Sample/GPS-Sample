@@ -20,6 +20,7 @@ import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -145,40 +146,48 @@ class CreateEnumerationTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            val polygonPoints = ArrayList<LatLon>()
+            binding.saveButton.isEnabled = false
+            binding.cancelButton.isEnabled = false
+            binding.busyView.visibility = View.VISIBLE
 
-            var creationDate = Date().time
+            Thread {
+                val polygonPoints = ArrayList<LatLon>()
 
-            if (intersectionPolygon is MapManager.MapboxPolygon)
-            {
-                val mapboxPolygon = intersectionPolygon as MapManager.MapboxPolygon
-                mapboxPolygon.polygonAnnotation?.points?.map { points ->
-                    points.map { point ->
-                        polygonPoints.add( LatLon( creationDate++, point.latitude(), point.longitude()))
+                var creationDate = Date().time
+
+                if (intersectionPolygon is MapManager.MapboxPolygon)
+                {
+                    val mapboxPolygon = intersectionPolygon as MapManager.MapboxPolygon
+                    mapboxPolygon.polygonAnnotation?.points?.map { points ->
+                        points.map { point ->
+                            polygonPoints.add( LatLon( creationDate++, point.latitude(), point.longitude()))
+                        }
                     }
                 }
-            }
-            else if (intersectionPolygon is org.osmdroid.views.overlay.Polygon)
-            {
-                val osmPolygon = intersectionPolygon as org.osmdroid.views.overlay.Polygon
-                osmPolygon.points.map { point ->
-                    polygonPoints.add( LatLon( creationDate++, point.latitude, point.longitude ))
+                else if (intersectionPolygon is org.osmdroid.views.overlay.Polygon)
+                {
+                    val osmPolygon = intersectionPolygon as org.osmdroid.views.overlay.Polygon
+                    osmPolygon.points.map { point ->
+                        polygonPoints.add( LatLon( creationDate++, point.latitude, point.longitude ))
+                    }
                 }
-            }
 
-            if (polygonPoints.isEmpty())
-            {
-                enumArea.vertices.map {
-                    polygonPoints.add( LatLon( creationDate++, it.latitude, it.longitude ))
+                if (polygonPoints.isEmpty())
+                {
+                    enumArea.vertices.map {
+                        polygonPoints.add( LatLon( creationDate++, it.latitude, it.longitude ))
+                    }
                 }
-            }
 
-            val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygonPoints, locationUuids ))
+                val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygonPoints, locationUuids ))
 
-            enumerationTeam?.let { team ->
-                enumArea.enumerationTeams.add(team)
-                findNavController().popBackStack()
-            }
+                enumerationTeam?.let { team ->
+                    enumArea.enumerationTeams.add(team)
+                    activity!!.runOnUiThread {
+                        findNavController().popBackStack()
+                    }
+                }
+            }.start()
         }
 
         binding.mapOverlayView.setOnTouchListener(this)
@@ -228,6 +237,8 @@ class CreateEnumerationTeamFragment : Fragment(),
                 }
             }
 
+            val markerProperties = ArrayList<MapManager.MarkerProperty>()
+
             for (location in enumArea.locations)
             {
                 if (!location.isLandmark)
@@ -235,9 +246,14 @@ class CreateEnumerationTeamFragment : Fragment(),
                     if (!locationBelongsToTeam( location ))
                     {
                         val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.home_black )
+                        markerProperties.add( MapManager.MarkerProperty( location, R.drawable.home_black, "" ))
                     }
                 }
+            }
+
+            if (markerProperties.isNotEmpty())
+            {
+                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties )
             }
         }
     }

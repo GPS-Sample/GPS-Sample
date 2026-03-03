@@ -1023,6 +1023,8 @@ class PerformEnumerationFragment : Fragment(),
                 }
             }
 
+            val markerProperties = ArrayList<MapManager.MarkerProperty>()
+
             for (location in enumerationTeamLocations)
             {
                 if (!location.isLandmark && location.isVisible)
@@ -1059,8 +1061,13 @@ class PerformEnumerationFragment : Fragment(),
                         title = location.enumerationItems[0].subAddress
                     }
 
-                    MapManager.instance().createMarker( activity!!, mapView, location, resourceId, title )
+                    markerProperties.add( MapManager.MarkerProperty( location, resourceId, title ))
                 }
+            }
+
+            if (markerProperties.isNotEmpty())
+            {
+                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties )
             }
         }
     }

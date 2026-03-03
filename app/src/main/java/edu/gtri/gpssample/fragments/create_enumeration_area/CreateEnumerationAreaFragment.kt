@@ -451,221 +451,6 @@ class CreateEnumerationAreaFragment : Fragment(),
         polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager( polylineAnnotationManager, binding.mapboxMapView )
     }
 
-    fun loadStyle( geoJson: String, completion: (style: Style) -> Unit )
-    {
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
-
-        binding.mapboxMapView.getMapboxMap().loadStyle(style(mapStyle!!) {
-
-            TileServer.rasterSource?.let { rasterSource ->
-                +rasterSource
-            }
-
-            TileServer.rasterLayer?.let { rasterLayer ->
-                +rasterLayer
-            }
-
-            +image("home_black") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_black))
-            }
-
-            +image("home_blue") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_blue))
-            }
-
-            +image("home_green") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_green))
-            }
-
-            +image("home_light_blue") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_light_blue))
-            }
-
-            +image("home_orange") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_orange))
-            }
-
-            +image("home_purple") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_purple))
-            }
-
-            +image("home_red") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_red))
-            }
-
-            +image("multi_home_black") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_black))
-            }
-
-            +image("multi_home_blue") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_blue))
-            }
-
-            +image("multi_home_green") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_green))
-            }
-
-            +image("multi_home_light_blue") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_light_blue))
-            }
-
-            +image("multi_home_orange") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_orange))
-            }
-
-            +image("multi_home_purple") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_purple))
-            }
-
-            +image("multi_home_red") {
-                bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_red))
-            }
-
-            +symbolLayer("LAYER_ID", "SOURCE_ID") {
-                sourceLayer("SOURCE_LAYER_ID")
-                iconImage(
-                    switchCase {
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("home_black")
-                        }
-                        literal("home_black")
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("home_blue")
-                        }
-                        literal("home_blue")
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("home_green")
-                        }
-                        literal("home_green")
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("home_light_blue")
-                        }
-                        literal("home_light_blue")
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("home_orange")
-                        }
-                        literal("home_orange")
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("home_purple")
-                        }
-                        literal("home_purple")
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("home_red")
-                        }
-                        literal("home_red")
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("multi_home_black")
-                        }
-                        literal("multi_home_black")
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("multi_home_blue")
-                        }
-                        literal("multi_home_blue")
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("multi_home_green")
-                        }
-                        literal("multi_home_green")
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("multi_home_light_blue")
-                        }
-                        literal("multi_home_light_blue")
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("multi_home_orange")
-                        }
-                        literal("multi_home_orange")
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("multi_home_purple")
-                        }
-                        literal("multi_home_purple")
-                        eq {
-                            get {
-                                literal("POI")
-                            }
-                            literal("multi_home_red")
-                        }
-                        literal("multi_home_red")
-
-                        // Default case is to return an empty string so no icon will be loaded
-                        literal("home_green")
-                    }
-                )
-
-                iconAllowOverlap(true)
-                iconAnchor(IconAnchor.CENTER)
-            }
-
-            +geoJsonSource( "SOURCE_ID" ) {
-                this.data(geoJson.toString())
-                this.build()
-            }
-        }) {
-            completion( it )
-        }
-    }
-
-    fun createFeature( lat: Double, lon: Double, icon: String ) : JSONObject
-    {
-        val geometry = JSONObject()
-        geometry.put( "type", "Point" )
-
-        val coordinates = JSONArray()
-        coordinates.put( lon )
-        coordinates.put( lat )
-
-        geometry.put( "coordinates", coordinates )
-
-        val properties = JSONObject()
-        properties.put( "name", icon )
-        properties.put("POI", icon )
-
-        val feature = JSONObject()
-        feature.put( "type", "Feature" )
-        feature.put( "geometry", geometry )
-        feature.put( "properties", properties )
-
-        return feature
-    }
-
     override fun onResume()
     {
         super.onResume()
@@ -751,21 +536,6 @@ class CreateEnumerationAreaFragment : Fragment(),
                 refreshMap()
                 return true
             }
-//            else
-//            {
-//                val items = ArrayList<String>()
-//                items.add( resources.getString(R.string.rename ))
-//                items.add( resources.getString(R.string.delete ))
-//                items.add( resources.getString(R.string.attach_mbtiles ))
-//                items.add( resources.getString(R.string.detach_mbtiles ))
-//
-//                findEnumAreaOfLocation( getAllEnumAreas(), LatLng( point.latitude(), point.longitude()))?.let { enumArea ->
-//                    MultiConfirmationDialog( activity, resources.getString(R.string.select_task),
-//                        "", items, enumArea, this)
-//                }
-//
-//                return true
-//            }
         }
 
         return false
@@ -798,117 +568,20 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         val allEnumAreas = getAllEnumAreas()
 
-        val geoJson = JSONObject()
-        geoJson.put( "type", "FeatureCollection" )
-
-        features = JSONArray()
+        createAnnotationManagers()
 
         for (enumArea in allEnumAreas)
         {
-            for (location in enumArea.locations)
-            {
-                var resourceName = "home_black"
-
-                if (location.isLandmark)
-                {
-                    resourceName = "location_blue"
-                }
-                else if (location.enumerationItems.size == 1)
-                {
-                    if (location.enumerationItems.isNotEmpty())
-                    {
-                        val enumerationItem = location.enumerationItems[0]
-
-                        if (enumerationItem.samplingState == SamplingState.Sampled)
-                        {
-                            when( enumerationItem.collectionState )
-                            {
-                                CollectionState.Undefined -> resourceName = "home_light_blue"
-                                CollectionState.Incomplete -> resourceName = "home_orange"
-                                CollectionState.Complete -> resourceName = "home_purple"
-                            }
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Undefined)
-                        {
-                            resourceName = "home_black"
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                        {
-                            resourceName = "home_red"
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                        {
-                            resourceName = "home_green"
-                        }
-                    }
-                }
-                else
-                {
-                    for (enumerationItem in location.enumerationItems)
-                    {
-                        if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined)
-                        {
-                            resourceName = "home_light_blue"
-                            break
-                        }
-                    }
-
-                    if (resourceName == "home_black")
-                    {
-                        for (enumerationItem in location.enumerationItems)
-                        {
-                            if (enumerationItem.samplingState == SamplingState.Sampled)
-                            {
-                                if (enumerationItem.collectionState == CollectionState.Incomplete)
-                                {
-                                    resourceName = "multi_home_orange"
-                                    break
-                                }
-                                else if (enumerationItem.collectionState == CollectionState.Complete)
-                                {
-                                    resourceName = "multi_home_purple"
-                                }
-                            }
-                            else if (enumerationItem.enumerationState == EnumerationState.Undefined)
-                            {
-                                resourceName = "multi_home_black"
-                            }
-                            else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                            {
-                                resourceName = "multi_home_red"
-                                break
-                            }
-                            else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                            {
-                                resourceName = "multi_home_green"
-                            }
-                        }
-                    }
-                }
-
-                val feature = createFeature( location.latitude, location.longitude, resourceName )
-                features.put(feature)
+            enumArea.mapTileRegion?.let {
+                addPolygon(it)
             }
+
+            addPolygon(enumArea)
         }
 
-        geoJson.put( "features", features )
+        MapManager.instance().loadMarkers( activity!!, binding.mapboxMapView, allEnumAreas )
 
-        loadStyle( geoJson.toString() ) { style ->
-
-            style.addLayer(SymbolLayer("SOURCE_LAYER_ID", "SOURCE_ID"))
-
-            createAnnotationManagers()
-
-            for (enumArea in allEnumAreas) {
-                enumArea.mapTileRegion?.let {
-                    addPolygon(it)
-                }
-
-                addPolygon(enumArea)
-            }
-        }
-
-        binding.mapboxMapView.getMapboxMap().addOnCameraChangeListener( this )
+        binding.mapboxMapView.getMapboxMap().addOnCameraChangeListener(this)
     }
 
     fun getAllEnumAreas() : ArrayList<EnumArea>
@@ -1077,45 +750,6 @@ class CreateEnumerationAreaFragment : Fragment(),
                         }
                     }
                     else -> {}
-                }
-            }
-        }
-
-        return true
-    }
-
-    fun onTouchXXX(p0: View?, p1: MotionEvent?): Boolean
-    {
-        p1?.let { p1 ->
-            if (p1.action == MotionEvent.ACTION_UP)
-            {
-                polyLinePoints.clear()
-
-                polylineAnnotation?.let {
-                    it.points = polyLinePoints
-                    polylineAnnotationManager?.update(it)
-                }
-
-                refreshMap()
-            }
-            else
-            {
-                val point = binding.mapboxMapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
-                polyLinePoints.add( point )
-
-                if (polylineAnnotation == null)
-                {
-                    val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
-                        .withPoints(polyLinePoints)
-                        .withLineColor("#ee4e8b")
-                        .withLineWidth(5.0)
-
-                    polylineAnnotation = polylineAnnotationManager?.create(polylineAnnotationOptions)
-                }
-                else
-                {
-                    polylineAnnotation!!.points = polyLinePoints
-                    polylineAnnotationManager?.update(polylineAnnotation!!)
                 }
             }
         }
