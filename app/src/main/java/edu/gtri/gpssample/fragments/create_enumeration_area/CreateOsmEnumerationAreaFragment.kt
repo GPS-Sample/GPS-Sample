@@ -44,6 +44,7 @@ import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import io.github.dellisd.spatialk.geojson.FeatureCollection
+import io.github.dellisd.spatialk.geojson.Polygon
 import io.github.dellisd.spatialk.geojson.MultiPolygon
 import io.github.dellisd.spatialk.geojson.Point
 import kotlinx.coroutines.launch
@@ -962,6 +963,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                             feature.geometry?.let { geometry ->
                                 val items = ArrayList(feature.properties.keys)
                                 when (geometry) {
+                                    is Polygon,
                                     is MultiPolygon -> {
                                         DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), items ) { propertySelection ->
                                             if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
@@ -1069,15 +1071,24 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
             feature.geometry?.let { geometry ->
                 when( geometry ) {
+                    is Polygon,
                     is MultiPolygon -> {
-                        val multiPolygon = geometry as MultiPolygon
-
                         var creationDate = Date().time
-
                         val vertices = ArrayList<LatLon>()
 
-                        multiPolygon.coordinates[0][0].forEach { position ->
-                            vertices.add( LatLon( creationDate++, position.latitude, position.longitude ))
+                        if (geometry is Polygon)
+                        {
+                            geometry.coordinates[0].forEach { position ->
+                                vertices.add( LatLon( creationDate++, position.latitude, position.longitude ))
+                            }
+                        }
+                        else if (geometry is MultiPolygon)
+                        {
+                            val multiPolygon = geometry as MultiPolygon
+
+                            multiPolygon.coordinates[0][0].forEach { position ->
+                                vertices.add( LatLon( creationDate++, position.latitude, position.longitude ))
+                            }
                         }
 
                         val latLngBounds = GeoUtils.findGeobounds(vertices)

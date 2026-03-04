@@ -34,16 +34,6 @@ import com.google.android.gms.maps.model.*
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.maps.*
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
-import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
-import com.mapbox.maps.extension.style.expressions.dsl.generated.switchCase
-import com.mapbox.maps.extension.style.image.image
-import com.mapbox.maps.extension.style.layers.addLayer
-import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
-import com.mapbox.maps.extension.style.layers.generated.symbolLayer
-import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
-import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
-import com.mapbox.maps.extension.style.style
-import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
@@ -68,6 +58,7 @@ import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import io.github.dellisd.spatialk.geojson.FeatureCollection
+import io.github.dellisd.spatialk.geojson.Polygon
 import io.github.dellisd.spatialk.geojson.MultiPolygon
 import io.github.dellisd.spatialk.geojson.Point
 import kotlinx.coroutines.launch
@@ -955,6 +946,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                             feature.geometry?.let { geometry ->
                                 val items = ArrayList(feature.properties.keys)
                                 when (geometry) {
+                                    is Polygon,
                                     is MultiPolygon -> {
                                         DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), items ) { propertySelection ->
                                             if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
@@ -1077,15 +1069,24 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             feature.geometry?.let { geometry ->
                 when( geometry ) {
+                    is Polygon,
                     is MultiPolygon -> {
-                        val multiPolygon = geometry as MultiPolygon
-
                         var creationDate = Date().time
-
                         val vertices = ArrayList<LatLon>()
 
-                        multiPolygon.coordinates[0][0].forEach { position ->
-                            vertices.add( LatLon( creationDate++, position.latitude, position.longitude ))
+                        if (geometry is Polygon)
+                        {
+                            geometry.coordinates[0].forEach { position ->
+                                vertices.add( LatLon( creationDate++, position.latitude, position.longitude ))
+                            }
+                        }
+                        else if (geometry is MultiPolygon)
+                        {
+                            val multiPolygon = geometry as MultiPolygon
+
+                            multiPolygon.coordinates[0][0].forEach { position ->
+                                vertices.add( LatLon( creationDate++, position.latitude, position.longitude ))
+                            }
                         }
 
                         val latLngBounds = GeoUtils.findGeobounds(vertices)
@@ -1120,6 +1121,14 @@ class CreateEnumerationAreaFragment : Fragment(),
                             else
                             {
                                 enumArea.name = enumArea.name + "-[" + strata.name + "]"
+                            }
+                        }
+
+                        activity!!.runOnUiThread {
+                            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                                MapManager.instance().stopCenteringOnLocation( binding.mapboxMapView )
+                                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                                MapManager.instance().centerMap( enumArea, currentZoomLevel, binding.mapboxMapView )
                             }
                         }
 
