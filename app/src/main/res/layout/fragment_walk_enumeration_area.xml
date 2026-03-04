@@ -52,6 +52,19 @@
                     android:layout_gravity="top|end"
                     app:srcCompat="@drawable/compass_icon"/>
 
+                <TextView
+                    android:id="@+id/osm_label"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:layout_gravity="bottom|start"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:text="OSM"
+                    android:textStyle="normal" />
+
                 <View
                     android:id="@+id/map_overlay_view"
                     android:layout_width="match_parent"
@@ -59,18 +72,37 @@
                 </View>
             </FrameLayout>
 
-            <TextView
-                android:id="@+id/legend_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:gravity="center_vertical|center_horizontal"
-                android:layout_gravity="top|start"
-                android:text="@string/legend"
+            <LinearLayout
+                android:orientation="horizontal"
+                android:background="#40FFFFFF"
                 android:layout_marginTop="30dp"
                 android:layout_marginStart="10dp"
-                android:textColor="@color/blue"
-                android:textSize="15sp"
-                android:textStyle="normal" />
+                android:layout_gravity="top|start"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp">
+
+                <TextView
+                    android:id="@+id/legend_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="0dp"
+                    android:text="@string/legend"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+
+                <ImageView
+                    android:id="@+id/legend_image_view"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="10dp"
+                    app:srcCompat="@drawable/info2" />
+            </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -173,7 +205,7 @@
                 android:layout_margin="5dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:background="@drawable/location_bubble" />
+                android:background="@drawable/location_bubble_primary" />
 
             <Space
                 android:layout_margin="5dp"

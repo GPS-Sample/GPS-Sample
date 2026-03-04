@@ -86,7 +86,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     private var editMode = false
-    private var features = JSONArray()
     private val binding get() = _binding!!
     private var showCurrentLocation = false
     private var inputDialog: InputDialog? = null

@@ -166,11 +166,17 @@ class CreateStudyModel {
         _currentStudy?.value?.fields?.let { fields ->
             for (field in fields)
             {
-                fieldList.add( field.name )
-                field.fields?.let { blockFields ->
-                    for (blockField in blockFields)
-                    {
-                        fieldList.add( blockField.name )
+                if (field.type != FieldType.Note)
+                {
+                    fieldList.add( field.name )
+                    field.fields?.let { blockFields ->
+                        for (blockField in blockFields)
+                        {
+                            if (blockField.type != FieldType.Note)
+                            {
+                                fieldList.add( blockField.name )
+                            }
+                        }
                     }
                 }
             }

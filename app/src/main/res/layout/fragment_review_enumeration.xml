@@ -69,6 +69,7 @@
 
         <LinearLayout
             android:orientation="horizontal"
+            android:background="#40FFFFFF"
             android:layout_marginTop="30dp"
             android:layout_marginStart="10dp"
             android:layout_gravity="top|start"
@@ -80,21 +81,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:gravity="center_vertical|center_horizontal"
+                android:paddingStart="10dp"
+                android:paddingEnd="0dp"
                 android:text="@string/legend"
-                android:textColor="@color/primary_textcolor"
+                android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="normal" />
 
             <ImageView
                 android:id="@+id/legend_image_view"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_marginStart="5dp"
-                android:layout_marginTop="10dp"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                app:srcCompat="@drawable/help2"/>
+                android:layout_marginTop="5dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="10dp"
+                app:srcCompat="@drawable/info2" />
         </LinearLayout>
 
         <LinearLayout
+            android:visibility="gone"
             android:orientation="horizontal"
             android:layout_gravity="top|end"
             android:layout_marginEnd="10dp"
@@ -131,6 +137,7 @@
         </LinearLayout>
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/location_text_view"
             android:layout_width="wrap_content"
             android:layout_height="40dp"

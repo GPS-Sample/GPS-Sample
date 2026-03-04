@@ -579,7 +579,7 @@ class MapManager
                 fillPaint.color = fillColor
                 fillPaint.alpha = fillOpacity
                 outlinePaint.color = borderColor
-                outlinePaint.strokeWidth = 4f
+                outlinePaint.strokeWidth = 5f
             }
 
             mapView.overlays.add(polygon)

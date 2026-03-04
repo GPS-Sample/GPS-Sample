@@ -89,6 +89,7 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_marginTop="30dp"
+            android:background="#40FFFFFF"
             android:layout_marginStart="10dp"
             android:layout_gravity="top|start"
             android:layout_width="wrap_content"
@@ -99,22 +100,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:gravity="center_vertical|center_horizontal"
+                android:paddingStart="10dp"
+                android:paddingEnd="0dp"
                 android:text="@string/legend"
-                android:textColor="@color/primary_textcolor"
+                android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="normal" />
 
             <ImageView
                 android:id="@+id/legend_image_view"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_marginStart="5dp"
-                android:layout_marginTop="10dp"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                app:srcCompat="@drawable/help2"/>
+                android:layout_marginTop="5dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="10dp"
+                app:srcCompat="@drawable/info2" />
         </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
+            android:background="#40FFFFFF"
             android:layout_gravity="top|end"
             android:layout_marginEnd="10dp"
             android:layout_width="wrap_content"
@@ -123,6 +129,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="0dp"
                 android:gravity="center_vertical|center_horizontal"
                 android:textColor="@color/black"
                 android:text="@string/accuracy"
@@ -143,6 +151,8 @@
                 android:id="@+id/accuracy_value_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="10dp"
                 android:gravity="center_vertical|center_horizontal"
                 android:textColor="@color/black"
                 android:textSize="15sp"
@@ -165,13 +175,15 @@
             android:id="@+id/location_text_view"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:layout_marginEnd="10dp"
-            android:gravity="center_vertical|center_horizontal"
             android:layout_gravity="bottom|end"
+            android:layout_marginEnd="10dp"
+            android:background="#40FFFFFF"
+            android:gravity="center_vertical|center_horizontal"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
             android:textColor="@color/black"
             android:textSize="15sp"
-            android:textStyle="normal" />
-    </FrameLayout>
+            android:textStyle="normal" />    </FrameLayout>
 
     <View
         android:background="@color/light_gray"
@@ -258,7 +270,7 @@
             android:layout_margin="5dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:background="@drawable/location_bubble" />
+            android:background="@drawable/location_bubble_primary" />
 
         <Button
             android:id="@+id/add_household_button"

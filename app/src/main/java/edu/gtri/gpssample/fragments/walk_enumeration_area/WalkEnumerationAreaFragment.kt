@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -66,7 +67,7 @@ class WalkEnumerationAreaFragment : Fragment(),
 
     private var isRecording = false
     private val binding get() = _binding!!
-    private var showCurrentLocation = true
+    private var showCurrentLocation = false
     private var currentGPSAccuracy: Int? = null
     private var startPoint: com.mapbox.geojson.Point? = null
     private var currentGPSLocation: com.mapbox.geojson.Point? = null
@@ -115,9 +116,17 @@ class WalkEnumerationAreaFragment : Fragment(),
             return
         }
 
+        binding.legendTextView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
+        binding.legendImageView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
         binding.centerOnLocationButton.backgroundTintList?.let {
             defaultColorList = it
-            binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+//            binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
         }
 
         if (config.enumAreas.isNotEmpty() && config.enumAreas[0].mbTilesPath.isNotEmpty())
@@ -131,23 +140,38 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom,this ) { mapView ->
             this.mapView = mapView
+
             MapManager.instance().enableLocationUpdates( activity!!, mapView )
-//            binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
+            binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
 
             if (config.enumAreas.isNotEmpty())
             {
-                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+//                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
                 sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                     MapManager.instance().centerMap( config.enumAreas[0], currentZoomLevel, mapView )
                 }
             }
             else
             {
-                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
+                if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                {
+                    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                        if (location != null)
+                        {
+                            val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
+                            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                                MapManager.instance().centerMap( point, currentZoomLevel, mapView )
+                            }
+                        }
+                    }
                 }
+//                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+//                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+//                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+//                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
+//                }
             }
 
             refreshMap()

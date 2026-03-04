@@ -116,6 +116,7 @@
                 </FrameLayout>
 
                 <LinearLayout
+                    android:visibility="gone"
                     android:orientation="horizontal"
                     android:layout_marginTop="30dp"
                     android:layout_marginStart="10dp"

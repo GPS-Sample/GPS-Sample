@@ -7,8 +7,10 @@
 
 package edu.gtri.gpssample.fragments.configuration
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
@@ -18,11 +20,13 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.location.LocationServices
 import com.mapbox.geojson.Point
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
@@ -46,6 +50,7 @@ import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
+import org.osmdroid.views.MapView
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -255,25 +260,22 @@ class ConfigurationFragment : Fragment(),
             val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
 
             MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom ) { mapView ->
-                MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
-                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
-                }
+                binding.osmLabel.visibility = if (mapView is MapView) View.VISIBLE else View.GONE
 
-//                if (config.enumAreas.isNotEmpty())
-//                {
-//                    sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-//                        MapManager.instance().centerMap( config.enumAreas[0], currentZoomLevel, mapView )
-//                    }
-//                }
-//                else
-//                {
-//                    sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-//                        MapManager.instance().centerMap( Point.fromLngLat( MapManager.GEORGIA_TECH.longitude, MapManager.GEORGIA_TECH.latitude), currentZoomLevel, mapView )
-//                    }
-//                }
+                if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                {
+                    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                        if (location != null)
+                        {
+                            val point = Point.fromLngLat( location.longitude, location.latitude )
+                            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                                MapManager.instance().centerMap( point, currentZoomLevel, mapView )
+                            }
+                        }
+                    }
+                }
             }
 
             val items = ArrayList<String>()
