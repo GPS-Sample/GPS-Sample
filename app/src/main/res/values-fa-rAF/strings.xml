@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <string name="app_name">GPSSample</string>
+    <string name="action_settings">"تنظیمات"</string>
+    <string name="action_sign_out">"خروج"</string>
+    <string name="next">"بعدی"</string>
+    <string name="previous">"قبلی"</string>
+    <string name="manager">"مدیر"</string>
+    <string name="client">"شمارش"</string>
+    <string name="connected_clients">"مشتریان متصل"</string>
+    <string name="create_hotspot">"ایجاد نقطه داغ"</string>
+    <string name="create_server">"سرور بسازید"</string>
+    <string name="create_qr_code">"کد QR ایجاد کنید"</string>
+    <string name="connect_hotspot">"اتصال به هات"</string>
+    <string name="registering_device">"ثبت دستگاه"</string>
+    <string name="sending_command">"فرمان ارسال"</string>
+    <string name="sending_enum_data">"ارسال داده"</string>
+    <string name="receiving_data">"دریافت داده"</string>
+    <string name="configuration_received">"پیکربندی دریافت شد"</string>
+    <string name="admin">"مدیر"</string>
+    <string name="supervisor">"سرپرست"</string>
+    <string name="enumerator">"مشمول"</string>
+    <string name="surveyor">"نقشه"</string>
+    <string name="configurations">"پیکربندی"</string>
+    <string name="no_configurations">"شما هیچ پیکربندی ندارید"</string>
+    <string name="no_studies">"شما هیچ مطالعه"</string>
+    <string name="data_collector">"داده"</string>
+    <string name="scan_qr_code">"اسکن کد QR"</string>
+    <string name="continue_with_existing_study">"به مطالعهٔ موجود ادامه دهید"</string>
+    <string name="admin_sign_in">"ورود مدیر"</string>
+    <string name="supervisor_sign_in">"ورود سرپرست"</string>
+    <string name="data_collector_sign_in">"ورود جمع"</string>
+    <string name="admin_sign_up">"مدیر ثبت"</string>
+    <string name="supervisor_sign_up">"ثبت"</string>
+    <string name="data_collector_sign_up">"ثبت"</string>
+    <string name="enter_your_pin">"شماره رمز خود را وارد کنید"</string>
+    <string name="reenter_your_pin">"کد پین خود را دوباره وارد کنید"</string>
+    <string name="back">"بازگشت"</string>
+    <string name="cancel">"لغو"</string>
+    <string name="finish">"پایان"</string>
+    <string name="save">"ذخیره"</string>
+    <string name="done">"انجام شد"</string>
+    <string name="select_role">"نقش خود را انتخاب کنید"</string>
+    <string name="admin_select_role">"مدیر نقش را انتخاب کنید"</string>
+    <string name="supervisor_select_role">"انتخاب نقش سرپرست"</string>
+    <string name="sign_in">"ورود"</string>
+    <string name="sign_up">"ثبت"</string>
+    <string name="sign_out">"خروج"</string>
+    <string name="not_registered">"ثبت"</string>
+    <string name="name">"نام"</string>
+    <string name="enter_your_name">"نام خود را وارد کنید"</string>
+    <string name="pin">"پین"</string>
+    <string name="forgot_pin_question">"سؤال پین فراموش شد"</string>
+    <string name="forgot_pin_answer">"پاسخ پین فراموش شد"</string>
+    <string name="enter_your_answer">"پاسخ خود را وارد کنید"</string>
+    <string name="create_config">"ایجاد پیکربندی"</string>
+    <string name="delete_config">"حذف پیکربندی"</string>
+    <string name="edit_config">"ویرایش پیکربندی"</string>
+    <string name="create_study">"ایجاد مطالعه"</string>
+    <string name="edit_study">"ویرایش مطالعه"</string>
+    <string name="delete_study">"حذف مطالعه"</string>
+    <string name="create_field">"ایجاد میدان"</string>
+    <string name="config_name">"نام پیکربندی"</string>
+    <string name="study_name">"نام مطالعه"</string>
+    <string name="field_name">"نام فیلد"</string>
+    <string name="enumeration_fields">"فیلدهای فهرست"</string>
+    <string name="enter_config_name">"نام پیکربندی را وارد کنید"</string>
+    <string name="enter_study_name">"نام مطالعه را وارد کنید"</string>
+    <string name="enter_field_name">"نام رشته را وارد کنید"</string>
+    <string name="preferred_units">"واحدهای ترجیحی"</string>
+    <string name="date_format">"قالب تاریخ"</string>
+    <string name="time_format">"قالب زمان"</string>
+    <string name="manage_enumerators">"مدیریت شمارنده"</string>
+    <string name="collect_enumerations">"جمع"</string>
+    <string name="generate_sample">"تولید نمونه"</string>
+    <string name="collect_samples">"جمع"</string>
+    <string name="min_gps_precision">"دقت GPS مورد نظر"</string>
+    <string name="enter_min_gps_precision">"دقت مورد نظر GPS را وارد کنید"</string>
+    <string name="define_enumeration_fields">"تعریف فیلدهای شمارش"</string>
+    <string name="define_enumeration_area">"تعریف ناحیه شمارش"</string>
+    <string name="define_sampling_method">"روش نمونه"</string>
+    <string name="studies">"مطالعات"</string>
+    <string name="barcode_result">"بارکد شناسایی شد"</string>
+    <string name="error_scanner_cancelled">"اسکنر کد لغو شد."</string>
+    <string name="error_camera_permission_not_granted">"اجازهٔ دوربین داده نشده است."</string>
+    <string name="error_app_name_unavailable">"نام اپ تعیین نشده است."</string>
+    <string name="error_default_message">"اسکن کد ناموفق بود:"</string>
+    <string name="menu_item_settings">"تنظیمات"</string>
+    <string name="change_role">"تغییر نقش"</string>
+    <string name="enter_your_user_name">"نام کاربری خود را وارد کنید"</string>
+    <string name="field_type">"نوع میدان"</string>
+    <string name="enter_checkbox_text">"متن مورد چک"</string>
+    <string name="enter_dropdown_item_text">"متن مورد لیست کشویی را وارد کنید"</string>
+    <string name="add_another">"یک مورد دیگر اضافه کنید"</string>
+    <string name="delete_field">"حذف میدان"</string>
+    <string name="manage_this_study">"این مطالعه را مدیریت کنید"</string>
+    <string name="manage_study">"مدیریت مطالعه"</string>
+    <string name="manage_configuration">"مدیریت پیکربندی"</string>
+    <string name="manage_configurations">"مدیریت پیکربندی"</string>
+    <string name="generate_qr_code">"کد QR تولید کنید"</string>
+    <string name="create_filter">"ایجاد فیلتر"</string>
+    <string name="create_rule">"قانون ایجاد کنید"</string>
+    <string name="enter_rule_name">"نام قاعده را وارد کنید"</string>
+    <string name="field">"میدان"</string>
+    <string name="operator">"اپراتور"</string>
+    <string name="enter_value">"مقدار را وارد کنید"</string>
+    <string name="value">"ارزش"</string>
+    <string name="rule">"قانون"</string>
+    <string name="connector">"اتصال"</string>
+    <string name="sampling_method">"روش نمونه"</string>
+    <string name="enter_filter_name">"نام فیلتر را وارد کنید"</string>
+    <string name="sample_size">"اندازه نمونه"</string>
+    <string name="filter_name">"نام فیلتر"</string>
+    <string name="rule_name">"نام قاعده"</string>
+    <string name="total_sample_size">"تعداد کل نمونه در تمام خوشه"</string>
+    <string name="manage_studies">"مدیریت مطالعات"</string>
+    <string name="manage_samples">"مدیریت نمونه"</string>
+    <string name="create_sample">"ایجاد نمونه"</string>
+    <string name="delete_sample">"حذف نمونه"</string>
+    <string name="manage_supervisors">"مدیریت سرپرستان"</string>
+    <string name="home">"خانه"</string>
+    <string name="manage_enumeration_areas">"مدیریت حوزه"</string>
+    <string name="please_confirm">"لطفاً تأیید کنید"</string>
+    <string name="import_enumeration">"وارد کردن داده"</string>
+    <string name="export_configuration">"صادرات پیکربندی"</string>
+    <string name="delete_study_message">"آیا مطمئن هستید که می"</string>
+    <string name="delete_field_message">"آیا مطمئن هستید که می"</string>
+    <string name="delete_rule_message">"آیا مطمئن هستید که می"</string>
+    <string name="delete_team_message">"آیا مطمئن هستید که می"</string>
+    <string name="delete_configuration_message">"آیا مطمئن هستید که می"</string>
+    <string name="delete_household_message">"آیا مطمئن هستید که می"</string>
+    <string name="create_field_rule_message">"شما باید حداقل یک فیلد ایجاد کنید تا بتوانید یک قاعده بسازید"</string>
+    <string name="create_rule_filter_message">"شما باید حداقل یک قاعده ایجاد کنید تا بتوانید یک فیلتر بسازید"</string>
+    <string name="select_import_method_message">"انتخاب روش وارد کردن"</string>
+    <string name="select_export_message">"انتخاب روش صادر کردن"</string>
+    <string name="clear_selections_message">"آیا مطمئن هستید که می"</string>
+    <string name="team_name_message">"شما باید نام یک تیم را وارد کنید"</string>
+    <string name="configuration_documents_message">"پیکربندی در پوشهٔ Documents ذخیره شد."</string>
+    <string name="delete_enum_area_message">"آیا مطمئن هستید که می"</string>
+    <string name="no_study_ea">"شما هیچ مطالعه"</string>
+    <string name="filename_export_message">"یک نام فایل برای صادر کردن وارد کنید"</string>
+    <string name="select_task">"یک وظیفه را انتخاب کنید"</string>
+    <string name="yes">"بله"</string>
+    <string name="no">"خیر"</string>
+    <string name="qr_code">"کد QR"</string>
+    <string name="file_system">"سیستم فایل"</string>
+    <string name="survey">"نظرسنجی"</string>
+    <string name="undefined">"تعریف نشده"</string>
+    <string name="enter_name">"لطفاً یک نام وارد کنید"</string>
+    <string name="desired_gps_position">"لطفاً حداقل دقت GPS مورد نظر را وارد کنید"</string>
+    <string name="import_configuration">"واردات پیکربندی"</string>
+    <string name="select_import_method">"انتخاب روش وارد کردن"</string>
+    <string name="select_configuration">"انتخاب پیکربندی"</string>
+    <string name="home_not_exist">"خانوار وجود ندارد"</string>
+    <string name="reason_incomplete">"اوه! لطفاً دلیلی برای ناقص بودن انتخاب کنید."</string>
+    <string name="enter_enum_area_name">"نام ناحیه شمارش را وارد کنید"</string>
+    <string name="select_enumeration">"یک ناحیه شمارش را انتخاب کنید"</string>
+    <string name="select_time">"زمان را انتخاب کنید"</string>
+    <string name="select_date">"تاریخ را انتخاب کنید"</string>
+    <string name="your_pin_is">"پین شما:"</string>
+    <string name="incorrect_answer_message">"اوه! پاسخ نادرست است.  لطفاً دوباره تلاش کنید."</string>
+    <string name="enter_other_question">"سؤال دیگر را وارد کنید"</string>
+    <string name="reenter_pin">"لطفاً پین را دوباره وارد کنید"</string>
+    <string name="enter_pin">"لطفاً یک پین وارد کنید"</string>
+    <string name="other_question">"سؤال دیگر"</string>
+    <string name="enter_answer">"لطفاً یک پاسخ وارد کنید."</string>
+    <string name="pin_not_match">"پین"</string>
+    <string name="enter_file_name">"شما باید یک نام فایل وارد کنید"</string>
+    <string name="pin_incorrect">"پین فعلی نادرست است"</string>
+    <string name="config_not_found">"خطای مرگبار! پیکربندی یافت نشد."</string>
+    <string name="missing_parameter_rule">"خطای مرگبار! پارامتر مورد نیاز: rule مفقود است."</string>
+    <string name="ok">"باشه"</string>
+    <string name="wifi_disabled">"وای"</string>
+    <string name="wifi_disabled_message">"وای"</string>
+    <string name="additional_info">"اطلاعات اضافی"</string>
+    <string name="incomplete">"نامکمل"</string>
+    <string name="does_not_exist">"وجود ندارد"</string>
+    <string name="other">"سایر"</string>
+    <string name="notes">"یادداشت"</string>
+    <string name="oops">"اوه!"</string>
+    <string name="field_is_required">"این فیلد الزامی است"</string>
+    <string name="number">"شماره"</string>
+    <string name="text">"فیلد متنی"</string>
+    <string name="checkbox">"تیک"</string>
+    <string name="connected">"متصل"</string>
+    <string name="forgot_pin">"رمز PIN را فراموش کرده"</string>
+    <string name="reset_pin">"بازنشانی رمز PIN"</string>
+    <string name="personally_identifiable">"اطلاعات قابل شناسایی شخصی"</string>
+    <string name="integer_only">"تنها عدد صحیح"</string>
+    <string name="required">"الزامی"</string>
+    <string name="time">"زمان"</string>
+    <string name="date">"تاریخ"</string>
+    <string name="dropdown">"لیست کشویی"</string>
+    <string name="fields">"میدان"</string>
+    <string name="rules">"قوانین"</string>
+    <string name="simple_random">"نمونه گیری تصادفی ساده"</string>
+    <string name="cluster_sampling">"نمونه گیری خوشه"</string>
+    <string name="subset_overlap">"زیرمجموعه"</string>
+    <string name="strata_exclusive">"طبقات: به"</string>
+    <string name="numberhouseholds">"تعداد خانوارها"</string>
+    <string name="percenthouseholds">"درصد خانوارها"</string>
+    <string name="percenttotal">"درصد کل جمعیت"</string>
+    <string name="equal">"مساوی"</string>
+    <string name="not_equal">"نامساوی"</string>
+    <string name="less_than">"کمتر از"</string>
+    <string name="greater_than">"بزرگ"</string>
+    <string name="greater_than_equal">"بزرگ"</string>
+    <string name="add_condition">"افزودن شرط"</string>
+    <string name="select_rule">"قانون انتخاب"</string>
+    <string name="teams">"تیم"</string>
+    <string name="select_location">"مکان انتخاب"</string>
+    <string name="current_location">"جاری"</string>
+    <string name="tap_the_map">"برای افزودن مکان جدید، روی نقشه ضربه بزنید"</string>
+    <string name="complete">"تکمیل شد"</string>
+    <string name="reason_incomplete_label">"دلیل تکمیل نشدن"</string>
+    <string name="warning">"هشدار!"</string>
+    <string name="duplicate_warning">"افزودن این مکان جدید بسیار به یک مکان موجود نزدیک است.  آیا مطمئن هستید که می"</string>
+    <string name="missing_team">"در پیکربندی تعریف تیم وجود ندارد."</string>
+    <string name="collection_teams">"تیم"</string>
+    <string name="begin_field_block">"شروع بلوک فیلد"</string>
+    <string name="save_and_end_block">"ذخیره و پایان بلوک"</string>
+    <string name="add_another_field">"ذخیره و افزودن فیلد دیگر"</string>
+    <string name="current_location_not_set">"مکان فعلی تنظیم نشده است"</string>
+    <string name="option_item_name">"نام آیتم گزینه را وارد کنید"</string>
+    <string name="export_collection_data">"صادرات داده"</string>
+    <string name="import_field_data">"واردات داده"</string>
+    <string name="select_a_date">"تاریخ را انتخاب کنید"</string>
+    <string name="select">"انتخاب کنید"</string>
+    <string name="team_name">"نام تیم"</string>
+    <string name="launch_survey">"شروع نظرسنجی"</string>
+    <string name="mark_as_incomplete">"به"</string>
+    <string name="enter_current_pin">"پین فعلی را وارد کنید"</string>
+    <string name="enter_new_pin">"پین جدید را دوباره وارد کنید"</string>
+    <string name="re_enter_new_pin">"پین جدید را دوباره وارد کنید"</string>
+    <string name="select_a_time">"انتخاب زمان"</string>
+    <string name="UUID">"UUID"</string>
+    <string name="latitude">"عرض جغرافیایی"</string>
+    <string name="longitude">"طول جغرافیایی"</string>
+    <string name="last_updated">"آخرین به"</string>
+    <string name="status">"وضعیت"</string>
+    <string name="description">"توضیحات"</string>
+    <string name="add_image">"افزودن تصویر"</string>
+    <string name="enumeration_areas">"مناطق شمارش"</string>
+    <string name="enter_team_name">"نام تیم را وارد کنید"</string>
+    <string name="assign_households">"خانوارها را تخصیص دهید"</string>
+    <string name="sampling_type">"نوع نمونه"</string>
+    <string name="generating_qr_code">"در حال تولید کد QR…"</string>
+    <string name="samples">"نمونه"</string>
+    <string name="you_don_t_have_any_samples_for_this_study">"شما برای این مطالعه هیچ نمونه"</string>
+    <string name="enum_saved_doc">"شمارش به پوشه اسناد ذخیره شد."</string>
+    <string name="config_saved_doc">"پیکربندی به پوشه اسناد ذخیره شد."</string>
+    <string name="nobody_home">"هیچ"</string>
+    <string name="export_enum_data">"صادرات داده"</string>
+    <string name="delete_landmark_message">"آیا مطمئن هستید که می"</string>
+    <string name="subaddress">"زیرآدرس"</string>
+    <string name="sampled">"نمونه برداری شده"</string>
+    <string name="completed_enumeration">"فهرست"</string>
+    <string name="incomplete_enumeration">"فهرست"</string>
+    <string name="dismiss">"رد کردن"</string>
+    <string name="delete">"حذف"</string>
+    <string name="launching_odk_collect_application">"راه"</string>
+    <string name="filters">"فیلترها (ترکیب قواعد)"</string>
+    <string name="new_location">"مکان را شناسایی کنید"</string>
+    <string name="delete_configuration">"پیکربندی فعلی با واردات جایگزین خواهد شد.  آیا مایل به ادامه هستید؟"</string>
+    <string name="total_population">"اندازه کل جمعیت"</string>
+    <string name="enter_the_total_population_size">"اندازه کل جمعیت را وارد کنید"</string>
+    <string name="total_population_size_error">"اندازه کل جمعیت باید بزرگتر از صفر باشد"</string>
+    <string name="sample_size_error">"اندازه نمونه باید از صفر بزرگتر باشد"</string>
+    <string name="simple_random_sampling_label">"مجموع اندازه نمونه در تمام خوشه"</string>
+    <string name="cluster_sampling_label">"اندازه نمونه برای هر خوشه"</string>
+    <string name="show_enumeration_info">"نمایش اطلاعات شمارش"</string>
+    <string name="please_enter_a_name">"لطفاً برای این فیلد یک نام وارد کنید."</string>
+    <string name="please_enter_a_subaddress">"لطفاً یک زیرآدرس منحصربه"</string>
+    <string name="please_select_team_boundary">"لطفاً مرز تیم را انتخاب کنید."</string>
+    <string name="enum_area_name_property">"مقدار خاصیت نام ناحیه شمارش را وارد کنید."</string>
+    <string name="downloading_map_tiles">"در حال دانلود کاشی"</string>
+    <string name="style_pack_download_failed">"دانلود بسته سبک نقشه ناموفق بود"</string>
+    <string name="tile_pack_download_failed">"دانلود بسته کاشی"</string>
+    <string name="download_map_tiles_now">"آیا می"</string>
+    <string name="delete_map_tile_region">"مطمئنید می"</string>
+    <string name="import_enumeration_area">"وارد کردن منطقه شمارش"</string>
+    <string name="create_enumeration_area">"ایجاد منطقه شمارش"</string>
+    <string name="add_household">"افزودن خانوار"</string>
+    <string name="define_map_tile_cache_region">"تعریف ناحیهٔ کش کاشی نقشه"</string>
+    <string name="download_map_tiles">"دانلود کاشی"</string>
+    <string name="center_on_location">"مرکز بر روی مکان"</string>
+    <string name="less_than_equal">"کمتر یا مساوی"</string>
+    <string name="gps_accuracy_error">"دقت GPS کمتر از دقت مورد نیاز است"</string>
+    <string name="gps_location_error">"شما در حال حاضر از این مکان بسیار دور هستید"</string>
+    <string name="good">"خوب"</string>
+    <string name="poor">"بد"</string>
+    <string name="unknown">"نامعلوم"</string>
+    <string name="legend">"افسانه"</string>
+    <string name="select_date_type">"لطفاً نوع تاریخ را انتخاب کنید"</string>
+    <string name="contains">"حاوی"</string>
+    <string name="collection_saved_doc">"مجموعه در دایرکتوری اسناد ذخیره شد"</string>
+    <string name="invalid_operator">"عملگر انتخاب"</string>
+    <string name="about_gpssample">"درباره GPSSample"</string>
+    <string name="privacy_statement">"بیانیه حریم خصوصی"</string>
+    <string name="terms_and_conditions">"شرایط و ضوابط"</string>
+    <string name="show_map">"نمایش نقشه"</string>
+    <string name="number_of_residents">"تعداد ساکنان"</string>
+    <string name="end_user_license_agreement">"قرارداد مجوز کاربر نهایی"</string>
+    <string name="code_of_conduct">"آیین"</string>
+    <string name="clear_map">"مطمئن هستید که می"</string>
+    <string name="delete_point">"مطمئن هستید که می"</string>
+    <string name="enumeration_area">"منطقه شمارش"</string>
+    <string name="please_select_a_role">"لطفاً یک نقش را انتخاب کنید"</string>
+    <string name="please_enter_your_user_name">"لطفاً نام کاربری خود را وارد کنید"</string>
+    <string name="user_name_not_found">"نام کاربری یافت نشد"</string>
+    <string name="multi_families">"چند خانوار"</string>
+    <string name="is_multi_family">"آیا این یک مکان چند خانواری است؟"</string>
+    <string name="sample">"نمونه"</string>
+    <string name="mark_status">"وضعیت علامت"</string>
+    <string name="not_visited">"بازدید نشده"</string>
+    <string name="incomplete_collection">"نظرسنجی ناقص"</string>
+    <string name="completed_collection">"نظرسنجی تکمیل شده"</string>
+    <string name="accuracy">"دقت:"</string>
+    <string name="subaddress_is_required">"زیرآدرس الزامی است"</string>
+    <string name="auto_increment_subaddress">"افزایش خودکار زیرآدرس"</string>
+    <string name="allow_manual_identification_of_locations">"اجازه شناسایی دستی مکان"</string>
+    <string name="proximity_warning_enabled">"هشدار نزدیکی فعال است"</string>
+    <string name="encryption_password">"رمز عبور رمزگذاری"</string>
+    <string name="enter_encryption_password">"رمز عبور رمزگذاری را وارد کنید"</string>
+    <string name="summary">"خلاصه"</string>
+    <string name="num_enumeration_areas">"تعداد حوزه"</string>
+    <string name="num_hhs_enumerated">"تعداد خانوارهای سرشماری"</string>
+    <string name="num_hhs_eligible">"تعداد خانوارهای واجد شرایط:"</string>
+    <string name="num_hhs_sampled">"تعداد خانواده"</string>
+    <string name="num_hhs_surveyed">"تعداد خانواده"</string>
+    <string name="num_hhs_remaining_to_survey">"تعداد خانوارهای باقی"</string>
+    <string name="decryption_failed">"رمزگشایی ناموفق بود.  لطفاً دوباره تلاش کنید."</string>
+    <string name="rename_or_delete">"آیا می"</string>
+    <string name="rename">"نام"</string>
+    <string name="map_tile_boundary">"طول و عرض (کیلومتر) ناحیه کاشی نقشه مورد نظر را وارد کنید."</string>
+    <string name="success">"موفقیت!"</string>
+    <string name="error">"خطا!"</string>
+    <string name="import_succeeded">"واردات با موفقیت انجام شد."</string>
+    <string name="clear_map_tile_region">"منطقهٔ کش کاشی نقشه را پاک کنید"</string>
+    <string name="import_request_failed">"در حال انتظار برای درخواست واردات، درخواست صادرات دریافت شد"</string>
+    <string name="export_request_failed">"در حال انتظار برای درخواست صادرات، درخواست واردات دریافت شد"</string>
+    <string name="network_connection">"اتصال شبکه"</string>
+    <string name="enumerated">"شمارش"</string>
+    <string name="surveyed">"پیمایش"</string>
+    <string name="meters">"مترها"</string>
+    <string name="feet">"پا"</string>
+    <string name="kilometers">"کیلومتر"</string>
+    <string name="miles">"مایل"</string>
+    <string name="importing_locations">"در حال وارد کردن مکان"</string>
+    <string name="saving_configuration">"در حال ذخیره پیکربندی…"</string>
+    <string name="polygon_is_self_intersecting">"چندضلعی که بر اساس این نقاط ساخته شود، خودبه"</string>
+    <string name="no_eligible_households">"هیچ خانوار واجد شرایط برای نمونه"</string>
+    <string name="walk_enumeration_area">"پیمایش ناحیه شمارش"</string>
+    <string name="mark_current_location">"علامت"</string>
+    <string name="delete_last_location">"حذف آخرین موقعیت"</string>
+    <string name="clear_map_and_start_over">"نقشه را پاک کنید و دوباره شروع کنید"</string>
+    <string name="image_size_warning">"شما بیش از ۲۵ مگابایت دادهٔ تصویر را فراتر برده"</string>
+    <string name="subaddress_start">"شمارهٔ اولیهٔ زیرآدرس را وارد کنید"</string>
+    <string name="creation_options">"گزینه"</string>
+    <string name="set_location">"محدودیت"</string>
+    <string name="set_boundary">"کشیدن مرز"</string>
+    <string name="update_boundary">"به"</string>
+    <string name="location_image">"تصویر مکان"</string>
+    <string name="review_all_teams">"بازبینی همه تیم"</string>
+    <string name="config_saved">"پیکربندی ذخیره شد."</string>
+    <string name="select_file_location">"مکان فایل را انتخاب کنید"</string>
+    <string name="default_location">"مکان پیش"</string>
+    <string name="let_me_choose">"بگذار انتخاب کنم"</string>
+    <string name="boundary_is_self_intersecting">"مرز این ناحیه شمارش خودبه"</string>
+    <string name="select_the_property_identifier">"متغیر نام خوشه را انتخاب کنید"</string>
+    <string name="select_the_hh_identifiers">"متغیرهای خانوار را برای وارد کردن انتخاب کنید"</string>
+    <string name="app_version">"نسخهٔ برنامه"</string>
+    <string name="db_version">"نسخهٔ پایگاه داده"</string>
+    <string name="team">"تیم"</string>
+    <string name="enumerator_sign_in">"ورود سرشماری"</string>
+    <string name="enumerator_sign_up">"ثبت"</string>
+    <string name="minimum_value">"حداقل مقدار"</string>
+    <string name="maximum_value">"حداکثر مقدار"</string>
+    <string name="enter_the_minimum_value">"ارزش حداقلی را وارد کنید"</string>
+    <string name="enter_the_maximum_value">"ارزش حداکثری را وارد کنید"</string>
+    <string name="select_the_minimum_date">"تاریخ حداقل را انتخاب کنید"</string>
+    <string name="select_the_maximum_date">"تاریخ حداکثر را انتخاب کنید"</string>
+    <string name="min_greater_than_max">"ارزش حداقل از ارزش حداکثر بزرگ"</string>
+    <string name="enumeration_status">"وضعیت شمارش"</string>
+    <string name="collection_status">"وضعیت جمع"</string>
+    <string name="enumeration_reason_incomplete_label">"دلیل شمارش ناقص"</string>
+    <string name="collection_reason_incomplete_label">"دلیل جمع"</string>
+    <string name="enumeration_notes">"یادداشت"</string>
+    <string name="collection_notes">"یادداشت"</string>
+    <string name="select_map_tiles">"یک مجموعه کاشی نقشه انتخاب کنید"</string>
+    <string name="loading_mapbox_tiles">"در حال بارگذاری کاشی"</string>
+    <string name="mapbox_streets">"نقشه خیابان"</string>
+    <string name="satellite_streets">"نقشه ماهواره"</string>
+    <string name="import_map_tiles">"وارد کردن کاشی"</string>
+    <string name="re_import">"فایل انتخاب"</string>
+    <string name="attach_mbtiles_question">"آیا می"</string>
+    <string name="import_geojson">"وارد کردن یک فایل GeoJSON"</string>
+    <string name="import_mbtiles">"وارد کردن یک فایل MBTiles"</string>
+    <string name="select_file_type">"نوع فایل وارداتی را انتخاب کنید"</string>
+    <string name="attach_mbtiles">"وصل کردن کاشی"</string>
+    <string name="detach_mbtiles">"جدا کردن کاشی"</string>
+    <string name="take_photo">"عکس بگیر"</string>
+    <string name="retake_photo">"عکس را دوباره بگیر"</string>
+    <string name="min_password_required">"حداقل طول رمز عبور ۶ کاراکتر است"</string>
+    <string name="street_map">"نقشه خیابان"</string>
+    <string name="satellite_map">"نقشه ماهواره"</string>
+    <string name="map_engine">"موتور نقشه"</string>
+    <string name="define_center">"برای تعیین نقطه مرکزی، روی نقشه ضربه بزنید"</string>
+    <string name="select_ea">"برای انتخاب، روی یک ناحیه شمارش ضربه بزنید"</string>
+    <string name="select_configuration_file">"یک فایل پیکربندی را انتخاب کنید"</string>
+    <string name="show_breadcrumbs">"مسیر طی"</string>
+    <string name="record_breadcrumbs">"مسیر طی"</string>
+    <string name="delete_breadcrumbs">"مسیر طی"</string>
+    <string name="view">"مشاهده"</string>
+    <string name="filter_by">"فیلتر بر اساس:"</string>
+    <string name="add_landmark">"افزودن نقطهٔ مورد علاقه"</string>
+    <string name="export_succeeded">"صادرات با موفقیت انجام شد"</string>
+    <string name="export_failed">"صادرات ناموفق بود"</string>
+    <string name="select_map_engine">"انتخاب موتور نقشه"</string>
+    <string name="import_failed">"خطا. واردسازی ناموفق بود. مطمئن شوید نسخه"</string>
+    <string name="privacy_policy_statement">"GPSSample راه رفتن شما را ثبت می"</string>
+    <string name="accept_privacy_policy">"فعال"</string>
+    <string name="decline_privacy_policy">"فعلاً نه:\nویژگی ردیابی کار نخواهد کرد"</string>
+    <string name="background_location_permission">"مجوز موقعیت مکانی پس"</string>
+    <string name="enable_background_activity_title">"فعال"</string>
+    <string name="enable_background_activity_body">""1. دکمه تنظیمات را لمس کنید\n 2. GPSSample را در فهرست پیدا کنید.\n 3. اجازه فعالیت در پس""</string>
+    <string name="open_settings">"تنظیمات را باز کنید"</string>
+    <string name="note">"یادداشت"</string>
+    <string name="edit_location">"ویرایش مکان"</string>
+    <string name="select_strata">"انتخاب لایه"</string>
+    <string name="delete_strata_message">"آیا مطمئن هستید که می"</string>
+    <string name="define_boundary">"برای تعریف مرز، روی نقشه ضربه بزنید"</string>
+    <string name="select_the_strata_identifier">"متغیر نام لایه را انتخاب کنید"</string>
+    <string name="strata_name">"نام لایه"</string>
+    <string name="add_strata">"افزودن طبقه"</string>
+    <string name="strata">"لایه"</string>
+    <string-array name="forgot_pin_questions">
+        <item>"نام میانی پدر"</item>
+        <item>"نام خانوادگی پیش از ازدواج مادر"</item>
+        <item>"نام حیوان خانگی مورد علاقه"</item>
+        <item>"چهار رقم آخر شماره تلفن همراه"</item>
+        <item>"غذای مورد علاقه"</item>
+        <item>"ماه تولد"</item>
+        <item>"سوال دیگر"</item>
+    </string-array>
+    <string-array name="distance_formats">
+        <item>"مترها / کیلومترها"</item>
+        <item>"پا / مایل"</item>
+    </string-array>
+    <string-array name="time_formats">
+        <item>"۱۲ ساعته (صبح/عصر)"</item>
+        <item>"بیست و چهار ساعته"</item>
+    </string-array>
+    <string-array name="field_types">
+        <item>"متن"</item>
+        <item>"شماره"</item>
+        <item>"تاریخ"</item>
+        <item>"خانهٔ تیک"</item>
+        <item>"منوی کشویی"</item>
+    </string-array>
+    <string-array name="operators">
+        <item>"برابرها"</item>
+        <item>"برابر نیست"</item>
+        <item>"کمتر از"</item>
+        <item>"بزرگ"</item>
+        <item>"بزرگ"</item>
+    </string-array>
+    <string-array name="connectors">
+        <item>"و"</item>
+        <item>"یا"</item>
+        <item>"نه"</item>
+    </string-array>
+    <string-array name="samling_methods">
+        <item>"نمونه گیری تصادفی ساده"</item>
+        <item>"نمونه گیری خوشه"</item>
+        <item>"زیرمجموعه"</item>
+        <item>"طبقات: به"</item>
+    </string-array>
+    <string-array name="date_formats">
+        <item>"روز/ماه/سال"</item>
+        <item>"ماه/روز/سال"</item>
+        <item>"سال/ماه/روز"</item>
+    </string-array>
+    <string-array name="map_engines">
+        <item>"نقشهٔ خیابان"</item>
+        <item>"مپ"</item>
+    </string-array>
+    <string-array name="sort_filters">
+        <item>"پیش"</item>
+        <item>"تعریف"</item>
+        <item>"نامکمل"</item>
+        <item>"مکمل"</item>
+        <item>"نقاط دیدنی"</item>
+    </string-array>
+    <string-array name="show_views">
+        <item>"نمایش پیش"</item>
+        <item>"فقط نقشه"</item>
+        <item>"فقط فهرست"</item>
+    </string-array>
+</resources>

@@ -19,7 +19,7 @@ def translate(appName, language, index):
 		outputFileName = "../../app/src/main/res/values/strings.xml"
 	else:
 		outputFileName = "../../app/src/main/res/values-" + language + "/strings.xml"
- 
+
 	outputFile = open( outputFileName, 'w' )
 
 	outputFile.write('<?xml version="1.0" encoding="utf-8"?>\n')
@@ -52,7 +52,7 @@ def translate(appName, language, index):
 		components = line.split('\t')
 
 		keyword = components[0]
-    
+
 		if keywordCount( lines, keyword ) > 1: # array of elements
 			if keyword != currentKeyWord:
 				if needsClosure:

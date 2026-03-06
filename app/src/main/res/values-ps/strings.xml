@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <string name="app_name">GPSSample</string>
+    <string name="action_settings">"تنظیمات"</string>
+    <string name="action_sign_out">"وتل"</string>
+    <string name="next">"بل"</string>
+    <string name="previous">"مخکینی"</string>
+    <string name="manager">"مدیر"</string>
+    <string name="client">"شماره کول"</string>
+    <string name="connected_clients">"وصل شوي مراجعین"</string>
+    <string name="create_hotspot">"هاټ سپاټ جوړ کړئ"</string>
+    <string name="create_server">"سرور جوړ کړئ"</string>
+    <string name="create_qr_code">"کیو آر کوډ جوړ کړئ"</string>
+    <string name="connect_hotspot">"له هاټ سپاټ سره وصل شئ"</string>
+    <string name="registering_device">"د وسیلې ثبتول"</string>
+    <string name="sending_command">"د امر لیږل"</string>
+    <string name="sending_enum_data">"د لیستولو معلوماتو لیږل"</string>
+    <string name="receiving_data">"د معلوماتو ترلاسه کول"</string>
+    <string name="configuration_received">"ترلاسه شوې تشکیلات"</string>
+    <string name="admin">"مدیر"</string>
+    <string name="supervisor">"څارونکی"</string>
+    <string name="enumerator">"شمېرونکی"</string>
+    <string name="surveyor">"سروې کوونکی"</string>
+    <string name="configurations">"تنظیمات"</string>
+    <string name="no_configurations">"تاسو هیڅ تنظیمات نلرئ"</string>
+    <string name="no_studies">"د دې تنظیم لپاره تاسو هیڅ مطالعې نلرئ"</string>
+    <string name="data_collector">"د معلوماتو راټولونکی"</string>
+    <string name="scan_qr_code">"QR کوډ سکین کړئ"</string>
+    <string name="continue_with_existing_study">"له موجوده مطالعې سره دوام ورکړئ"</string>
+    <string name="admin_sign_in">"مدیر ننوتل"</string>
+    <string name="supervisor_sign_in">"څارونکی ننوتل"</string>
+    <string name="data_collector_sign_in">"د معلوماتو راټولونکی ننوتل"</string>
+    <string name="admin_sign_up">"د مدیر نوم لیکنه"</string>
+    <string name="supervisor_sign_up">"څارونکي نوم لیکنه"</string>
+    <string name="data_collector_sign_up">"د معلوماتو راټولونکي نوم لیکنه"</string>
+    <string name="enter_your_pin">"خپل پین داخل کړئ"</string>
+    <string name="reenter_your_pin">"خپل پین بیا داخل کړئ"</string>
+    <string name="back">"شاته"</string>
+    <string name="cancel">"لغوه"</string>
+    <string name="finish">"پای"</string>
+    <string name="save">"خوندي کول"</string>
+    <string name="done">"تکمیل"</string>
+    <string name="select_role">"خپل رول وټاکئ"</string>
+    <string name="admin_select_role">"مدیر رول وټاکئ"</string>
+    <string name="supervisor_select_role">"څارونکی رول وټاکئ"</string>
+    <string name="sign_in">"ننوتل"</string>
+    <string name="sign_up">"نوم لیکنه"</string>
+    <string name="sign_out">"وتل"</string>
+    <string name="not_registered">"نوم لیکنه مو نه ده کړې؟ نوم لیکنه وکړئ!"</string>
+    <string name="name">"نوم"</string>
+    <string name="enter_your_name">"خپل نوم ولیکئ"</string>
+    <string name="pin">"پن"</string>
+    <string name="forgot_pin_question">"د پن د پوښتنې هېرول"</string>
+    <string name="forgot_pin_answer">"د پن د ځواب هېرول"</string>
+    <string name="enter_your_answer">"خپل ځواب ولیکئ"</string>
+    <string name="create_config">"تشکیلات جوړ کړئ"</string>
+    <string name="delete_config">"تشکیلات حذف کړئ"</string>
+    <string name="edit_config">"ترکیب سمول"</string>
+    <string name="create_study">"مطالعه جوړول"</string>
+    <string name="edit_study">"مطالعه سمول"</string>
+    <string name="delete_study">"مطالعه حذفول"</string>
+    <string name="create_field">"میدان جوړول"</string>
+    <string name="config_name">"د تشکیلاتو نوم"</string>
+    <string name="study_name">"د مطالعې نوم"</string>
+    <string name="field_name">"د ساحې نوم"</string>
+    <string name="enumeration_fields">"د لیست شویو ساحو"</string>
+    <string name="enter_config_name">"د تشکیلاتو نوم داخل کړئ"</string>
+    <string name="enter_study_name">"د مطالعې نوم داخل کړئ"</string>
+    <string name="enter_field_name">"د ساحې نوم داخل کړئ"</string>
+    <string name="preferred_units">"ترجیحي واحدونه"</string>
+    <string name="date_format">"د نېټې بڼه"</string>
+    <string name="time_format">"د وخت بڼه"</string>
+    <string name="manage_enumerators">"انومېټرونه اداره کړئ"</string>
+    <string name="collect_enumerations">"انومېشنونه راټول کړئ"</string>
+    <string name="generate_sample">"نموونه جوړه کړئ"</string>
+    <string name="collect_samples">"نمونې راټولې کړئ"</string>
+    <string name="min_gps_precision">"د ګیپس مطلوب دقت"</string>
+    <string name="enter_min_gps_precision">"د ګیپس مطلوب دقت داخل کړئ"</string>
+    <string name="define_enumeration_fields">"د شمېرنې د ساحو تعریف"</string>
+    <string name="define_enumeration_area">"د شمېرنې ساحه تعریف کړئ"</string>
+    <string name="define_sampling_method">"نمونې اخیستنې طریقه تعریف کړئ"</string>
+    <string name="studies">"مطالعات"</string>
+    <string name="barcode_result">"بارکوډ وموندل شو"</string>
+    <string name="error_scanner_cancelled">"د کوډ سکینر لغوه شو"</string>
+    <string name="error_camera_permission_not_granted">"د کیمرې اجازې نه دي ورکړل شوې."</string>
+    <string name="error_app_name_unavailable">"د اپلیکیشن نوم نه دی ټاکل شوی."</string>
+    <string name="error_default_message">"د کوډ سکین کولو کې پاتې راغی:"</string>
+    <string name="menu_item_settings">"تنظیمات"</string>
+    <string name="change_role">"دنده بدله کړئ"</string>
+    <string name="enter_your_user_name">"خپل کارن نوم ولیکئ"</string>
+    <string name="field_type">"د ساحې ډول"</string>
+    <string name="enter_checkbox_text">"د چیک باکس توکي متن ولیکئ"</string>
+    <string name="enter_dropdown_item_text">"د ډراپ ډاون توکي متن ولیکئ"</string>
+    <string name="add_another">"یو بل اضافه کړئ"</string>
+    <string name="delete_field">"میدان حذف کړئ"</string>
+    <string name="manage_this_study">"دې مطالعې اداره کړئ"</string>
+    <string name="manage_study">"مطالعې اداره کړئ"</string>
+    <string name="manage_configuration">"تشکیلات اداره کړئ"</string>
+    <string name="manage_configurations">"تشکیلات اداره کړئ"</string>
+    <string name="generate_qr_code">"کیو آر کوډ جوړ کړئ"</string>
+    <string name="create_filter">"فلټر جوړ کړئ"</string>
+    <string name="create_rule">"قاعده جوړه کړئ"</string>
+    <string name="enter_rule_name">"د قاعدې نوم ولیکئ"</string>
+    <string name="field">"فیلډ"</string>
+    <string name="operator">"چلونکی"</string>
+    <string name="enter_value">"ارزښت داخل کړئ"</string>
+    <string name="value">"ارزښت"</string>
+    <string name="rule">"قاعده"</string>
+    <string name="connector">"نښلونکی"</string>
+    <string name="sampling_method">"د نمونې اخیستلو طریقه"</string>
+    <string name="enter_filter_name">"د فلټر نوم داخل کړئ"</string>
+    <string name="sample_size">"د نمونې اندازه"</string>
+    <string name="filter_name">"د فلټر نوم"</string>
+    <string name="rule_name">"د قانون نوم"</string>
+    <string name="total_sample_size">"د ټولو کلسټرونو په کچه د نمونې ټولیز اندازه"</string>
+    <string name="manage_studies">"د مطالعو مدیریت"</string>
+    <string name="manage_samples">"نمونې اداره کړئ"</string>
+    <string name="create_sample">"نمونې جوړول"</string>
+    <string name="delete_sample">"نمونې حذف کول"</string>
+    <string name="manage_supervisors">"څارونکي اداره کړئ"</string>
+    <string name="home">"کور"</string>
+    <string name="manage_enumeration_areas">"د شمېرنې ساحې اداره کړئ"</string>
+    <string name="please_confirm">"مهرباني وکړئ تایید کړئ"</string>
+    <string name="import_enumeration">"د شمېرنې ډیټا وارد کړئ"</string>
+    <string name="export_configuration">"ترتیبات صادر کړئ"</string>
+    <string name="delete_study_message">"ایا تاسو ډاډه یاست چې غواړئ دا مطالعه د تل لپاره حذف کړئ؟"</string>
+    <string name="delete_field_message">"ایا تاسو ډاډه یاست چې غواړئ دا ساحه د تل لپاره حذف کړئ؟"</string>
+    <string name="delete_rule_message">"ایا تاسو ډاډه یاست چې غواړئ دا قاعده د تل لپاره حذف کړئ؟"</string>
+    <string name="delete_team_message">"ایا تاسو ډاډه یاست چې غواړئ دا ټیم د تل لپاره حذف کړئ؟"</string>
+    <string name="delete_configuration_message">"ایا تاسو ډاډه یاست چې غواړئ دا تشکیلات د تل لپاره حذف کړئ؟"</string>
+    <string name="delete_household_message">"ایا تاسو ډاډه یاست چې غواړئ دا کورنۍ د تل لپاره حذف کړئ؟"</string>
+    <string name="create_field_rule_message">"تاسو باید د قانون جوړولو څخه مخکې لږ تر لږه یو فیلډ جوړ کړئ"</string>
+    <string name="create_rule_filter_message">"تاسو باید د فلټر جوړولو څخه مخکې لږ تر لږه یو قانون جوړ کړئ"</string>
+    <string name="select_import_method_message">"د واردولو طریقه وټاکئ"</string>
+    <string name="select_export_message">"د صادرولو طریقه وټاکئ"</string>
+    <string name="clear_selections_message">"ایا تاسو ډاډه یاست چې غواړئ ټول انتخابونه پاک کړئ؟"</string>
+    <string name="team_name_message">"تاسو باید د یوې لوبډلې نوم ولیکئ."</string>
+    <string name="configuration_documents_message">"تشکیلات د اسنادو په فولډر کې خوندي شول."</string>
+    <string name="delete_enum_area_message">"ایا تاسو ډاډه یاست چې غواړئ د شمېرنې ساحه دایمي ډول حذف کړئ؟"</string>
+    <string name="no_study_ea">"تاسو د دې شمېرنې سیمې سره کومه مطالعه نه لرئ"</string>
+    <string name="filename_export_message">"د صادرولو لپاره د فایل نوم داخل کړئ"</string>
+    <string name="select_task">"یوه دنده وټاکئ"</string>
+    <string name="yes">"هو"</string>
+    <string name="no">"نه"</string>
+    <string name="qr_code">"کیو آر کوډ"</string>
+    <string name="file_system">"د فایلونو سیسټم"</string>
+    <string name="survey">"سروې"</string>
+    <string name="undefined">"تعریف شوی نه دی"</string>
+    <string name="enter_name">"مهرباني وکړئ یو نوم ولیکئ"</string>
+    <string name="desired_gps_position">"مهرباني وکړئ د GPS لږ تر لږه مطلوب دقت ولیکئ"</string>
+    <string name="import_configuration">"تنظیمات وارد کړئ"</string>
+    <string name="select_import_method">"د واردولو طریقه وټاکئ"</string>
+    <string name="select_configuration">"تشکیلات وټاکئ"</string>
+    <string name="home_not_exist">"کور شتون نلري"</string>
+    <string name="reason_incomplete">"اوه! مهرباني وکړئ د نیمګړي پاتې کېدو لپاره یو دلیل وټاکئ"</string>
+    <string name="enter_enum_area_name">"د شمېرنې ساحې نوم ولیکئ"</string>
+    <string name="select_enumeration">"یو د شمېرنې ساحه وټاکئ"</string>
+    <string name="select_time">"وخت وټاکئ"</string>
+    <string name="select_date">"نېټه وټاکئ"</string>
+    <string name="your_pin_is">"ستاسو پین دی:"</string>
+    <string name="incorrect_answer_message">"اوه! ناسم ځواب. مهرباني وکړئ بیا هڅه وکړئ."</string>
+    <string name="enter_other_question">"نورې پوښتنې داخل کړئ"</string>
+    <string name="reenter_pin">"مهرباني وکړئ پن بیا داخل کړئ"</string>
+    <string name="enter_pin">"مهرباني وکړئ پن داخل کړئ"</string>
+    <string name="other_question">"بله پوښتنه"</string>
+    <string name="enter_answer">"مهرباني وکړئ یو ځواب ولیکئ."</string>
+    <string name="pin_not_match">"پن کوډونه سره سمون نه خوري."</string>
+    <string name="enter_file_name">"تاسو باید د فایل نوم ولیکئ."</string>
+    <string name="pin_incorrect">"اوسنی پین غلط دی"</string>
+    <string name="config_not_found">"فیتال! تشکیلات وموندل شول نه."</string>
+    <string name="missing_parameter_rule">"فیتال! اړین پیرامیټر نشته: قاعده"</string>
+    <string name="ok">"سمه ده"</string>
+    <string name="wifi_disabled">"وای فای غیر فعال دی"</string>
+    <string name="wifi_disabled_message">"وای فای بند دی. مهرباني وکړئ ډاډ ترلاسه کړئ چې وای فای فعاله ده."</string>
+    <string name="additional_info">"اضافي معلومات"</string>
+    <string name="incomplete">"نا بشپړ"</string>
+    <string name="does_not_exist">"شتون نه لري"</string>
+    <string name="other">"نور"</string>
+    <string name="notes">"یادښتونه"</string>
+    <string name="oops">"اوه!"</string>
+    <string name="field_is_required">"دا ساحه لازمي ده"</string>
+    <string name="number">"شماره"</string>
+    <string name="text">"متن"</string>
+    <string name="checkbox">"چک باکس"</string>
+    <string name="connected">"وصل"</string>
+    <string name="forgot_pin">"پن هېر شوی"</string>
+    <string name="reset_pin">"پن بیا تنظیم کړئ"</string>
+    <string name="personally_identifiable">"شخصي د پېژندلو وړ معلومات"</string>
+    <string name="integer_only">"یوازې عدد"</string>
+    <string name="required">"اړین"</string>
+    <string name="time">"وخت"</string>
+    <string name="date">"نېټه"</string>
+    <string name="dropdown">"ښکته کېدونکی"</string>
+    <string name="fields">"ډګرونه"</string>
+    <string name="rules">"قوانین"</string>
+    <string name="simple_random">"ساده تصادفي نمونه"</string>
+    <string name="cluster_sampling">"ډله"</string>
+    <string name="subset_overlap">"فرعي ټولګي: ممکن یو پر بل پراته وي"</string>
+    <string name="strata_exclusive">"طبقې: یو له بل سره ناساز"</string>
+    <string name="numberhouseholds">"د کورنیو شمېر"</string>
+    <string name="percenthouseholds">"د ټولو کورنیو سلنه"</string>
+    <string name="percenttotal">"د ټول نفوس سلنه"</string>
+    <string name="equal">"برابر"</string>
+    <string name="not_equal">"غیر مساوي"</string>
+    <string name="less_than">"له کم"</string>
+    <string name="greater_than">"له زیات"</string>
+    <string name="greater_than_equal">"له زیات یا مساوي"</string>
+    <string name="add_condition">"شرط اضافه کړئ"</string>
+    <string name="select_rule">"قاعده وټاکئ"</string>
+    <string name="teams">"ټیمونه"</string>
+    <string name="select_location">"موقعیت وټاکئ"</string>
+    <string name="current_location">"اوسنی"</string>
+    <string name="tap_the_map">"د نوي ځای اضافه کولو لپاره په نقشه کلیک وکړئ"</string>
+    <string name="complete">"بشپړ"</string>
+    <string name="reason_incomplete_label">"د نیمګړي پاتې کېدو دلیل"</string>
+    <string name="warning">"خبرداری!"</string>
+    <string name="duplicate_warning">"د دې نوي ځای اضافه کول یو له پخوا موجود ځای څخه خورا نږدې دي. ایا تاسو ډاډه یاست چې غواړئ دا اضافه کړئ؟"</string>
+    <string name="missing_team">"په تشکیلاتو کې د ټیم تعریف نشته."</string>
+    <string name="collection_teams">"د معلوماتو راټولولو ټیمونه"</string>
+    <string name="begin_field_block">"د ساحوي بلاک پیل"</string>
+    <string name="save_and_end_block">"په ساتلو سره د بلاک پای"</string>
+    <string name="add_another_field">"په ساتلو سره د بل ساحوي بلاک اضافه کول"</string>
+    <string name="current_location_not_set">"اوسنی ځای نه دی ټاکل شوی"</string>
+    <string name="option_item_name">"د انتخابي توکي نوم ولیکئ"</string>
+    <string name="export_collection_data">"د ټولګې معلومات صادر کړئ"</string>
+    <string name="import_field_data">"د ساحې معلومات وارد کړئ"</string>
+    <string name="select_a_date">"یوه نېټه وټاکئ"</string>
+    <string name="select">"ټاکل"</string>
+    <string name="team_name">"د ټیم نوم"</string>
+    <string name="launch_survey">"سروې پیل کړئ"</string>
+    <string name="mark_as_incomplete">"د نیمګړي په توګه نښه کړئ"</string>
+    <string name="enter_current_pin">"اوسنی پن داخل کړئ"</string>
+    <string name="enter_new_pin">"نوی پن بیا داخل کړئ"</string>
+    <string name="re_enter_new_pin">"نوی پن بیا داخل کړئ"</string>
+    <string name="select_a_time">"یو وخت وټاکئ"</string>
+    <string name="UUID">"یو یو آی ډي"</string>
+    <string name="latitude">"عرض البلد"</string>
+    <string name="longitude">"طول البلد"</string>
+    <string name="last_updated">"وروستی ځل تازه شوی"</string>
+    <string name="status">"حالت"</string>
+    <string name="description">"تشریح"</string>
+    <string name="add_image">"انځور اضافه کړئ"</string>
+    <string name="enumeration_areas">"د شمېرنې سیمې"</string>
+    <string name="enter_team_name">"د ټیم نوم ولیکئ"</string>
+    <string name="assign_households">"کورنۍ وټاکئ"</string>
+    <string name="sampling_type">"د نمونې ډول"</string>
+    <string name="generating_qr_code">"د QR کوډ جوړول..."</string>
+    <string name="samples">"نمونې"</string>
+    <string name="you_don_t_have_any_samples_for_this_study">"د دې مطالعې لپاره تاسو کوم نمونې نلرئ"</string>
+    <string name="enum_saved_doc">"شمېرنه د اسنادو په فولډر کې خوندي شوه."</string>
+    <string name="config_saved_doc">"تشکیلات د اسنادو په فولډر کې خوندي شول."</string>
+    <string name="nobody_home">"څوک نشته"</string>
+    <string name="export_enum_data">"د شمېرنې ډیټا صادرول"</string>
+    <string name="delete_landmark_message">"ایا تاسو ډاډه یاست چې غواړئ دا نښه د تل لپاره حذف کړئ؟"</string>
+    <string name="subaddress">"فرعي پته"</string>
+    <string name="sampled">"نمونې اخیستل شوی"</string>
+    <string name="completed_enumeration">"تکمیل شوی لیست"</string>
+    <string name="incomplete_enumeration">"ناپوره لیست"</string>
+    <string name="dismiss">"لېږدول"</string>
+    <string name="delete">"مخکې کول"</string>
+    <string name="launching_odk_collect_application">"د ODK Collect اپلیکیشن پیلېږي..."</string>
+    <string name="filters">"فلټرونه (قواعد یوځای کوي)"</string>
+    <string name="new_location">"موقعیت وپیژنئ"</string>
+    <string name="delete_configuration">"اوسنۍ تشکیلات به د واردولو له لارې بدل شي.  ایا غواړئ پرمخ لاړ شئ؟"</string>
+    <string name="total_population">"د ټول نفوس اندازه"</string>
+    <string name="enter_the_total_population_size">"د ټول نفوس اندازه ولیکئ"</string>
+    <string name="total_population_size_error">"د ټول نفوس اندازه باید له صفر څخه ډیره وي"</string>
+    <string name="sample_size_error">"د نمونې اندازه باید له صفر څخه ډیره وي"</string>
+    <string name="simple_random_sampling_label">"په ټولو خوشو کې د نمونې ټولیز اندازه"</string>
+    <string name="cluster_sampling_label">"په هره خوشه کې د نمونې اندازه"</string>
+    <string name="show_enumeration_info">"د شمېرنې معلومات وښایاست"</string>
+    <string name="please_enter_a_name">"مهرباني وکړئ د دې ساحې لپاره یو نوم ولیکئ."</string>
+    <string name="please_enter_a_subaddress">"مهرباني وکړئ یو ځانګړی فرعي پته ولیکئ."</string>
+    <string name="please_select_team_boundary">"مهرباني وکړئ د ټیم پوله وټاکئ."</string>
+    <string name="enum_area_name_property">"د انومریشن ایریا نوم پراپرټۍ ارزښت داخل کړئ"</string>
+    <string name="downloading_map_tiles">"د نقشې ټایلونه ډاونلوډیږي..."</string>
+    <string name="style_pack_download_failed">"د نقشې سټایل پيک ډاونلوډ ناکام شو"</string>
+    <string name="tile_pack_download_failed">"د نقشې ټایل پيک ډاونلوډ ناکام شو"</string>
+    <string name="download_map_tiles_now">"ایا تاسو غواړئ چې اوس د نقشې ټایلونه ډاونلوډ کړئ؟"</string>
+    <string name="delete_map_tile_region">"ایا تاسو ډاډه یاست چې غواړئ دا د نقشې ټایل سیمه حذف کړئ؟"</string>
+    <string name="import_enumeration_area">"د شمېرنې ساحې واردول"</string>
+    <string name="create_enumeration_area">"د شمېرنې ساحه جوړول"</string>
+    <string name="add_household">"کورنۍ اضافه کړئ"</string>
+    <string name="define_map_tile_cache_region">"د نقشې ټایلونو د کیش سیمې تعریفول"</string>
+    <string name="download_map_tiles">"د نقشې ټایلونه ډاونلوډ کړئ"</string>
+    <string name="center_on_location">"پر موقعیت مرکز کړئ"</string>
+    <string name="less_than_equal">"له یا مساوي کم"</string>
+    <string name="gps_accuracy_error">"د GPS دقت له اړین دقت څخه کم دی"</string>
+    <string name="gps_location_error">"تاسو اوسمهال له دې ځایه ډېر لرې یاست"</string>
+    <string name="good">"ښه"</string>
+    <string name="poor">"خراب"</string>
+    <string name="unknown">"نامعلوم"</string>
+    <string name="legend">"نښان"</string>
+    <string name="select_date_type">"مهرباني وکړئ د نېټې ډول وټاکئ"</string>
+    <string name="contains">"لري"</string>
+    <string name="collection_saved_doc">"ټولګه د اسنادو ډایرکټرۍ ته خوندي شوه"</string>
+    <string name="invalid_operator">"ټاکل شوی آپریټر د ټاکل شوي قانون لپاره معتبر نه دی"</string>
+    <string name="about_gpssample">"د GPSSample په اړه"</string>
+    <string name="privacy_statement">"د محرمیت بیانیه"</string>
+    <string name="terms_and_conditions">"اصول او شرایط"</string>
+    <string name="show_map">"نقشه وښایاست"</string>
+    <string name="number_of_residents">"د اوسیدونکو شمېر"</string>
+    <string name="end_user_license_agreement">"د وروستي کارونکي د جواز تړون"</string>
+    <string name="code_of_conduct">"د چلند اصول"</string>
+    <string name="clear_map">"ایا تاسو ډاډه یاست چې غواړئ نقشه پاکه کړئ؟"</string>
+    <string name="delete_point">"ایا تاسو ډاډه یاست چې غواړئ وروستی ټکی لرې کړئ؟"</string>
+    <string name="enumeration_area">"د شمېرنې ساحه"</string>
+    <string name="please_select_a_role">"مهرباني وکړئ یوه رول وټاکئ"</string>
+    <string name="please_enter_your_user_name">"مهرباني وکړئ خپل کارن نوم ولیکئ"</string>
+    <string name="user_name_not_found">"کارن نوم وموندل شو"</string>
+    <string name="multi_families">"څو کورنۍ"</string>
+    <string name="is_multi_family">"ایا دا د څو کورنیو ځای دی؟"</string>
+    <string name="sample">"نموونه"</string>
+    <string name="mark_status">"حالت نښه کړئ"</string>
+    <string name="not_visited">"نه لیدل شوی"</string>
+    <string name="incomplete_collection">"نیمګړی سروې"</string>
+    <string name="completed_collection">"بشپړ شوی سروې"</string>
+    <string name="accuracy">"دقیقوالی :"</string>
+    <string name="subaddress_is_required">"فرعي پته اړینه ده"</string>
+    <string name="auto_increment_subaddress">"خودکاره زیاتیدونکې فرعي پته"</string>
+    <string name="allow_manual_identification_of_locations">"د ځایونو لاسي پیژندنه اجازه ورکړئ"</string>
+    <string name="proximity_warning_enabled">"د نږدېوالي خبرداری فعال دی"</string>
+    <string name="encryption_password">"د کوډ کولو پټنوم"</string>
+    <string name="enter_encryption_password">"د کوډ کولو پټنوم ولیکئ"</string>
+    <string name="summary">"لنډیز"</string>
+    <string name="num_enumeration_areas">"د شمېرنې ساحو شمېر:"</string>
+    <string name="num_hhs_enumerated">"د شمېرل شویو کورنیو شمېر:"</string>
+    <string name="num_hhs_eligible">"د وړ کورنیو شمېر:"</string>
+    <string name="num_hhs_sampled">"د نمونې په توګه اخیستل شویو کورنیو شمېر:"</string>
+    <string name="num_hhs_surveyed">"د سروې شویو کورنیو شمېر:"</string>
+    <string name="num_hhs_remaining_to_survey">"د سروې لپاره پاتې کورنۍ:"</string>
+    <string name="decryption_failed">"د کوډ ماتولو هڅه ناکامه شوه. مهرباني وکړئ بیا هڅه وکړئ."</string>
+    <string name="rename_or_delete">"ایا غواړئ د شمېرنې ساحه نوم بدل کړئ یا یې حذف کړئ؟"</string>
+    <string name="rename">"نوم بدل کړئ"</string>
+    <string name="map_tile_boundary">"د مطلوب نقشې ټایل سیمې اوږدوالی/پراخوالی (کیلومتره) داخل کړئ"</string>
+    <string name="success">"بریالی!"</string>
+    <string name="error">"تېروتنه!"</string>
+    <string name="import_succeeded">"واردول بریالي شول."</string>
+    <string name="clear_map_tile_region">"د نقشې ټایل کیش سیمه پاک کړئ"</string>
+    <string name="import_request_failed">"د صادراتو غوښتنې ته په تمه د وارداتو غوښتنه ترلاسه شوه"</string>
+    <string name="export_request_failed">"د صادراتو غوښتنې ته په تمه د وارداتو غوښتنه ترلاسه شوه"</string>
+    <string name="network_connection">"شبکويي اتصال"</string>
+    <string name="enumerated">"شمار شوي"</string>
+    <string name="surveyed">"سروې شوي"</string>
+    <string name="meters">"مېټر"</string>
+    <string name="feet">"فوټ"</string>
+    <string name="kilometers">"کیلومتر"</string>
+    <string name="miles">"مایلونه"</string>
+    <string name="importing_locations">"د ځایونو واردول..."</string>
+    <string name="saving_configuration">"د تشکیلاتو خوندي کول..."</string>
+    <string name="polygon_is_self_intersecting">"د دې نقطو پر بنسټ جوړ شوی پولیګون به په خپل ځان کې تقاطع کوونکی وي."</string>
+    <string name="no_eligible_households">"د نمونې اخیستلو لپاره کوم وړ کورنۍ نشته."</string>
+    <string name="walk_enumeration_area">"د پیاده شمېرنې ساحه"</string>
+    <string name="mark_current_location">"اوسنۍ موقعیت نښه کړئ"</string>
+    <string name="delete_last_location">"وروستۍ موقعیت حذف کړئ"</string>
+    <string name="clear_map_and_start_over">"نقشه پاکه کړئ او له سره یې پیل کړئ"</string>
+    <string name="image_size_warning">"تاسو د انځور له ۲۵ میګابایټه ډیټا څخه زیات مصرف کړی دی. د نورو انځورونو اضافه کول به د ډیټا لیږد پر فعالیت باندې ډېر اغېز ولري."</string>
+    <string name="subaddress_start">"د سب اډریس لپاره د پیل شمېره داخل کړئ"</string>
+    <string name="creation_options">"د جوړولو انتخابونه"</string>
+    <string name="set_location">"حدود تعریف کړئ (اوږدوالی x پلنوالی)"</string>
+    <string name="set_boundary">"حد رسم کړئ"</string>
+    <string name="update_boundary">"حد تازه کړئ"</string>
+    <string name="location_image">"د موقعیت انځور"</string>
+    <string name="review_all_teams">"د ټولو ټیمونو بیاکتنه"</string>
+    <string name="config_saved">"تشکیلات خوندي شول."</string>
+    <string name="select_file_location">"د فایل ځای وټاکئ"</string>
+    <string name="default_location">"اصلي موقعیت"</string>
+    <string name="let_me_choose">"ما ته انتخاب راکړئ"</string>
+    <string name="boundary_is_self_intersecting">"د دې شمېرنې ساحې پوله په خپله سره تقاطع لري. ایا غواړئ پوله سمه کړئ؟"</string>
+    <string name="select_the_property_identifier">"د کلسټر نوم متغیر وټاکئ"</string>
+    <string name="select_the_hh_identifiers">"د واردولو لپاره د کورنۍ متغیرونه وټاکئ"</string>
+    <string name="app_version">"د اپلیکیشن نسخه"</string>
+    <string name="db_version">"د ډیټابیس نسخه"</string>
+    <string name="team">"ټیم"</string>
+    <string name="enumerator_sign_in">"شمېرونکي ننوتل"</string>
+    <string name="enumerator_sign_up">"شمېرونکي نوم لیکنه"</string>
+    <string name="minimum_value">"لږ تر لږه ارزښت"</string>
+    <string name="maximum_value">"تر ټولو ډېر ارزښت"</string>
+    <string name="enter_the_minimum_value">"لږ تر لږه ارزښت داخل کړئ"</string>
+    <string name="enter_the_maximum_value">"تر ټولو لوړ ارزښت داخل کړئ"</string>
+    <string name="select_the_minimum_date">"تر ټولو ټیټه نېټه وټاکئ"</string>
+    <string name="select_the_maximum_date">"تر ټولو لوړه نېټه وټاکئ"</string>
+    <string name="min_greater_than_max">"لږ تر لږه ارزښت له تر ټولو ډېر ارزښت څخه ډېر دی"</string>
+    <string name="enumeration_status">"د شمېرنې وضعیت"</string>
+    <string name="collection_status">"د راټولولو وضعیت"</string>
+    <string name="enumeration_reason_incomplete_label">"د شمېرنې د نیمګړي والي دلیل"</string>
+    <string name="collection_reason_incomplete_label">"د راټولولو د نیمګړي والي دلیل"</string>
+    <string name="enumeration_notes">"د شمېرنې یادښتونه"</string>
+    <string name="collection_notes">"د راټولولو یادښتونه"</string>
+    <string name="select_map_tiles">"د نقشې ټایل سیټ وټاکئ"</string>
+    <string name="loading_mapbox_tiles">"د مپ"</string>
+    <string name="mapbox_streets">"د مپ باکس د سړکونو نقشه"</string>
+    <string name="satellite_streets">"د سپوږمکۍ د سړکونو نقشه"</string>
+    <string name="import_map_tiles">"د نقشې ټایلونه واردول"</string>
+    <string name="re_import">"غوره شوې فایل لا دمخه وارد شوی دی. ایا غواړئ چې اوس یې بیا وارد کړئ؟"</string>
+    <string name="attach_mbtiles_question">"ایا غواړئ چې دې سیمې ته MBTiles ضمیمه کړئ؟"</string>
+    <string name="import_geojson">"د جیو جی"</string>
+    <string name="import_mbtiles">"د اېم"</string>
+    <string name="select_file_type">"د فایل واردولو ډول وټاکئ"</string>
+    <string name="attach_mbtiles">"د MB ټایلونه وصل کړئ"</string>
+    <string name="detach_mbtiles">"د MB ټایلونه جلا کړئ"</string>
+    <string name="take_photo">"عکس واخلئ"</string>
+    <string name="retake_photo">"عکس بیا واخلئ"</string>
+    <string name="min_password_required">"د پټنوم لږ تر لږه اوږدوالی ۶ نښې دی"</string>
+    <string name="street_map">"د سړک نقشه"</string>
+    <string name="satellite_map">"مصنوعي ماهواره نقشه"</string>
+    <string name="map_engine">"نقشې انجن"</string>
+    <string name="define_center">"د مرکز نقطې د ټاکلو لپاره پر نقشه ټپ وکړئ"</string>
+    <string name="select_ea">"د یوې شمېرنې ساحې د انتخاب لپاره پرې ټپ وکړئ"</string>
+    <string name="select_configuration_file">"د تشکیلاتو فایل وټاکئ"</string>
+    <string name="show_breadcrumbs">"تېر شوی لار وښایاست"</string>
+    <string name="record_breadcrumbs">"تېر شوی لار ثبت کړئ"</string>
+    <string name="delete_breadcrumbs">"تېر شوی لار حذف کړئ"</string>
+    <string name="view">"کتنه"</string>
+    <string name="filter_by">"د دې له مخې فلټر کړئ:"</string>
+    <string name="add_landmark">"د علاقې ټکی اضافه کړئ"</string>
+    <string name="export_succeeded">"صادر کول بریالي شول"</string>
+    <string name="export_failed">"صادر کول ناکام شول"</string>
+    <string name="select_map_engine">"نقشې انجن وټاکئ"</string>
+    <string name="import_failed">"تېروتنه. واردول ناکام شول. ډاډ ترلاسه کړئ چې د GPSSample نسخې یو شان دي."</string>
+    <string name="privacy_policy_statement">""GPSSample ستاسو د تګ لاره ثبتوي کله چې تاسو د کورونو ترمنځ ګرځئ او کورونه په نقشه کې نښه کوئ.\n\n ثبت هغه وخت پیل کېږي کله چې تاسو د ثبت تڼۍ ووهئ، او هغه وخت بندېږي کله چې د بندولو تڼۍ ووهئ.\n\n کله چې ثبت روان وي، موقعیت تل اخیستل کېږي، حتی که اپلېکېشن په شالید کې وي یا موبایل لاک وي.\n\n ستاسو د موقعیت معلومات ستاسو په موبایل کې په خوندي ډول ساتل کېږي او یوازې ستاسو په اجازه لېږدول کېږي.\n\n تاسو کولی شئ د شالید موقعیت اجازه هر وخت د Android له تنظیماتو څخه بنده کړئ.""</string>
+    <string name="accept_privacy_policy">"د شاليد موقعيت فعال کړئ:\nتل اجازه ورکړئ"</string>
+    <string name="decline_privacy_policy">"اوس نه:\nتعقیب به کار ونه کړي"</string>
+    <string name="background_location_permission">"د شالید موقعیت اجازه"</string>
+    <string name="enable_background_activity_title">"پټ فعالیت فعال کړئ"</string>
+    <string name="enable_background_activity_body">""1. د تنظیماتو پرانیزئ (OPEN SETTINGS) تڼۍ ووهئ\n 2. په لست کې GPSSample ومومئ.\n 3. د شالید فعالیت اجازه (ALLOW BACKGROUND ACTIVITY) فعاله کړئ.\n 4. بېرته دې اپلېکېشن ته راستانه شئ.""</string>
+    <string name="open_settings">"تنظیمات خلاص کړئ"</string>
+    <string name="note">"یادښت"</string>
+    <string name="edit_location">"موقعیت ایډیټ کړئ"</string>
+    <string name="select_strata">"سټراټا وټاکئ"</string>
+    <string name="delete_strata_message">"ایا تاسو ډاډه یاست چې غواړئ دا سټراټا د تل لپاره حذف کړئ؟"</string>
+    <string name="define_boundary">"د پولې ټاکلو لپاره پر نقشه ټپ کړئ"</string>
+    <string name="select_the_strata_identifier">"د سټراټا د نوم متغیر وټاکئ"</string>
+    <string name="strata_name">"د سټراټا نوم"</string>
+    <string name="add_strata">"سټراټا اضافه کړئ"</string>
+    <string name="strata">"پرتونه"</string>
+    <string-array name="forgot_pin_questions">
+        <item>"د پلار منځنی نوم"</item>
+        <item>"د مور د واده څخه مخکې تخلص"</item>
+        <item>"د خوښې څاروي نوم"</item>
+        <item>"د ګرځنده تلیفون وروستي ۴ عددونه"</item>
+        <item>"د خوښې خواړه"</item>
+        <item>"د زېږون میاشت"</item>
+        <item>"نورې پوښتنې"</item>
+    </string-array>
+    <string-array name="distance_formats">
+        <item>"متره / کیلومتره"</item>
+        <item>"فوټ / مایل"</item>
+    </string-array>
+    <string-array name="time_formats">
+        <item>"۱۲ ساعته (سهار/ماسپښین)"</item>
+        <item>"۲۴ ساعته"</item>
+    </string-array>
+    <string-array name="field_types">
+        <item>"پیغام"</item>
+        <item>"شماره"</item>
+        <item>"نېټه"</item>
+        <item>"چک باکس"</item>
+        <item>"ډراپ ډاون"</item>
+    </string-array>
+    <string-array name="operators">
+        <item>"برابر"</item>
+        <item>"غیر مساوي"</item>
+        <item>"له کم"</item>
+        <item>"له زیات"</item>
+        <item>"له زیات یا مساوي"</item>
+    </string-array>
+    <string-array name="connectors">
+        <item>"او"</item>
+        <item>"یا"</item>
+        <item>"نه"</item>
+    </string-array>
+    <string-array name="samling_methods">
+        <item>"ساده تصادفي نمونه"</item>
+        <item>"ډله"</item>
+        <item>"فرعي ټولګي: ممکن تداخل ولري"</item>
+        <item>"طبقات: یو له بل سره غیر قابل ترکیب"</item>
+    </string-array>
+    <string-array name="date_formats">
+        <item>"ورځ/میاشت/کال"</item>
+        <item>"میاشت/ورځ/کال"</item>
+        <item>"کال/میاشت/ورځ"</item>
+    </string-array>
+    <string-array name="map_engines">
+        <item>"اوپن سټریټ مپ"</item>
+        <item>"مپ باکس"</item>
+    </string-array>
+    <string-array name="sort_filters">
+        <item>"اصلي"</item>
+        <item>"نا تعریف شوی"</item>
+        <item>"نا بشپړ"</item>
+        <item>"بشپړ"</item>
+        <item>"د علاقې وړ ځایونه"</item>
+    </string-array>
+    <string-array name="show_views">
+        <item>"اصلي بڼه"</item>
+        <item>"یوازې نقشه"</item>
+        <item>"یوازې لیست"</item>
+    </string-array>
+</resources>
