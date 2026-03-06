@@ -31,7 +31,7 @@
                     android:layout_margin="20dp"
                     android:gravity="center_vertical"
                     android:textSize="17sp"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/text_color"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

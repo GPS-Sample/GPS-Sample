@@ -16,6 +16,8 @@
     <color name="medium_gray">#888888</color>
     <color name="background">#F4F2F2</color>
 
+    <color name="text_color">#000000</color>
+
     <color name="text_light">#D8D8D8</color>
     <color name="primary_high">#2E67ED</color>
     <color name="primary_low">#19367A</color>

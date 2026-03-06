@@ -59,7 +59,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:gravity="center_vertical"
-                android:textColor="@color/black"
+                android:textColor="@color/text_color"
                 android:textStyle="italic"
                 android:textSize="15sp"/>
         </LinearLayout>

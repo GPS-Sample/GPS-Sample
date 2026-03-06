@@ -25,7 +25,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/download_map_tiles"
-            android:textColor="@color/black"
+            android:textColor="@color/text_color"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>
@@ -50,7 +50,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/center_on_location"
-            android:textColor="@color/black"
+            android:textColor="@color/text_color"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>
@@ -76,7 +76,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/add_household"
-            android:textColor="@color/black"
+            android:textColor="@color/text_color"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>
@@ -100,7 +100,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/add_landmark"
-            android:textColor="@color/black"
+            android:textColor="@color/text_color"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>
@@ -125,7 +125,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/export_configuration"
-            android:textColor="@color/black"
+            android:textColor="@color/text_color"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>
@@ -149,7 +149,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/record_breadcrumbs"
-            android:textColor="@color/black"
+            android:textColor="@color/text_color"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>
@@ -173,7 +173,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/show_breadcrumbs"
-            android:textColor="@color/black"
+            android:textColor="@color/text_color"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>
@@ -198,7 +198,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/delete_breadcrumbs"
-            android:textColor="@color/black"
+            android:textColor="@color/text_color"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>

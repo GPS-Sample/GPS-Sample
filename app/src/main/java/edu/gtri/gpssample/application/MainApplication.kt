@@ -36,7 +36,7 @@ class MainApplication : Application()
 
         instance = this
 
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         val serviceChannel = NotificationChannel(
 

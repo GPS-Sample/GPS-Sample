@@ -32,7 +32,7 @@
                     android:layout_marginStart="20dp"
                     android:gravity="center_vertical"
                     android:textSize="17sp"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/text_color"/>
 
                 <TextView
                     android:id="@+id/required_text_view"
