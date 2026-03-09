@@ -19,6 +19,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
@@ -53,7 +54,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
 
     interface NetworkConnectDelegate
     {
-        fun didReceiveConfiguration(error: Boolean)
+        fun didReceiveConfiguration(errorCode: Config.ErrorCode)
         fun didSendData(complete: Boolean)
     }
 
@@ -172,27 +173,31 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
                 _commandSent.postValue(NetworkStatus.CommandSent)
                 if (response.command == NetworkCommand.NetworkConfigResponse)
                 {
-                    response.payload?.let { payload ->
+                    val result = Config.unpack(String(response.payload), encryptionPassword)
+                    val config = result.first
+                    val errorCode = result.second
 
-                        Config.unpack(String(payload), encryptionPassword)?.let { config ->
+                    if (config == null)
+                    {
+                        val error = if (errorCode == Config.ErrorCode.PasswordError) NetworkStatus.PasswordError else NetworkStatus.DataReceivedError
+                        _dataReceived.postValue( error )
+                        connectDelegate?.didReceiveConfiguration( errorCode )
+                    }
+                    else
+                    {
+                        DAO.instance().writableDatabase.beginTransaction()
 
-                            DAO.instance().writableDatabase.beginTransaction()
+                        DAO.configDAO.createOrUpdateConfig(config)
 
-                            DAO.configDAO.createOrUpdateConfig(config)
+                        DAO.instance().writableDatabase.setTransactionSuccessful()
+                        DAO.instance().writableDatabase.endTransaction()
 
-                            DAO.instance().writableDatabase.setTransactionSuccessful()
-                            DAO.instance().writableDatabase.endTransaction()
+                        fetchImages( config )
+                        fetchMbTiles( config )
 
-                            fetchImages( config )
-                            fetchMbTiles( config )
-
-                            configurationDelegate?.configurationReceived(config)
-                            _dataReceived.postValue(NetworkStatus.DataReceived)
-                            connectDelegate?.didReceiveConfiguration(false)
-                        } ?: run {
-                            _dataReceived.postValue(NetworkStatus.DataReceivedError)
-                            connectDelegate?.didReceiveConfiguration(true)
-                        }
+                        configurationDelegate?.configurationReceived(config)
+                        _dataReceived.postValue(NetworkStatus.DataReceived)
+                        connectDelegate?.didReceiveConfiguration(Config.ErrorCode.None)
                     }
                 }
             }
@@ -651,6 +656,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
         _commandSent.postValue(NetworkStatus.CommandError)
         _dataReceived.postValue(NetworkStatus.DataReceivedError)
         sleep(kDialogTimeout)
-        connectDelegate?.didReceiveConfiguration(true)
+        connectDelegate?.didReceiveConfiguration(Config.ErrorCode.UnknownError)
     }
 }

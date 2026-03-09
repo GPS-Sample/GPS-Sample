@@ -67,12 +67,13 @@ object ZipUtils
         }.start()
     }
 
-    fun unzip( activity: Activity, zipUri: Uri, password: String, completion: (config: Config?)->Unit )
+    fun unzip( activity: Activity, zipUri: Uri, password: String, completion: (Pair<Config?, Config.ErrorCode>)->Unit )
     {
         Thread {
             try
             {
                 var config: Config? = null
+                var errorCode = Config.ErrorCode.None
 
                 activity.contentResolver.openInputStream(zipUri)?.use { inputStream ->
                     ZipInputStream(BufferedInputStream(inputStream)).use { zis ->
@@ -98,8 +99,9 @@ object ZipUtils
                             }
                             else
                             {
-                                config = Config.unpack( content, password )
-                                Log.d( "xxx", "imported Config" )
+                                val (cfg, eCode) = Config.unpack( content, password )
+                                config = cfg
+                                errorCode = eCode
                             }
 
                             zis.closeEntry()
@@ -109,14 +111,14 @@ object ZipUtils
                 }
 
                 activity.runOnUiThread {
-                    completion( config )
+                    completion( Pair(config, errorCode ))
                 }
             }
             catch( ex: Exception )
             {
                 Log.d( "xxx", ex.stackTraceToString())
                 activity.runOnUiThread {
-                    completion( null )
+                    completion( Pair(null,Config.ErrorCode.UnknownError))
                 }
             }
         }.start()

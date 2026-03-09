@@ -434,6 +434,9 @@
     <string name="strata_name">"Strata Name"</string>
     <string name="add_strata">"Add Strata"</string>
     <string name="strata">"Strata"</string>
+
+    <string name="password_error">"The password entered is incorrect."</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

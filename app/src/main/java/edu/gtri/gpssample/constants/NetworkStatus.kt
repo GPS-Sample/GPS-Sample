@@ -22,8 +22,7 @@ enum class NetworkStatus(val format : String) {
     ClientRegisterError("Client Connected"),
     CommandSent("Command Sent"),
     CommandError("Command Error"),
-
-
+    PasswordError("Password Error"),
 }
 
 object NetworkStatusConverter {

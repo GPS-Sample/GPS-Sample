@@ -520,11 +520,15 @@ class ConfigurationFragment : Fragment(),
 
                         try
                         {
-                            ZipUtils.unzip( activity!!, uri, currentConfig.encryptionPassword ) { config ->
+                            ZipUtils.unzip( activity!!, uri, currentConfig.encryptionPassword ) { result ->
+                                val config = result.first
+                                val errorCode = result.second
+
                                 if (config == null)
                                 {
                                     binding.overlayView.visibility = View.GONE
-                                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                                    val message = if (errorCode == Config.ErrorCode.PasswordError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
+                                    InfoDialog( activity!!, resources.getString(R.string.error), message, resources.getString(R.string.ok), null, null)
                                 }
                                 else
                                 {

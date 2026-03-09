@@ -42,7 +42,7 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
 
     interface ManageConfigurationNetworkDelegate
     {
-        fun didReceiveConfiguration(complete: Boolean)
+        fun didReceiveConfiguration(errorCode: Config.ErrorCode)
     }
 
     private var _activity : Activity? = null
@@ -173,7 +173,7 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
        // }
     }
 
-    override fun didReceiveConfiguration(error: Boolean)
+    override fun didReceiveConfiguration(errorCode: Config.ErrorCode)
     {
         runBlocking(Dispatchers.Main) {
             networkClientModel.resetState()
@@ -183,7 +183,7 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
                 if (it is ManageConfigurationsFragment)
                 {
                     val bundle = Bundle()
-                    bundle.putBoolean( Keys.kError.value, error )
+                    bundle.putInt( Keys.kError.value, errorCode.ordinal )
                     it.setFragmentResult( it.javaClass.simpleName, bundle )
                 }
             }

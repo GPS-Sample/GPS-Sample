@@ -77,7 +77,8 @@ class ManageConfigurationsFragment : Fragment(),
         clearFragmentResultListener( this.javaClass.simpleName )
 
         setFragmentResultListener( this.javaClass.simpleName ) { key, bundle ->
-            didReceiveConfiguration( bundle.getBoolean(Keys.kError.value))
+            val errorCode = Config.ErrorCode.values()[bundle.getInt(Keys.kError.value)]
+            didReceiveConfiguration( errorCode )
             clearFragmentResult( this.javaClass.simpleName )
         }
     }
@@ -407,9 +408,9 @@ class ManageConfigurationsFragment : Fragment(),
         }
     }
 
-    override fun didReceiveConfiguration(error: Boolean)
+    override fun didReceiveConfiguration(errorCode: Config.ErrorCode)
     {
-        if (error)
+        if (errorCode != Config.ErrorCode.None)
         {
             InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
         }
@@ -580,11 +581,15 @@ class ManageConfigurationsFragment : Fragment(),
                 {
                     binding.overlayView.visibility = View.VISIBLE
 
-                    ZipUtils.unzip( activity!!, uri, encryptionPassword ) { config ->
+                    ZipUtils.unzip( activity!!, uri, encryptionPassword ) { result ->
+                        val config = result.first
+                        val errorCode = result.second
+
                         if (config == null)
                         {
                             binding.overlayView.visibility = View.GONE
-                            InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                            val message = if (errorCode == Config.ErrorCode.PasswordError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
+                            InfoDialog( activity!!, resources.getString(R.string.error), message, resources.getString(R.string.ok), null, null)
                         }
                         else
                         {
@@ -602,7 +607,7 @@ class ManageConfigurationsFragment : Fragment(),
                             binding.overlayView.visibility = View.GONE
                             configurations = DAO.configDAO.getConfigs()
                             manageConfigurationsAdapter.updateConfigurations(configurations)
-                            didReceiveConfiguration(false )
+                            didReceiveConfiguration(Config.ErrorCode.None )
                         }
                     }
                 }

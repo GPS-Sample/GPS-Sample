@@ -163,19 +163,21 @@ data class Config(
 
         if (this.selectedEnumAreaUuid.isNotEmpty())
         {
-            unpack( packedConfig, encryptionPassword )?.let { configCopy ->
+            val (config, error) = unpack( packedConfig, encryptionPassword )
 
-                for (enumArea in configCopy.enumAreas)
+            if (config != null)
+            {
+                for (enumArea in config.enumAreas)
                 {
-                    if (enumArea.uuid == configCopy.selectedEnumAreaUuid)
+                    if (enumArea.uuid == config.selectedEnumAreaUuid)
                     {
-                        configCopy.enumAreas.clear()
-                        configCopy.enumAreas.add( enumArea )
+                        config.enumAreas.clear()
+                        config.enumAreas.add( enumArea )
                         break
                     }
                 }
 
-                val enumArea = configCopy.enumAreas[0]
+                val enumArea = config.enumAreas[0]
 
                 if (enumArea.selectedCollectionTeamUuid.isNotEmpty())
                 {
@@ -206,27 +208,39 @@ data class Config(
                     }
                 }
 
-                packedConfig = configCopy.pack()
+                packedConfig = config.pack()
             }
         }
 
         return packedConfig
     }
 
+    enum class ErrorCode
+    {
+        PasswordError,
+        DecompressError,
+        DecodeError,
+        UnknownError,
+        None
+    }
+
     companion object
     {
-        fun unpack( jsonString: String, password: String ) : Config?
+        fun unpack( jsonString: String, password: String ) : Pair<Config?, ErrorCode>
         {
+            var errorCode = ErrorCode.None
+
             try
             {
                 // check for a cleartext string
 
                 if (jsonString.isNotEmpty() && jsonString.first() == '{')
                 {
-                    return Json.decodeFromString<Config>( jsonString )
+                    val config = Json.decodeFromString<Config>( jsonString )
+                    return Pair( config, ErrorCode.None )
                 }
 
-                var clearText = jsonString
+                var clearText = ""
 
                 // step 1: decrypt the json string, if necessary
 
@@ -237,7 +251,14 @@ data class Config(
                     }
                 }
 
+                if (clearText.isEmpty())
+                {
+                    return Pair( null, ErrorCode.PasswordError )
+                }
+
                 // step 2: decompress the json string
+
+                errorCode = ErrorCode.DecompressError
 
                 val byteArray = Base64.decode( clearText, Base64.DEFAULT )
                 val byteArrayInputStream = ByteArrayInputStream( byteArray )
@@ -249,14 +270,17 @@ data class Config(
 
                 // step 3: decode the JSON string into a Config object
 
-                return Json.decodeFromString<Config>( uncompressedString )
+                errorCode = ErrorCode.DecodeError
+
+                val config = Json.decodeFromString<Config>( uncompressedString )
+                return Pair( config, ErrorCode.None )
             }
             catch( ex: Exception )
             {
                 Log.d( "xxx", ex.stackTraceToString())
             }
 
-            return null
+            return Pair( null, errorCode )
         }
     }
 }

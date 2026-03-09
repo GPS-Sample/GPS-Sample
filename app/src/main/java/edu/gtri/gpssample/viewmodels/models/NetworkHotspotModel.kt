@@ -62,6 +62,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
         ImportFailed,
         ImportRequestFailed,
         ExportRequestFailed,
+        PasswordFailed,
     }
 
     companion object
@@ -314,11 +315,14 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                     return
                 }
 
-                val config = Config.unpack( String(message.payload), encryptionPassword )
+                val result = Config.unpack( String(message.payload), encryptionPassword )
+                val config = result.first
+                val errorCode = result.second
 
                 if (config == null)
                 {
-                    delegate?.importFailed( MessageType.ImportFailed )
+                    val messageType = if (errorCode == Config.ErrorCode.PasswordError) MessageType.PasswordFailed else MessageType.ImportFailed
+                    delegate?.importFailed( messageType )
                 }
                 else
                 {

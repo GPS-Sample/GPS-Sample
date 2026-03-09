@@ -121,6 +121,8 @@ class HotspotFragment : Fragment(), NetworkHotspotModel.NetworkHotspotDelegate
         activity!!.runOnUiThread {
             when (messageType)
             {
+                NetworkHotspotModel.MessageType.PasswordFailed ->
+                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.password_error), resources.getString(R.string.ok), null, null)
                 NetworkHotspotModel.MessageType.ImportFailed ->
                     InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
                 NetworkHotspotModel.MessageType.ImportRequestFailed ->
