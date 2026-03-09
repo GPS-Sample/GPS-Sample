@@ -41,6 +41,8 @@ import com.mapbox.maps.ImageHolder
 import com.mapbox.maps.MapInitOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.OfflineManager
+import com.mapbox.maps.RenderedQueryGeometry
+import com.mapbox.maps.RenderedQueryOptions
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
 import com.mapbox.maps.StylePackLoadOptions
@@ -76,6 +78,7 @@ import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.compass.compass
+import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
@@ -970,20 +973,21 @@ class MapManager
         return resourceName
     }
 
-    fun createFeature( lat: Double, lon: Double, icon: String ) : JSONObject
+    fun createFeature( location: Location, icon: String ) : JSONObject
     {
         val geometry = JSONObject()
         geometry.put( "type", "Point" )
 
         val coordinates = JSONArray()
-        coordinates.put( lon )
-        coordinates.put( lat )
+        coordinates.put( location.longitude )
+        coordinates.put( location.latitude )
 
         geometry.put( "coordinates", coordinates )
 
         val properties = JSONObject()
-        properties.put( "iconName", icon )
-        properties.put( "POI", icon )
+        properties.put("iconName", icon )
+        properties.put("POI", icon )
+        properties.put("locationUuid", location.uuid)
 
         val feature = JSONObject()
         feature.put( "type", "Feature" )
@@ -1004,11 +1008,7 @@ class MapManager
         {
             for (location in enumArea.locations)
             {
-                features.put(
-                    MapManager.instance().createFeature(
-                        location.latitude,
-                        location.longitude,
-                        MapManager.instance().getResourceName(location)))
+                features.put(MapManager.instance().createFeature(location, MapManager.instance().getResourceName(location)))
             }
         }
 
@@ -1071,7 +1071,38 @@ class MapManager
                 iconIgnorePlacement(false)
                 iconAnchor(IconAnchor.CENTER)
             }
-        })
+        }) { style ->
+
+            mapView.gestures.addOnMapClickListener { point ->
+
+                val screenPoint = mapView.mapboxMap.pixelForCoordinate(point)
+
+                val options = RenderedQueryOptions(
+                    listOf("UNCLUSTERED_LAYER"),
+                    null
+                )
+
+                mapView.mapboxMap.queryRenderedFeatures(
+                    RenderedQueryGeometry(screenPoint),
+                    options
+                ) { result ->
+
+                    val features = result.value
+
+                    if (!features.isNullOrEmpty()) {
+
+                        val feature = features[0].queriedFeature.feature
+                        val locationUuid = feature.getStringProperty("locationUuid")
+
+                        DAO.locationDAO.getLocation( locationUuid )?.let {
+                            delegate?.onMarkerTapped( it )
+                        }
+                    }
+                }
+
+                true
+            }
+        }
     }
 
     data class MarkerProperty( var location: Location, var resourceId: Int, var title: String )
@@ -1118,8 +1149,7 @@ class MapManager
             {
                 features.put(
                     MapManager.instance().createFeature(
-                        markerProperty.location.latitude,
-                        markerProperty.location.longitude,
+                        markerProperty.location,
                         MapManager.instance().getResourceName(markerProperty.location)))
 
                 geoJson.put("features", features)
