@@ -914,6 +914,26 @@ class MapManager
         }
     }
 
+    fun getResourceName( id: Int ) : String
+    {
+        when (id) {
+            R.drawable.home_black -> return "home_black"
+            R.drawable.home_red -> return "home_red"
+            R.drawable.home_green -> return "home_green"
+            R.drawable.home_light_blue -> return "home_light_blue"
+            R.drawable.home_orange -> return "home_orange"
+            R.drawable.home_purple -> return "home_purple"
+            R.drawable.multi_home_black -> return "multi_home_black"
+            R.drawable.multi_home_red -> return "multi_home_red"
+            R.drawable.multi_home_green -> return "multi_home_green"
+            R.drawable.multi_home_light_blue -> return "multi_home_light_blue"
+            R.drawable.multi_home_orange -> return "multi_home_orange"
+            R.drawable.multi_home_purple -> return "multi_home_purple"
+        }
+
+        return ""
+    }
+
     fun getResourceName(location: Location) : String
     {
         var resourceName = "home_black"
@@ -921,44 +941,43 @@ class MapManager
         if (location.isLandmark) {
             resourceName = "location_blue"
         } else if (location.enumerationItems.size == 1) {
-            if (location.enumerationItems.isNotEmpty()) {
-                val enumerationItem = location.enumerationItems[0]
+            val enumerationItem = location.enumerationItems[0]
 
-                if (enumerationItem.samplingState == SamplingState.Sampled) {
-                    when (enumerationItem.collectionState) {
-                        CollectionState.Undefined -> resourceName = "home_light_blue"
-                        CollectionState.Incomplete -> resourceName = "home_orange"
-                        CollectionState.Complete -> resourceName = "home_purple"
-                    }
-                } else if (enumerationItem.enumerationState == EnumerationState.Undefined) {
-                    resourceName = "home_black"
-                } else if (enumerationItem.enumerationState == EnumerationState.Incomplete) {
-                    resourceName = "home_red"
-                } else if (enumerationItem.enumerationState == EnumerationState.Enumerated) {
-                    resourceName = "home_green"
+            if (enumerationItem.samplingState == SamplingState.Sampled) {
+                when (enumerationItem.collectionState) {
+                    CollectionState.Undefined -> resourceName = "home_light_blue"
+                    CollectionState.Incomplete -> resourceName = "home_orange"
+                    CollectionState.Complete -> resourceName = "home_purple"
                 }
+            } else if (enumerationItem.enumerationState == EnumerationState.Undefined) {
+                resourceName = "home_black"
+            } else if (enumerationItem.enumerationState == EnumerationState.Incomplete) {
+                resourceName = "home_red"
+            } else if (enumerationItem.enumerationState == EnumerationState.Enumerated) {
+                resourceName = "home_green"
             }
         }
         else
         {
-            for (enumerationItem in location.enumerationItems)
-            {
-                if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined) {
-                    resourceName = "home_light_blue"
-                    break
+            for (enumerationItem in location.enumerationItems) {
+                if (enumerationItem.samplingState == SamplingState.Sampled) {
+                    if (enumerationItem.collectionState == CollectionState.Undefined) {
+                        if (resourceName == "home_black") { // set only if not already set
+                            resourceName = "multi_home_light_blue"
+                        }
+                    } else if (enumerationItem.collectionState == CollectionState.Incomplete) {
+                        resourceName = "multi_home_orange"
+                        break // any Incomplete makes it incomplete
+                    } else if (enumerationItem.collectionState == CollectionState.Complete) {
+                        resourceName = "multi_home_purple"
+                    }
                 }
             }
 
-            if (resourceName == "home_black") {
+            if (resourceName == "home_black") // still not set
+            {
                 for (enumerationItem in location.enumerationItems) {
-                    if (enumerationItem.samplingState == SamplingState.Sampled) {
-                        if (enumerationItem.collectionState == CollectionState.Incomplete) {
-                            resourceName = "multi_home_orange"
-                            break
-                        } else if (enumerationItem.collectionState == CollectionState.Complete) {
-                            resourceName = "multi_home_purple"
-                        }
-                    } else if (enumerationItem.enumerationState == EnumerationState.Undefined) {
+                    if (enumerationItem.enumerationState == EnumerationState.Undefined) {
                         resourceName = "multi_home_black"
                     } else if (enumerationItem.enumerationState == EnumerationState.Incomplete) {
                         resourceName = "multi_home_red"
@@ -1150,7 +1169,7 @@ class MapManager
                 features.put(
                     MapManager.instance().createFeature(
                         markerProperty.location,
-                        MapManager.instance().getResourceName(markerProperty.location)))
+                        MapManager.instance().getResourceName(markerProperty.resourceId)))
 
                 geoJson.put("features", features)
             }
