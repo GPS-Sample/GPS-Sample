@@ -405,41 +405,41 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
             addPolygon(enumArea)
 
-            if (!editMode && enumArea.breadcrumbs.isNotEmpty())
-            {
-                for (breadcrumb in enumArea.breadcrumbs)
-                {
-                    MapManager.instance().createMarker( activity!!, mapView, com.mapbox.geojson.Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
-                }
-
-                val breadcrumbs = ArrayList<Breadcrumb>()
-                var groupId: String = ""
-
-                for (breadcrumb in enumArea.breadcrumbs)
-                {
-                    if (breadcrumbs.isEmpty())
-                    {
-                        groupId = breadcrumb.groupId
-                    }
-
-                    if (breadcrumb.groupId == groupId)
-                    {
-                        breadcrumbs.add( breadcrumb )
-                    }
-                    else
-                    {
-                        MapManager.instance().createPolyline( mapView, breadcrumbs )
-                        groupId = breadcrumb.groupId
-                        breadcrumbs.clear()
-                        breadcrumbs.add( breadcrumb )
-                    }
-                }
-
-                if (breadcrumbs.isNotEmpty())
-                {
-                    MapManager.instance().createPolyline( mapView, breadcrumbs )
-                }
-            }
+//            if (!editMode && enumArea.breadcrumbs.isNotEmpty())
+//            {
+//                for (breadcrumb in enumArea.breadcrumbs)
+//                {
+//                    MapManager.instance().createMarker( activity!!, mapView, com.mapbox.geojson.Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
+//                }
+//
+//                val breadcrumbs = ArrayList<Breadcrumb>()
+//                var groupId: String = ""
+//
+//                for (breadcrumb in enumArea.breadcrumbs)
+//                {
+//                    if (breadcrumbs.isEmpty())
+//                    {
+//                        groupId = breadcrumb.groupId
+//                    }
+//
+//                    if (breadcrumb.groupId == groupId)
+//                    {
+//                        breadcrumbs.add( breadcrumb )
+//                    }
+//                    else
+//                    {
+//                        MapManager.instance().createPolyline( mapView, breadcrumbs )
+//                        groupId = breadcrumb.groupId
+//                        breadcrumbs.clear()
+//                        breadcrumbs.add( breadcrumb )
+//                    }
+//                }
+//
+//                if (breadcrumbs.isNotEmpty())
+//                {
+//                    MapManager.instance().createPolyline( mapView, breadcrumbs )
+//                }
+//            }
 
             val markerProperties = ArrayList<MapManager.MarkerProperty>()
 
