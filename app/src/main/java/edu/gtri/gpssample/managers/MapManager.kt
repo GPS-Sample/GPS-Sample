@@ -9,6 +9,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.InsetDrawable
@@ -1128,11 +1129,49 @@ class MapManager
     {
     }
 
+    class MyRadiusMarkerClusterer(context: Context) : RadiusMarkerClusterer(context) {
+
+        private val labelPaint = Paint().apply {
+            color = Color.BLACK
+            textSize = 20f
+            isAntiAlias = true
+            textAlign = Paint.Align.CENTER // horizontal centering
+            typeface = Typeface.DEFAULT_BOLD
+        }
+
+        override fun draw(canvas: Canvas, mapView: org.osmdroid.views.MapView, shadow: Boolean)
+        {
+            super.draw(canvas, mapView, shadow)
+
+            if (!shadow)
+            {
+                for (marker in this.items)
+                {
+                    val point = mapView.projection.toPixels(marker.position, null)
+                    marker.title?.let { title ->
+                        val icon = marker.icon
+                        val iconHeight = icon?.intrinsicHeight ?: 0
+                        val iconWidth = icon?.intrinsicWidth ?: 0
+
+                        // Measure text height for vertical centering
+                        val textBounds = Rect()
+                        labelPaint.getTextBounds(title, 0, title.length, textBounds)
+                        val textHeight = textBounds.height()
+
+                        // Offset Y so text is vertically centered over the icon
+                        val yOffset = iconHeight / 2f - textHeight / 2f
+                        canvas.drawText(title, point.x.toFloat(), point.y.toFloat() - yOffset, labelPaint)
+                    }
+                }
+            }
+        }
+    }
+
     fun loadMarkers( context: Context, mapView: View, markerProperties: ArrayList<MarkerProperty> )
     {
         if (mapView is org.osmdroid.views.MapView)
         {
-            val clusterer = RadiusMarkerClusterer(context)
+            val clusterer = MyRadiusMarkerClusterer(context)
             clusterer.textPaint.color = Color.WHITE
 
             for (markerProperty in markerProperties)
