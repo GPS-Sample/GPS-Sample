@@ -35,6 +35,7 @@ import com.mapbox.common.TileDataDomain
 import com.mapbox.common.TileRegionLoadOptions
 import com.mapbox.common.TileStore
 import com.mapbox.common.TileStoreOptions
+import com.mapbox.geojson.Feature
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.GlyphsRasterizationMode
@@ -61,6 +62,7 @@ import com.mapbox.maps.extension.style.layers.generated.circleLayer
 import com.mapbox.maps.extension.style.layers.generated.symbolLayer
 import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
 import com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor
+import com.mapbox.maps.extension.style.layers.properties.generated.TextJustify
 import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import com.mapbox.maps.extension.style.style
 import com.mapbox.maps.plugin.LocationPuck2D
@@ -104,6 +106,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonPrimitive
 import org.json.JSONArray
 import org.json.JSONObject
 import org.osmdroid.tileprovider.MapTileProviderBasic
@@ -1065,7 +1068,7 @@ class MapManager
                 data(geoJson)
                 cluster(true)
                 clusterRadius(50)
-                clusterMaxZoom(16)
+                clusterMaxZoom(18)
                 build()
             }
 
@@ -1086,10 +1089,21 @@ class MapManager
 
             +symbolLayer("UNCLUSTERED_LAYER", "SOURCE_ID") {
                 filter(not(has("point_count"))) // only single points
+
+                // Icon
                 iconImage(get("iconName"))       // your property in GeoJSON
-                iconAllowOverlap(false)
-                iconIgnorePlacement(false)
+                iconAllowOverlap(true)
+                iconIgnorePlacement(true)
                 iconAnchor(IconAnchor.CENTER)
+
+                // Text label
+                textField(get("title"))           // add this property to your GeoJSON
+                textSize(18.0)
+                textColor(Color.BLACK)
+                textAnchor(TextAnchor.CENTER)
+                textJustify(TextJustify.CENTER) // vertical alignment                textJustify(TextJustify.CENTER)
+                textAllowOverlap(true)
+                textIgnorePlacement(true)
             }
         }) { style ->
 
@@ -1135,33 +1149,35 @@ class MapManager
             color = Color.BLACK
             textSize = 20f
             isAntiAlias = true
-            textAlign = Paint.Align.CENTER // horizontal centering
+            textAlign = Paint.Align.CENTER
             typeface = Typeface.DEFAULT_BOLD
         }
 
-        override fun draw(canvas: Canvas, mapView: org.osmdroid.views.MapView, shadow: Boolean)
-        {
+        private val labelZoomThreshold = 18.0  // adjust to taste
+
+        override fun draw(canvas: Canvas, mapView: org.osmdroid.views.MapView, shadow: Boolean) {
             super.draw(canvas, mapView, shadow)
 
-            if (!shadow)
-            {
-                for (marker in this.items)
-                {
-                    val point = mapView.projection.toPixels(marker.position, null)
-                    marker.title?.let { title ->
-                        val icon = marker.icon
-                        val iconHeight = icon?.intrinsicHeight ?: 0
-                        val iconWidth = icon?.intrinsicWidth ?: 0
+            if (shadow) return
 
-                        // Measure text height for vertical centering
-                        val textBounds = Rect()
-                        labelPaint.getTextBounds(title, 0, title.length, textBounds)
-                        val textHeight = textBounds.height()
+            Log.d( "xxx", mapView.zoomLevelDouble.toString())
 
-                        // Offset Y so text is vertically centered over the icon
-                        val yOffset = iconHeight / 2f - textHeight / 2f
-                        canvas.drawText(title, point.x.toFloat(), point.y.toFloat() - yOffset, labelPaint)
-                    }
+            // Only draw labels when zoomed in
+            if (mapView.zoomLevelDouble < labelZoomThreshold) return
+
+            for (marker in items) {
+                val point = mapView.projection.toPixels(marker.position, null)
+
+                marker.title?.let { title ->
+                    val icon = marker.icon
+                    val iconHeight = icon?.intrinsicHeight ?: 0
+
+                    val textBounds = Rect()
+                    labelPaint.getTextBounds(title, 0, title.length, textBounds)
+                    val textHeight = textBounds.height()
+
+                    val yOffset = iconHeight / 2f - textHeight / 2f
+                    canvas.drawText(title, point.x.toFloat(), point.y.toFloat() - yOffset, labelPaint)
                 }
             }
         }
@@ -1198,20 +1214,28 @@ class MapManager
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
-            val geoJson = JSONObject()
-            geoJson.put("type", "FeatureCollection")
-
             val features = JSONArray()
 
-            for (markerProperty in markerProperties)
-            {
-                features.put(
-                    MapManager.instance().createFeature(
-                        markerProperty.location,
-                        MapManager.instance().getResourceName(markerProperty.resourceId)))
+            for (markerProperty in markerProperties) {
+                // Create the base feature
+                val feature = MapManager.instance().createFeature(
+                    markerProperty.location,
+                    MapManager.instance().getResourceName(markerProperty.resourceId)
+                )
 
-                geoJson.put("features", features)
+                // Get the properties JSONObject
+                val properties = feature.getJSONObject("properties")
+
+                // Add the label property
+                properties.put("title", markerProperty.title) // the text you want over the icon
+
+                // Add feature to array
+                features.put(feature)
             }
+
+            val geoJson = JSONObject()
+            geoJson.put("type", "FeatureCollection")
+            geoJson.put("features", features)
 
             loadMarkers( context, mapView, geoJson.toString())
         }
