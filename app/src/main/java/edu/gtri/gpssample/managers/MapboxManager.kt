@@ -17,8 +17,15 @@ import android.graphics.drawable.Drawable
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import com.mapbox.geojson.Feature
 import com.mapbox.geojson.Point
 import com.mapbox.maps.*
+import com.mapbox.maps.extension.style.layers.addLayer
+import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
+import com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor
+import com.mapbox.maps.extension.style.layers.properties.generated.TextJustify
+import com.mapbox.maps.extension.style.sources.addSource
+import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import com.mapbox.maps.plugin.annotation.AnnotationConfig
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
@@ -104,8 +111,11 @@ class MapboxManager( var context: Context )
         val pointAnnotationOptions = PointAnnotationOptions()
             .withPoint(point)
             .withTextField(label)
-            .withTextSize(12.0)
-            .withTextColor(Color.parseColor(color))
+            .withTextSize(14.0)
+            .withTextColor(Color.BLACK)
+            .withTextHaloColor("rgba(255,255,255,0.50)")
+            .withTextHaloWidth(5.0)
+            .withTextHaloBlur(0.5)
 
         // Add it to the map
         pointAnnotationManager.create(pointAnnotationOptions)

@@ -926,7 +926,7 @@ class PerformEnumerationFragment : Fragment(),
 
         if (pointList.isNotEmpty() && pointList[0].isNotEmpty())
         {
-            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20 )
+            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20, Color.RED, enumArea.name )
 
             if (isShowingBreadcrumbs && enumArea.breadcrumbs.isNotEmpty())
             {
