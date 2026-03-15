@@ -276,6 +276,11 @@ class LocationDAO(private var dao: DAO)
 
     fun delete( location: Location )
     {
+        if (location.imageUuid.isNotEmpty())
+        {
+            ImageDAO.instance().delete( location.imageUuid )
+        }
+
         var whereClause = "${DAO.COLUMN_UUID} = ?"
         var args = arrayOf(location.uuid)
         dao.writableDatabase.delete(DAO.TABLE_LOCATION, whereClause, args)

@@ -129,9 +129,10 @@ class ConfigurationFragment : Fragment(),
                     ConfirmationDialog.ButtonPress.Left -> {
                     }
                     ConfirmationDialog.ButtonPress.Right -> {
-                        DAO.deleteAll()
-                        ImageDAO.deleteAll()
-                        findNavController().popBackStack()
+                        sharedViewModel.currentConfiguration?.value?.let { config ->
+                            DAO.configDAO.deleteConfig( config )
+                            findNavController().popBackStack()
+                        }
                     }
                     ConfirmationDialog.ButtonPress.None -> {
                     }

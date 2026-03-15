@@ -99,10 +99,15 @@ class ImageDAO(private var context: Context, name: String?, factory: SQLiteDatab
 
     fun delete( image: Image )
     {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args = arrayOf(image.uuid)
+        delete( image.uuid )
+    }
 
-        writableDatabase.delete(DAO.TABLE_MAP_TILE_REGION, whereClause, args)
+    fun delete( imageUuid: String )
+    {
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args = arrayOf(imageUuid)
+
+        writableDatabase.delete(TABLE_IMAGE, whereClause, args)
     }
 
     companion object
