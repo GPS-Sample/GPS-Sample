@@ -44,6 +44,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
+import edu.gtri.gpssample.managers.PreferencesManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -240,7 +241,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                     }
                 }
             }
-
         }
 
         binding.createEnumAreaButton.setOnClickListener {
@@ -884,10 +884,10 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
             }
             resources.getString(R.string.delete) -> {
-                MapManager.instance().clearMap( mapView )
                 unsavedEnumAreas.remove( tag )
                 config.enumAreas.remove( tag )
                 DAO.enumAreaDAO.delete( tag )
+                refreshMap()
             }
             resources.getString(R.string.attach_mbtiles) -> {
                 selectedEnumArea = enumArea
@@ -1031,10 +1031,36 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
     fun processGeoJson( json: String, nameKey: String, strataKey: String = "" )
     {
-        if (json.isEmpty())
+        val hash = PreferencesManager.computeHash( json )
+
+        if (PreferencesManager.isHashImported(config.uuid, hash ))
         {
+            ConfirmationDialog( activity,
+                resources.getString(R.string.duplicate_import), "",
+                resources.getString(R.string.no),
+                resources.getString(R.string.yes),
+                null, false ) { buttonPressed, tag ->
+                when (buttonPressed) {
+                    ConfirmationDialog.ButtonPress.Left -> {}
+
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        finishProcessGeoJson( json, nameKey, strataKey )
+                    }
+
+                    ConfirmationDialog.ButtonPress.None -> {}
+                }
+            }
         }
         else
+        {
+            PreferencesManager.saveHash(config.uuid, hash )
+            finishProcessGeoJson( json, nameKey, strataKey )
+        }
+    }
+
+    fun finishProcessGeoJson( json: String, nameKey: String, strataKey: String = "" )
+    {
+        if (json.isNotEmpty())
         {
             activity!!.runOnUiThread {
                 busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )

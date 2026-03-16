@@ -1160,8 +1160,6 @@ class MapManager
 
             if (shadow) return
 
-            Log.d( "xxx", mapView.zoomLevelDouble.toString())
-
             // Only draw labels when zoomed in
             if (mapView.zoomLevelDouble < labelZoomThreshold) return
 

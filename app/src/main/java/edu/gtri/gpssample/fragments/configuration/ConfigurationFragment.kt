@@ -130,8 +130,14 @@ class ConfigurationFragment : Fragment(),
                     }
                     ConfirmationDialog.ButtonPress.Right -> {
                         sharedViewModel.currentConfiguration?.value?.let { config ->
-                            DAO.configDAO.deleteConfig( config )
-                            findNavController().popBackStack()
+                            val busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.delete_config), this, false )
+                            Thread {
+                                DAO.configDAO.deleteConfig( config )
+                                activity!!.runOnUiThread {
+                                    busyIndicatorDialog.alertDialog.cancel()
+                                    findNavController().popBackStack()
+                                }
+                            }.start()
                         }
                     }
                     ConfirmationDialog.ButtonPress.None -> {
