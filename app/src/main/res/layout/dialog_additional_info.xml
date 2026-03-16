@@ -7,7 +7,7 @@
 
     <TextView
         android:text="@string/additional_info"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="17sp"
         android:textStyle="bold"
         android:padding="10dp"
@@ -40,7 +40,7 @@
 
         <TextView
             android:text="@string/reason_incomplete_label"
-            android:textColor="@color/primary"
+            android:textColor="@color/primary_textcolor"
             android:textSize="17sp"
             android:textStyle="bold"
             android:padding="10dp"
@@ -79,7 +79,7 @@
 
     <TextView
         android:text="@string/notes"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="17sp"
         android:textStyle="bold"
         android:padding="10dp"

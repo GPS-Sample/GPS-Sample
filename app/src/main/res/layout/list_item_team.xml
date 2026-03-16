@@ -37,7 +37,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:gravity="center_vertical"
-                    android:textColor="@color/primary"
+                    android:textColor="@color/primary_textcolor"
                     android:textStyle="bold"
                     android:textSize="20sp"
                     android:text="@string/text" />
@@ -58,7 +58,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:gravity="center_vertical"
-                android:textColor="@color/text_color"
+                android:textColor="@color/primary_textcolor"
                 android:textStyle="italic"
                 android:textSize="17sp"/>
         </LinearLayout>

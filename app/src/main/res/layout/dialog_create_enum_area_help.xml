@@ -27,7 +27,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/import_enumeration_area"
-            android:textColor="@color/text_color"
+            android:textColor="@color/primary_textcolor"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>
@@ -53,7 +53,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/create_enumeration_area"
-            android:textColor="@color/text_color"
+            android:textColor="@color/primary_textcolor"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>
@@ -79,7 +79,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/add_household"
-            android:textColor="@color/text_color"
+            android:textColor="@color/primary_textcolor"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>
@@ -103,7 +103,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/download_map_tiles"
-            android:textColor="@color/text_color"
+            android:textColor="@color/primary_textcolor"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>
@@ -127,7 +127,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/edit_location"
-            android:textColor="@color/text_color"
+            android:textColor="@color/primary_textcolor"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>
@@ -152,7 +152,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/center_on_location"
-            android:textColor="@color/text_color"
+            android:textColor="@color/primary_textcolor"
             android:textSize="17sp"
             android:textStyle="normal" />
     </LinearLayout>

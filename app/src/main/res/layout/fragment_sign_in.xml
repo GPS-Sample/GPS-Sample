@@ -20,7 +20,7 @@
             android:layout_margin="20dp"
             android:gravity="center_vertical"
             android:text="@string/admin_sign_in"
-            android:textColor="?attr/colorPrimary"
+            android:textColor="@color/primary_textcolor"
             android:textSize="17sp"
             android:textStyle="bold" />
 
@@ -52,7 +52,7 @@
             android:layout_marginTop="20dp"
             android:gravity="center"
             android:text="@string/forgot_pin"
-            android:textColor="@color/primary"
+            android:textColor="@color/blue"
             android:textSize="17sp"/>
 
         <TextView
@@ -62,7 +62,7 @@
             android:layout_marginTop="0dp"
             android:gravity="center"
             android:text="@string/reset_pin"
-            android:textColor="@color/primary"
+            android:textColor="@color/blue"
             android:textSize="17sp"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>

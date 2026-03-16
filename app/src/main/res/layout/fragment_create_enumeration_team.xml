@@ -18,7 +18,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:gravity="center_vertical"
-            android:textColor="@color/primary"
+            android:textColor="@color/primary_textcolor"
             android:text="@string/team_name"
             android:textSize="17sp"
             android:textStyle="bold" />
@@ -40,7 +40,7 @@
             android:layout_marginRight="20dp"
             android:gravity="center_vertical"
             android:text="@string/assign_households"
-            android:textColor="@color/primary"
+            android:textColor="@color/primary_textcolor"
             android:textSize="17sp"
             android:textStyle="bold" />
 

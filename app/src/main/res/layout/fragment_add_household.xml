@@ -85,7 +85,7 @@
                                 android:gravity="center_vertical"
                                 android:padding="10dp"
                                 android:text="@string/additional_info"
-                                android:textColor="@color/primary"
+                                android:textColor="@color/primary_textcolor"
                                 android:textSize="17sp"
                                 android:textStyle="bold" />
 
@@ -131,7 +131,7 @@
                                     android:gravity="center_vertical"
                                     android:padding="10dp"
                                     android:text="@string/UUID"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:textSize="17sp"
                                     android:textStyle="bold" />
 
@@ -140,7 +140,7 @@
                                     android:focusable="false"
                                     android:layout_marginEnd="20dp"
                                     android:textSize="17sp"
-                                    android:textColor="@color/text_color"
+                                    android:textColor="@color/primary_textcolor"
                                     android:layout_weight="1"
                                     android:layout_width="0dp"
                                     android:layout_height="50dp"/>
@@ -158,7 +158,7 @@
                                     android:gravity="center_vertical"
                                     android:padding="10dp"
                                     android:text="@string/latitude"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:textSize="17sp"
                                     android:textStyle="bold" />
 
@@ -167,7 +167,7 @@
                                     android:focusable="false"
                                     android:layout_marginEnd="20dp"
                                     android:textSize="17sp"
-                                    android:textColor="@color/text_color"
+                                    android:textColor="@color/primary_textcolor"
                                     android:layout_weight="1"
                                     android:layout_width="0dp"
                                     android:layout_height="50dp"/>
@@ -185,7 +185,7 @@
                                     android:gravity="center_vertical"
                                     android:padding="10dp"
                                     android:text="@string/longitude"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:textSize="17sp"
                                     android:textStyle="bold" />
 
@@ -194,7 +194,7 @@
                                     android:focusable="false"
                                     android:layout_marginEnd="20dp"
                                     android:textSize="17sp"
-                                    android:textColor="@color/text_color"
+                                    android:textColor="@color/primary_textcolor"
                                     android:layout_weight="1"
                                     android:layout_width="0dp"
                                     android:layout_height="50dp"/>
@@ -212,7 +212,7 @@
                                     android:gravity="center_vertical"
                                     android:padding="10dp"
                                     android:text="@string/subaddress"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:textSize="17sp"
                                     android:textStyle="bold" />
 
@@ -221,7 +221,7 @@
                                     android:focusable="true"
                                     android:layout_marginEnd="20dp"
                                     android:textSize="17sp"
-                                    android:textColor="@color/text_color"
+                                    android:textColor="@color/primary_textcolor"
                                     android:imeOptions="actionDone"
                                     android:inputType="text"
                                     android:layout_weight="1"
@@ -251,7 +251,7 @@
                                 <TextView
                                     android:id="@+id/enumeration_status_text_view"
                                     android:text="@string/enumeration_status"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:textSize="17sp"
                                     android:textStyle="bold"
                                     android:padding="10dp"
@@ -276,7 +276,7 @@
                                     <TextView
                                         android:id="@+id/enumeration_reason_incomplete_text_view"
                                         android:text="@string/enumeration_reason_incomplete_label"
-                                        android:textColor="@color/primary"
+                                        android:textColor="@color/primary_textcolor"
                                         android:textSize="17sp"
                                         android:textStyle="bold"
                                         android:padding="10dp"
@@ -319,7 +319,7 @@
                                 <TextView
                                     android:id="@+id/enumeration_notes_text_view"
                                     android:text="@string/enumeration_notes"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:textSize="17sp"
                                     android:textStyle="bold"
                                     android:padding="10dp"
@@ -345,7 +345,7 @@
                                 <TextView
                                     android:id="@+id/collection_status_text_view"
                                     android:text="@string/collection_status"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:textSize="17sp"
                                     android:textStyle="bold"
                                     android:padding="10dp"
@@ -370,7 +370,7 @@
                                     <TextView
                                         android:id="@+id/collection_reason_incomplete_text_view"
                                         android:text="@string/collection_reason_incomplete_label"
-                                        android:textColor="@color/primary"
+                                        android:textColor="@color/primary_textcolor"
                                         android:textSize="17sp"
                                         android:textStyle="bold"
                                         android:padding="10dp"
@@ -413,7 +413,7 @@
                                 <TextView
                                     android:id="@+id/collection_notes_text_view"
                                     android:text="@string/collection_notes"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:textSize="17sp"
                                     android:textStyle="bold"
                                     android:padding="10dp"
@@ -461,7 +461,7 @@
                             android:gravity="center_vertical"
                             android:padding="10dp"
                             android:text="@string/location_image"
-                            android:textColor="@color/primary"
+                            android:textColor="@color/primary_textcolor"
                             android:textSize="17sp"
                             android:textStyle="bold" />
 

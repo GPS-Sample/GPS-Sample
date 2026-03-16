@@ -428,7 +428,7 @@
                                     android:layout_marginStart="10dp"
                                     android:gravity="center_vertical"
                                     android:text="@string/num_enumeration_areas"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:autoSizeMinTextSize="8sp"
                                     android:autoSizeMaxTextSize="17sp"
                                     android:autoSizeTextType="uniform"
@@ -441,7 +441,7 @@
                                     android:layout_marginLeft="10dp"
                                     android:layout_marginRight="10dp"
                                     android:gravity="center_vertical|end"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:text="0"
                                     android:textSize="17sp"/>
                             </LinearLayout>
@@ -458,7 +458,7 @@
                                     android:layout_marginStart="10dp"
                                     android:gravity="center_vertical"
                                     android:text="@string/num_hhs_enumerated"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:autoSizeMinTextSize="8sp"
                                     android:autoSizeMaxTextSize="17sp"
                                     android:autoSizeTextType="uniform"
@@ -471,7 +471,7 @@
                                     android:layout_marginLeft="10dp"
                                     android:layout_marginRight="10dp"
                                     android:gravity="center_vertical|end"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:text="0"
                                     android:textSize="17sp"/>
                             </LinearLayout>
@@ -488,7 +488,7 @@
                                     android:layout_marginStart="10dp"
                                     android:gravity="center_vertical"
                                     android:text="@string/num_hhs_eligible"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:autoSizeMinTextSize="8sp"
                                     android:autoSizeMaxTextSize="17sp"
                                     android:autoSizeTextType="uniform"
@@ -501,7 +501,7 @@
                                     android:layout_marginLeft="10dp"
                                     android:layout_marginRight="10dp"
                                     android:gravity="center_vertical|end"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:text="0"
                                     android:textSize="17sp"/>
                             </LinearLayout>
@@ -518,7 +518,7 @@
                                     android:layout_marginStart="10dp"
                                     android:gravity="center_vertical"
                                     android:text="@string/num_hhs_sampled"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:autoSizeMinTextSize="8sp"
                                     android:autoSizeMaxTextSize="17sp"
                                     android:autoSizeTextType="uniform"
@@ -531,7 +531,7 @@
                                     android:layout_marginLeft="10dp"
                                     android:layout_marginRight="10dp"
                                     android:gravity="center_vertical|end"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:text="0"
                                     android:textSize="17sp"/>
                             </LinearLayout>
@@ -548,7 +548,7 @@
                                     android:layout_marginStart="10dp"
                                     android:gravity="center_vertical"
                                     android:text="@string/num_hhs_surveyed"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:autoSizeMinTextSize="8sp"
                                     android:autoSizeMaxTextSize="17sp"
                                     android:autoSizeTextType="uniform"
@@ -561,7 +561,7 @@
                                     android:layout_marginLeft="10dp"
                                     android:layout_marginRight="10dp"
                                     android:gravity="center_vertical|end"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:text="0"
                                     android:textSize="17sp"/>
                             </LinearLayout>
@@ -579,7 +579,7 @@
                                     android:layout_marginStart="10dp"
                                     android:gravity="center_vertical"
                                     android:text="@string/num_hhs_remaining_to_survey"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:autoSizeMinTextSize="8sp"
                                     android:autoSizeMaxTextSize="17sp"
                                     android:autoSizeTextType="uniform"
@@ -592,7 +592,7 @@
                                     android:layout_marginLeft="10dp"
                                     android:layout_marginRight="10dp"
                                     android:gravity="center_vertical|end"
-                                    android:textColor="@color/primary"
+                                    android:textColor="@color/primary_textcolor"
                                     android:text="0"
                                     android:textSize="17sp"/>
                             </LinearLayout>
