@@ -412,7 +412,8 @@ class ManageConfigurationsFragment : Fragment(),
     {
         if (errorCode != Config.ErrorCode.None)
         {
-            InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+            val message = if (errorCode == Config.ErrorCode.PasswordError) resources.getString(R.string.password_error) else resources.getString(R.string.import_failed)
+            InfoDialog( activity!!, resources.getString(R.string.error), message, resources.getString(R.string.ok), null, null)
         }
         else
         {
