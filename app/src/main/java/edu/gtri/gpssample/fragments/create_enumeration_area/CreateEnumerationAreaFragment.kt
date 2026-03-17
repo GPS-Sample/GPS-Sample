@@ -34,6 +34,7 @@ import com.google.android.gms.maps.model.*
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.maps.*
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
+import com.mapbox.maps.extension.style.expressions.dsl.generated.has
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
@@ -54,6 +55,7 @@ import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.MapManager.Companion.GEORGIA_TECH
 import edu.gtri.gpssample.managers.MapboxManager
+import edu.gtri.gpssample.managers.PreferencesManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -1000,6 +1002,35 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     fun processGeoJson( json: String, nameKey: String, strataKey: String = "" )
     {
+        val hash = PreferencesManager.computeHash( json )
+
+        if (PreferencesManager.isHashImported(config.uuid, hash ))
+        {
+            ConfirmationDialog( activity,
+                resources.getString(R.string.oops), resources.getString(R.string.duplicate_import),
+                resources.getString(R.string.no),
+                resources.getString(R.string.yes),
+                null, false ) { buttonPressed, tag ->
+                when (buttonPressed) {
+                    ConfirmationDialog.ButtonPress.Left -> {}
+
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        finishProcessGeoJson( json, nameKey, strataKey )
+                    }
+
+                    ConfirmationDialog.ButtonPress.None -> {}
+                }
+            }
+        }
+        else
+        {
+            PreferencesManager.saveHash(config.uuid, hash )
+            finishProcessGeoJson( json, nameKey, strataKey )
+        }
+    }
+
+    fun finishProcessGeoJson( json: String, nameKey: String, strataKey: String = "" )
+    {
         if (json.isEmpty())
         {
         }
@@ -1049,6 +1080,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     fun parseGeoJson( text: String, nameKey: String, strataKey: String )
     {
+        var hasBeenCentered = false
         val points = ArrayList<PointWithProperty>()
         val featureCollection = FeatureCollection.fromJson( text )
 
@@ -1123,11 +1155,16 @@ class CreateEnumerationAreaFragment : Fragment(),
                             }
                         }
 
-                        activity!!.runOnUiThread {
-                            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                                MapManager.instance().stopCenteringOnLocation( binding.mapboxMapView )
-                                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
-                                MapManager.instance().centerMap( enumArea, currentZoomLevel, binding.mapboxMapView )
+                        if (!hasBeenCentered)
+                        {
+                            hasBeenCentered = true
+                            activity!!.runOnUiThread {
+                                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                                    MapManager.instance().stopCenteringOnLocation( binding.mapboxMapView )
+                                    binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                                    MapManager.instance().centerMap( enumArea, currentZoomLevel, binding.mapboxMapView )
+                                    refreshMap()
+                                }
                             }
                         }
 
