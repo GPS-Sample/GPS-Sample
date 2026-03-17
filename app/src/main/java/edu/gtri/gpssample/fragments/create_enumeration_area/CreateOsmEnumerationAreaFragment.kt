@@ -1036,7 +1036,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         if (PreferencesManager.isHashImported(config.uuid, hash ))
         {
             ConfirmationDialog( activity,
-                resources.getString(R.string.duplicate_import), "",
+                resources.getString(R.string.oops), resources.getString(R.string.duplicate_import),
                 resources.getString(R.string.no),
                 resources.getString(R.string.yes),
                 null, false ) { buttonPressed, tag ->
