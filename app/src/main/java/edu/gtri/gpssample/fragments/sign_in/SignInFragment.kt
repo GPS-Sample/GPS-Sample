@@ -93,7 +93,7 @@ class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
             binding.nameEditText.setText( userName )
         }
 
-        binding.forgotPinTextView.setOnClickListener {
+        binding.forgotPinButton.setOnClickListener {
             val userName = binding.nameEditText.text.toString()
             if (userName.isEmpty())
             {
@@ -133,7 +133,7 @@ class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
             }
         }
 
-        binding.resetPinTextView.setOnClickListener {
+        binding.resetPinButton.setOnClickListener {
             val userName = binding.nameEditText.text.toString()
             if (userName.isEmpty())
             {

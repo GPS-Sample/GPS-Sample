@@ -170,7 +170,7 @@ class MainFragment : Fragment()
                             binding.adminButton.visibility = View.GONE
                             binding.supervisorButton.visibility = View.GONE
                             binding.enumeratorButton.visibility = View.GONE
-                            binding.signUpTextView.visibility = View.GONE
+                            binding.signUpButton.visibility = View.GONE
                         }
                         else if (highestRole == Role.Enumerator)
                         {
@@ -216,27 +216,27 @@ class MainFragment : Fragment()
             }
         }
 
-        binding.signUpTextView.setOnClickListener {
-            var bundl: Bundle? = null
+        binding.signUpButton.setOnClickListener {
+            var bundle: Bundle? = null
 
             if (binding.adminButton.isChecked) {
-                bundl = Bundle()
-                bundl.putString( Keys.kRole.value, Role.Admin.value)
+                bundle = Bundle()
+                bundle.putString( Keys.kRole.value, Role.Admin.value)
             }
             else if (binding.supervisorButton.isChecked) {
-                bundl = Bundle()
-                bundl.putString( Keys.kRole.value, Role.Supervisor.value)
+                bundle = Bundle()
+                bundle.putString( Keys.kRole.value, Role.Supervisor.value)
             }
             else if (binding.enumeratorButton.isChecked) {
-                bundl = Bundle()
-                bundl.putString( Keys.kRole.value, Role.Enumerator.value)
+                bundle = Bundle()
+                bundle.putString( Keys.kRole.value, Role.Enumerator.value)
             }
             else if (binding.dataCollectorButton.isChecked) {
-                bundl = Bundle()
-                bundl.putString( Keys.kRole.value, Role.DataCollector.value)
+                bundle = Bundle()
+                bundle.putString( Keys.kRole.value, Role.DataCollector.value)
             }
 
-            if (bundl == null)
+            if (bundle == null)
             {
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_select_a_role), Toast.LENGTH_SHORT).show()
             }
@@ -247,9 +247,9 @@ class MainFragment : Fragment()
                 binding.dataCollectorButton.isChecked = false
 
                 binding.signInButton.isEnabled = false
-                binding.signUpTextView.isEnabled = false
+                binding.signUpButton.isEnabled = false
 
-                findNavController().navigate(R.id.action_navigate_to_SignUpFragment, bundl)
+                findNavController().navigate(R.id.action_navigate_to_SignUpFragment, bundle)
             }
         }
 
