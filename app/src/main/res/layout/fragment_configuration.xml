@@ -118,14 +118,16 @@
                             android:gravity="center_vertical"
                             android:text="@string/map_engine"
                             android:textSize="17sp"
+                            android:textStyle="bold"
                             android:textColor="@color/primary_textcolor" />
 
                         <TextView
                             android:id="@+id/map_engine_text"
                             android:layout_width="match_parent"
-                            android:layout_height="30dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginLeft="20dp"
                             android:layout_marginRight="20dp"
+                            style="@android:style/Widget.EditText"
                             android:textSize="17sp"/>
 
                         <TextView
@@ -136,15 +138,17 @@
                             android:gravity="center_vertical"
                             android:text="@string/preferred_units"
                             android:textSize="17sp"
+                            android:textStyle="bold"
                             android:textColor="@color/primary_textcolor" />
 
                         <TextView
                             android:id="@+id/config_preferred_units_text"
                             android:layout_width="match_parent"
-                            android:layout_height="30dp"
+                            android:layout_height="match_parent"
                             android:layout_marginLeft="20dp"
                             android:layout_marginRight="20dp"
                             android:textSize="17sp"
+                            style="@android:style/Widget.EditText"
                             android:text="@{viewModel.currentConfigurationDistanceFormat}" />
 
                         <TextView
@@ -155,15 +159,17 @@
                             android:gravity="center_vertical"
                             android:text="@string/date_format"
                             android:textSize="17sp"
+                            android:textStyle="bold"
                             android:textColor="@color/primary_textcolor" />
 
                         <TextView
                             android:id="@+id/config_date_format_text"
                             android:layout_width="match_parent"
-                            android:layout_height="30dp"
+                            android:layout_height="match_parent"
                             android:layout_marginLeft="20dp"
                             android:layout_marginRight="20dp"
                             android:textSize="17sp"
+                            style="@android:style/Widget.EditText"
                             android:text="@{viewModel.currentConfigurationDateFormat}" />
 
                         <TextView
@@ -174,15 +180,17 @@
                             android:gravity="center_vertical"
                             android:text="@string/time_format"
                             android:textSize="17sp"
+                            android:textStyle="bold"
                             android:textColor="@color/primary_textcolor" />
 
                         <TextView
                             android:id="@+id/config_time_format_text"
                             android:layout_width="match_parent"
-                            android:layout_height="30dp"
+                            android:layout_height="match_parent"
                             android:layout_marginLeft="20dp"
                             android:layout_marginRight="20dp"
                             android:textSize="17sp"
+                            style="@android:style/Widget.EditText"
                             android:text="@{viewModel.currentConfigurationTimeFormat}" />
 
                         <TextView
@@ -193,15 +201,17 @@
                             android:gravity="center_vertical"
                             android:text="@string/min_gps_precision"
                             android:textSize="17sp"
+                            android:textStyle="bold"
                             android:textColor="@color/primary_textcolor" />
 
                         <TextView
                             android:id="@+id/min_gps_precision_edit_text"
                             android:layout_width="match_parent"
-                            android:layout_height="30dp"
+                            android:layout_height="match_parent"
                             android:layout_marginLeft="20dp"
                             android:layout_marginRight="20dp"
                             android:textSize="17sp"
+                            style="@android:style/Widget.EditText"
                             android:text="@{viewModel.currentConfigurationMinimumGpsPrecision}"/>
 
                         <TextView
@@ -212,15 +222,17 @@
                             android:gravity="center_vertical"
                             android:text="@string/encryption_password"
                             android:textSize="17sp"
+                            android:textStyle="bold"
                             android:textColor="@color/primary_textcolor" />
 
                         <TextView
                             android:id="@+id/encryption_password_edit_text"
                             android:layout_width="match_parent"
-                            android:layout_height="30dp"
+                            android:layout_height="match_parent"
                             android:layout_marginLeft="20dp"
                             android:layout_marginRight="20dp"
                             android:textSize="17sp"
+                            style="@android:style/Widget.EditText"
                             android:text="@={viewModel.currentConfiguration.encryptionPassword}"/>
 
                         <LinearLayout
@@ -237,6 +249,7 @@
                                 android:gravity="center_vertical"
                                 android:text="@string/allow_manual_identification_of_locations"
                                 android:textSize="17sp"
+                                android:textStyle="bold"
                                 android:textColor="@color/primary_textcolor" />
 
                             <androidx.appcompat.widget.SwitchCompat
@@ -262,6 +275,7 @@
                                 android:gravity="center_vertical"
                                 android:text="@string/subaddress_is_required"
                                 android:textSize="17sp"
+                                android:textStyle="bold"
                                 android:textColor="@color/primary_textcolor" />
 
                             <androidx.appcompat.widget.SwitchCompat
@@ -287,6 +301,7 @@
                                 android:gravity="center_vertical"
                                 android:text="@string/auto_increment_subaddress"
                                 android:textSize="17sp"
+                                android:textStyle="bold"
                                 android:textColor="@color/primary_textcolor" />
 
                             <androidx.appcompat.widget.SwitchCompat
@@ -312,6 +327,7 @@
                                 android:gravity="center_vertical"
                                 android:text="@string/proximity_warning_enabled"
                                 android:textSize="17sp"
+                                android:textStyle="bold"
                                 android:textColor="@color/primary_textcolor" />
 
                             <androidx.appcompat.widget.SwitchCompat
@@ -326,10 +342,11 @@
                         <TextView
                             android:id="@+id/proximity_warning_text_view"
                             android:layout_width="match_parent"
-                            android:layout_height="30dp"
+                            android:layout_height="match_parent"
                             android:layout_marginLeft="20dp"
                             android:layout_marginRight="20dp"
                             android:textSize="17sp"
+                            style="@android:style/Widget.EditText"
                             android:text="@{viewModel.currentConfigurationProximityWarning}"/>
                     </LinearLayout>
 
@@ -398,6 +415,7 @@
                         android:gravity="center_vertical"
                         android:text="@string/summary"
                         android:textSize="17sp"
+                        android:textStyle="bold"
                         android:textColor="@color/primary_textcolor" />
 
                     <androidx.cardview.widget.CardView
@@ -607,6 +625,7 @@
                         android:gravity="center_vertical"
                         android:text="@string/enumeration_areas"
                         android:textSize="17sp"
+                        android:textStyle="bold"
                         android:textColor="@color/primary_textcolor" />
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -630,6 +649,7 @@
                             android:gravity="center_vertical"
                             android:text="@string/studies"
                             android:textSize="17sp"
+                            android:textStyle="bold"
                             android:textColor="@color/primary_textcolor" />
                     </FrameLayout>
 
