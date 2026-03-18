@@ -10,7 +10,7 @@
 
     <TextView
         android:text="@string/privacy_statement"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="17sp"
         android:textStyle="bold"
         android:padding="20dp"

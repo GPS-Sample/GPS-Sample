@@ -10,7 +10,7 @@
 
     <TextView
         android:text="@string/code_of_conduct"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="17sp"
         android:textStyle="bold"
         android:padding="20dp"

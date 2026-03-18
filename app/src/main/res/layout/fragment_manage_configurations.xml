@@ -69,7 +69,7 @@
     <FrameLayout
         android:id="@+id/overlay_view"
         android:visibility="gone"
-        android:background="@color/light_gray"
+        android:background="@color/black"
         android:alpha=".5"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
