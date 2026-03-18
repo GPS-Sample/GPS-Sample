@@ -1067,8 +1067,8 @@ class MapManager
             +geoJsonSource("SOURCE_ID") {
                 data(geoJson)
                 cluster(true)
-                clusterRadius(50)
-                clusterMaxZoom(18)
+                clusterRadius(20)
+                clusterMaxZoom(16)
                 build()
             }
 
