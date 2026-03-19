@@ -263,10 +263,35 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
                 val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
                 requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
 
-                editText.doAfterTextChanged {
-                    if (it.toString().isNotEmpty())
+                editText.doAfterTextChanged { editable ->
+                    if (editable.toString().isNotEmpty())
                     {
-                        fieldData.numberValue = it.toString().toDouble()
+                        var error = ""
+                        val value = editable.toString().toDouble()
+
+                        field.minimum?.let { minimum ->
+                            if (value < minimum)
+                            {
+                                error = "The entered value is less than the minimum"
+                            }
+                        }
+
+                        field.maximum?.let { maximum ->
+                            if (value > maximum)
+                            {
+                                error = "The entered value is greater than the maximum"
+                            }
+                        }
+
+                        if (error.isNotEmpty())
+                        {
+                            editable?.delete(editable.length - 1, editable.length)
+                            Toast.makeText( context!!.applicationContext,error,Toast.LENGTH_SHORT ).show()
+                        }
+                        else
+                        {
+                            fieldData.numberValue = editable.toString().toDouble()
+                        }
                     }
                 }
 
