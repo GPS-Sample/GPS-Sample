@@ -37,6 +37,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.databinding.FragmentMainBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class MainFragment : Fragment()
@@ -264,31 +265,32 @@ class MainFragment : Fragment()
                 view.post {
                     if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)
                     {
-                        ConfirmationDialog( activity, resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement),
-                            resources.getString(R.string.accept_privacy_policy), resources.getString(R.string.decline_privacy_policy), null, true, false ) { buttonPressed, tag ->
-                            when( buttonPressed )
-                            {
-                                ConfirmationDialog.ButtonPress.Left -> {
-                                    ConfirmationDialog( activity, resources.getString(R.string.enable_background_activity_title), resources.getString(R.string.enable_background_activity_body),
-                                        resources.getString(R.string.open_settings), resources.getString(R.string.cancel), null, true, false ) { buttonPressed, tag ->
-                                        when( buttonPressed )
-                                        {
-                                            ConfirmationDialog.ButtonPress.Left -> {
-                                                requestIgnoreBatteryOptimizationsIfNeeded()
-                                            }
-                                            ConfirmationDialog.ButtonPress.Right -> {
-                                            }
-                                            ConfirmationDialog.ButtonPress.None -> {
-                                            }
-                                        }
-                                    }
-                                }
-                                ConfirmationDialog.ButtonPress.Right -> {
-                                }
-                                ConfirmationDialog.ButtonPress.None -> {
-                                }
-                            }
-                        }
+                        NotificationDialog(requireActivity(), resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement))
+//                        ConfirmationDialog( activity, resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement),
+//                            resources.getString(R.string.accept_privacy_policy), resources.getString(R.string.decline_privacy_policy), null, true, false ) { buttonPressed, tag ->
+//                            when( buttonPressed )
+//                            {
+//                                ConfirmationDialog.ButtonPress.Left -> {
+//                                    ConfirmationDialog( activity, resources.getString(R.string.enable_background_activity_title), resources.getString(R.string.enable_background_activity_body),
+//                                        resources.getString(R.string.open_settings), resources.getString(R.string.cancel), null, true, false ) { buttonPressed, tag ->
+//                                        when( buttonPressed )
+//                                        {
+//                                            ConfirmationDialog.ButtonPress.Left -> {
+//                                                requestIgnoreBatteryOptimizationsIfNeeded()
+//                                            }
+//                                            ConfirmationDialog.ButtonPress.Right -> {
+//                                            }
+//                                            ConfirmationDialog.ButtonPress.None -> {
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                                ConfirmationDialog.ButtonPress.Right -> {
+//                                }
+//                                ConfirmationDialog.ButtonPress.None -> {
+//                                }
+//                            }
+//                        }
                     }
                 }
             }
