@@ -188,8 +188,16 @@ class ConfigurationFragment : Fragment(),
         }
 
         binding.exportButton.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString(R.string.export_configuration), resources.getString(R.string.select_export_message),
-                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
+            ConfirmationDialog( activity, resources.getString(R.string.export_configuration), resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
+                sharedViewModel.currentConfiguration?.value?.let{ config ->
+                    config.selectedEnumAreaUuid = ""
+                    for (enumArea in config.enumAreas)
+                    {
+                        enumArea.selectedEnumerationTeamUuid = ""
+                        enumArea.selectedCollectionTeamUuid = ""
+                    }
+                }
+
                 when( buttonPressed )
                 {
                     ConfirmationDialog.ButtonPress.Left -> {
@@ -197,15 +205,6 @@ class ConfigurationFragment : Fragment(),
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export )
 
                         sharedViewModel.currentConfiguration?.value?.let{ config ->
-
-                            config.selectedEnumAreaUuid = ""
-
-                            for (enumArea in config.enumAreas)
-                            {
-                                enumArea.selectedEnumerationTeamUuid = ""
-                                enumArea.selectedCollectionTeamUuid = ""
-                            }
-
                             sharedNetworkViewModel.setCurrentConfig(config)
                             sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
                             sharedNetworkViewModel.createHotspot(view)

@@ -32,6 +32,7 @@ import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
@@ -440,45 +441,36 @@ class ManageConfigurationsFragment : Fragment(),
                 sharedViewModel.currentConfiguration?.value?.let{ config->
 
                     // find the selected Enum Area
-                    val enumAreas = config.enumAreas.filter {
-                        it.uuid == config.selectedEnumAreaUuid
-                    }
+                    val enumAreas = config.enumAreas.filter { it.uuid == config.selectedEnumAreaUuid }
 
                     // find the selected study
-                    val studies = config.studies.filter {
-                        it.uuid == config.selectedStudyUuid
-                    }
+                    val studies = config.studies.filter { it.uuid == config.selectedStudyUuid }
 
-                    if (enumAreas.isNotEmpty() && studies.isNotEmpty())
+                    if (enumAreas.isEmpty() || studies.isEmpty())
+                    {
+                        NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.enumerator_import_error))
+                        return
+                    }
+                    else
                     {
                         val enumArea = enumAreas[0]
                         val study = studies[0]
 
                         // find the selected enumeration Team
-                        val enumTeams = enumArea.enumerationTeams.filter { enumTeam ->
-                            enumTeam.uuid == enumArea.selectedEnumerationTeamUuid
-                        }
+                        val enumTeams = enumArea.enumerationTeams.filter { enumTeam -> enumTeam.uuid == enumArea.selectedEnumerationTeamUuid }
 
                         // find the selected collection Team
-                        val collectionTeams = enumArea.collectionTeams.filter { collectionTeam ->
-                            collectionTeam.uuid == enumArea.selectedCollectionTeamUuid
-                        }
+                        val collectionTeams = enumArea.collectionTeams.filter { collectionTeam -> collectionTeam.uuid == enumArea.selectedCollectionTeamUuid }
 
                         if (collectionTeams.isNotEmpty())
                         {
                             val collectionTeam = collectionTeams[0]
 
-                            // find the selected Enum Area
-                            val enumAreas = config.enumAreas.filter {
-                                it.uuid == collectionTeam.enumAreaUuid
-                            }
-
-                            val enumArea = enumAreas[0]
-
                             sharedViewModel.createStudyModel.setStudy( study )
                             sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
                             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                             samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+
                             findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
                         }
                         else if (enumTeams.isNotEmpty())
@@ -488,6 +480,7 @@ class ManageConfigurationsFragment : Fragment(),
                             sharedViewModel.createStudyModel.setStudy( study )
                             sharedViewModel.currentEnumerationTeamUuid = enumTeam.uuid
                             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+
                             findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
                         }
                     }
@@ -496,19 +489,15 @@ class ManageConfigurationsFragment : Fragment(),
         }
         else if (user.role == Role.DataCollector.toString())
         {
-            if(configurations.size > 0)
+            if (configurations.size > 0)
             {
                 sharedViewModel.currentConfiguration?.value?.let{ config->
 
                     // find the selected Enum Area
-                    val enumAreas = config.enumAreas.filter {
-                        it.uuid == config.selectedEnumAreaUuid
-                    }
+                    val enumAreas = config.enumAreas.filter { it.uuid == config.selectedEnumAreaUuid }
 
                     // find the selected study
-                    val studies = config.studies.filter {
-                        it.uuid == config.selectedStudyUuid
-                    }
+                    val studies = config.studies.filter { it.uuid == config.selectedStudyUuid }
 
                     if (enumAreas.isNotEmpty() && studies.isNotEmpty())
                     {
@@ -516,9 +505,7 @@ class ManageConfigurationsFragment : Fragment(),
                         val enumArea = enumAreas[0]
 
                         // find the selected collection Team
-                        val collectionTeams = enumArea.collectionTeams.filter { collectionTeam ->
-                            collectionTeam.uuid == enumArea.selectedCollectionTeamUuid
-                        }
+                        val collectionTeams = enumArea.collectionTeams.filter { collectionTeam -> collectionTeam.uuid == enumArea.selectedCollectionTeamUuid }
 
                         if (collectionTeams.isNotEmpty())
                         {

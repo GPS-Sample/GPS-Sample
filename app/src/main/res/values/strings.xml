@@ -437,6 +437,7 @@
 
     <string name="password_error">"The password entered is incorrect."</string>
     <string name="duplicate_import">"The selected GeoJson file appears to have already been imported. Would you like to continue with this import?"</string>
+    <string name="enumerator_import_error">"This configuration does not have an enumeration team associated with it."</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
