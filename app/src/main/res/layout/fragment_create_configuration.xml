@@ -307,7 +307,7 @@
                         android:inputType="number"
                         android:imeOptions="actionDone"
                         android:text="@={viewModel.currentConfiguration.proximityWarningStringValue}"
-                        android:hint="Proximity warning value?" />
+                        android:hint="@string/proximity_warning_value" />
 
                     <TextView
                         android:layout_weight="1"
