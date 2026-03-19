@@ -292,16 +292,34 @@
                         android:layout_marginEnd="20dp" />
                 </LinearLayout>
 
-                <EditText
-                    android:id="@+id/proximity_warning_edit_text"
+                <LinearLayout
+                    android:id="@+id/proximity_warning_layout"
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:inputType="number"
-                    android:imeOptions="actionDone"
-                    android:text="@={viewModel.currentConfiguration.proximityWarningStringValue}"
-                    android:hint="Enter the proximity warning value" />
+                    android:layout_height="50dp">
+
+                    <EditText
+                        android:id="@+id/proximity_warning_edit_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:inputType="number"
+                        android:imeOptions="actionDone"
+                        android:text="@={viewModel.currentConfiguration.proximityWarningStringValue}"
+                        android:hint="Proximity warning value?" />
+
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:gravity="center_vertical"
+                        android:text="@{viewModel.distanceFormatString}"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+                </LinearLayout>
 
                 <Space
                     android:layout_width="match_parent"

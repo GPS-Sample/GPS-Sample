@@ -10,6 +10,7 @@ package edu.gtri.gpssample.viewmodels
 import android.content.SharedPreferences
 import android.view.View
 import android.widget.AdapterView
+import androidx.camera.core.CameraEffect
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -50,6 +51,9 @@ class ConfigurationViewModel : ViewModel()
     // Exposed LiveData each screen being controlled by the view model
     val currentConfiguration : LiveData<Config>?
         get() = _currentConfiguration
+
+    private val _distanceFormatString = MutableLiveData<String>()
+    val distanceFormatString: LiveData<String> = _distanceFormatString
 
     var currentLocationUuid = ""
     var currentCollectionTeamUuid = ""
@@ -192,10 +196,12 @@ class ConfigurationViewModel : ViewModel()
             if (position == 0)
             {
                 it.distanceFormat = DistanceFormat.Meters
+                _distanceFormatString.value = minimumGpsPrecisionFormats[0]
             }
             else
             {
                 it.distanceFormat = DistanceFormat.Feet
+                _distanceFormatString.value = minimumGpsPrecisionFormats[1]
             }
         }
     }

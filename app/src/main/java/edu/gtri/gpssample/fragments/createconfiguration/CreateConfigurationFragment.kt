@@ -132,7 +132,7 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
 
             if (!config.proximityWarningIsEnabled)
             {
-                binding.proximityWarningEditText.visibility = View.GONE
+                binding.proximityWarningLayout.visibility = View.GONE
             }
         }
 
@@ -180,11 +180,11 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
         binding.proximityWarningEnabledSwitch.setOnClickListener {
             if (binding.proximityWarningEnabledSwitch.isChecked)
             {
-                binding.proximityWarningEditText.visibility = View.VISIBLE
+                binding.proximityWarningLayout.visibility = View.VISIBLE
             }
             else
             {
-                binding.proximityWarningEditText.visibility = View.GONE
+                binding.proximityWarningLayout.visibility = View.GONE
             }
         }
 
