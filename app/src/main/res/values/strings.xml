@@ -434,12 +434,28 @@
     <string name="strata_name">"Strata Name"</string>
     <string name="add_strata">"Add Strata"</string>
     <string name="strata">"Strata"</string>
-
+    <string name="gpssample_start">""GPSSample is a free Android app for field-based household listing, sampling, and navigation. Select your role to get started, or visit gpssample.org to learn more""</string>
+    <string name="role_hint">""Administrator: Sets up the full configuration, study, sampling method, rules, and filters. Supervisor: Manages field teams, draws samples, transfers data. Enumerator: Maps and lists households in the field. Data Collector: Navigates to sampled households and launches the survey. Note: Once you register a role on this device, only that role and roles below it will be available.""</string>
     <string name="password_error">"The password entered is incorrect."</string>
-    <string name="duplicate_import">"The selected GeoJson file appears to have already been imported. Would you like to continue with this import?"</string>
+    <string name="pin_hint">"Create a numeric PIN with 4 to 6 digits to secure your profile on this device. You will be shown a security question in case you forget your PIN."</string>
+    <string name="gpsaccuracy_hint">""Sets the minimum GPS accuracy required before a location point can be recorded. Recommended: 20 meters for standard surveys, 30 meters for rural areas. Lower values are more precise but harder to achieve in dense urban areas or under tree cover.""</string>
+    <string name="manual_hint">"Allow manual location entry. When on: enumerators can tap a location on the map to add a household if within 20 meters. Useful in dense urban areas or poor GPS signal. When off (default): only current GPS location is used."</string>
+    <string name="autoincrement_hint">""When on (default): each household is assigned a sequential number (1, 2, 3...) automatically. Turn off if your survey uses pre-assigned household identifiers.""</string>
+    <string name="proximity_hint">"When on: enumerators receive an alert if they try to add a household within [X] meters of an existing record. Helps prevent duplicate entries."</string>
+    <string name="encryption_hint">""Create a password that will be shared with all supervisors, enumerators, and data collectors on this project. This password is required to import the configuration on any device. Use letters and numbers only - no spaces or special characters.""</string>
+    <string name="sampling_hint">"Method descriptions: /nSimple Random Sample: Each household has an equal chance of being selected. /nCluster Sample (# of households): Select a fixed number of households from each cluster. /nCluster Sample (% of households): Select a percentage of households from each cluster."</string>
+    <string name="pii_hint">""Mark this field as PII if it could identify a specific individual. Examples: full name, phone number, national ID number.""</string>
+    <string name="field_block_hint">""Use a field block to repeat a set of questions based on this number. Example: if this field captures the number of children, the questions in the block will be asked once per child. Mark the last question in the group with End Field Block""</string>
+    <string name="rule_hint">""Give this rule a short descriptive name for your reference (e.g., Has child 12-23 months, Is a household could be child_household). This name appears in the filter setup step where rules are combined""</string>
+    <string name="filter_hint">""Filters combine one or more rules using AND, OR, or NOT logic to define which households are eligible for sampling. A filter is required even if you have only one rule.""</string>
+    <string name="team_draw_hint">"Define the area each field team will enumerate. Draw a boundary on the map for each team."</string>
+    <string name="subaddress_hint">""A unique identifier for each household in this cluster. Leave as auto-increment (1, 2, 3...) unless your survey uses pre-assigned household identifiers.""</string>
+    <string name="back2">"Done - return to map"</string>
+    <string name="dbsize_alert">"Your GPSSample database is approaching its 35MB limit. Consider exporting data before continuing."</string>
+    <string name="footer">"gpssample.org | gpssample23@gmail.com | Training Videos"</string>
+    <string name="duplicate_import">"The selected GeoJson file has already been imported. Would you like to continue with this import?"</string>
     <string name="enumerator_import_error">"This configuration does not have an enumeration team associated with it."</string>
-    <string name="proximity_warning_value">Proximity warning value?</string>
-
+    <string name="proximity_warning_value">"Proximity warning value?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

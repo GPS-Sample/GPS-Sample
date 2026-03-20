@@ -434,6 +434,28 @@
     <string name="strata_name">"Nombre del estrato"</string>
     <string name="add_strata">"Añadir estrato"</string>
     <string name="strata">"Estratos"</string>
+    <string name="gpssample_start">""GPSSample es una aplicación gratuita para Android destinada al registro de hogares, el muestreo y la navegación sobre el terreno. Selecciona tu función para empezar, o visita gpssample.org para obtener más información.""</string>
+    <string name="role_hint">""Administrador: Establece la configuración completa, el estudio, el método de muestreo, las reglas y los filtros. Supervisor: Gestiona los equipos de campo, toma muestras y transfiere datos. Encuestador: Mapea y elabora listados de hogares sobre el terreno. Recopilador de datos: Se desplaza hasta los hogares seleccionados y pone en marcha la encuesta. Nota: Una vez que registres una función en este dispositivo, solo estarán disponibles esa función y las funciones subordinadas a ella.  ""</string>
+    <string name="password_error">"La contraseña introducida es incorrecta."</string>
+    <string name="pin_hint">"Crea un PIN numérico de 4 a 6 dígitos para proteger tu perfil en este dispositivo. Se te mostrará una pregunta de seguridad por si olvidas tu PIN."</string>
+    <string name="gpsaccuracy_hint">""Establece la precisión mínima del GPS necesaria para que se pueda registrar un punto de ubicación. Recomendado: 20 metros para encuestas estándar, 30 metros para zonas rurales. Los valores más bajos son más precisos, pero más difíciles de alcanzar en zonas urbanas densas o bajo la cobertura de árboles.""</string>
+    <string name="manual_hint">"Permitir la introducción manual de la ubicación. Cuando está activada: los encuestadores pueden tocar una ubicación en el mapa para añadir un hogar si se encuentra a menos de 20 metros. Útil en zonas urbanas densas o con mala señal de GPS. Cuando está desactivada (por defecto): solo se utiliza la ubicación GPS actual."</string>
+    <string name="autoincrement_hint">""Cuando está activada (por defecto): a cada hogar se le asigna automáticamente un número secuencial (1, 2, 3...). Desactívela si su encuesta utiliza identificadores de hogares preasignados.""</string>
+    <string name="proximity_hint">"Cuando está activada: los encuestadores reciben una alerta si intentan añadir un hogar que se encuentre a menos de [X] metros de un registro ya existente. Esto ayuda a evitar entradas duplicadas."</string>
+    <string name="encryption_hint">""Crea una contraseña que se compartirá con todos los supervisores, encuestadores y recopiladores de datos de este proyecto. Esta contraseña es necesaria para importar la configuración en cualquier dispositivo. Utiliza solo letras y números; no incluyas espacios ni caracteres especiales.""</string>
+    <string name="sampling_hint">"" Descripciones de los métodos: /nMuestra aleatoria simple: cada hogar tiene las mismas posibilidades de ser seleccionado. /nMuestra por conglomerados (n.º de hogares): seleccione un número fijo de hogares de cada conglomerado. /nMuestra por conglomerados (% de hogares): seleccione un porcentaje de hogares de cada conglomerado.""</string>
+    <string name="pii_hint">""Marque este campo como PII si pudiera identificar a una persona concreta. Ejemplos: nombre completo, número de teléfono, número de identificación nacional.""</string>
+    <string name="field_block_hint">""Utilice un bloque de campos para repetir un conjunto de preguntas en función de este número. Ejemplo: si este campo recoge el número de hijos, las preguntas del bloque se formularán una vez por cada hijo. Marque la última pregunta del grupo con «Finalizar bloque de campos».""</string>
+    <string name="rule_hint">""Asigne a esta regla un nombre descriptivo breve para su referencia (por ejemplo, «Tiene hijos de 12 a 23 meses», «Es un hogar» podría ser «hijo_hogar»). Este nombre aparece en el paso de configuración del filtro, donde se combinan las reglas""</string>
+    <string name="filter_hint">""Los filtros combinan una o más reglas utilizando la lógica AND, OR o NOT para definir qué hogares son elegibles para el muestreo. Se requiere un filtro incluso si solo tiene una regla.""</string>
+    <string name="team_draw_hint">"Defina el área que cada equipo de campo censará. Trace un límite en el mapa para cada equipo."</string>
+    <string name="subaddress_hint">""Un identificador único para cada hogar de este grupo. Déjelo en autoincremento (1, 2, 3...) a menos que su encuesta utilice identificadores de hogar preasignados.""</string>
+    <string name="back2">"Hecho: volver al mapa"</string>
+    <string name="dbsize_alert">"Su base de datos de GPSSample se está acercando a su límite de 35 MB. Considere la posibilidad de exportar los datos antes de continuar."</string>
+    <string name="footer">"gpssample.org | gpssample23@gmail.com | Vídeos de formación"</string>
+    <string name="duplicate_import">"El archivo GeoJSON seleccionado ya se ha importado. ¿Desea continuar con esta importación?"</string>
+    <string name="enumerator_import_error">"Esta configuración no tiene ningún equipo de recuento asociado."</string>
+    <string name="proximity_warning_value">"¿Valor de advertencia de proximidad?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>

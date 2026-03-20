@@ -434,6 +434,28 @@
     <string name="strata_name">"نام لایه"</string>
     <string name="add_strata">"افزودن طبقه"</string>
     <string name="strata">"لایه"</string>
+    <string name="gpssample_start">"GPSSample یک اپلیکیشن رایگان اندروید برای فهرست"</string>
+    <string name="role_hint">"مدیر: پیکربندی کامل، مطالعه، روش نمونه"</string>
+    <string name="password_error">"رمز عبور وارد شده نادرست است."</string>
+    <string name="pin_hint">"برای ایمن"</string>
+    <string name="gpsaccuracy_hint">"حداقل دقت GPS مورد نیاز برای ثبت یک نقطه مکانی را تعیین می"</string>
+    <string name="manual_hint">"ورود دستی مکان را مجاز کنید. وقتی روشن باشد: سرشماری"</string>
+    <string name="autoincrement_hint">"وقتی روشن است (پیش"</string>
+    <string name="proximity_hint">"در صورت فعال بودن: شمارشگران در صورتی که بخواهند خانوار جدیدی را در فاصله [X] متری از یک رکورد موجود اضافه کنند، هشداری دریافت می"</string>
+    <string name="encryption_hint">"یک رمز عبور ایجاد کنید که با تمام سرپرستان، شمارشگران و گردآورندگان داده در این پروژه به اشتراک گذاشته شود. این رمز عبور برای وارد کردن پیکربندی بر روی هر دستگاهی الزامی است. فقط از حروف و اعداد استفاده کنید - بدون فاصله یا کاراکترهای ویژه."</string>
+    <string name="sampling_hint">"توضیحات روش: /nنمونه"</string>
+    <string name="pii_hint">"این فیلد را در صورتی که بتواند یک فرد خاص را شناسایی کند، به عنوان PII (اطلاعات شخصی قابل شناسایی) علامت"</string>
+    <string name="field_block_hint">"برای تکرار مجموعه"</string>
+    <string name="rule_hint">"برای ارجاع خود، یک نام توصیفی کوتاه به این قاعده بدهید (مثلاً، «دارای فرزند ۱۲-۲۳ ماهه»، «یک خانوار» می"</string>
+    <string name="filter_hint">"فیلترها با استفاده از منطق AND (و)، OR (یا) یا NOT (نه) یک یا چند قاعده را ترکیب می"</string>
+    <string name="team_draw_hint">"منطقه را که هر تیم میدانی آن را سرشماری خواهد کرد، تعریف کنید. برای هر تیم یک مرز روی نقشه رسم کنید."</string>
+    <string name="subaddress_hint">"یک شناسه یکتا برای هر خانوار در این خوشه. آن را به صورت خودافزا (۱، ۲، ۳...) باقی بگذارید، مگر اینکه نظرسنجی شما از شناسه"</string>
+    <string name="back2">"انجام شد - بازگشت به نقشه"</string>
+    <string name="dbsize_alert">"پایگاه داده GPSSample شما به محدودیت ۳۵ مگابایتی خود نزدیک می"</string>
+    <string name="footer">"gpssample.org | gpssample23@gmail.com | ویدیوهای آموزشی"</string>
+    <string name="duplicate_import">"فایل GeoJson انتخاب شده قبلاً وارد شده است. آیا می"</string>
+    <string name="enumerator_import_error">"این پیکربندی هیچ تیم انومره"</string>
+    <string name="proximity_warning_value">"مقدار هشدار نزدیکی؟"</string>
     <string-array name="forgot_pin_questions">
         <item>"نام میانی پدر"</item>
         <item>"نام خانوادگی پیش از ازدواج مادر"</item>

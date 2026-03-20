@@ -434,6 +434,28 @@
     <string name="strata_name">"Pangalan ng strata"</string>
     <string name="add_strata">"Magdagdag ng Strata"</string>
     <string name="strata">"Strata"</string>
+    <string name="gpssample_start">""Ang GPSSample ay isang libreng Android app para sa paglilista, pagsa-sample, at pag-navigate ng mga sambahayan batay sa field. Piliin ang iyong tungkulin upang makapagsimula, o bisitahin ang gpssample.org upang matuto nang higit pa.""</string>
+    <string name="role_hint">""Administrator: Itinatakda ang buong configuration, pag-aaral, paraan ng pagsa-sample, mga panuntunan, at mga filter. Superbisor: Namamahala sa mga field team, kumukuha ng mga sample, naglilipat ng data. Tagabilang: Nagmapa at naglilista ng mga sambahayan sa field. Tagakolekta ng Datos: Nagna-navigate sa mga na-sample na sambahayan at inilulunsad ang survey. Paalala: Kapag nakapagrehistro ka na ng isang tungkulin sa device na ito, tanging ang tungkulin at mga tungkulin sa ibaba nito ang magiging available.""</string>
+    <string name="password_error">"Mali ang password na inilagay."</string>
+    <string name="pin_hint">"Gumawa ng numeric PIN na may 4 hanggang 6 na digit upang ma-secure ang iyong profile sa device na ito. Ipapakita sa iyo ang isang tanong sa seguridad kung sakaling makalimutan mo ang iyong PIN."</string>
+    <string name="gpsaccuracy_hint">""Itinatakda ang minimum na katumpakan ng GPS na kinakailangan bago maitala ang isang punto ng lokasyon. Inirerekomenda: 20 metro para sa mga karaniwang survey, 30 metro para sa mga rural na lugar. Mas tumpak ang mas mababang mga halaga ngunit mas mahirap makamit sa mga siksik na urban na lugar o sa ilalim ng takip ng mga puno.""</string>
+    <string name="manual_hint">"Payagan ang manu-manong pagpasok ng lokasyon. Kapag naka-on: maaaring mag-tap ang mga enumerator ng lokasyon sa mapa upang magdagdag ng sambahayan kung nasa loob ng 20 metro. Kapaki-pakinabang sa mga siksik na urban area o mahinang signal ng GPS. Kapag naka-off (default): tanging ang kasalukuyang lokasyon ng GPS ang ginagamit."</string>
+    <string name="autoincrement_hint">""Kapag naka-on (default): ang bawat sambahayan ay awtomatikong binibigyan ng sunod-sunod na numero (1, 2, 3...). Patayin kung ang iyong survey ay gumagamit ng mga paunang nakatalagang household identifier.""</string>
+    <string name="proximity_hint">"Kapag naka-on: makakatanggap ang mga enumerator ng alerto kung susubukan nilang magdagdag ng isang sambahayan sa loob ng [X] metro mula sa isang umiiral na tala. Nakakatulong na maiwasan ang mga dobleng entry."</string>
+    <string name="encryption_hint">""Gumawa ng password na ibabahagi sa lahat ng superbisor, enumerator, at mga tagakolekta ng datos sa proyektong ito. Kinakailangan ang password na ito upang ma-import ang configuration sa anumang device. Gumamit lamang ng mga letra at numero - walang mga espasyo o mga espesyal na karakter.""</string>
+    <string name="sampling_hint">"Mga paglalarawan ng pamamaraan: /nSimple Random Sample: Ang bawat sambahayan ay may pantay na pagkakataong mapili. /nCluster Sample (# ng mga sambahayan): Pumili ng isang takdang bilang ng mga sambahayan mula sa bawat kumpol. /nCluster Sample (% ng mga sambahayan): Pumili ng porsyento ng mga sambahayan mula sa bawat kumpol."</string>
+    <string name="pii_hint">""Markahan ang field na ito bilang PII kung makikilala nito ang isang partikular na indibidwal. Mga Halimbawa: buong pangalan, numero ng telepono, numero ng pambansang ID.""</string>
+    <string name="field_block_hint">""Gumamit ng field block upang ulitin ang isang hanay ng mga tanong batay sa numerong ito. Halimbawa: kung nakukuha ng field na ito ang bilang ng mga bata, ang mga tanong sa block ay itatanong nang isang beses bawat bata. Markahan ang huling tanong sa grupo gamit ang End Field Block""</string>
+    <string name="rule_hint">""Bigyan ang panuntunang ito ng maikling naglalarawang pangalan para sa iyong sanggunian (hal., May anak na 12-23 buwan, Ang isang sambahayan ay maaaring child_household). Ang pangalang ito ay lilitaw sa hakbang ng pag-setup ng filter kung saan pinagsama ang mga panuntunan.""</string>
+    <string name="filter_hint">""Pinagsasama ng mga filter ang isa o higit pang mga panuntunan gamit ang AND, OR, o NOT na lohika upang tukuyin kung aling mga sambahayan ang karapat-dapat para sa sampling. Kinakailangan ang isang filter kahit na mayroon ka lamang isang panuntunan.""</string>
+    <string name="team_draw_hint">"Tukuyin ang lugar na isasama ng bawat pangkat sa larangan. Gumuhit ng hangganan sa mapa para sa bawat pangkat."</string>
+    <string name="subaddress_hint">""Isang natatanging identifier para sa bawat sambahayan sa cluster na ito. Iwanan bilang auto-increment (1, 2, 3...) maliban kung ang iyong survey ay gumagamit ng mga paunang nakatalagang identifier ng sambahayan.""</string>
+    <string name="back2">"Tapos na - bumalik sa mapa"</string>
+    <string name="dbsize_alert">"Ang iyong GPSSample database ay papalapit na sa 35MB na limitasyon nito. Isaalang-alang ang pag-export ng data bago magpatuloy."</string>
+    <string name="footer">"gpssample.org | gpssample23@gmail.com | Mga Video sa Pagsasanay"</string>
+    <string name="duplicate_import">"Na-import na ang napiling GeoJson file. Gusto mo bang ipagpatuloy ang pag-import na ito?"</string>
+    <string name="enumerator_import_error">"Walang nauugnay na pangkat ng enumerasyon ang configuration na ito."</string>
+    <string name="proximity_warning_value">"Halaga ng babala sa proximity?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Panggitnang pangalan ng ama"</item>
         <item>"Pangalan ng dalaga ng ina"</item>

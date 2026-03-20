@@ -434,6 +434,28 @@
     <string name="strata_name">"Nome do estrato"</string>
     <string name="add_strata">"Adicionar estratificação"</string>
     <string name="strata">"Estratos"</string>
+    <string name="gpssample_start">""O GPSSample é uma aplicação gratuita para Android destinada ao recenseamento de famílias, amostragem e navegação no terreno. Selecione a sua função para começar ou visite gpssample.org para saber mais""</string>
+    <string name="role_hint">""Administrador: Define a configuração completa, o estudo, o método de amostragem, as regras e os filtros. Supervisor: Gere as equipas de campo, recolhe amostras e transfere dados. Recenseador: Mapeia e regista agregados familiares no terreno. Recolhedor de dados: Navega até aos agregados familiares amostrados e inicia o inquérito. Nota: Depois de registar uma função neste dispositivo, apenas essa função e as funções abaixo dela estarão disponíveis.""</string>
+    <string name="password_error">"A palavra-passe introduzida está incorreta."</string>
+    <string name="pin_hint">"Crie um PIN numérico com 4 a 6 dígitos para proteger o seu perfil neste dispositivo. Ser-lhe-á apresentada uma pergunta de segurança caso se esqueça do seu PIN."</string>
+    <string name="gpsaccuracy_hint">""Define a precisão mínima de GPS necessária para que um ponto de localização possa ser registado. Recomendado: 20 metros para inquéritos padrão, 30 metros para áreas rurais. Valores mais baixos são mais precisos, mas mais difíceis de alcançar em áreas urbanas densas ou sob cobertura arbórea.""</string>
+    <string name="manual_hint">""Permitir a introdução manual da localização. Quando ativado: os recenseadores podem tocar numa localização no mapa para adicionar um agregado familiar, se estiver a menos de 20 metros. Útil em áreas urbanas densas ou com sinal de GPS fraco. Quando desativado (predefinição): apenas é utilizada a localização GPS atual.""</string>
+    <string name="autoincrement_hint">""Quando ativado (padrão): é atribuído automaticamente um número sequencial (1, 2, 3...) a cada agregado familiar. Desative se o seu inquérito utilizar identificadores de agregados familiares pré-atribuídos.""</string>
+    <string name="proximity_hint">"Quando ativado: os recenseadores recebem um alerta se tentarem adicionar um agregado familiar a menos de [X] metros de um registo já existente. Ajuda a evitar entradas duplicadas."</string>
+    <string name="encryption_hint">""Crie uma palavra-passe que será partilhada com todos os supervisores, recenseadores e recolhedores de dados deste projeto. Esta palavra-passe é necessária para importar a configuração em qualquer dispositivo. Utilize apenas letras e números — sem espaços nem caracteres especiais.""</string>
+    <string name="sampling_hint">"Descrições dos métodos: /nAmostra Aleatória Simples: Cada agregado familiar tem a mesma probabilidade de ser selecionado. /nAmostra por Agrupamento (n.º de agregados familiares): Selecione um número fixo de agregados familiares de cada agrupamento. /nAmostra por Agrupamento (% de agregados familiares): Selecione uma percentagem de agregados familiares de cada agrupamento."</string>
+    <string name="pii_hint">""Marque este campo como PII se puder identificar um indivíduo específico. Exemplos: nome completo, número de telefone, número de identificação nacional.""</string>
+    <string name="field_block_hint">""Utilize um bloco de campos para repetir um conjunto de perguntas com base neste número. Exemplo: se este campo capturar o número de crianças, as perguntas no bloco serão feitas uma vez por criança. Marque a última pergunta do grupo com «Fim do bloco de campos»""</string>
+    <string name="rule_hint">""Dê a esta regra um nome descritivo curto para sua referência (por exemplo, «Tem criança de 12 a 23 meses», «É um agregado familiar» poderia ser «agregado_familiar_com_criança»). Este nome aparece na etapa de configuração do filtro, onde as regras são combinadas""</string>
+    <string name="filter_hint">""Os filtros combinam uma ou mais regras utilizando a lógica AND, OR ou NOT para definir quais as famílias elegíveis para a amostragem. É necessário um filtro mesmo que tenha apenas uma regra.""</string>
+    <string name="team_draw_hint">"Defina a área que cada equipa de campo irá recensear. Desenhe um limite no mapa para cada equipa."</string>
+    <string name="subaddress_hint">""Um identificador único para cada agregado familiar neste agrupamento. Deixe como autoincremento (1, 2, 3...) a menos que o seu inquérito utilize identificadores de agregados familiares pré-atribuídos.""</string>
+    <string name="back2">"Concluído - voltar ao mapa"</string>
+    <string name="dbsize_alert">"A sua base de dados GPSSample está a aproximar-se do limite de 35 MB. Considere exportar os dados antes de continuar."</string>
+    <string name="footer">"gpssample.org | gpssample23@gmail.com | Vídeos de formação"</string>
+    <string name="duplicate_import">"O ficheiro GeoJSON selecionado já foi importado. Deseja continuar com esta importação?"</string>
+    <string name="enumerator_import_error">"Esta configuração não tem nenhuma equipa de recenseamento associada."</string>
+    <string name="proximity_warning_value">"Valor do aviso de proximidade?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>

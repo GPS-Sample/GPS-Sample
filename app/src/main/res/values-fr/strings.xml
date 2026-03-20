@@ -434,6 +434,28 @@
     <string name="strata_name">"Nom de la strate"</string>
     <string name="add_strata">"Ajoutez une strate"</string>
     <string name="strata">"Strata"</string>
+    <string name="gpssample_start">"GPSSample est une application Android gratuite destinée au recensement des ménages, à l'échantillonnage et à la navigation sur le terrain. Sélectionnez votre rôle pour commencer, ou rendez-vous sur gpssample.org pour en savoir plus"</string>
+    <string name="role_hint">"Administrateur : définit la configuration complète, l'étude, la méthode d'échantillonnage, les règles et les filtres. Superviseur : gère les équipes de terrain, prélève des échantillons, transfère les données. Enquêteur : cartographie et recense les ménages sur le terrain. Collecteur de données : se rend chez les ménages échantillonnés et lance l'enquête. Remarque : une fois que vous avez enregistré un rôle sur cet appareil, seuls ce rôle et les rôles qui lui sont subordonnés seront disponibles."</string>
+    <string name="password_error">"Le mot de passe saisi est incorrect."</string>
+    <string name="pin_hint">"Créez un code PIN numérique de 4 à 6 chiffres pour sécuriser votre profil sur cet appareil. Une question de sécurité vous sera posée au cas où vous oublieriez votre code PIN."</string>
+    <string name="gpsaccuracy_hint">"Définit la précision GPS minimale requise avant qu'un point de localisation puisse être enregistré. Recommandé : 20 mètres pour les enquêtes standard, 30 mètres pour les zones rurales. Des valeurs plus faibles sont plus précises mais plus difficiles à atteindre dans les zones urbaines denses ou sous le couvert des arbres."</string>
+    <string name="manual_hint">"Autoriser la saisie manuelle de la localisation. Lorsque cette option est activée : les enquêteurs peuvent appuyer sur un emplacement sur la carte pour ajouter un ménage s'il se trouve à moins de 20 mètres. Utile dans les zones urbaines denses ou en cas de signal GPS faible. Lorsque cette option est désactivée (par défaut) : seule la localisation GPS actuelle est utilisée."</string>
+    <string name="autoincrement_hint">"Lorsque cette option est activée (par défaut) : un numéro séquentiel (1, 2, 3...) est automatiquement attribué à chaque ménage. Désactivez cette option si votre enquête utilise des identifiants de ménage pré-attribués."</string>
+    <string name="proximity_hint">"Lorsque cette option est activée : les enquêteurs reçoivent une alerte s'ils tentent d'ajouter un ménage situé à moins de [X] mètres d'un enregistrement existant. Cela permet d'éviter les doublons."</string>
+    <string name="encryption_hint">"Créez un mot de passe qui sera partagé avec tous les superviseurs, enquêteurs et collecteurs de données participant à ce projet. Ce mot de passe est nécessaire pour importer la configuration sur n'importe quel appareil. Utilisez uniquement des lettres et des chiffres – pas d'espaces ni de caractères spéciaux."</string>
+    <string name="sampling_hint">"Descriptions des méthodes : /nÉchantillon aléatoire simple : chaque ménage a une chance égale d'être sélectionné. /nÉchantillon par grappes (nombre de ménages) : sélectionnez un nombre fixe de ménages dans chaque grappe. /nÉchantillon par grappes (pourcentage de ménages) : sélectionnez un pourcentage de ménages dans chaque grappe."</string>
+    <string name="pii_hint">"Marquez ce champ comme « PII » (informations personnelles identifiables) s'il permet d'identifier une personne spécifique. Exemples : nom complet, numéro de téléphone, numéro d'identité national."</string>
+    <string name="field_block_hint">"Utilisez un bloc de champs pour répéter une série de questions en fonction de ce nombre. Exemple : si ce champ recense le nombre d'enfants, les questions du bloc seront posées une fois par enfant. Marquez la dernière question du groupe avec « Fin du bloc de champs »."</string>
+    <string name="rule_hint">"Donnez à cette règle un nom descriptif court pour votre référence (par exemple, « A un enfant de 12 à 23 mois », « Est un ménage » pourrait être « child_household »). Ce nom apparaît à l'étape de configuration du filtre où les règles sont combinées"</string>
+    <string name="filter_hint">"Les filtres combinent une ou plusieurs règles à l'aide de la logique ET, OU ou NON pour définir quels ménages sont éligibles pour l'échantillonnage. Un filtre est obligatoire même si vous n'avez qu'une seule règle."</string>
+    <string name="team_draw_hint">"Définissez la zone que chaque équipe de terrain va recenser. Tracez une limite sur la carte pour chaque équipe."</string>
+    <string name="subaddress_hint">"Un identifiant unique pour chaque ménage de ce groupe. Laissez le paramètre sur « auto-incrémentation » (1, 2, 3...) sauf si votre enquête utilise des identifiants de ménage pré-attribués."</string>
+    <string name="back2">"Terminé - Retour à la carte"</string>
+    <string name="dbsize_alert">"Votre base de données GPSSample approche de sa limite de 35 Mo. Pensez à exporter vos données avant de continuer."</string>
+    <string name="footer">"gpssample.org | gpssample23@gmail.com | Vidéos de formation"</string>
+    <string name="duplicate_import">"Le fichier GeoJSON sélectionné a déjà été importé. Souhaitez-vous poursuivre cette importation ?"</string>
+    <string name="enumerator_import_error">"Cette configuration n'est associée à aucune équipe de recensement."</string>
+    <string name="proximity_warning_value">"Valeur d'alerte de proximité ?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>

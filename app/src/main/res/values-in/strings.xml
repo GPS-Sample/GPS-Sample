@@ -434,6 +434,28 @@
     <string name="strata_name">"Nama lapisan"</string>
     <string name="add_strata">"Tambahkan Strata"</string>
     <string name="strata">"Lapisan"</string>
+    <string name="gpssample_start">""GPSSample adalah aplikasi Android gratis untuk pendataan rumah tangga, pengambilan sampel, dan navigasi berbasis lapangan. Pilih peran Anda untuk memulai, atau kunjungi gpssample.org untuk mempelajari lebih lanjut.""</string>
+    <string name="role_hint">""Administrator: Menetapkan konfigurasi lengkap, studi, metode pengambilan sampel, aturan, dan filter. Supervisor: Mengelola tim lapangan, mengambil sampel, dan mentransfer data. Enumerator: Memetakan dan mendata rumah tangga di lapangan. Pengumpul Data: Bernavigasi menuju rumah tangga yang terpilih sebagai sampel dan memulai survei. Catatan: Setelah Anda mendaftarkan peran pada perangkat ini, hanya peran tersebut dan peran-peran di bawahnya yang akan tersedia.""</string>
+    <string name="password_error">"Kata sandi yang dimasukkan salah."</string>
+    <string name="pin_hint">"Buat PIN numerik dengan 4 hingga 6 digit untuk mengamankan profil Anda pada perangkat ini. Anda akan diberikan pertanyaan keamanan sebagai langkah pemulihan jika Anda lupa PIN Anda."</string>
+    <string name="gpsaccuracy_hint">""Menetapkan akurasi GPS minimum yang diperlukan sebelum sebuah titik lokasi dapat direkam. Disarankan: 20 meter untuk survei standar, 30 meter untuk wilayah pedesaan. Nilai yang lebih rendah memberikan presisi yang lebih tinggi, namun lebih sulit dicapai di area perkotaan yang padat atau di bawah naungan pepohonan.""</string>
+    <string name="manual_hint">"Izinkan entri lokasi secara manual. Saat aktif: enumerator dapat mengetuk sebuah lokasi pada peta untuk menambahkan rumah tangga jika lokasi tersebut berada dalam jarak 20 meter. Fitur ini berguna di area perkotaan yang padat atau saat sinyal GPS lemah. Saat nonaktif (bawaan): hanya lokasi GPS saat ini yang digunakan."</string>
+    <string name="autoincrement_hint">""Saat aktif (bawaan): setiap rumah tangga secara otomatis diberikan nomor urut (1, 2, 3...). Nonaktifkan fitur ini jika survei Anda menggunakan pengidentifikasi rumah tangga yang telah ditetapkan sebelumnya.""</string>
+    <string name="proximity_hint">"Saat diaktifkan: enumerator akan menerima peringatan jika mereka mencoba menambahkan rumah tangga yang berada dalam jarak [X] meter dari data yang sudah ada. Fitur ini membantu mencegah entri data ganda."</string>
+    <string name="encryption_hint">""Buatlah kata sandi yang akan dibagikan kepada semua supervisor, enumerator, dan pengumpul data dalam proyek ini. Kata sandi ini diperlukan untuk mengimpor konfigurasi pada perangkat apa pun. Gunakan hanya huruf dan angka—tanpa spasi atau karakter khusus.""</string>
+    <string name="sampling_hint">"Deskripsi metode: /nSampel Acak Sederhana: Setiap rumah tangga memiliki peluang yang sama untuk terpilih. /nSampel Klaster (Jumlah rumah tangga): Pilih sejumlah rumah tangga yang tetap dari setiap klaster. /nSampel Klaster (% rumah tangga): Pilih persentase tertentu dari rumah tangga di setiap klaster."</string>
+    <string name="pii_hint">""Tandai kolom ini sebagai PII (Informasi Identitas Pribadi) jika kolom tersebut dapat mengidentifikasi individu tertentu. Contoh: nama lengkap, nomor telepon, nomor identitas nasional.""</string>
+    <string name="field_block_hint">""Gunakan blok kolom untuk mengulang serangkaian pertanyaan berdasarkan angka yang dimasukkan di kolom ini. Contoh: jika kolom ini mencatat jumlah anak, pertanyaan-pertanyaan di dalam blok tersebut akan diajukan satu kali untuk setiap anak. Tandai pertanyaan terakhir dalam kelompok tersebut dengan ""End Field Block"" (Akhiri Blok Kolom).""</string>
+    <string name="rule_hint">""Berikan nama yang singkat dan deskriptif pada aturan ini sebagai referensi Anda (contoh: ""Memiliki anak usia 12-23 bulan"", ""Merupakan rumah tangga""—bisa disingkat menjadi ""child_household""). Nama ini akan muncul pada langkah pengaturan filter, di mana berbagai aturan digabungkan.""</string>
+    <string name="filter_hint">""Filter menggabungkan satu atau lebih aturan menggunakan logika AND, OR, atau NOT untuk menentukan rumah tangga mana yang memenuhi syarat untuk dijadikan sampel. Penggunaan filter wajib dilakukan, bahkan jika Anda hanya memiliki satu aturan saja.""</string>
+    <string name="team_draw_hint">"Tentukan area yang akan didata oleh setiap tim lapangan. Gambarkan batas wilayah pada peta untuk setiap tim."</string>
+    <string name="subaddress_hint">""Pengidentifikasi unik untuk setiap rumah tangga dalam klaster ini. Biarkan sebagai *auto-increment* (1, 2, 3...) kecuali survei Anda menggunakan pengidentifikasi rumah tangga yang telah ditetapkan sebelumnya.""</string>
+    <string name="back2">"Selesai - kembali ke peta"</string>
+    <string name="dbsize_alert">"Basis data GPSSample Anda hampir mencapai batas 35MB. Pertimbangkan untuk mengekspor data sebelum melanjutkan."</string>
+    <string name="footer">"gpssample.org | gpssample23@gmail.com | Video Pelatihan"</string>
+    <string name="duplicate_import">"Berkas GeoJson yang dipilih telah diimpor. Apakah Anda ingin melanjutkan impor ini?"</string>
+    <string name="enumerator_import_error">"Konfigurasi ini tidak memiliki tim enumerasi yang terkait dengannya."</string>
+    <string name="proximity_warning_value">"Nilai peringatan kedekatan?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>
