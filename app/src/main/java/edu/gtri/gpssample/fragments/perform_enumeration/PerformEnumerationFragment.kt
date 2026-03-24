@@ -1085,7 +1085,7 @@ class PerformEnumerationFragment : Fragment(),
                 {
                     if (isRecordingBreadcrumbs && enumArea.breadcrumbs.isNotEmpty())
                     {
-                        enumArea.breadcrumbs.add(Breadcrumb( UUID.randomUUID().toString(), Date().time, enumArea.uuid, location.latitude, location.longitude, enumArea.breadcrumbs.last().groupId))
+                        enumArea.breadcrumbs.add(Breadcrumb(enumArea.uuid, enumerationTeam.name, location.latitude, location.longitude, enumArea.breadcrumbs.last().groupId))
                     }
 
                     DAO.enumerationItemDAO.createOrUpdateEnumerationItem( EnumerationItem(), location )?.let { enumerationItem ->
@@ -1482,7 +1482,7 @@ class PerformEnumerationFragment : Fragment(),
                         {
                             MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.breadcrumb, "")
 
-                            val breadcrumb = Breadcrumb( enumArea.uuid, point.latitude(), point.longitude(), lastBreadcrumbGroupId )
+                            val breadcrumb = Breadcrumb( enumArea.uuid, enumerationTeam.name, point.latitude(), point.longitude(), lastBreadcrumbGroupId )
                             DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breadcrumb )
                             enumArea.breadcrumbs.add( breadcrumb )
 

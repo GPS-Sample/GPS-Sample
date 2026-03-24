@@ -17,11 +17,12 @@ data class Breadcrumb(
     var uuid: String,
     var creationDate: Long,
     var enumAreaUuid: String,
+    var enumTeamName: String,
     var latitude: Double,
     var longitude: Double,
     var groupId: String
 )
 {
-    constructor( enumAreaUuid: String, latitude: Double, longitude: Double, groupId: String )
-            : this( UUID.randomUUID().toString(), Date().time, enumAreaUuid, latitude, longitude, groupId )
+    constructor( enumAreaUuid: String, enumTeamName: String, latitude: Double, longitude: Double, groupId: String )
+            : this( UUID.randomUUID().toString(), Date().time, enumAreaUuid, enumTeamName, latitude, longitude, groupId )
 }

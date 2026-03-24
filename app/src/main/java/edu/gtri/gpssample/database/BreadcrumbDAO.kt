@@ -47,6 +47,7 @@ class BreadcrumbDAO(private var dao: DAO)
         values.put( DAO.COLUMN_UUID, breadcrumb.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, breadcrumb.creationDate )
         values.put( DAO.COLUMN_ENUM_AREA_UUID, breadcrumb.enumAreaUuid )
+        values.put( DAO.COLUMN_ENUMERATION_TEAM_NAME, breadcrumb.enumTeamName )
         values.put( DAO.COLUMN_LATITUDE, breadcrumb.latitude )
         values.put( DAO.COLUMN_LONGITUDE, breadcrumb.longitude )
         values.put( DAO.COLUMN_GROUP_ID, breadcrumb.groupId )
@@ -58,11 +59,12 @@ class BreadcrumbDAO(private var dao: DAO)
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val enumAreaUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
+        val enumTeamName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_NAME))
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LATITUDE))
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LONGITUDE))
         val groupId = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_GROUP_ID))
 
-        return Breadcrumb( uuid, creationDate, enumAreaUuid, latitude, longitude, groupId )
+        return Breadcrumb( uuid, creationDate, enumAreaUuid, enumTeamName, latitude, longitude, groupId )
     }
 
     fun getBreadcrumb( uuid: String ): Breadcrumb?

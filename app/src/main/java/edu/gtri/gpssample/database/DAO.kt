@@ -19,6 +19,7 @@ import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.Image
 import java.util.*
+import androidx.core.database.sqlite.transaction
 
 class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
     : SQLiteOpenHelper( context, DATABASE_NAME, factory, DATABASE_VERSION )
@@ -395,6 +396,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
+                    COLUMN_ENUMERATION_TEAM_NAME + " TEXT" + "," +
                     COLUMN_LATITUDE + " REAL" + "," +
                     COLUMN_LONGITUDE + " REAL" + "," +
                     COLUMN_GROUP_ID + " TEXT" +
@@ -414,13 +416,44 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             migrateFrom314To321( db )
             migrateFrom321To322( db )
         }
+
         if (oldVersion == 321 && newVersion == 322)
         {
             migrateFrom321To322( db )
         }
+
+        if (oldVersion == 322 && newVersion == 323)
+        {
+            migrateFrom322To323( db )
+        }
         else
         {
             dropAllTables( db )
+        }
+    }
+
+    fun migrateFrom322To323(db: SQLiteDatabase)
+    {
+        db.transaction {
+            try {
+                // ----------------------------
+                // 1. Update Breadcrumb table
+                // ----------------------------
+                execSQL("ALTER TABLE $TABLE_BREADCRUMB ADD COLUMN $COLUMN_ENUMERATION_TEAM_NAME TEXT DEFAULT ''")
+
+                // ----------------------------
+                // 2. Update dbVersion in Config
+                // ----------------------------
+                val newDbVersion = 323
+                val contentValues = ContentValues().apply {
+                    put(COLUMN_CONFIG_DB_VERSION, newDbVersion)
+                }
+                update(TABLE_CONFIG, contentValues, null, null)
+            } catch (ex: Exception) {
+                Log.d("xxx", "Migration from DB 322 to 323 FAILED: ${ex.message}")
+                throw ex // optional: rethrow so Android knows migration failed
+            } finally {
+            }
         }
     }
 
@@ -962,6 +995,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        const val DATABASE_VERSION = 322
+        const val DATABASE_VERSION = 323
     }
 }
