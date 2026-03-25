@@ -1298,33 +1298,23 @@ class PerformCollectionFragment : Fragment(),
                         val currentLatLng = LatLng( point.latitude(), point.longitude())
                         val itemLatLng = LatLng( it.latitude, it.longitude )
                         val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
+                        var (distanceValue, distanceUnits) = formatDistance( config, distance )
+                        enumerationItem.distance = distanceValue
+                        enumerationItem.distanceUnits = distanceUnits
 
-                        if (distance < 400) // display in meters or feet
-                        {
-                            if (config.distanceFormat == DistanceFormat.Meters)
-                            {
-                                enumerationItem.distance = distance
-                                enumerationItem.distanceUnits = resources.getString( R.string.meters )
-                            }
-                            else
-                            {
-                                enumerationItem.distance = distance * 3.28084
-                                enumerationItem.distanceUnits = resources.getString( R.string.feet )
-                            }
-                        }
-                        else // display in kilometers or miles
-                        {
-                            if (config.distanceFormat == DistanceFormat.Meters)
-                            {
-                                enumerationItem.distance = distance / 1000.0
-                                enumerationItem.distanceUnits = resources.getString( R.string.kilometers )
-                            }
-                            else
-                            {
-                                enumerationItem.distance = distance / 1609.34
-                                enumerationItem.distanceUnits = resources.getString( R.string.miles )
-                            }
-                        }
+                    }
+                }
+
+                for (location in performCollectionAdapter.locations)
+                {
+                    if (location.isLandmark)
+                    {
+                        val currentLatLng = LatLng( point.latitude(), point.longitude())
+                        val itemLatLng = LatLng( location.latitude, location.longitude )
+                        val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
+                        var (distanceValue, distanceUnits) = formatDistance( config, distance )
+                        location.distance = distance
+                        location.distanceUnits = distanceUnits
                     }
                 }
 
@@ -1333,9 +1323,43 @@ class PerformCollectionFragment : Fragment(),
         }
     }
 
+    fun formatDistance( config: Config, distance: Double ) : Pair<Double,String>
+    {
+        var distanceUnits: String = ""
+        var distanceValue: Double = 0.0
+
+        if (config.distanceFormat == DistanceFormat.Meters)
+        {
+            if (distance < 500) // 1/2 kilometer
+            {
+                distanceValue = distance
+                distanceUnits = resources.getString(R.string.meters)
+            }
+            else
+            {
+                distanceValue = distance / 1000.0
+                distanceUnits = resources.getString( R.string.kilometers )
+            }
+        }
+        else if (config.distanceFormat == DistanceFormat.Feet)
+        {
+            if (distance < 2640) // 1/2 mile
+            {
+                distanceValue = distance * 3.28084
+                distanceUnits = resources.getString( R.string.feet )
+            }
+            else
+            {
+                distanceValue = distance / 1609.34
+                distanceUnits = resources.getString( R.string.miles )
+            }
+        }
+
+        return Pair( distanceValue, distanceUnits )
+    }
+
     override fun onMarkerTapped( location: Location )
     {
-        Log.d( "xxx", "onMarkerTapped" )
         sharedViewModel.currentLocationUuid = location.uuid
 
         if (location.isLandmark)

@@ -1495,38 +1495,50 @@ class PerformEnumerationFragment : Fragment(),
                         val currentLatLng = LatLng( point.latitude(), point.longitude())
                         val itemLatLng = LatLng( loc.latitude, loc.longitude )
                         val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
-                        if (distance < 400) // display in meters or feet
-                        {
-                            if (config.distanceFormat == DistanceFormat.Meters)
-                            {
-                                loc.distance = distance
-                                loc.distanceUnits = resources.getString( R.string.meters )
-                            }
-                            else
-                            {
-                                loc.distance = distance * 3.28084
-                                loc.distanceUnits = resources.getString( R.string.feet )
-                            }
-                        }
-                        else // display in kilometers or miles
-                        {
-                            if (config.distanceFormat == DistanceFormat.Meters)
-                            {
-                                loc.distance = distance / 1000.0
-                                loc.distanceUnits = resources.getString( R.string.kilometers )
-                            }
-                            else
-                            {
-                                loc.distance = distance / 1609.34
-                                loc.distanceUnits = resources.getString( R.string.miles )
-                            }
-                        }
+                        var (distanceValue, distanceUnits) = formatDistance( config, distance )
+                        loc.distance = distance
+                        loc.distanceUnits = distanceUnits
                     }
 
                     performEnumerationAdapter.updateLocations( enumerationTeamLocations )
                 }
             }
         }
+    }
+
+    fun formatDistance( config: Config, distance: Double ) : Pair<Double,String>
+    {
+        var distanceUnits: String = ""
+        var distanceValue: Double = 0.0
+
+        if (config.distanceFormat == DistanceFormat.Meters)
+        {
+            if (distance < 500) // 1/2 kilometer
+            {
+                distanceValue = distance
+                distanceUnits = resources.getString(R.string.meters)
+            }
+            else
+            {
+                distanceValue = distance / 1000.0
+                distanceUnits = resources.getString( R.string.kilometers )
+            }
+        }
+        else if (config.distanceFormat == DistanceFormat.Feet)
+        {
+            if (distance < 2640) // 1/2 mile
+            {
+                distanceValue = distance * 3.28084
+                distanceUnits = resources.getString( R.string.feet )
+            }
+            else
+            {
+                distanceValue = distance / 1609.34
+                distanceUnits = resources.getString( R.string.miles )
+            }
+        }
+
+        return Pair( distanceValue, distanceUnits )
     }
 
     override fun onTouch(view: View?, motionEvent: MotionEvent?): Boolean {
