@@ -272,14 +272,14 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
                         field.minimum?.let { minimum ->
                             if (value < minimum)
                             {
-                                error = "The entered value is less than the minimum"
+                                error = "${field.name}: The minimum allowed value is ${minimum}"
                             }
                         }
 
                         field.maximum?.let { maximum ->
                             if (value > maximum)
                             {
-                                error = "The entered value is greater than the maximum"
+                                error = "${field.name}: The maximum allowed value is ${maximum}"
                             }
                         }
 
