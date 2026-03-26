@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="edu.gtri.gpssample.MainActivity">
+
+    <item
+        android:id="@+id/show_hide_breadcrumbs"
+        android:title="@string/menu_team_review_hide"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/mapbox_streets"
+        android:title="@string/street_map"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/satellite_streets"
+        android:title="@string/satellite_map"
+        app:showAsAction="never"/>
+</menu>

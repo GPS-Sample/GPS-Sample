@@ -63,6 +63,7 @@ class ReviewEnumerationFragment : Fragment(),
 
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
+    private var isShowingBreadcrumbs = true
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -219,6 +220,94 @@ class ReviewEnumerationFragment : Fragment(),
         pointList.add( points )
 
         MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20 )
+
+        if (isShowingBreadcrumbs && enumArea.breadcrumbs.isNotEmpty())
+        {
+            var numPaths = 1
+            var groupId: String = ""
+            var path = ArrayList<Breadcrumb>()
+            val paths = ArrayList<ArrayList<Breadcrumb>>()
+
+            for (breadcrumb in enumArea.breadcrumbs)
+            {
+                if (groupId.isEmpty())
+                {
+                    groupId = breadcrumb.groupId
+                    path.add( breadcrumb )
+                }
+                else if (breadcrumb.groupId == groupId)
+                {
+                    path.add( breadcrumb )
+                }
+                else
+                {
+                    numPaths += 1
+                    paths.add( path )
+                    groupId = breadcrumb.groupId
+                    path = ArrayList<Breadcrumb>()
+                    path.add( breadcrumb )
+                }
+            }
+
+            // add the last path to the list
+            if (paths.size < numPaths)
+            {
+                paths.add( path )
+            }
+
+            for (path in paths)
+            {
+                if (path.size == 1)
+                {
+                    MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
+                    MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
+                }
+                else if (path.size > 1)
+                {
+                    MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
+                    MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
+                    MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.end_breadcrumb, "")
+                    MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.breadcrumb, "")
+                }
+
+                for (breadcrumb in path)
+                {
+                    if (breadcrumb != path.first() && breadcrumb != path.last())
+                    {
+                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
+                    }
+                }
+            }
+
+            groupId = ""
+
+            val breadcrumbs = ArrayList<Breadcrumb>()
+
+            for (breadcrumb in enumArea.breadcrumbs)
+            {
+                if (breadcrumbs.isEmpty())
+                {
+                    groupId = breadcrumb.groupId
+                }
+
+                if (breadcrumb.groupId == groupId)
+                {
+                    breadcrumbs.add( breadcrumb )
+                }
+                else
+                {
+                    MapManager.instance().createPolyline( mapView, breadcrumbs )
+                    groupId = breadcrumb.groupId
+                    breadcrumbs.clear()
+                    breadcrumbs.add( breadcrumb )
+                }
+            }
+
+            if (breadcrumbs.isNotEmpty())
+            {
+                MapManager.instance().createPolyline( mapView, breadcrumbs )
+            }
+        }
 
         for (enumerationTeam in enumArea.enumerationTeams)
         {
@@ -381,15 +470,30 @@ class ReviewEnumerationFragment : Fragment(),
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
+    {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_map_style_min, menu)
+
+        if (isShowingBreadcrumbs)
+        {
+            inflater.inflate(R.menu.menu_team_review_hide, menu)
+        }
+        else
+        {
+            inflater.inflate(R.menu.menu_team_review_show, menu)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
         when (item.itemId)
         {
+            R.id.show_hide_breadcrumbs ->
+            {
+                isShowingBreadcrumbs = !isShowingBreadcrumbs
+                requireActivity().invalidateOptionsMenu()
+                refreshMap()
+            }
             R.id.mapbox_streets ->
             {
                 val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)

@@ -913,8 +913,6 @@ class PerformEnumerationFragment : Fragment(),
 
         MapManager.instance().clearMap( mapView )
 
-//        performEnumerationAdapter.updateLocations( enumerationTeamLocations )
-
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
@@ -937,22 +935,25 @@ class PerformEnumerationFragment : Fragment(),
 
                 for (breadcrumb in enumArea.breadcrumbs)
                 {
-                    if (groupId.isEmpty())
+                    if (breadcrumb.enumTeamName == enumerationTeam.name)
                     {
-                        groupId = breadcrumb.groupId
-                        path.add( breadcrumb )
-                    }
-                    else if (breadcrumb.groupId == groupId)
-                    {
-                        path.add( breadcrumb )
-                    }
-                    else
-                    {
-                        numPaths += 1
-                        paths.add( path )
-                        groupId = breadcrumb.groupId
-                        path = ArrayList<Breadcrumb>()
-                        path.add( breadcrumb )
+                        if (groupId.isEmpty())
+                        {
+                            groupId = breadcrumb.groupId
+                            path.add( breadcrumb )
+                        }
+                        else if (breadcrumb.groupId == groupId)
+                        {
+                            path.add( breadcrumb )
+                        }
+                        else
+                        {
+                            numPaths += 1
+                            paths.add( path )
+                            groupId = breadcrumb.groupId
+                            path = ArrayList<Breadcrumb>()
+                            path.add( breadcrumb )
+                        }
                     }
                 }
 
@@ -976,6 +977,7 @@ class PerformEnumerationFragment : Fragment(),
                         MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.end_breadcrumb, "")
                         MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.breadcrumb, "")
                     }
+
                     for (breadcrumb in path)
                     {
                         if (breadcrumb != path.first() && breadcrumb != path.last())
@@ -991,21 +993,24 @@ class PerformEnumerationFragment : Fragment(),
 
                 for (breadcrumb in enumArea.breadcrumbs)
                 {
-                    if (breadcrumbs.isEmpty())
+                    if (breadcrumb.enumTeamName == enumerationTeam.name)
                     {
-                        groupId = breadcrumb.groupId
-                    }
+                        if (breadcrumbs.isEmpty())
+                        {
+                            groupId = breadcrumb.groupId
+                        }
 
-                    if (breadcrumb.groupId == groupId)
-                    {
-                        breadcrumbs.add( breadcrumb )
-                    }
-                    else
-                    {
-                        MapManager.instance().createPolyline( mapView, breadcrumbs )
-                        groupId = breadcrumb.groupId
-                        breadcrumbs.clear()
-                        breadcrumbs.add( breadcrumb )
+                        if (breadcrumb.groupId == groupId)
+                        {
+                            breadcrumbs.add( breadcrumb )
+                        }
+                        else
+                        {
+                            MapManager.instance().createPolyline( mapView, breadcrumbs )
+                            groupId = breadcrumb.groupId
+                            breadcrumbs.clear()
+                            breadcrumbs.add( breadcrumb )
+                        }
                     }
                 }
 

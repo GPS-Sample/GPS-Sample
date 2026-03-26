@@ -456,6 +456,10 @@
     <string name="duplicate_import">"The selected GeoJson file has already been imported. Would you like to continue with this import?"</string>
     <string name="enumerator_import_error">"This configuration does not have an enumeration team associated with it."</string>
     <string name="proximity_warning_value">"Proximity warning value?"</string>
+
+    <string name="menu_team_review_show">"Show Walked Path"</string>
+    <string name="menu_team_review_hide">"Hide Walked Path"</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
