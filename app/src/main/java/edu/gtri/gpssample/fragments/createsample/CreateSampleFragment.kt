@@ -287,17 +287,17 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
             MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
         }
 
+        val markerProperties = ArrayList<MapManager.MarkerProperty>()
+
         for (enumArea in config.enumAreas)
         {
-            if (study.samplingMethod == SamplingMethod.Cluster)
+            if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata)
             {
                 if (enumArea.uuid != config.selectedEnumAreaUuid)
                 {
                     continue
                 }
             }
-
-            val markerProperties = ArrayList<MapManager.MarkerProperty>()
 
             for (location in enumArea.locations)
             {
@@ -343,11 +343,11 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
                     }
                 }
             }
+        }
 
-            if (markerProperties.isNotEmpty())
-            {
-                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties )
-            }
+        if (markerProperties.isNotEmpty())
+        {
+            MapManager.instance().loadMarkers( activity!!, mapView, markerProperties )
         }
     }
 
