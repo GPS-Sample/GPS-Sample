@@ -46,6 +46,9 @@ data class EnumArea (
     constructor( configUuid: String, strataUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, vertices: ArrayList<LatLon>, mapTileRegion: MapTileRegion?)
             : this(UUID.randomUUID().toString(), Date().time, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion, ArrayList<Breadcrumb>())
 
+    constructor( creationDate: Long, configUuid: String, strataUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, vertices: ArrayList<LatLon>, mapTileRegion: MapTileRegion?)
+            : this(UUID.randomUUID().toString(), creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion, ArrayList<Breadcrumb>())
+
     fun equals( other: EnumArea ): Boolean
     {
         if (this.uuid == other.uuid &&

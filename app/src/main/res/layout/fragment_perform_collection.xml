@@ -61,13 +61,15 @@
                 android:id="@+id/mapbox_map_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="visible"></com.mapbox.maps.MapView>
+                android:visibility="visible">
+            </com.mapbox.maps.MapView>
 
             <org.osmdroid.views.MapView
                 android:id="@+id/osm_map_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="gone"></org.osmdroid.views.MapView>
+                android:visibility="gone">
+            </org.osmdroid.views.MapView>
 
             <ImageView
                 android:id="@+id/north_up_image_view"
@@ -79,10 +81,13 @@
                 android:visibility="gone"
                 app:srcCompat="@drawable/compass_icon" />
 
+            <include layout="@layout/hh_popup"/>
+
             <View
                 android:id="@+id/map_overlay_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"></View>
+                android:layout_height="match_parent">
+            </View>
         </FrameLayout>
 
         <LinearLayout

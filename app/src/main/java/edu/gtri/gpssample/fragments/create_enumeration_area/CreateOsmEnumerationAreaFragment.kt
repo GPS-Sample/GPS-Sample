@@ -535,7 +535,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
             if (markerProperties.isNotEmpty())
             {
-                MapManager.instance().loadMarkers( activity!!, binding.osmMapView, markerProperties )
+                MapManager.instance().loadMarkers( activity!!, binding.osmMapView, markerProperties, false, false )
             }
         }
     }
@@ -1091,6 +1091,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
     fun parseGeoJson( text: String, nameKey: String, strataKey: String )
     {
+        var creationDate = Date().time
         val points = ArrayList<edu.gtri.gpssample.fragments.create_enumeration_area.CreateEnumerationAreaFragment.PointWithProperty>()
         val featureCollection = FeatureCollection.fromJson( text )
 
@@ -1112,7 +1113,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 when( geometry ) {
                     is Polygon,
                     is MultiPolygon -> {
-                        var creationDate = Date().time
                         val vertices = ArrayList<LatLon>()
 
                         if (geometry is Polygon)
@@ -1136,7 +1136,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
                         val mapTileRegion = MapTileRegion( northEast, southWest )
 
-                        val enumArea = EnumArea(config.uuid, "", name, "", 0, vertices, mapTileRegion )
+                        val enumArea = EnumArea( creationDate++, config.uuid, "", name, "", 0, vertices, mapTileRegion )
 
                         var strata: Strata? = null
 

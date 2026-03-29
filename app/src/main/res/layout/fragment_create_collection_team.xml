@@ -68,6 +68,8 @@
                 android:text="OSM"
                 android:textStyle="normal" />
 
+            <include layout="@layout/hh_popup"/>
+
             <View
                 android:visibility="gone"
                 android:id="@+id/overlay_view"

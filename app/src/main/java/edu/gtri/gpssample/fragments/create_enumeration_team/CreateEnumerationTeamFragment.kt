@@ -253,7 +253,7 @@ class CreateEnumerationTeamFragment : Fragment(),
 
             if (markerProperties.isNotEmpty())
             {
-                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties )
+                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, false, false )
             }
         }
     }

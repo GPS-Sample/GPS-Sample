@@ -91,6 +91,8 @@
                     app:srcCompat="@drawable/info2" />
             </LinearLayout>
 
+            <include layout="@layout/hh_popup"/>
+
             <View
                 android:visibility="gone"
                 android:id="@+id/map_overlay_view"

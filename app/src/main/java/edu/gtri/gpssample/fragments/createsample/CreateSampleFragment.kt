@@ -347,7 +347,7 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
 
         if (markerProperties.isNotEmpty())
         {
-            MapManager.instance().loadMarkers( activity!!, mapView, markerProperties )
+            MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, false, false )
         }
     }
 

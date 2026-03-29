@@ -330,6 +330,8 @@ class ReviewEnumerationFragment : Fragment(),
             }
         }
 
+        val markerProperties = ArrayList<MapManager.MarkerProperty>()
+
         for (location in enumArea.locations)
         {
             if (!location.isLandmark)
@@ -360,8 +362,19 @@ class ReviewEnumerationFragment : Fragment(),
                     resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_green else R.drawable.home_green
                 }
 
-                MapManager.instance().createMarker( activity!!, mapView, location, resourceId, "" )
+                var title = ""
+                if (location.enumerationItems.isNotEmpty())
+                {
+                    title = location.enumerationItems[0].subAddress
+                }
+
+                markerProperties.add( MapManager.MarkerProperty( location, resourceId, title ))
             }
+        }
+
+        if (markerProperties.isNotEmpty())
+        {
+            MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, false, false )
         }
     }
 

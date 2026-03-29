@@ -79,6 +79,8 @@
                 android:layout_gravity="top|end"
                 app:srcCompat="@drawable/compass_icon"/>
 
+            <include layout="@layout/hh_popup"/>
+
             <View
                 android:id="@+id/map_overlay_view"
                 android:layout_width="match_parent"

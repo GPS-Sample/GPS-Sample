@@ -356,6 +356,8 @@ class ReviewCollectionFragment : Fragment(),
             MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20, Color.RED, collectionTeam.name )
         }
 
+        val markerProperties = ArrayList<MapManager.MarkerProperty>()
+
         for (location in enumArea.locations)
         {
             if (!location.isLandmark && location.enumerationItems.isNotEmpty())
@@ -414,9 +416,15 @@ class ReviewCollectionFragment : Fragment(),
                     {
                         title = location.enumerationItems.last().subAddress
                     }
-                    MapManager.instance().createMarker( activity!!, mapView, location, resourceId, title )
+
+                    markerProperties.add( MapManager.MarkerProperty( location, resourceId, title ))
                 }
             }
+        }
+
+        if (markerProperties.isNotEmpty())
+        {
+            MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, false, false )
         }
     }
 

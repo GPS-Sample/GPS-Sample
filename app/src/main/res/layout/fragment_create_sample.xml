@@ -113,6 +113,8 @@
                         android:textSize="15sp"
                         android:text="OSM"
                         android:textStyle="normal" />
+
+                    <include layout="@layout/hh_popup"/>
                 </FrameLayout>
 
                 <LinearLayout

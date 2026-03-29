@@ -1081,6 +1081,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     fun parseGeoJson( text: String, nameKey: String, strataKey: String )
     {
         var hasBeenCentered = false
+        var creationDate = Date().time
         val points = ArrayList<PointWithProperty>()
         val featureCollection = FeatureCollection.fromJson( text )
 
@@ -1102,7 +1103,6 @@ class CreateEnumerationAreaFragment : Fragment(),
                 when( geometry ) {
                     is Polygon,
                     is MultiPolygon -> {
-                        var creationDate = Date().time
                         val vertices = ArrayList<LatLon>()
 
                         if (geometry is Polygon)
@@ -1126,7 +1126,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                         val mapTileRegion = MapTileRegion( northEast, southWest )
 
-                        val enumArea = EnumArea(config.uuid, "", name, "", 0, vertices, mapTileRegion )
+                        val enumArea = EnumArea(creationDate++,config.uuid, "", name, "", 0, vertices, mapTileRegion )
 
                         var strata: Strata? = null
 

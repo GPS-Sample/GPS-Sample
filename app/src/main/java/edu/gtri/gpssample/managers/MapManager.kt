@@ -20,6 +20,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
@@ -45,6 +46,7 @@ import com.mapbox.maps.MapView
 import com.mapbox.maps.OfflineManager
 import com.mapbox.maps.RenderedQueryGeometry
 import com.mapbox.maps.RenderedQueryOptions
+import com.mapbox.maps.ScreenBox
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
 import com.mapbox.maps.StylePackLoadOptions
@@ -481,12 +483,21 @@ class MapManager
         mapboxPointAnnotationManager!!.apply {
             addClickListener(
                 OnPointAnnotationClickListener { pointAnnotation ->
-                    pointAnnotation.getData()?.asJsonObject?.get("uuid")?.asString?.let { uuid ->
-                        DAO.locationDAO.getLocation( uuid )?.let {
-                            delegate?.onMarkerTapped( it )
+                    var retVal = false
+                    try {
+                        pointAnnotation.getData()?.asJsonObject?.let { jsonObject ->
+                            jsonObject.get("uuid")?.asString?.let { uuid ->
+                                DAO.locationDAO.getLocation( uuid )?.let {
+                                    retVal = true
+                                    delegate?.onMarkerTapped( it )
+                                }
+                            }
                         }
                     }
-                    true
+                    catch( ex: Exception ) {
+                        Log.d( "xxx", ex.stackTraceToString())
+                    }
+                    retVal
                 }
             )
         }
@@ -1007,7 +1018,14 @@ class MapManager
 
         geometry.put( "coordinates", coordinates )
 
+        var title = ""
+        if (location.enumerationItems.isNotEmpty())
+        {
+            title = location.enumerationItems.first().subAddress.toString()
+        }
+
         val properties = JSONObject()
+        properties.put("title", title )
         properties.put("iconName", icon )
         properties.put("POI", icon )
         properties.put("locationUuid", location.uuid)
@@ -1020,168 +1038,7 @@ class MapManager
         return feature
     }
 
-    fun loadMarkers( activity: Activity, mapView: MapView, enumAreas: ArrayList<EnumArea> )
-    {
-        val geoJson = JSONObject()
-        geoJson.put("type", "FeatureCollection")
-
-        val features = JSONArray()
-
-        for (enumArea in enumAreas)
-        {
-            for (location in enumArea.locations)
-            {
-                features.put(MapManager.instance().createFeature(location, MapManager.instance().getResourceName(location)))
-            }
-        }
-
-        geoJson.put("features", features)
-
-        loadMarkers( activity, mapView, geoJson.toString())
-    }
-
-    fun loadMarkers( context: Context, mapView: MapView, geoJson: String )
-    {
-        val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
-        val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
-
-        mapView.getMapboxMap().loadStyle(style(mapStyle!!) {
-
-            TileServer.rasterSource?.let { +it }
-            TileServer.rasterLayer?.let { +it }
-
-            val iconNames = listOf(
-                "home_black", "home_blue", "home_green", "home_light_blue",
-                "home_orange", "home_purple", "home_red",
-                "multi_home_black", "multi_home_blue", "multi_home_green",
-                "multi_home_light_blue", "multi_home_orange",
-                "multi_home_purple", "multi_home_red"
-            )
-
-            iconNames.forEach { name ->
-                +image(name) {
-                    bitmap(BitmapFactory.decodeResource(context.resources, context.resources.getIdentifier(name, "drawable", context.packageName)))
-                }
-            }
-
-            +geoJsonSource("SOURCE_ID") {
-                data(geoJson)
-                cluster(true)
-                clusterRadius(20)
-                clusterMaxZoom(16)
-                build()
-            }
-
-            +circleLayer("CLUSTER_LAYER", "SOURCE_ID") {
-                filter(has("point_count"))
-                circleRadius(15.0)
-                circleColor(Color.BLUE)
-                circleOpacity(0.5)
-            }
-
-            +symbolLayer("CLUSTER_COUNT_LAYER", "SOURCE_ID") {
-                filter(has("point_count"))
-                textField(get("point_count"))
-                textSize(14.0)
-                textColor(Color.WHITE)
-                textAnchor(TextAnchor.CENTER)
-            }
-
-            +symbolLayer("UNCLUSTERED_LAYER", "SOURCE_ID") {
-                filter(not(has("point_count"))) // only single points
-
-                // Icon
-                iconImage(get("iconName"))       // your property in GeoJSON
-                iconAllowOverlap(true)
-                iconIgnorePlacement(true)
-                iconAnchor(IconAnchor.CENTER)
-
-                // Text label
-                textField(get("title"))           // add this property to your GeoJSON
-                textSize(18.0)
-                textColor(Color.BLACK)
-                textAnchor(TextAnchor.CENTER)
-                textJustify(TextJustify.CENTER) // vertical alignment                textJustify(TextJustify.CENTER)
-                textAllowOverlap(true)
-                textIgnorePlacement(true)
-            }
-        }) { style ->
-
-            mapView.gestures.addOnMapClickListener { point ->
-
-                val screenPoint = mapView.mapboxMap.pixelForCoordinate(point)
-
-                val options = RenderedQueryOptions(
-                    listOf("UNCLUSTERED_LAYER"),
-                    null
-                )
-
-                mapView.mapboxMap.queryRenderedFeatures(
-                    RenderedQueryGeometry(screenPoint),
-                    options
-                ) { result ->
-
-                    val features = result.value
-
-                    if (!features.isNullOrEmpty()) {
-
-                        val feature = features[0].queriedFeature.feature
-                        val locationUuid = feature.getStringProperty("locationUuid")
-
-                        DAO.locationDAO.getLocation( locationUuid )?.let {
-                            delegate?.onMarkerTapped( it )
-                        }
-                    }
-                }
-
-                true
-            }
-        }
-    }
-
-    data class MarkerProperty( var location: Location, var resourceId: Int, var title: String )
-    {
-    }
-
-    class MyRadiusMarkerClusterer(context: Context) : RadiusMarkerClusterer(context) {
-
-        private val labelPaint = Paint().apply {
-            color = Color.BLACK
-            textSize = 20f
-            isAntiAlias = true
-            textAlign = Paint.Align.CENTER
-            typeface = Typeface.DEFAULT_BOLD
-        }
-
-        private val labelZoomThreshold = 18.0  // adjust to taste
-
-        override fun draw(canvas: Canvas, mapView: org.osmdroid.views.MapView, shadow: Boolean) {
-            super.draw(canvas, mapView, shadow)
-
-            if (shadow) return
-
-            // Only draw labels when zoomed in
-            if (mapView.zoomLevelDouble < labelZoomThreshold) return
-
-            for (marker in items) {
-                val point = mapView.projection.toPixels(marker.position, null)
-
-                marker.title?.let { title ->
-                    val icon = marker.icon
-                    val iconHeight = icon?.intrinsicHeight ?: 0
-
-                    val textBounds = Rect()
-                    labelPaint.getTextBounds(title, 0, title.length, textBounds)
-                    val textHeight = textBounds.height()
-
-                    val yOffset = iconHeight / 2f - textHeight / 2f
-                    canvas.drawText(title, point.x.toFloat(), point.y.toFloat() - yOffset, labelPaint)
-                }
-            }
-        }
-    }
-
-    fun loadMarkers( context: Context, mapView: View, markerProperties: ArrayList<MarkerProperty> )
+    fun loadMarkers( context: Context, mapView: View, markerProperties: ArrayList<MarkerProperty>, alwaysShowDetails: Boolean, showDetailButton: Boolean )
     {
         if (mapView is org.osmdroid.views.MapView)
         {
@@ -1235,7 +1092,214 @@ class MapManager
             geoJson.put("type", "FeatureCollection")
             geoJson.put("features", features)
 
-            loadMarkers( context, mapView, geoJson.toString())
+            loadMarkers( context, mapView, geoJson.toString(), alwaysShowDetails, showDetailButton )
+        }
+    }
+
+    fun loadMarkers( activity: Activity, mapView: MapView, enumAreas: ArrayList<EnumArea> )
+    {
+        val geoJson = JSONObject()
+        geoJson.put("type", "FeatureCollection")
+
+        val features = JSONArray()
+
+        for (enumArea in enumAreas)
+        {
+            for (location in enumArea.locations)
+            {
+                features.put(instance().createFeature(location, MapManager.instance().getResourceName(location)))
+            }
+        }
+
+        geoJson.put("features", features)
+
+        loadMarkers( activity, mapView, geoJson.toString(), false, false )
+    }
+
+    fun loadMarkers( context: Context, mapView: MapView, geoJson: String, alwaysShowDetails: Boolean, showDetailButton: Boolean )
+    {
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
+        val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
+
+        mapView.getMapboxMap().loadStyle(style(mapStyle!!) {
+
+            TileServer.rasterSource?.let { +it }
+            TileServer.rasterLayer?.let { +it }
+
+            val iconNames = listOf(
+                "home_black", "home_blue", "home_green", "home_light_blue",
+                "home_orange", "home_purple", "home_red",
+                "multi_home_black", "multi_home_blue", "multi_home_green",
+                "multi_home_light_blue", "multi_home_orange",
+                "multi_home_purple", "multi_home_red"
+            )
+
+            iconNames.forEach { name ->
+                +image(name) {
+                    bitmap(BitmapFactory.decodeResource(context.resources, context.resources.getIdentifier(name, "drawable", context.packageName)))
+                }
+            }
+
+            +geoJsonSource("SOURCE_ID") {
+                data(geoJson)
+                cluster(true)
+                clusterRadius(20)
+                clusterMaxZoom(16)
+                build()
+            }
+
+            +circleLayer("CLUSTER_LAYER", "SOURCE_ID") {
+                filter(has("point_count"))
+                circleRadius(15.0)
+                circleColor(Color.BLUE)
+                circleOpacity(0.5)
+            }
+
+            +symbolLayer("UNCLUSTERED_LAYER", "SOURCE_ID") {
+                filter(not(has("point_count"))) // only single points
+
+                // Icon
+                iconImage(get("iconName"))       // your property in GeoJSON
+                iconAllowOverlap(true)
+                iconIgnorePlacement(true)
+                iconAnchor(IconAnchor.CENTER)
+            }
+        }) { style ->
+            mapView.gestures.addOnMapClickListener { point ->
+
+                currentPopup?.let {
+                    currentPopup!!.visibility = View.GONE
+                    currentPopup = null
+                }
+
+                val rectSize = 30.0 // pixels
+                val screenCoord = mapView.mapboxMap.pixelForCoordinate(point)
+                val queryRect = ScreenBox(
+                    ScreenCoordinate(screenCoord.x - rectSize / 2, screenCoord.y - rectSize / 2),
+                    ScreenCoordinate(screenCoord.x + rectSize / 2, screenCoord.y + rectSize / 2)
+                )
+
+                mapView.mapboxMap.queryRenderedFeatures(
+                    RenderedQueryGeometry(queryRect),
+                    RenderedQueryOptions(listOf("CLUSTER_LAYER", "UNCLUSTERED_LAYER"), null)
+                ) { result ->
+                    val features = result.value
+
+                    if (!features.isNullOrEmpty())
+                    {
+                        var isHH = true
+                        val feature = features[0].queriedFeature.feature
+                        val locationUuid = feature.getStringProperty("locationUuid")
+                        var title = feature.getStringProperty("title")
+                        if (title == null)
+                        {
+                            feature.getStringProperty("point_count")?.let { pointCount ->
+                                isHH = false
+                                title = "# items: ${pointCount}"
+                            }
+                        }
+
+                        if (alwaysShowDetails || (!title.isNullOrEmpty()))
+                        {
+                            val featurePoint = feature.geometry() as? Point
+                            featurePoint?.let { point ->
+                                val screen = mapView.mapboxMap.pixelForCoordinate(point)
+
+                                showHHPopup( mapView, screen, title, isHH && showDetailButton )
+                                {
+                                    currentPopup!!.visibility = View.GONE
+                                    currentPopup = null
+                                    DAO.locationDAO.getLocation(locationUuid)?.let {
+                                        delegate?.onMarkerTapped(it)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                true
+            }
+        }
+    }
+
+    private var currentPopup : View? = null
+
+    fun showHHPopup( mapView: MapView, screenPoint: ScreenCoordinate, title: String, showDetailButton: Boolean, onNavigate: () -> Unit)
+    {
+        (mapView.parent as View).findViewById<View>(R.id.hh_popup)?.let { popup ->
+            val textView = popup.findViewById<TextView>(R.id.title)
+            val button = popup.findViewById<Button>(R.id.details_button)
+
+            currentPopup = popup
+            textView.text = title
+
+            if (!showDetailButton) {
+                button.visibility = View.GONE
+            } else {
+                button.visibility = View.VISIBLE
+                button.setOnClickListener {
+                    popup.visibility = View.GONE
+                    onNavigate()
+                }
+            }
+
+            // Force measure and position correctly
+            popup.post {
+                // Measure the popup to get actual width/height
+                popup.measure(
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+                )
+                val popupWidth = popup.measuredWidth
+                val popupHeight = popup.measuredHeight
+
+                popup.x = screenPoint.x.toFloat() - popupWidth / 2
+                popup.y = screenPoint.y.toFloat() - popupHeight - 20
+                popup.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    data class MarkerProperty( var location: Location, var resourceId: Int, var title: String )
+    {
+    }
+
+    class MyRadiusMarkerClusterer(context: Context) : RadiusMarkerClusterer(context) {
+
+        private val labelPaint = Paint().apply {
+            color = Color.BLACK
+            textSize = 20f
+            isAntiAlias = true
+            textAlign = Paint.Align.CENTER
+            typeface = Typeface.DEFAULT_BOLD
+        }
+
+        private val labelZoomThreshold = 18.0  // adjust to taste
+
+        override fun draw(canvas: Canvas, mapView: org.osmdroid.views.MapView, shadow: Boolean) {
+            super.draw(canvas, mapView, shadow)
+
+            if (shadow) return
+
+            // Only draw labels when zoomed in
+            if (mapView.zoomLevelDouble < labelZoomThreshold) return
+
+            for (marker in items) {
+                val point = mapView.projection.toPixels(marker.position, null)
+
+                marker.title?.let { title ->
+                    val icon = marker.icon
+                    val iconHeight = icon?.intrinsicHeight ?: 0
+
+                    val textBounds = Rect()
+                    labelPaint.getTextBounds(title, 0, title.length, textBounds)
+                    val textHeight = textBounds.height()
+
+                    val yOffset = iconHeight / 2f - textHeight / 2f
+                    canvas.drawText(title, point.x.toFloat(), point.y.toFloat() - yOffset, labelPaint)
+                }
+            }
         }
     }
 

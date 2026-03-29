@@ -60,6 +60,8 @@
                 android:text="OSM"
                 android:textStyle="normal" />
 
+            <include layout="@layout/hh_popup"/>
+
             <View
                 android:id="@+id/map_overlay_view"
                 android:layout_width="match_parent"
