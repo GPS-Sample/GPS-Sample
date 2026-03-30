@@ -104,6 +104,7 @@ import edu.gtri.gpssample.database.models.MapTileRegion
 import edu.gtri.gpssample.managers.TileServer.Companion.rasterLayer
 import edu.gtri.gpssample.managers.TileServer.Companion.rasterSource
 import edu.gtri.gpssample.utils.GeoUtils
+import io.github.dellisd.spatialk.geojson.dsl.feature
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -1038,7 +1039,7 @@ class MapManager
         return feature
     }
 
-    fun loadMarkers( context: Context, mapView: View, markerProperties: ArrayList<MarkerProperty>, alwaysShowDetails: Boolean, showDetailButton: Boolean )
+    fun loadMarkers( context: Context, mapView: View, markerProperties: ArrayList<MarkerProperty>, showDetailButton: Boolean )
     {
         if (mapView is org.osmdroid.views.MapView)
         {
@@ -1092,7 +1093,7 @@ class MapManager
             geoJson.put("type", "FeatureCollection")
             geoJson.put("features", features)
 
-            loadMarkers( context, mapView, geoJson.toString(), alwaysShowDetails, showDetailButton )
+            loadMarkers( context, mapView, geoJson.toString(), showDetailButton )
         }
     }
 
@@ -1113,10 +1114,10 @@ class MapManager
 
         geoJson.put("features", features)
 
-        loadMarkers( activity, mapView, geoJson.toString(), false, false )
+        loadMarkers( activity, mapView, geoJson.toString(), false )
     }
 
-    fun loadMarkers( context: Context, mapView: MapView, geoJson: String, alwaysShowDetails: Boolean, showDetailButton: Boolean )
+    fun loadMarkers( context: Context, mapView: MapView, geoJson: String, showDetailButton: Boolean )
     {
         val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
         val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
@@ -1187,31 +1188,50 @@ class MapManager
 
                     if (!features.isNullOrEmpty())
                     {
-                        var isHH = true
-                        val feature = features[0].queriedFeature.feature
-                        val locationUuid = feature.getStringProperty("locationUuid")
-                        var title = feature.getStringProperty("title")
-                        if (title == null)
+                        for (queriedFeature in features)
                         {
-                            feature.getStringProperty("point_count")?.let { pointCount ->
-                                isHH = false
-                                title = "# items: ${pointCount}"
+                            var title = ""
+                            var isHH = true
+                            val feature = queriedFeature.queriedFeature.feature
+
+                            if (feature.hasProperty( "title" ))
+                            {
+                                isHH = true
+                                title = feature.getStringProperty( "title" )
                             }
-                        }
+                            else if (feature.hasProperty( "point_count" ))
+                            {
+                                isHH = false
+                                title = "# items: " + feature.getNumberProperty( "point_count" )
+                            }
 
-                        if (alwaysShowDetails || (!title.isNullOrEmpty()))
-                        {
-                            val featurePoint = feature.geometry() as? Point
-                            featurePoint?.let { point ->
-                                val screen = mapView.mapboxMap.pixelForCoordinate(point)
+                            val locationUuid = feature.getStringProperty("locationUuid")
 
-                                showHHPopup( mapView, screen, title, isHH && showDetailButton )
-                                {
-                                    currentPopup!!.visibility = View.GONE
-                                    currentPopup = null
-                                    DAO.locationDAO.getLocation(locationUuid)?.let {
-                                        delegate?.onMarkerTapped(it)
+                            if (title.isEmpty() && locationUuid.isNotEmpty())
+                            {
+                                DAO.locationDAO.getLocation(locationUuid)?.let {
+                                    delegate?.onMarkerTapped(it)
+                                }
+                            }
+                            else
+                            {
+                                val featurePoint = feature.geometry() as? Point
+                                featurePoint?.let { point ->
+                                    val screen = mapView.mapboxMap.pixelForCoordinate(point)
+
+                                    showHHPopup( mapView, screen, title, isHH && showDetailButton )
+                                    {
+                                        currentPopup!!.visibility = View.GONE
+                                        currentPopup = null
+                                        DAO.locationDAO.getLocation(locationUuid)?.let {
+                                            delegate?.onMarkerTapped(it)
+                                        }
                                     }
+                                }
+
+                                if (currentPopup != null)
+                                {
+                                    break
                                 }
                             }
                         }

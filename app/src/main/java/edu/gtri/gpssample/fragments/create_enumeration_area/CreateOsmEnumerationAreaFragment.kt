@@ -535,7 +535,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
             if (markerProperties.isNotEmpty())
             {
-                MapManager.instance().loadMarkers( activity!!, binding.osmMapView, markerProperties, false, false )
+                MapManager.instance().loadMarkers( activity!!, binding.osmMapView, markerProperties, false )
             }
         }
     }

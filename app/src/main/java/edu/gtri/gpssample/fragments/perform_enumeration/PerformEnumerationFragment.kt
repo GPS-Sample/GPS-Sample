@@ -227,7 +227,6 @@ class PerformEnumerationFragment : Fragment(),
             if (!LocationService.started)
             {
                 LocationService.locationCallback = locationCallback
-                Log.d( "xxx", "locationServer.locationCallback NOT null" )
                 val intent = Intent(activity!!, LocationService::class.java)
                 ContextCompat.startForegroundService(activity!!, intent)
             }
@@ -1072,7 +1071,7 @@ class PerformEnumerationFragment : Fragment(),
 
             if (markerProperties.isNotEmpty())
             {
-                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, true, true )
+                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, true )
             }
         }
     }
@@ -1093,34 +1092,37 @@ class PerformEnumerationFragment : Fragment(),
                         enumArea.breadcrumbs.add(Breadcrumb(enumArea.uuid, enumerationTeam.name, location.latitude, location.longitude, enumArea.breadcrumbs.last().groupId))
                     }
 
-                    DAO.enumerationItemDAO.createOrUpdateEnumerationItem( EnumerationItem(), location )?.let { enumerationItem ->
-                        location.enumerationItems.add( enumerationItem )
+                    ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                        when( buttonPressed )
+                        {
+                            ConfirmationDialog.ButtonPress.Left,
+                            ConfirmationDialog.ButtonPress.Right -> {
+                                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( EnumerationItem(), location )?.let { enumerationItem ->
+                                    location.enumerationItems.add(enumerationItem)
+                                    sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
 
-                        sharedViewModel.currentConfiguration?.value?.let { config ->
-                            if (config.autoIncrementSubaddress)
-                            {
-                                enumerationItem.subAddress = "${maxSubaddress + 1}"
-                            }
-                        }
+                                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                                        if (config.autoIncrementSubaddress) {
+                                            enumerationItem.subAddress = "${maxSubaddress + 1}"
+                                        }
+                                    }
+                                }
 
-                        sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
-
-                        ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                            when( buttonPressed )
-                            {
-                                ConfirmationDialog.ButtonPress.Left -> {
+                                if (buttonPressed == ConfirmationDialog.ButtonPress.Left)
+                                {
                                     val bundle = Bundle()
                                     bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
                                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
                                 }
-                                ConfirmationDialog.ButtonPress.Right -> {
+                                else
+                                {
                                     val bundle = Bundle()
                                     bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
                                     bundle.putInt( Keys.kStartSubaddress.value, maxSubaddress)
                                     findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle)
                                 }
-                                ConfirmationDialog.ButtonPress.None -> {
-                                }
+                            }
+                            ConfirmationDialog.ButtonPress.None -> {
                             }
                         }
                     }

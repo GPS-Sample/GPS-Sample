@@ -424,7 +424,7 @@ class ReviewCollectionFragment : Fragment(),
 
         if (markerProperties.isNotEmpty())
         {
-            MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, false, false )
+            MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, false )
         }
     }
 
