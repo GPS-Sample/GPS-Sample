@@ -999,7 +999,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                                         }
                                     }
                                     is Point -> {
-                                        checkboxDialog = CheckboxDialog( activity!!, resources.getString(R.string.select_the_hh_identifiers), items, json, feature, this )
+                                        checkboxDialog = CheckboxDialog( activity!!, resources.getString(R.string.select_the_hh_identifiers), items, json, this )
                                     }
                                     else -> {}
                                 }

@@ -90,6 +90,8 @@ class PerformEnumerationFragment : Fragment(),
     private var currentGPSLocation: Point? = null
     private val enumerationTeamLocations = ArrayList<Location>()
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
+    private var includeConfig = false
+    private var includeImages = false
 
     private var maxSubaddress = 0
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
@@ -507,42 +509,41 @@ class PerformEnumerationFragment : Fragment(),
                         }
                     }
                     ConfirmationDialog.ButtonPress.Right -> {
-                        ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null, true) { buttonPressed, tag ->
-                            when( buttonPressed )
-                            {
-                                ConfirmationDialog.ButtonPress.Left -> {
+                        val items = ArrayList<String>()
+                        items.add( "Configuration Files" )
+                        items.add( "Image Files" )
+                        CheckboxDialog( activity!!, "Select the file types to export", items ) { selections ->
+                            includeConfig = false
+                            includeImages = false
 
-                                    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q)
+                            for (selection in selections) {
+                                if (selection == items[0]) includeConfig = true
+                                if (selection == items[1]) includeImages = true
+                            }
+
+                            if (includeConfig || includeImages)
+                            {
+                                ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null, true) { buttonPressed, tag ->
+                                    when( buttonPressed )
                                     {
-                                        ZipUtils.exportToPublicDownloads( activity!!, config, getPathName(), false, { success ->
-                                            if (success)
-                                            {
-                                                Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                        ConfirmationDialog.ButtonPress.Left -> {
+                                            ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Enumerated", includeConfig, includeImages, shouldPackMinimal()) { success ->
+                                                if (success)
+                                                {
+                                                    Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                                }
+                                                else
+                                                {
+                                                    NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                                }
                                             }
-                                            else
-                                            {
-                                                NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
-                                            }
-                                        })
+                                        }
+                                        ConfirmationDialog.ButtonPress.Right -> {
+                                            exportToDevice()
+                                        }
+                                        ConfirmationDialog.ButtonPress.None -> {
+                                        }
                                     }
-                                    else
-                                    {
-                                        ZipUtils.exportToDefaultLocation( activity!!, config, getPathName(), shouldPackMinimal(), { success ->
-                                            if (success)
-                                            {
-                                                Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
-                                            }
-                                            else
-                                            {
-                                                NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
-                                            }
-                                        })
-                                    }
-                                }
-                                ConfirmationDialog.ButtonPress.Right -> {
-                                    exportToDevice()
-                                }
-                                ConfirmationDialog.ButtonPress.None -> {
                                 }
                             }
                         }
@@ -1226,14 +1227,6 @@ class PerformEnumerationFragment : Fragment(),
         return ""
     }
 
-    fun getPathName() : String
-    {
-        val path = Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Enumerated"
-        val root = File( path )
-        root.mkdirs()
-        return path + "/" + getFileName()
-    }
-
     fun exportToDevice()
     {
         val zipFileName = getFileName() + ".zip"
@@ -1255,38 +1248,10 @@ class PerformEnumerationFragment : Fragment(),
                 if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR && resultCode == Activity.RESULT_OK)
                 {
                     data?.data?.let { uri ->
-                        ZipUtils.saveToDefaultLocation( activity!!, config, getPathName(), shouldPackMinimal()) { configFile, imageFile ->
-                             if (configFile != null)
+                        ZipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages, shouldPackMinimal(), uri ) { error ->
+                            if (error.isEmpty())
                             {
-                                if (imageFile != null)
-                                {
-                                    ZipUtils.zipToUri( activity!!, listOf( configFile, imageFile ), uri ) { error ->
-                                        if (error.isEmpty())
-                                        {
-                                            imageFile.delete()
-                                            configFile.delete()
-                                            Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
-                                        }
-                                        else
-                                        {
-                                            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    ZipUtils.zipToUri( activity!!, listOf( configFile ), uri ) { error ->
-                                        if (error.isEmpty())
-                                        {
-                                            configFile.delete()
-                                            Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
-                                        }
-                                        else
-                                        {
-                                            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
-                                        }
-                                    }
-                                }
+                                Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
                             }
                             else
                             {

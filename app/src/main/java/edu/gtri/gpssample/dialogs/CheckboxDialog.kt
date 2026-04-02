@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.dialogs.ConfirmationDialog.ButtonPress
 import edu.gtri.gpssample.fragments.add_multi_household.AddMultiHouseholdAdapter
 import io.github.dellisd.spatialk.geojson.Feature
 
@@ -30,7 +31,43 @@ class CheckboxDialog
     {
     }
 
-    constructor( context: Context?, title: String?, items: List<String>, text: String, feature: Feature, delegate: CheckboxDialogDelegate )
+    constructor( context: Context?, title: String?, items: List<String>, completion: (( selections: ArrayList<String> )->Unit) )
+    {
+        val inflater = LayoutInflater.from(context)
+
+        val view = inflater.inflate(R.layout.dialog_checkbox, null)
+
+        val checkboxDialogAdapter = CheckboxDialogAdapter( items, true )
+
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
+
+        recyclerView.adapter = checkboxDialogAdapter
+        recyclerView.itemAnimator = DefaultItemAnimator()
+        recyclerView.layoutManager = LinearLayoutManager(context)
+
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle(title).setView(view)
+
+        val alertDialog = builder.create()
+
+        alertDialog.setCancelable(true)
+        alertDialog.show()
+
+        val firstButton = view.findViewById<Button>(R.id.left_button)
+        val secondButton = view.findViewById<Button>(R.id.right_button)
+
+        firstButton.setOnClickListener {
+            alertDialog.dismiss()
+            completion( ArrayList<String>())
+        }
+
+        secondButton.setOnClickListener {
+            alertDialog.dismiss()
+            completion( checkboxDialogAdapter.selections )
+        }
+    }
+
+    constructor( context: Context?, title: String?, items: List<String>, text: String, delegate: CheckboxDialogDelegate )
     {
         val inflater = LayoutInflater.from(context)
 

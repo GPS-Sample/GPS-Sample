@@ -43,6 +43,7 @@ import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
+import edu.gtri.gpssample.dialogs.CheckboxDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
@@ -67,6 +68,9 @@ class ConfigurationFragment : Fragment(),
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
+
+    private var includeConfig = false
+    private var includeImages = false
 
     val REQUEST_CODE_PICK_CONFIG_DIR    = 1001
     val REQUEST_CONFIGURATION           = 1003
@@ -184,7 +188,6 @@ class ConfigurationFragment : Fragment(),
                     }
                 }
             }
-
         }
 
         binding.exportButton.setOnClickListener {
@@ -211,44 +214,43 @@ class ConfigurationFragment : Fragment(),
                         }
                     }
                     ConfirmationDialog.ButtonPress.Right -> {
-                        ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null, true) { buttonPressed, tag ->
-                            when( buttonPressed )
-                            {
-                                ConfirmationDialog.ButtonPress.Left -> {
-                                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                        val items = ArrayList<String>()
+                        items.add( "Configuration Files" )
+                        items.add( "Image Files" )
+                        CheckboxDialog( activity!!, "Select the file types to export", items ) { selections ->
+                            includeConfig = false
+                            includeImages = false
 
-                                        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q)
-                                        {
-                                            ZipUtils.exportToPublicDownloads( activity!!, config, getPathName(), false, { success ->
-                                                if (success)
-                                                {
-                                                    Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                            for (selection in selections) {
+                                if (selection == items[0]) includeConfig = true
+                                if (selection == items[1]) includeImages = true
+                            }
+
+                            if (includeConfig || includeImages)
+                            {
+                                ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null, true) { buttonPressed, tag ->
+                                    when( buttonPressed )
+                                    {
+                                        ConfirmationDialog.ButtonPress.Left -> {
+                                            sharedViewModel.currentConfiguration?.value?.let { config ->
+                                                ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages, false ) { success ->
+                                                    if (success)
+                                                    {
+                                                        Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                                    }
+                                                    else
+                                                    {
+                                                        NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                                    }
                                                 }
-                                                else
-                                                {
-                                                    NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
-                                                }
-                                            })
+                                            }
                                         }
-                                        else
-                                        {
-                                            ZipUtils.exportToDefaultLocation( activity!!, config, getPathName(), false, { success ->
-                                                if (success)
-                                                {
-                                                    Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
-                                                }
-                                                else
-                                                {
-                                                    NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
-                                                }
-                                            } )
+                                        ConfirmationDialog.ButtonPress.Right -> {
+                                            exportToDevice()
+                                        }
+                                        ConfirmationDialog.ButtonPress.None -> {
                                         }
                                     }
-                                }
-                                ConfirmationDialog.ButtonPress.Right -> {
-                                    exportToDevice()
-                                }
-                                ConfirmationDialog.ButtonPress.None -> {
                                 }
                             }
                         }
@@ -345,22 +347,10 @@ class ConfigurationFragment : Fragment(),
 
             val versionName = BuildConfig.VERSION_NAME
 
-            val path = Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Configurations"
-            val root = File( path )
-            root.mkdirs()
-
             return "${role}-${userName}-${config.name}-${dateTime!!}-${versionName}"
         }
 
         return ""
-    }
-
-    fun getPathName() : String
-    {
-        val path = Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Configurations"
-        val root = File( path )
-        root.mkdirs()
-        return path + "/" + getFileName()
     }
 
     fun updateOverview()
@@ -479,38 +469,14 @@ class ConfigurationFragment : Fragment(),
             {
                 data?.data?.let { uri ->
                     sharedViewModel.currentConfiguration?.value?.let { config ->
-                        ZipUtils.saveToDefaultLocation( activity!!, config, getPathName(), false ) { configFile, imageFile ->
-                            if (configFile != null)
+                        ZipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages, false, uri ) { error ->
+                            if (error.isEmpty())
                             {
-                                if (imageFile != null)
-                                {
-                                    ZipUtils.zipToUri( activity!!, listOf( configFile, imageFile ), uri ) { error ->
-                                        if (error.isEmpty())
-                                        {
-                                            imageFile.delete()
-                                            configFile.delete()
-                                            Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
-                                        }
-                                        else
-                                        {
-                                            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    ZipUtils.zipToUri( activity!!, listOf( configFile ), uri ) { error ->
-                                        if (error.isEmpty())
-                                        {
-                                            configFile.delete()
-                                            Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
-                                        }
-                                        else
-                                        {
-                                            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
-                                        }
-                                    }
-                                }
+                                Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                            }
+                            else
+                            {
+                                NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
                             }
                         }
                     }

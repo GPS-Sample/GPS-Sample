@@ -459,6 +459,7 @@
 
     <string name="menu_team_review_show">"Show Walked Path"</string>
     <string name="menu_team_review_hide">"Hide Walked Path"</string>
+    <string name="continue_button">"Continue"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
