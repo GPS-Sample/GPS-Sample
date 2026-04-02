@@ -411,20 +411,63 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int)
     {
-        if (oldVersion == 314 && newVersion == 321)
-        {
-            migrateFrom314To321( db )
-            migrateFrom321To322( db )
-        }
+        Log.d( "xxx", "oldVersion = $oldVersion" )
+        Log.d( "xxx", "newVersion = $newVersion" )
 
-        if (oldVersion == 321 && newVersion == 322)
+        if (oldVersion == 314)
         {
-            migrateFrom321To322( db )
+            if (newVersion == 321)
+            {
+                migrateFrom314To321( db )
+                Log.d( "xxx", "migrated from 314 to 321" )
+            }
+            else if (newVersion == 322)
+            {
+                migrateFrom314To321( db )
+                migrateFrom321To322( db )
+                Log.d( "xxx", "migrated from 314 to 322" )
+            }
+            else if (newVersion == 323)
+            {
+                migrateFrom314To321( db )
+                migrateFrom321To322( db )
+                migrateFrom322To323( db )
+                Log.d( "xxx", "migrated from 314 to 323" )
+            }
+            else
+            {
+                dropAllTables( db )
+            }
         }
-
-        if (oldVersion == 322 && newVersion == 323)
+        else if (oldVersion == 321)
         {
-            migrateFrom322To323( db )
+            if (newVersion == 322)
+            {
+                migrateFrom321To322( db )
+                Log.d( "xxx", "migrated from 321 to 322" )
+            }
+            else if (newVersion == 323)
+            {
+                migrateFrom321To322( db )
+                migrateFrom322To323( db )
+                Log.d( "xxx", "migrated from 321 to 323" )
+            }
+            else
+            {
+                dropAllTables( db )
+            }
+        }
+        else if (oldVersion == 322)
+        {
+            if (newVersion == 323)
+            {
+                migrateFrom322To323( db )
+                Log.d( "xxx", "migrated from 322 to 323" )
+            }
+            else
+            {
+                dropAllTables( db )
+            }
         }
         else
         {
