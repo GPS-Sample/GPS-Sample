@@ -4,6 +4,7 @@ import android.app.Activity
 import android.net.Uri
 import android.content.ContentValues
 import android.content.Context
+import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
@@ -140,21 +141,32 @@ object ZipUtils
     fun zipToPublicDocuments( activity: Activity, config: Config, fileName: String, subDirectory: String, includeConfig: Boolean, includeImages: Boolean, shouldPackMinimal: Boolean, completion: (Boolean) -> Unit)
     {
         Thread {
-            try {
+            try
+            {
+                val resolver = activity.contentResolver
                 val values = ContentValues().apply {
                     put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
                     put(MediaStore.MediaColumns.MIME_TYPE, "application/zip")
-                    put(
-                        MediaStore.MediaColumns.RELATIVE_PATH,
-                        Environment.DIRECTORY_DOCUMENTS + "/GPSSample/$subDirectory"
-                    )
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                    {
+                        put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS + "/GPSSample/$subDirectory")
+                    }
+                    else
+                    {
+                        val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),"GPSSample/$subDirectory")
+
+                        if (!dir.exists())
+                        {
+                            dir.mkdirs()
+                        }
+
+                        val file = File(dir, fileName)
+                        put(MediaStore.MediaColumns.DATA, file.absolutePath)
+                    }
                 }
 
-                val resolver = activity.contentResolver
-                val uri = resolver.insert(
-                    MediaStore.Files.getContentUri("external"),
-                    values
-                ) ?: throw Exception("Failed to create MediaStore entry")
+                val uri = resolver.insert(MediaStore.Files.getContentUri("external"), values) ?: throw Exception("Failed to create MediaStore entry")
 
                 resolver.openOutputStream(uri)?.use { outputStream ->
                     ZipOutputStream(BufferedOutputStream(outputStream)).use { zipOut ->
@@ -163,29 +175,30 @@ object ZipUtils
                         if (includeConfig)
                         {
                             val packedConfig = if (shouldPackMinimal) config.packMinimal() else config.pack()
-
                             val configEntry = ZipEntry("$fileName.json")
                             zipOut.putNextEntry(configEntry)
                             zipOut.write(packedConfig.toByteArray())
                             zipOut.closeEntry()
                         }
 
-                        // ---- IMAGE JSON (if exists) ----
+                        // ---- IMAGE JSON ----
                         if (includeImages)
                         {
                             val imageList = ImageList(config.uuid, ArrayList<Image>())
 
-                            for (enumArea in config.enumAreas) {
-                                for (location in enumArea.locations) {
+                            for (enumArea in config.enumAreas)
+                            {
+                                for (location in enumArea.locations)
+                                {
                                     ImageDAO.instance().getImage(location)?.let {
                                         imageList.images.add(it)
                                     }
                                 }
                             }
 
-                            if (imageList.images.isNotEmpty()) {
+                            if (imageList.images.isNotEmpty())
+                            {
                                 val payload = imageList.pack(config.encryptionPassword)
-
                                 val imageEntry = ZipEntry("$fileName-img.json")
                                 zipOut.putNextEntry(imageEntry)
                                 zipOut.write(payload.toByteArray())
@@ -197,7 +210,9 @@ object ZipUtils
 
                 activity.runOnUiThread { completion(true) }
 
-            } catch (ex: Exception) {
+            }
+            catch (ex: Exception)
+            {
                 Log.d("xxx", ex.stackTraceToString())
                 activity.runOnUiThread { completion(false) }
             }
