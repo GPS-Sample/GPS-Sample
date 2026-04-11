@@ -456,8 +456,8 @@ class PerformCollectionFragment : Fragment(),
                     }
                 }
 
-                refreshMap()
                 performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+                refreshMap()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}

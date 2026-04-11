@@ -37,6 +37,7 @@ import com.mapbox.common.TileRegionLoadOptions
 import com.mapbox.common.TileStore
 import com.mapbox.common.TileStoreOptions
 import com.mapbox.geojson.Feature
+import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.GlyphsRasterizationMode
@@ -65,7 +66,9 @@ import com.mapbox.maps.extension.style.layers.generated.symbolLayer
 import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
 import com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor
 import com.mapbox.maps.extension.style.layers.properties.generated.TextJustify
+import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
+import com.mapbox.maps.extension.style.sources.getSourceAs
 import com.mapbox.maps.extension.style.style
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.AnnotationConfig
@@ -545,6 +548,10 @@ class MapManager
                 {
                     overlays.add(overlay)
                 }
+                else if (overlay is MyRadiusMarkerClusterer)
+                {
+                    overlays.add(overlay)
+                }
             }
 
             for (overlay in overlays)
@@ -560,6 +567,11 @@ class MapManager
             mapboxPolylineAnnotationManager?.deleteAll()
             mapboxPointAnnotationManager?.deleteAll()
             mapboxBreadcrumbAnnotationManager?.deleteAll()
+
+            mapView.getMapboxMap().getStyle()?.let { style ->
+                val source = style.getSourceAs<GeoJsonSource>("SOURCE_ID")
+                source?.featureCollection(FeatureCollection.fromFeatures(arrayOf()))
+            }
         }
     }
 

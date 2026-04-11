@@ -162,6 +162,10 @@ class PerformEnumerationFragment : Fragment(),
             }
         }
 
+        for (location in enumerationTeamLocations) {
+            location.isVisible = true
+        }
+
         (activity!!.application as? MainApplication)?.user?.let {
             user = it
         }
@@ -297,12 +301,19 @@ class PerformEnumerationFragment : Fragment(),
                                 location.isVisible = false
                                 if (!location.isLandmark)
                                 {
-                                    for (enumerationItem in location.enumerationItems)
+                                    if (location.enumerationItems.isEmpty())
                                     {
-                                        if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                                        location.isVisible = true
+                                    }
+                                    else
+                                    {
+                                        for (enumerationItem in location.enumerationItems)
                                         {
-                                            location.isVisible = true
-                                            break
+                                            if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                                            {
+                                                location.isVisible = true
+                                                break
+                                            }
                                         }
                                     }
                                 }
@@ -351,6 +362,7 @@ class PerformEnumerationFragment : Fragment(),
                     }
 
                     performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+                    refreshMap()
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
