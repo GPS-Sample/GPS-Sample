@@ -857,30 +857,42 @@ class PerformEnumerationFragment : Fragment(),
         overflowButtons.forEachIndexed { index, view ->
             when (view.id)
             {
-                R.id.help_button -> popupMenu.menu.add(0, view.id, index, "Help")
-                R.id.export_button -> popupMenu.menu.add(0, view.id, index, "Export Configuration")
-                R.id.delete_breadcrumbs_button -> popupMenu.menu.add(0, view.id, index, "Delete the walked path")
+                R.id.export_button -> popupMenu.menu.add(0, view.id, index, resources.getString(R.string.export_configuration ))
+                R.id.record_breadcrumbs_button ->
+                {
+                    if (isRecordingBreadcrumbs)
+                    {
+                        popupMenu.menu.add(0, view.id, index, resources.getString(R.string.stop_recording ))
+                    }
+                    else
+                    {
+                        popupMenu.menu.add(0, view.id, index, resources.getString(R.string.record_breadcrumbs ))
+                    }
+                }
                 R.id.show_breadcrumbs_button ->
                 {
                     if (isShowingBreadcrumbs)
                     {
-                        popupMenu.menu.add(0, view.id, index, "Hide Breadcrumbs")
+                        popupMenu.menu.add(0, view.id, index, resources.getString(R.string.hide_breadcrumbs ))
                     }
                     else
                     {
-                        popupMenu.menu.add(0, view.id, index, "Show Breadcrumbs")
+                        popupMenu.menu.add(0, view.id, index, resources.getString(R.string.show_breadcrumbs ))
                     }
                 }
+                R.id.delete_breadcrumbs_button -> popupMenu.menu.add(0, view.id, index, resources.getString(R.string.delete_breadcrumbs ))
+                R.id.help_button -> popupMenu.menu.add(0, view.id, index, resources.getString(R.string.help_button ))
             }
         }
 
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId)
             {
-                R.id.help_button -> binding.helpButton.performClick()
                 R.id.export_button -> binding.exportButton.performClick()
+                R.id.record_breadcrumbs_button -> binding.recordBreadcrumbsButton.performClick()
                 R.id.show_breadcrumbs_button -> binding.showBreadcrumbsButton.performClick()
                 R.id.delete_breadcrumbs_button -> binding.deleteBreadcrumbsButton.performClick()
+                R.id.help_button -> binding.helpButton.performClick()
             }
             true
         }

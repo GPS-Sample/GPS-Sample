@@ -460,6 +460,9 @@
     <string name="menu_team_review_show">"Show Walked Path"</string>
     <string name="menu_team_review_hide">"Hide Walked Path"</string>
     <string name="continue_button">"Continue"</string>
+    <string name="help_button">"Help"</string>
+    <string name="hide_breadcrumbs">"Hide the walked path"</string>
+    <string name="stop_recording">"Stop recording the walked path"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
