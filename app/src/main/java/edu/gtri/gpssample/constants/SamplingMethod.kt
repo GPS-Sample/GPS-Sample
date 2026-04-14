@@ -7,6 +7,7 @@
 
 package edu.gtri.gpssample.constants
 
+import android.util.Log
 import androidx.fragment.app.Fragment
 
 enum class SamplingMethod(val format : String) {
@@ -19,13 +20,12 @@ enum class SamplingMethod(val format : String) {
 
 object SamplingMethodConverter
 {
-    val array : Array<String> = Array(4){ i ->
+    val array : Array<String> = Array(3){ i ->
         when(i)
         {
-            0 -> SamplingMethod.SimpleRandom.format
-            1 -> SamplingMethod.Cluster.format
-            2 -> SamplingMethod.Subsets.format
-            3 -> SamplingMethod.Strata.format
+            0 -> SamplingMethod.Cluster.format
+            1 -> SamplingMethod.SimpleRandom.format
+            2 -> SamplingMethod.Strata.format
             else -> String()
         }
     }
@@ -34,11 +34,11 @@ object SamplingMethodConverter
     {
         return when(sampleMethod)
         {
+            SamplingMethod.None         -> 0
             SamplingMethod.SimpleRandom -> 1
-            SamplingMethod.Cluster -> 2
-            SamplingMethod.Subsets -> 3
-            SamplingMethod.Strata -> 4
-            else -> 0
+            SamplingMethod.Cluster      -> 2
+            SamplingMethod.Subsets      -> 3
+            SamplingMethod.Strata       -> 4
         }
     }
 
@@ -46,6 +46,7 @@ object SamplingMethodConverter
     {
         return when(index)
         {
+            0 -> SamplingMethod.None
             1 -> SamplingMethod.SimpleRandom
             2 -> SamplingMethod.Cluster
             3 -> SamplingMethod.Subsets
@@ -54,14 +55,13 @@ object SamplingMethodConverter
         }
     }
 
-    fun fromArrayPosition( position : Int) : SamplingMethod
+    fun fromArrayPosition( position : Int ) : SamplingMethod
     {
         return when(position)
         {
-            0 -> SamplingMethod.SimpleRandom
-            1 -> SamplingMethod.Cluster
-            2 -> SamplingMethod.Subsets
-            3 -> SamplingMethod.Strata
+            0 -> SamplingMethod.Cluster
+            1 -> SamplingMethod.SimpleRandom
+            2 -> SamplingMethod.Strata
             else -> SamplingMethod.None
         }
     }
@@ -70,34 +70,15 @@ object SamplingMethodConverter
     {
         return when(samplingMethod)
         {
-            SamplingMethod.SimpleRandom -> 0
-            SamplingMethod.Cluster -> 1
-            SamplingMethod.Subsets -> 2
-            SamplingMethod.Strata -> 3
+            SamplingMethod.Cluster      -> 0
+            SamplingMethod.SimpleRandom -> 1
+            SamplingMethod.Strata       -> 2
             else -> 0
         }
     }
+
     fun fromString( type : String) : SamplingMethod
     {
-        return when(type)
-        {
-            SamplingMethod.SimpleRandom.format -> SamplingMethod.SimpleRandom
-            SamplingMethod.Cluster.format -> SamplingMethod.Cluster
-            SamplingMethod.Subsets.format -> SamplingMethod.Subsets
-            SamplingMethod.Strata.format -> SamplingMethod.Strata
-            else -> SamplingMethod.None
-        }
-    }
-
-    fun internationalString(samplingMethod: SamplingMethod, fragment: Fragment) : String
-    {
-        return when(samplingMethod)
-        {
-            SamplingMethod.SimpleRandom-> "Simple Random Sampling" //fragment.getString(R.string.simple_random)
-            SamplingMethod.Cluster -> "Cluster Sampling" //fragment.getString(R.string.cluster_sampling)
-            SamplingMethod.Subsets -> "Subset Sampling" //fragment.getString(R.string.subset_overlap)
-            SamplingMethod.Strata -> "Strata Sampling" //fragment.getString(R.string.strata_exclusive)
-            else -> ""
-        }
+        return SamplingMethod.valueOf( type )
     }
 }

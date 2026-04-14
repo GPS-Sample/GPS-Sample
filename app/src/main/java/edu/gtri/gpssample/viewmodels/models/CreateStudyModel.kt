@@ -54,10 +54,9 @@ class CreateStudyModel {
                 { i ->
                     when (i) {
 
-                        0 -> fragment.getString(R.string.simple_random)
-                        1 -> fragment.getString(R.string.cluster_sampling)
-                        2 -> fragment.getString(R.string.subset_overlap)
-                        3 -> fragment.getString(R.string.strata_exclusive)
+                        0 -> fragment.getString(R.string.cluster_sampling)
+                        1 -> fragment.getString(R.string.simple_random)
+                        2 -> fragment.getString(R.string.strata_exclusive)
                         else -> String()
                     }
                 }
