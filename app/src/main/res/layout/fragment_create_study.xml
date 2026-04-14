@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".fragments.createstudy.CreateStudyFragment"
-    >
+    tools:context=".fragments.createstudy.CreateStudyFragment">
+
     <data>
         <import type="android.view.View" />
         <variable
@@ -15,6 +15,7 @@
             name="createStudyFragment"
             type="edu.gtri.gpssample.fragments.createstudy.CreateStudyFragment" />
     </data>
+
     <LinearLayout
         android:id="@+id/fragment_root_layout"
         android:orientation="vertical"
@@ -147,21 +148,48 @@
             </FrameLayout>
         </LinearLayout>
 
-        <ExpandableListView
-            android:id="@+id/expandable_list_view"
+<!--        <ExpandableListView-->
+<!--            android:id="@+id/expandable_list_view"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_marginStart="20dp"-->
+<!--            android:layout_marginTop="20dp"-->
+<!--            android:layout_marginEnd="20dp"-->
+<!--            android:layout_marginBottom="20dp"-->
+<!--            android:layout_weight="1" />-->
+
+        <Button
+            android:id="@+id/primary_sample_button"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginStart="20dp"
+            android:layout_height="50dp"
             android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:layout_weight="1" />
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/primary_sample" />
+
+        <Button
+            android:id="@+id/subset_sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/subset_sample" />
 
         <Button
             android:id="@+id/save_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_margin="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:text="@string/save" />

@@ -242,16 +242,16 @@
         tools:layout="@layout/fragment_create_study">
 
         <action
-            android:id="@+id/action_navigate_to_CreateFieldFragment"
-            app:destination="@id/CreateFieldFragment"/>
+            android:id="@+id/action_navigate_to_PrimarySampleFragment"
+            app:destination="@id/PrimarySampleFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_CreateRuleFragment"
-            app:destination="@id/CreateRuleFragment"/>
+            android:id="@+id/action_navigate_to_StrataSampleFragment"
+            app:destination="@id/StrataSampleFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_CreateFilterFragment"
-            app:destination="@id/CreateFilterFragment"/>
+            android:id="@+id/action_navigate_to_SubsetSampleFragment"
+            app:destination="@id/SubsetSampleFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_CreateEnumerationAreaFragment"
@@ -263,6 +263,62 @@
         <action
             android:id="@+id/action_navigate_to_CreateConfigurationFragment"
             app:destination="@id/CreateConfigurationFragment" />
+    </fragment>
+
+    <!--PrimarySampleFragment-->
+
+    <fragment
+        android:id="@+id/PrimarySampleFragment"
+        android:name="edu.gtri.gpssample.fragments.primary_sample.PrimarySampleFragment"
+        tools:layout="@layout/fragment_primary_sample">
+
+        <action
+            android:id="@+id/action_navigate_to_CreateFieldFragment"
+            app:destination="@id/CreateFieldFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_CreateRuleFragment"
+            app:destination="@id/CreateRuleFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_CreateFilterFragment"
+            app:destination="@id/CreateFilterFragment"/>
+    </fragment>
+
+    <!--StrataSampleFragment-->
+
+    <fragment
+        android:id="@+id/StrataSampleFragment"
+        android:name="edu.gtri.gpssample.fragments.strata_sample.StrataSampleFragment"
+        tools:layout="@layout/fragment_strata_sample">
+
+        <action
+            android:id="@+id/action_navigate_to_CreateFieldFragment"
+            app:destination="@id/CreateFieldFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_CreateRuleFragment"
+            app:destination="@id/CreateRuleFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_CreateFilterFragment"
+            app:destination="@id/CreateFilterFragment"/>
+    </fragment>
+
+    <!--StrataSampleFragment-->
+
+    <fragment
+        android:id="@+id/SubsetSampleFragment"
+        android:name="edu.gtri.gpssample.fragments.subset_sample.SubsetSampleFragment"
+        tools:layout="@layout/fragment_subset_sample">
+
+        <action
+            android:id="@+id/action_navigate_to_CreateRuleFragment"
+            app:destination="@id/CreateRuleFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_CreateFilterFragment"
+            app:destination="@id/CreateFilterFragment"/>
     </fragment>
 
     <!-- ManageEnumerationTeamsFragment   -->

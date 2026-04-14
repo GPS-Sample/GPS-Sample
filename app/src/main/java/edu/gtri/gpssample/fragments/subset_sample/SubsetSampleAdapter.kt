@@ -1,14 +1,6 @@
-/*
- * Copyright (C) 2022-2025 Georgia Tech Research Institute
- * SPDX-License-Identifier: GPL-3.0-or-later
- *
- * See the LICENSE file for the full license text.
-*/
-
-package edu.gtri.gpssample.fragments.createstudy
+package edu.gtri.gpssample.fragments.subset_sample
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,32 +14,18 @@ import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
 import java.util.ArrayList
 
-class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
+class SubsetSampleAdapter(var context: Context) : BaseExpandableListAdapter()
 {
-    lateinit var didSelectField: ((field: Field) -> Unit)
     lateinit var didSelectRule: ((rule: Rule) -> Unit)
     lateinit var didSelectFilter: ((filter: Filter) -> Unit)
-
-    lateinit var shouldAddField: (() -> Unit)
     lateinit var shouldAddRule: (() -> Unit)
     lateinit var shouldAddFilter: (() -> Unit)
 
-    var fields = ArrayList<Field>()
     var rules = ArrayList<Rule>()
     var filters = ArrayList<Filter>()
 
-    fun updateStudy( study: Study )
+    fun updateStudy( study: Study)
     {
-        fields = ArrayList<Field>()
-
-        for (field in study.fields)
-        {
-            fields.add( field )
-            field.fields?.let { childFields ->
-                fields.addAll( childFields )
-            }
-        }
-
         rules = study.rules
         filters = study.filters
 
@@ -56,16 +34,15 @@ class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
 
     override fun getGroupCount(): Int
     {
-        return 3
+        return 2
     }
 
     override fun getChildrenCount(p0: Int): Int
     {
         when( p0 )
         {
-            0-> return fields.size
-            1-> return rules.size
-            2-> return filters.size
+            0-> return rules.size
+            1-> return filters.size
         }
 
         return 0
@@ -75,9 +52,8 @@ class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
     {
         when( p0 )
         {
-            0-> return fields[p1]
-            1-> return rules[p1]
-            2-> return filters[p1]
+            0-> return rules[p1]
+            1-> return filters[p1]
         }
 
         return Any()
@@ -107,37 +83,15 @@ class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
 
         when( groupPosition )
         {
-            0 -> nameTextView.text = "${fields[childPosition].index}. ${fields[childPosition].name}"
-            1 -> nameTextView.text = rules[childPosition].name
-            2 -> nameTextView.text = filters[childPosition].name
-        }
-
-        if (groupPosition == 0)
-        {
-            val field = fields[childPosition]
-
-            if (field.parentUUID != null)
-            {
-                var parentIndex = 0
-
-                for (f in fields)
-                {
-                    if (f.uuid == field.parentUUID)
-                    {
-                        parentIndex = f.index
-                    }
-                }
-
-                nameTextView.text = "    ${parentIndex}.${fields[childPosition].index}. ${fields[childPosition].name}"
-            }
+            0 -> nameTextView.text = rules[childPosition].name
+            1 -> nameTextView.text = filters[childPosition].name
         }
 
         view.setOnClickListener {
             when( groupPosition )
             {
-                0 -> didSelectField( fields[childPosition] )
-                1 -> didSelectRule( rules[childPosition] )
-                2 -> didSelectFilter( filters[childPosition] )
+                0 -> didSelectRule( rules[childPosition] )
+                1 -> didSelectFilter( filters[childPosition] )
             }
         }
 
@@ -148,7 +102,6 @@ class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
     {
         when( p0 )
         {
-            0 -> return fields
             1 -> return rules
             2 -> return filters
         }
@@ -166,7 +119,7 @@ class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
         return true
     }
 
-    override fun getGroupView( groupPosition: Int, isExpanded: Boolean, childView: View?, viewGroup: ViewGroup?): View
+    override fun getGroupView(groupPosition: Int, isExpanded: Boolean, childView: View?, viewGroup: ViewGroup?): View
     {
         val view: View
 
@@ -183,9 +136,8 @@ class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
 
         when( groupPosition )
         {
-            0 -> listTitleTextView.text = context.getString(R.string.fields)
-            1 -> listTitleTextView.text = context.getString(R.string.rules)
-            2 -> listTitleTextView.text = context.getString(R.string.filters)
+            0 -> listTitleTextView.text = context.getString(R.string.rules)
+            1 -> listTitleTextView.text = context.getString(R.string.filters)
         }
 
         val downImageView = view.findViewById<View>(R.id.arrow_down_image_view) as ImageView
@@ -207,9 +159,8 @@ class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
         addButton.setOnClickListener {
             when( groupPosition )
             {
-                0 -> shouldAddField()
-                1 -> shouldAddRule()
-                2 -> shouldAddFilter()
+                0 -> shouldAddRule()
+                1 -> shouldAddFilter()
             }
         }
 

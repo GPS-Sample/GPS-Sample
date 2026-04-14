@@ -7,43 +7,23 @@
 
 package edu.gtri.gpssample.fragments.createstudy
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import android.util.SparseArray
 import android.view.*
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ExpandableListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.constants.SamplingMethod
-import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.database.models.Field
-import edu.gtri.gpssample.database.models.Filter
-import edu.gtri.gpssample.database.models.Rule
-import edu.gtri.gpssample.database.models.Strata
 import edu.gtri.gpssample.database.models.Study
-import edu.gtri.gpssample.dialogs.AddStrataDialog
-import edu.gtri.gpssample.dialogs.DropdownDialog
-import edu.gtri.gpssample.fragments.configuration.CreateStrataAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import java.util.*
 
 enum class DeleteMode(val value : Int)
 {
@@ -55,8 +35,6 @@ class CreateStudyFragment : Fragment()
     private lateinit var study: Study
     private var _binding: FragmentCreateStudyBinding? = null
     private val binding get() = _binding!!
-    private lateinit var createStudyAdapter: CreateStudyAdapter
-    private lateinit var createStrataAdapter: CreateStrataAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     private var expandableListState: SparseArray<Parcelable>? = null
@@ -78,33 +56,6 @@ class CreateStudyFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-
-        createStudyAdapter = CreateStudyAdapter(activity!!)
-        createStudyAdapter.didSelectField = this::didSelectField
-        createStudyAdapter.didSelectRule = this::didSelectRule
-        createStudyAdapter.didSelectFilter = this::didSelectFilter
-        createStudyAdapter.shouldAddField = this::shouldAddField
-        createStudyAdapter.shouldAddRule = this::shouldAddRule
-        createStudyAdapter.shouldAddFilter = this::shouldAddFilter
-
-        createStrataAdapter = CreateStrataAdapter(activity!!)
-        createStrataAdapter.didSelectStrata = this::didSelectStrata
-        createStrataAdapter.didSelectField = this::didSelectField
-        createStrataAdapter.didSelectRule = this::didSelectRule
-        createStrataAdapter.didSelectFilter = this::didSelectFilter
-        createStrataAdapter.shouldAddStrata = this::shouldAddStrata
-        createStrataAdapter.shouldAddField = this::shouldAddField
-        createStrataAdapter.shouldAddRule = this::shouldAddRule
-        createStrataAdapter.shouldAddFilter = this::shouldAddFilter
-
-        sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
-            createStudyAdapter.updateStudy( study )
-            createStrataAdapter.updateStudy( study )
-        }
-
-//        createStudyAdapter.didDeleteField = this::didDeleteField
-//        createStudyAdapter.didDeleteRule = this::didDeleteRule
-//        createStudyAdapter.didDeleteFilter = this::didDeleteFilter
 
         binding.apply {
             // Specify the fragment as the lifecycle owner
@@ -133,20 +84,19 @@ class CreateStudyFragment : Fragment()
             binding.deleteImageView.visibility = View.GONE
         }
 
-        if (study.samplingMethod == SamplingMethod.Strata)
-        {
-            binding.expandableListView.setAdapter(createStrataAdapter)
-        }
-        else
-        {
-            binding.expandableListView.setAdapter(createStudyAdapter)
-        }
-
-        expandableListState?.let {
-            binding.expandableListView.restoreHierarchyState(it)
-        }
-
-        binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
+        sharedViewModel.createStudyModel.samplingMethod.observe( this, androidx.lifecycle.Observer { samplingMethod ->
+            when(study.samplingMethod)
+            {
+                SamplingMethod.SimpleRandom -> {
+                    binding.sampleSizeTextView.text = resources.getString(R.string.simple_random_sampling_label)
+                }
+                SamplingMethod.Cluster -> {
+                    binding.sampleSizeTextView.text = resources.getString(R.string.cluster_sampling_label)
+                }
+                else -> {
+                }
+            }
+        })
 
         binding.deleteImageView.setOnClickListener {
             ConfirmationDialog(activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_study_message), resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
@@ -164,32 +114,24 @@ class CreateStudyFragment : Fragment()
             }
         }
 
+        binding.primarySampleButton.setOnClickListener {
+            if (study.samplingMethod == SamplingMethod.Strata)
+            {
+                findNavController().navigate( R.id.action_navigate_to_StrataSampleFragment )
+            }
+            else
+            {
+                findNavController().navigate( R.id.action_navigate_to_PrimarySampleFragment )
+            }
+        }
+
+        binding.subsetSampleButton.setOnClickListener {
+            findNavController().navigate( R.id.action_navigate_to_SubsetSampleFragment )
+        }
+
         binding.saveButton.setOnClickListener {
             updateStudy()
         }
-
-        sharedViewModel.createStudyModel.samplingMethod.observe( this, androidx.lifecycle.Observer { samplingMethod ->
-            when(study.samplingMethod)
-            {
-                SamplingMethod.SimpleRandom -> {
-                    binding.expandableListView.setAdapter(createStudyAdapter)
-                    binding.sampleSizeTextView.text = resources.getString(R.string.simple_random_sampling_label)
-                }
-                SamplingMethod.Cluster -> {
-                    binding.expandableListView.setAdapter(createStudyAdapter)
-                    binding.sampleSizeTextView.text = resources.getString(R.string.cluster_sampling_label)
-                }
-                SamplingMethod.Strata -> {
-                    binding.expandableListView.setAdapter(createStrataAdapter)
-                }
-                else -> {
-                }
-            }
-
-            expandableListState?.let {
-                binding.expandableListView.restoreHierarchyState(it)
-            }
-        })
     }
 
     override fun onResume()
@@ -197,120 +139,6 @@ class CreateStudyFragment : Fragment()
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateStudyFragment.value.toString() + ": " + this.javaClass.simpleName
-
-//        sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
-//            createStudyAdapter.updateStudy( study )
-//            createStrataAdapter.updateStudy( study )
-//        }
-    }
-
-    private fun shouldAddStrata()
-    {
-        val strata = Strata(study.uuid,"", 0, SampleType.NumberHouseholds )
-
-        AddStrataDialog(requireActivity(), strata, false ) { buttonPressed ->
-            if (buttonPressed == AddStrataDialog.ButtonPress.Save)
-            {
-                study.stratas.add( strata )
-                createStrataAdapter.updateStudy( study )
-            }
-        }
-    }
-
-    private fun shouldAddField()
-    {
-        val field = Field( null, study.fields.size+1,"", FieldType.Text, false, false, false, false, false, false, null, null )
-        sharedViewModel.createFieldModel.setCurrentField( field )
-        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
-    }
-
-    private fun shouldAddRule()
-    {
-        sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
-            if(study.fields.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_field_rule_message), Toast.LENGTH_SHORT).show()
-            }
-            else
-            {
-                sharedViewModel.createRuleModel.createNewRule(study)
-                findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment )
-            }
-        }
-    }
-
-    private fun shouldAddFilter()
-    {
-        val bundle = Bundle()
-        sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
-            if(study.rules.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_rule_filter_message), Toast.LENGTH_SHORT).show()
-            }else
-            {
-                sharedViewModel.createFilterModel.createNewFilter()
-                sharedViewModel.createFilterModel.createFilterAdapter.updateRules(null)
-                findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
-            }
-        }
-    }
-
-    private fun didSelectStrata( strata: Strata )
-    {
-        AddStrataDialog(requireActivity(), strata, true ) { buttonPressed ->
-            if (buttonPressed == AddStrataDialog.ButtonPress.Save)
-            {
-                createStrataAdapter.updateStudy( study )
-            }
-            else if (buttonPressed == AddStrataDialog.ButtonPress.Delete)
-            {
-                study.stratas.remove( strata )
-                createStrataAdapter.updateStudy( study )
-            }
-        }
-    }
-
-    private fun didSelectField( field: Field )
-    {
-        sharedViewModel.createFieldModel.setCurrentField(field)
-        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
-    }
-
-    private fun didSelectRule( rule: Rule )
-    {
-        val bundle = Bundle()
-        sharedViewModel.setSelectedRule(rule)
-        findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
-    }
-
-    private fun didSelectFilter( filter: Filter )
-    {
-        val bundle = Bundle()
-        sharedViewModel.createFilterModel.setSelectedFilter(filter)
-        findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
-    }
-
-//    private fun didDeleteField( field: Field )
-//    {
-//        sharedViewModel.createFieldModel.setCurrentField(field)
-//        ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_field_message),
-//            resources.getString(R.string.no), resources.getString(R.string.yes),DeleteMode.deleteFieldTag.value, this)
-//    }
-
-//    private fun didDeleteRule( rule: Rule )
-//    {
-//        sharedViewModel.deleteRule(rule)
-//        ConfirmationDialog( activity, resources.getString( R.string.please_confirm),  resources.getString(R.string.delete_rule_message),
-//            resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteRuleTag.value, this)
-//    }
-
-    private fun didDeleteFilter( filter: Filter )
-    {
-        findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment)
-    }
-
-    fun manageSamples()
-    {
     }
 
     private fun updateStudy()
@@ -332,44 +160,12 @@ class CreateStudyFragment : Fragment()
         findNavController().popBackStack()
     }
 
-//    override fun strataEditButtonPressed( strata: Strata )
-//    {
-//        AddStrataDialog(requireActivity(), strata ) { buttonPressed ->
-//            if (buttonPressed == AddStrataDialog.ButtonPress.Save)
-//            {
-//                if (!study.stratas.contains( strata ))
-//                {
-//                    study.stratas.add( strata )
-//                }
-//
-//                createStrataAdapter.updateStratas(study.stratas )
-//            }
-//        }
-//    }
-
-//    override fun strataDeleteButtonPressed( strata: Strata )
-//    {
-//        ConfirmationDialog(activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_strata_message), resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
-//            when( buttonPressed )
-//            {
-//                ConfirmationDialog.ButtonPress.Left -> {
-//                }
-//                ConfirmationDialog.ButtonPress.Right -> {
-//                    study.stratas.remove(strata )
-//                    createStrataAdapter.updateStratas(study.stratas )
-//                }
-//                ConfirmationDialog.ButtonPress.None -> {
-//                }
-//            }
-//        }
-//    }
-
     override fun onDestroyView()
     {
         super.onDestroyView()
 
         expandableListState = SparseArray()
-        binding.expandableListView.saveHierarchyState(expandableListState)
+//        binding.expandableListView.saveHierarchyState(expandableListState)
 
         _binding = null
     }

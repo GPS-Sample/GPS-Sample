@@ -42,4 +42,7 @@ enum class FragmentNumber( val value: Int ) {
     PrivacyFragment(1032 ),
     EulaFragment(1033 ),
     CodeFragment(1034 ),
+    PrimarySampleFragment(1035 ),
+    StrataSampleFragment(1036 ),
+    SubsetSampleFragment(1037 ),
 }

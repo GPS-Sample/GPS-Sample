@@ -1,11 +1,4 @@
-/*
- * Copyright (C) 2022-2025 Georgia Tech Research Institute
- * SPDX-License-Identifier: GPL-3.0-or-later
- *
- * See the LICENSE file for the full license text.
-*/
-
-package edu.gtri.gpssample.fragments.configuration
+package edu.gtri.gpssample.fragments.strata_sample
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -22,7 +15,7 @@ import edu.gtri.gpssample.database.models.Strata
 import edu.gtri.gpssample.database.models.Study
 import java.util.ArrayList
 
-class CreateStrataAdapter(var context: Context) : BaseExpandableListAdapter()
+class StrataSampleAdapter(var context: Context) : BaseExpandableListAdapter()
 {
     lateinit var didSelectStrata: ((strata: Strata) -> Unit)
     lateinit var didSelectField: ((field: Field) -> Unit)
@@ -39,7 +32,7 @@ class CreateStrataAdapter(var context: Context) : BaseExpandableListAdapter()
     private var rules = ArrayList<Rule>()
     private var filters = ArrayList<Filter>()
 
-    fun updateStudy( study: Study )
+    fun updateStudy( study: Study)
     {
         stratas = study.stratas
         fields = ArrayList<Field>()
@@ -202,7 +195,7 @@ class CreateStrataAdapter(var context: Context) : BaseExpandableListAdapter()
         return true
     }
 
-    override fun getGroupView( groupPosition: Int, isExpanded: Boolean, childView: View?, viewGroup: ViewGroup?): View
+    override fun getGroupView(groupPosition: Int, isExpanded: Boolean, childView: View?, viewGroup: ViewGroup?): View
     {
         val view: View
 

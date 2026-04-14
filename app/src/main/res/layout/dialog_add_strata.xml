@@ -32,7 +32,7 @@
 
     <TextView
         android:text="@string/strata_name"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="17sp"
         android:textStyle="bold"
         android:layout_marginTop="20dp"
@@ -58,7 +58,7 @@
 
         <TextView
             android:text="@string/sample_size"
-            android:textColor="@color/primary"
+            android:textColor="@color/primary_textcolor"
             android:textSize="17sp"
             android:textStyle="bold"
             android:gravity="center_vertical"
