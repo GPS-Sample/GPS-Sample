@@ -44,7 +44,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:inputType="textCapWords"
-                android:imeOptions="actionDone"
+                android:imeOptions="actionNext"
                 android:hint="@string/enter_your_name" />
 
             <TextView
@@ -64,7 +64,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:inputType="number"
-                android:imeOptions="actionDone"
+                android:imeOptions="actionNext"
                 android:hint="@string/enter_your_pin" />
 
             <TextView
@@ -84,7 +84,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:inputType="number"
-                android:imeOptions="actionDone"
+                android:imeOptions="actionNext"
                 android:hint="@string/reenter_your_pin" />
 
             <TextView
@@ -142,14 +142,16 @@
                 android:imeOptions="actionDone"
                 android:hint="@string/enter_your_answer" />
 
-            <Button
-                android:id="@+id/next_button"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_margin="20dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="@string/next" />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </ScrollView>
+
+    <Button
+        android:id="@+id/next_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:layout_margin="20dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/next" />
 </FrameLayout>

@@ -51,7 +51,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:inputType="textCapWords"
-                    android:imeOptions="actionDone"
+                    android:imeOptions="actionNext"
                     android:text="@={viewModel.currentConfiguration.name}"
                     android:hint="@string/enter_config_name" />
 
@@ -173,6 +173,7 @@
                     android:layout_height="50dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
+                    android:imeOptions="actionNext"
                     android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"
                     android:hint="@string/enter_min_gps_precision" />
 
@@ -192,6 +193,7 @@
                     android:layout_height="50dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
+                    android:imeOptions="actionNext"
                     android:text="@={viewModel.currentConfiguration.encryptionPassword}"
                     android:hint="@string/enter_encryption_password" />
 

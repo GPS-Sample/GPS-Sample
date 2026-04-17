@@ -282,7 +282,7 @@ class AddHouseholdFragment : Fragment(),
             }
         }
 
-        addHouseholdAdapter = AddHouseholdAdapter( editMode, config, enumerationItem, study.fields, filteredFieldDataList )
+        addHouseholdAdapter = AddHouseholdAdapter( binding.recyclerView, editMode, config, enumerationItem, study.fields, filteredFieldDataList )
         binding.recyclerView.adapter = addHouseholdAdapter
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)

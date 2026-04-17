@@ -33,7 +33,7 @@ import edu.gtri.gpssample.fragments.createfield.CreateFieldCheckboxAdapter
 import edu.gtri.gpssample.utils.DateUtils
 import java.util.*
 
-class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumerationItem: EnumerationItem, val fields: List<Field>, val filteredFieldDataList: List<FieldData>) :
+class AddHouseholdAdapter( val recyclerView: RecyclerView, val editMode: Boolean, val config: Config, val enumerationItem: EnumerationItem, val fields: List<Field>, val filteredFieldDataList: List<FieldData>) :
     RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>(),
     DatePickerDialog.DatePickerDialogDelegate,
     TimePickerDialog.TimePickerDialogDelegate
@@ -75,7 +75,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
             }
             else
             {
-                layoutNonBlockField( holder, field, fieldData )
+                layoutNonBlockField( holder, field, fieldData, position )
             }
         }
     }
@@ -215,8 +215,9 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
         }
     }
 
-    fun layoutNonBlockField( holder: ViewHolder, field: Field, fieldData: FieldData )
+    fun layoutNonBlockField( holder: ViewHolder, field: Field, fieldData: FieldData, position: Int )
     {
+        var editText: EditText? = null
         var frameLayout: FrameLayout? = null
 
         when (field.type) {
@@ -226,7 +227,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
 
             FieldType.Text -> {
                 frameLayout = holder.frameLayout.findViewById(R.id.text_layout)
-                val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
+                editText = frameLayout.findViewById<EditText>(R.id.edit_text)
                 editText.setText( fieldData.textValue )
                 val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
                 requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
@@ -243,7 +244,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
 
             FieldType.Number -> {
                 frameLayout = holder.frameLayout.findViewById(R.id.number_layout)
-                val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
+                editText = frameLayout.findViewById<EditText>(R.id.edit_text)
 
                 if (field.integerOnly)
                 {
@@ -305,7 +306,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
                 frameLayout = holder.frameLayout.findViewById(R.id.date_layout)
 
                 var date = Date()
-                val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
+                editText = frameLayout.findViewById<EditText>(R.id.edit_text)
 
                 if (!editMode)
                 {
@@ -411,12 +412,20 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
             else -> {}
         }
 
+        editText?.let { editText ->
+            editText.setOnFocusChangeListener { v, hasFocus ->
+                if (hasFocus) {
+                    val position = position
+                    if (position != RecyclerView.NO_POSITION) {
+                        recyclerView.scrollToPosition(position)
+                    }
+                }
+            }
+        }
         frameLayout?.let { layout ->
             layout.visibility = View.VISIBLE
             val titleView = layout.findViewById<TextView>(R.id.title_text_view)
             titleView.text = "${field.index}. ${field.name}"
-//            val textColor = if (field.type == FieldType.Note) ContextCompat.getColor(titleView.context, R.color.primary) else Color.BLACK
-//            titleView.setTextColor( textColor )
         }
     }
 
