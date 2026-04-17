@@ -319,7 +319,7 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
                         {
                             resourceId = R.drawable.home_green
 
-                            if (sampledItem.samplingState == SamplingState.Sampled)
+                            if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
                             {
                                 resourceId = R.drawable.home_light_blue
                             }
@@ -333,7 +333,7 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
 
                         for (sampledItem in location.enumerationItems)
                         {
-                            if (sampledItem.samplingState == SamplingState.Sampled)
+                            if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
                             {
                                 resourceId = R.drawable.multi_home_light_blue
                             }

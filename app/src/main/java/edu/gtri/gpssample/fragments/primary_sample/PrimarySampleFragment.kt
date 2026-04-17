@@ -9,6 +9,7 @@ package edu.gtri.gpssample.fragments.primary_sample
 
 import android.os.Bundle
 import android.view.*
+import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -68,8 +69,26 @@ class PrimarySampleFragment : Fragment()
             viewModel = sharedViewModel
         }
 
+        if (study.subsetSampleName.isNotEmpty())
+        {
+            binding.subsetSampleButton.visibility = View.VISIBLE
+            binding.enableSubsetCheckbox.isChecked = true
+        }
+
         binding.expandableListView.setAdapter(primarySampleAdapter)
         binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
+
+        binding.enableSubsetCheckbox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
+        {
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            {
+                binding.subsetSampleButton.visibility = if (isChecked) View.VISIBLE else View.GONE
+            }
+        })
+
+        binding.subsetSampleButton.setOnClickListener {
+            findNavController().navigate( R.id.action_navigate_to_SubsetSampleFragment )
+        }
 
         binding.saveButton.setOnClickListener {
             findNavController().popBackStack()
@@ -99,7 +118,7 @@ class PrimarySampleFragment : Fragment()
             }
             else
             {
-                sharedViewModel.createRuleModel.createNewRule(study)
+                sharedViewModel.createRuleModel.createNewPrimaryRule(study)
                 findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment )
             }
         }
@@ -109,7 +128,7 @@ class PrimarySampleFragment : Fragment()
     {
         val bundle = Bundle()
         sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
-            if(study.rules.isEmpty())
+            if(study.primaryRules.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_rule_filter_message), Toast.LENGTH_SHORT).show()
             }else

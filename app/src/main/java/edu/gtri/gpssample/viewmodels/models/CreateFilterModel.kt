@@ -55,13 +55,22 @@ class CreateFilterModel {
         currentFilter = _currentFilter
     }
 
-    fun addFilter(study : Study)
+    fun addPrimaryFilter(study : Study)
     {
         currentFilter?.value?.let { filter ->
-           // DAO.filterDAO.createOrUpdateFilter(filter)
-            if (!study.filters.contains( filter ))
+            if (!study.primaryFilters.contains( filter ))
             {
-                study.filters.add(filter)
+                study.primaryFilters.add(filter)
+            }
+        }
+    }
+
+    fun addSubsetFilter(study : Study)
+    {
+        currentFilter?.value?.let { filter ->
+            if (!study.subsetFilters.contains( filter ))
+            {
+                study.subsetFilters.add(filter)
             }
         }
     }
@@ -84,8 +93,16 @@ class CreateFilterModel {
     fun deleteSelectedFilter( study: Study )
     {
         _currentFilter?.value?.let { filter ->
-
-            study.filters.remove(filter)
+            filter.rule?.let { rule ->
+                if (rule.isSubsetRule)
+                {
+                    study.subsetFilters.remove(filter)
+                }
+                else
+                {
+                    study.primaryFilters.remove(filter)
+                }
+            }
             DAO.filterDAO.deleteFilter(filter)
             _currentFilter = null
         }

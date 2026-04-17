@@ -250,10 +250,6 @@
             app:destination="@id/StrataSampleFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_SubsetSampleFragment"
-            app:destination="@id/SubsetSampleFragment"/>
-
-        <action
             android:id="@+id/action_navigate_to_CreateEnumerationAreaFragment"
             app:destination="@id/CreateEnumerationAreaFragment"/>
 
@@ -271,6 +267,10 @@
         android:id="@+id/PrimarySampleFragment"
         android:name="edu.gtri.gpssample.fragments.primary_sample.PrimarySampleFragment"
         tools:layout="@layout/fragment_primary_sample">
+
+        <action
+            android:id="@+id/action_navigate_to_SubsetSampleFragment"
+            app:destination="@id/SubsetSampleFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_CreateFieldFragment"

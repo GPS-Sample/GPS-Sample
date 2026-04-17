@@ -28,17 +28,22 @@ data class Study(
     var samplingMethod: SamplingMethod,
     var sampleSize: Int,
     var sampleType : SampleType,
+    var subsetSampleName : String,
+    var subsetSampleSize : Int,
+    var subsetSampleType : SampleType,
     var stratas: ArrayList<Strata>,
     var fields : ArrayList<Field>,
-    var rules : ArrayList<Rule>,
-    var filters : ArrayList<Filter>,
+    var primaryRules : ArrayList<Rule>,
+    var primaryFilters : ArrayList<Filter>,
+    var subsetRules : ArrayList<Rule>,
+    var subsetFilters : ArrayList<Filter>,
 )
 {
     constructor(name: String, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType)
-            : this(UUID.randomUUID().toString(), Date().time, name, samplingMethod, sampleSize, sampleType, ArrayList<Strata>(), ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
+            : this(UUID.randomUUID().toString(), Date().time, name, samplingMethod, sampleSize, sampleType, "", 0, SampleType.None,ArrayList<Strata>(), ArrayList<Field>(), ArrayList<Rule>(),ArrayList<Filter>(),ArrayList<Rule>(), ArrayList<Filter>())
 
-    constructor(uuid: String, creationDate: Long, name: String, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType )
-            : this(uuid, creationDate, name, samplingMethod, sampleSize, sampleType, ArrayList<Strata>(), ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
+    constructor(uuid: String, creationDate: Long, name: String, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType, subsetSampleName: String, subsetSampleSize: Int, subsetSampleType: SampleType )
+            : this(uuid, creationDate, name, samplingMethod, sampleSize, sampleType, subsetSampleName, subsetSampleSize, subsetSampleType,ArrayList<Strata>(), ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<Rule>(), ArrayList<Filter>())
 
     fun pack(password: String) : String
     {
@@ -53,7 +58,10 @@ data class Study(
             this.name == other.name &&
             this.samplingMethod == other.samplingMethod &&
             this.sampleSize == other.sampleSize &&
-            this.sampleType == other.sampleType)
+            this.sampleType == other.sampleType &&
+            this.subsetSampleName == other.subsetSampleName &&
+            this.subsetSampleSize == other.subsetSampleSize &&
+            this.subsetSampleType == other.subsetSampleType)
         {
             return true
         }

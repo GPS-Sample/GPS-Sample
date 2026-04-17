@@ -19,6 +19,7 @@ enum class Keys( val value: String ) {
     kZoomLevel("ZoomLevel"),
     kIpAddress("IpAddress"),
     kMapStyle("MAPBOX_STREETS"),
+    kIsSubsetRule("IsSubsetRule"),
     kIsOnBoarding("IsOnBoarding"),
     kTermsAccepted("TermsAccepted"),
     kCollectionMode("CollectionMode"),

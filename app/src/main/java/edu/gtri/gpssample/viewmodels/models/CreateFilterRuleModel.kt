@@ -67,8 +67,8 @@ class CreateFilterRuleModel {
 
     val studyHasMultipleRules : ObservableBoolean
         get (){
-            _currentStudy?.value?.let{study->
-                if(study.rules.size > 1)
+            _currentStudy?.value?.let { study->
+                if (study.primaryRules.size > 1 || study.subsetRules.size > 1)
                 {
                     return ObservableBoolean(true)
                 }
@@ -98,7 +98,17 @@ class CreateFilterRuleModel {
             return _firstStringRuleList
         }
 
-    fun createNewFilterRule(filter : Filter, study : Study)
+    fun createNewPrimaryFilterRule( filter : Filter, study : Study )
+    {
+        createNewFilterRule( filter, study, false )
+    }
+
+    fun createNewSubsetFilterRule( filter : Filter, study : Study )
+    {
+        createNewFilterRule( filter, study, true )
+    }
+
+    private fun createNewFilterRule( filter : Filter, study : Study, isSubsetRule: Boolean )
     {
 
         _createFilterAdapter?.updateRules(null)
@@ -114,7 +124,14 @@ class CreateFilterRuleModel {
 
 
         // this list needs to be a copy every time.
-        ruleList = getRules()
+        if (isSubsetRule)
+        {
+            ruleList = getSubsetRules()
+        }
+        else
+        {
+            ruleList = getPrimaryRules()
+        }
 
         // set the current rule to the first one
         allRules.clear()
@@ -244,14 +261,14 @@ class CreateFilterRuleModel {
     }
 
 
-    private fun getRules() : Array<Rule>
+    private fun getPrimaryRules() : Array<Rule>
     {
         val ruleList = ArrayList<Rule>()
-        _currentStudy?.value?.rules?.let { rules ->
+        _currentStudy?.value?.primaryRules?.let { rules ->
             for (rule in rules)
             {
                 val ruleCopy = rule.copy()
-                ruleCopy?.let{ruleCopy->
+                ruleCopy?.let { ruleCopy->
                     ruleList.add( ruleCopy )
                 }
             }
@@ -259,6 +276,20 @@ class CreateFilterRuleModel {
         return ruleList.toTypedArray()
     }
 
+    private fun getSubsetRules() : Array<Rule>
+    {
+        val ruleList = ArrayList<Rule>()
+        _currentStudy?.value?.subsetRules?.let { rules ->
+            for (rule in rules)
+            {
+                val ruleCopy = rule.copy()
+                ruleCopy?.let { ruleCopy->
+                    ruleList.add( ruleCopy )
+                }
+            }
+        }
+        return ruleList.toTypedArray()
+    }
 
 //    private fun getSecondRules() : Array<Rule>
 //    {

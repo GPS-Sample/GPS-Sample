@@ -205,7 +205,7 @@ class PerformCollectionFragment : Fragment(),
                 collectionTeamLocations.add( location )
                 for (enumurationItem in location.enumerationItems)
                 {
-                    if (enumurationItem.samplingState == SamplingState.Sampled)
+                    if (enumurationItem.samplingState == SamplingState.Sampled || enumurationItem.subsetSamplingState == SamplingState.Sampled)
                     {
                         enumerationItems.add( enumurationItem )
                     }
@@ -337,7 +337,7 @@ class PerformCollectionFragment : Fragment(),
         }
 
         val items = ArrayList<String>()
-        val sortFilters = resources.getTextArray( R.array.sort_filters )
+        val sortFilters = resources.getTextArray( R.array.collection_sort_filters )
 
         for (sortFilter in sortFilters)
         {
@@ -452,6 +452,87 @@ class PerformCollectionFragment : Fragment(),
                         for (enumerationItem in enumerationItems)
                         {
                             enumerationItem.isVisible = false
+                        }
+                    }
+                    5 -> { // Primary Sample
+                        for (location in collectionTeamLocations)
+                        {
+                            location.isVisible = false
+                        }
+
+                        for (enumerationItem in enumerationItems)
+                        {
+                            enumerationItem.isVisible = false
+
+                            if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.subsetSamplingState != SamplingState.Sampled)
+                            {
+                                enumerationItem.isVisible = true
+                                for (location in collectionTeamLocations)
+                                {
+                                    for (enumItem in location.enumerationItems)
+                                    {
+                                        if (enumItem.uuid == enumerationItem.uuid)
+                                        {
+                                            location.isVisible = true
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    6 -> { // Subset Sample
+                        for (location in collectionTeamLocations)
+                        {
+                            location.isVisible = false
+                        }
+
+                        for (enumerationItem in enumerationItems)
+                        {
+                            enumerationItem.isVisible = false
+
+                            if (enumerationItem.samplingState != SamplingState.Sampled && enumerationItem.subsetSamplingState == SamplingState.Sampled)
+                            {
+                                enumerationItem.isVisible = true
+                                for (location in collectionTeamLocations)
+                                {
+                                    for (enumItem in location.enumerationItems)
+                                    {
+                                        if (enumItem.uuid == enumerationItem.uuid)
+                                        {
+                                            location.isVisible = true
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    7-> { // Primary + Subset Sample
+                        for (location in collectionTeamLocations)
+                        {
+                            location.isVisible = false
+                        }
+
+                        for (enumerationItem in enumerationItems)
+                        {
+                            enumerationItem.isVisible = false
+
+                            if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.subsetSamplingState == SamplingState.Sampled)
+                            {
+                                enumerationItem.isVisible = true
+                                for (location in collectionTeamLocations)
+                                {
+                                    for (enumItem in location.enumerationItems)
+                                    {
+                                        if (enumItem.uuid == enumerationItem.uuid)
+                                        {
+                                            location.isVisible = true
+                                            break
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -838,7 +919,7 @@ class PerformCollectionFragment : Fragment(),
                     {
                         val sampledItem = location.enumerationItems[0]
 
-                        if (sampledItem.samplingState == SamplingState.Sampled)
+                        if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
                         {
                             when( sampledItem.collectionState )
                             {
@@ -852,7 +933,8 @@ class PerformCollectionFragment : Fragment(),
                     {
                         for (sampledItem in location.enumerationItems)
                         {
-                            if (sampledItem.samplingState == SamplingState.Sampled && sampledItem.collectionState == CollectionState.Undefined)
+                            if ((sampledItem.samplingState == SamplingState.Sampled && sampledItem.collectionState == CollectionState.Undefined)
+                            ||  (sampledItem.subsetSamplingState == SamplingState.Sampled && sampledItem.collectionState == CollectionState.Undefined))
                             {
                                 resourceId = R.drawable.multi_home_light_blue
                                 break
@@ -863,7 +945,7 @@ class PerformCollectionFragment : Fragment(),
                         {
                             for (sampledItem in location.enumerationItems)
                             {
-                                if (sampledItem.samplingState == SamplingState.Sampled)
+                                if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
                                 {
                                     if (sampledItem.collectionState == CollectionState.Incomplete)
                                     {

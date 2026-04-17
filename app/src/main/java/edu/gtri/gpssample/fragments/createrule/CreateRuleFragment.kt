@@ -381,10 +381,15 @@ class CreateRuleFragment : Fragment(),
                             }
                         }
 
+                        if (rule.isSubsetRule)
+                        {
+                            sharedViewModel.addSubsetRule()
+                        }
+                        else
+                        {
+                            sharedViewModel.addPrimaryRule()
+                        }
 
-
-
-                        sharedViewModel.addRule()
                         findNavController().popBackStack()
                     }
                 }

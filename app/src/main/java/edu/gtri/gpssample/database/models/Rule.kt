@@ -21,21 +21,22 @@ data class Rule(
     var fieldUuid: String,
     var name: String,
     var value: String,
+    var isSubsetRule: Boolean,
     var operator : Operator?,
     var filterOperator: FilterOperator?,
     var fieldDataOptions : ArrayList<FieldDataOption>
     )
 {
-    constructor() : this(UUID.randomUUID().toString(), "", "", "", Operator.Equal, null, ArrayList<FieldDataOption>())
+    constructor() : this(UUID.randomUUID().toString(), "", "", "", false, Operator.Equal, null, ArrayList<FieldDataOption>())
 
     constructor( fieldUuid: String, name: String, value: String, operator: Operator)
-            : this(UUID.randomUUID().toString(), fieldUuid, name, value, operator, null, ArrayList<FieldDataOption>())
+            : this(UUID.randomUUID().toString(), fieldUuid, name, value, false, operator, null, ArrayList<FieldDataOption>())
 
     constructor( fieldUuid: String, name: String, value: String)
-            : this(UUID.randomUUID().toString(), fieldUuid, name, value, null, null, ArrayList<FieldDataOption>())
+            : this(UUID.randomUUID().toString(), fieldUuid, name, value, false, null, null, ArrayList<FieldDataOption>())
 
-    constructor(uuid : String, fieldUuid: String, name: String, value: String, operator: Operator, filterOperator: FilterOperator?)
-            : this(uuid, fieldUuid, name, value, operator, filterOperator, ArrayList<FieldDataOption>())
+    constructor(uuid : String, fieldUuid: String, name: String, value: String, isSubsetRule: Boolean, operator: Operator, filterOperator: FilterOperator?)
+            : this(uuid, fieldUuid, name, value, isSubsetRule, operator, filterOperator, ArrayList<FieldDataOption>())
 
     fun pack() : String
     {

@@ -315,11 +315,12 @@ class SamplingViewModel : ViewModel()
                     }
 
                     performSimpleRandomSampling( study.sampleSize, study.sampleType )
+                    performSimpleRandomSamplingForSubset( study.sampleSize, study.sampleType )
                 }
 
                 SamplingMethod.Cluster ->
                 {
-                    performClusterSampling( study.sampleSize, study.sampleType )
+                    performClusterSampling()
                 }
                 SamplingMethod.Strata ->
                 {
@@ -332,7 +333,7 @@ class SamplingViewModel : ViewModel()
         }
     }
 
-    fun performSimpleRandomSampling( studySampleSize: Int, studySampleType: SampleType )
+    fun performSimpleRandomSampling( studySampleSize: Int, studySampleType: SampleType, isPrimarySample: Boolean = true )
     {
         val validSamples : ArrayList<EnumerationItem> = ArrayList()
 
@@ -346,7 +347,7 @@ class SamplingViewModel : ViewModel()
                 // find and remove items that are not valid
                 if (sampleItem.enumerationState == EnumerationState.Enumerated)
                 {
-                    if (study.filters.isEmpty())
+                    if (study.primaryFilters.isEmpty())
                     {
                         sampleItem.enumerationEligibleForSampling = true
                         validSamples.add(sampleItem)
@@ -355,7 +356,7 @@ class SamplingViewModel : ViewModel()
 
                     var validSample = true
 
-                    for (filter in study.filters)
+                    for (filter in study.primaryFilters)
                     {
                         var validRule = false
 
@@ -473,7 +474,153 @@ class SamplingViewModel : ViewModel()
         }
     }
 
-    fun performClusterSampling( studySampleSize: Int, studySampleType: SampleType )
+    fun performSimpleRandomSamplingForSubset( studySampleSize: Int, studySampleType: SampleType, isPrimarySample: Boolean = true )
+    {
+        val validSamples : ArrayList<EnumerationItem> = ArrayList()
+
+        currentStudy?.value?.let { study ->
+            if (study.subsetRules.isEmpty() || study.subsetFilters.isEmpty())
+            {
+                return
+            }
+
+            for (sampleItem in _currentSampledItemsForSampling)
+            {
+                sampleItem.subsetSamplingState = SamplingState.NotSampled
+                sampleItem.enumerationEligibleForSubsetSampling = false
+                sampleItem.syncCode = sampleItem.syncCode + 1
+
+                // find and remove items that are not valid
+                if (sampleItem.enumerationState == EnumerationState.Enumerated)
+                {
+                    if (study.subsetFilters.isEmpty())
+                    {
+                        sampleItem.enumerationEligibleForSubsetSampling = true
+                        validSamples.add(sampleItem)
+                        continue
+                    }
+
+                    var validSample = true
+
+                    for (filter in study.subsetFilters)
+                    {
+                        var validRule = false
+
+                        filter.rule?.let { rule ->
+                            DAO.fieldDAO.getField( rule.fieldUuid )?.let { field ->
+                                for (fieldData in sampleItem.fieldDataList) {
+                                    DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { f ->
+                                        if (field.name.equals( f.name )) {
+                                            validRule = validateRule( rule, fieldData )
+                                        }
+                                    }
+                                    if (validRule)
+                                    {
+                                        break
+                                    }
+                                }
+                            }
+
+                            var filterOperator = rule.filterOperator
+
+                            while (filterOperator != null)
+                            {
+                                filterOperator.rule?.let { nextRule ->
+                                    DAO.fieldDAO.getField( nextRule.fieldUuid )?.let { nextField ->
+                                        for (fieldData in sampleItem.fieldDataList)
+                                        {
+                                            DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { f ->
+                                                if (nextField.name.equals( f.name ))
+                                                {
+                                                    val nextRuleValid = validateRule( nextRule, fieldData )
+
+                                                    when (filterOperator!!.connector)
+                                                    {
+                                                        Connector.AND-> {
+                                                            validRule = (validRule && nextRuleValid)
+                                                        }
+                                                        Connector.OR-> {
+                                                            validRule = (validRule || nextRuleValid)
+                                                        }
+                                                        Connector.NOT-> {
+                                                            validRule = (validRule && !nextRuleValid)
+                                                        }
+                                                        else-> {
+                                                            validRule = false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    filterOperator = nextRule.filterOperator
+                                }
+                            }
+                        }
+
+                        if (!validRule)
+                        {
+                            validSample = false
+                            break;
+                        }
+                    }
+
+                    if (validSample)
+                    {
+                        sampleItem.enumerationEligibleForSubsetSampling = true
+                        validSamples.add(sampleItem)
+                    }
+                }
+            }
+
+            var sampleSize = 0
+
+            when (studySampleType)
+            {
+                SampleType.NumberHouseholds ->
+                {
+                    sampleSize =  min(studySampleSize,validSamples.size)
+                }
+                SampleType.PercentHouseholds ->
+                {
+                    sampleSize = (studySampleSize.toDouble() / 100.0 * validSamples.size.toDouble()).roundToInt()
+                }
+                else -> {}
+            }
+
+            if (sampleSize == 0)
+            {
+                val fragment = currentFragment as? CreateSampleFragment
+                fragment?.let { fragment ->
+                    Toast.makeText( fragment.activity!!.applicationContext, "${fragment.activity!!.getString(R.string.no_eligible_households)}", Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                val sampledIndices = ArrayList<Int>()
+
+                for (i in 0 until sampleSize)
+                {
+                    var rnds = (0 until validSamples.size).random()
+
+                    while(sampledIndices.contains(rnds))
+                    {
+                        rnds = (0 until validSamples.size).random()
+                    }
+
+                    sampledIndices.add(rnds)
+                    validSamples[rnds].syncCode = validSamples[rnds].syncCode + 1
+                    validSamples[rnds].subsetSamplingState = SamplingState.Sampled
+                }
+
+                val fragment = currentFragment as? CreateSampleFragment
+                fragment?.sampleGenerated()
+            }
+        }
+    }
+
+    fun performClusterSampling()
     {
         currentEnumArea?.value?.let { enumArea ->
 
@@ -493,7 +640,10 @@ class SamplingViewModel : ViewModel()
                 }
             }
 
-            performSimpleRandomSampling( studySampleSize, studySampleType )
+            currentStudy?.value?.let { study ->
+                performSimpleRandomSampling( study.sampleSize, study.sampleType )
+                performSimpleRandomSamplingForSubset( study.subsetSampleSize, study.subsetSampleType )
+            }
         }
     }
 
@@ -519,6 +669,9 @@ class SamplingViewModel : ViewModel()
 
             DAO.strataDAO.getStrata( enumArea.strataUuid )?.let { strata ->
                 performSimpleRandomSampling(strata.sampleSize, strata.sampleType )
+                currentStudy?.value?.let { study ->
+                    performSimpleRandomSamplingForSubset( study.subsetSampleSize, study.subsetSampleType )
+                }
             }
         }
     }

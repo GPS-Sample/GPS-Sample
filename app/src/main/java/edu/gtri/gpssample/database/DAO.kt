@@ -88,7 +88,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_STUDY_NAME + " TEXT" + "," +
                     COLUMN_STUDY_SAMPLING_METHOD_INDEX + " INTEGER" + "," +
                     COLUMN_STUDY_SAMPLE_SIZE + " INTEGER" + "," +
-                    COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" +
+                    COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" + "," +
+                    COLUMN_STUDY_SUBSET_SAMPLE_NAME + " TEXT" + "," +
+                    COLUMN_STUDY_SUBSET_SAMPLE_SIZE + " INTEGER" + "," +
+                    COLUMN_STUDY_SUBSET_SAMPLE_SIZE_INDEX + " INTEGER" +
                     ") WITHOUT ROWID")
             db.execSQL(createTableStudy)
 
@@ -164,6 +167,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_RULE_NAME + " TEXT" + "," +
                     COLUMN_OPERATOR_ID + " INTEGER" + "," +
                     COLUMN_RULE_VALUE + " TEXT" + "," +
+                    COLUMN_RULE_IS_SUBSET_RULE + " INTEGER" + "," +
                     COLUMN_FILTEROPERATOR_UUID + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_FILTEROPERATOR_UUID) REFERENCES $TABLE_FILTEROPERATOR($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_UUID) REFERENCES $TABLE_FIELD($COLUMN_UUID)" +
@@ -279,7 +283,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ENUMERATION_ITEM_ENUMERATION_INCOMPLETE_REASON + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_ENUMERATION_NOTES + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SAMPLING + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SUBSET_SAMPLING + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_SAMPLING_STATE + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_SUBSET_SAMPLING_STATE + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_COLLECTION_STATE + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_COLLECTION_DATE + " INTEGER" + "," +
@@ -771,6 +777,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_STUDY_SAMPLING_METHOD_INDEX = "study_sampling_method_index"
         const val COLUMN_STUDY_SAMPLE_SIZE = "study_sample_size"
         const val COLUMN_STUDY_SAMPLE_SIZE_INDEX = "study_sample_size_index"
+        const val COLUMN_STUDY_SUBSET_SAMPLE_NAME = "study_subset_sample_name"
+        const val COLUMN_STUDY_SUBSET_SAMPLE_SIZE = "study_subset_sample_size"
+        const val COLUMN_STUDY_SUBSET_SAMPLE_SIZE_INDEX = "study_subset_sample_size_index"
 
         // Strata table
         const val TABLE_STRATA = "strata"
@@ -805,6 +814,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_RULE = "rule"
         const val COLUMN_RULE_NAME = "rule_name"
         const val COLUMN_RULE_VALUE = "rule_value"
+        const val COLUMN_RULE_IS_SUBSET_RULE = "rule_is_subset_rule"
         const val COLUMN_FILTEROPERATOR_UUID = "filter_operator_uuid"
 
         // Filter Table
@@ -857,7 +867,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_ENUMERATION_ITEM_ENUMERATION_INCOMPLETE_REASON = "enumeration_item_enumeration_incomplete_reason"
         const val COLUMN_ENUMERATION_ITEM_ENUMERATION_NOTES = "enumeration_item_enumeration_notes"
         const val COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SAMPLING = "enumeration_item_enumeration_eligible_for_sampling"
+        const val COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SUBSET_SAMPLING = "enumeration_item_enumeration_eligible_for_subset_sampling"
         const val COLUMN_ENUMERATION_ITEM_SAMPLING_STATE = "enumeration_item_sampling_state"
+        const val COLUMN_ENUMERATION_ITEM_SUBSET_SAMPLING_STATE = "enumeration_item_subset_sampling_state"
         const val COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME = "enumeration_item_collector_name"
         const val COLUMN_ENUMERATION_ITEM_COLLECTION_STATE = "enumeration_item_collection_state"
         const val COLUMN_ENUMERATION_ITEM_COLLECTION_DATE = "enumeration_item_collection_date"
@@ -1038,6 +1050,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        const val DATABASE_VERSION = 323
+        const val DATABASE_VERSION = 324
     }
 }

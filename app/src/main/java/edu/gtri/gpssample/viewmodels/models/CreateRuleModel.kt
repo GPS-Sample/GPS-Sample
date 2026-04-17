@@ -57,19 +57,30 @@ class CreateRuleModel {
             return englishArray
         }
 
-    fun addRule(study : Study)
+    fun addPrimaryRule( study : Study )
     {
-        //study.id?.let { id ->
-            currentRule?.value?.let { rule ->
-               // rule.studyId = id
-               // DAO.ruleDAO.createOrUpdateRule( rule )
-                if(!study.rules.contains(rule))
-                {
-                    study.rules.add(rule)
-                }
+        currentRule?.value?.let { rule ->
+            // rule.studyId = id
+            // DAO.ruleDAO.createOrUpdateRule( rule )
+            if (!study.primaryRules.contains(rule))
+            {
+                study.primaryRules.add(rule)
             }
-       // }
+        }
     }
+
+    fun addSubsetRule( study : Study )
+    {
+        currentRule?.value?.let { rule ->
+            // rule.studyId = id
+            // DAO.ruleDAO.createOrUpdateRule( rule )
+            if (!study.subsetRules.contains(rule))
+            {
+                study.subsetRules.add(rule)
+            }
+        }
+    }
+
     fun setSelectedRule(rule : Rule)
     {
         _currentRule = MutableLiveData(rule)
@@ -79,21 +90,39 @@ class CreateRuleModel {
 
     fun deleteSelectedRule(study : Study)
     {
-        _currentRule?.value?.let{rule ->
-            study.rules.remove(rule)
+        _currentRule?.value?.let { rule ->
+            if (rule.isSubsetRule)
+            {
+                study.subsetRules.remove( rule )
+            }
+            else
+            {
+                study.primaryRules.remove(rule )
+            }
             DAO.ruleDAO.deleteRule(rule)
         }
     }
 
-    fun deleteRule(rule:Rule, study : Study)
-    {
-        study.rules.remove(rule)
-        DAO.ruleDAO.deleteRule(rule)
-    }
+//    fun deleteRule(rule:Rule, study : Study)
+//    {
+//        study.rules.remove(rule)
+//        DAO.ruleDAO.deleteRule(rule)
+//    }
 
-    fun createNewRule(study: Study) : Boolean
+    fun createNewPrimaryRule(study: Study) : Boolean
     {
         val newRule = Rule()
+        newRule.isSubsetRule = false
+        _currentRule = MutableLiveData(newRule)
+        currentRule = _currentRule
+
+        return true
+    }
+
+    fun createNewSubsetRule(study: Study) : Boolean
+    {
+        val newRule = Rule()
+        newRule.isSubsetRule = true
         _currentRule = MutableLiveData(newRule)
         currentRule = _currentRule
 

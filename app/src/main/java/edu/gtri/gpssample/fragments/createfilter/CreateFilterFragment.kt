@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.Rule
@@ -37,9 +38,8 @@ class CreateFilterFragment : Fragment()
     private var _binding: FragmentCreateFilterBinding? = null
     private val binding get() = _binding!!
     private lateinit var createFilterAdapter: CreateFilterAdapter
-    private lateinit var filter: Filter
-    private var sampleSizeIsVisible = true
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private var isSubsetRule : Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -58,7 +58,8 @@ class CreateFilterFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-        binding?.apply {
+
+        binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
 
@@ -68,6 +69,10 @@ class CreateFilterFragment : Fragment()
             // Assign the fragment
             createFilterFragment = this@CreateFilterFragment
             this.executePendingBindings()
+        }
+
+        arguments?.getBoolean( Keys.kIsSubsetRule.value)?.let { isSubsetRule ->
+            this.isSubsetRule = isSubsetRule
         }
 
         createFilterAdapter = sharedViewModel.createFilterModel.createFilterAdapter
@@ -81,9 +86,16 @@ class CreateFilterFragment : Fragment()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.addRuleButton.setOnClickListener {
-            val bundle = Bundle()
-            sharedViewModel.createNewFilterRule()
+            if (isSubsetRule)
+            {
+                sharedViewModel.createNewSubsetFilterRule()
+            }
+            else
+            {
+                sharedViewModel.createNewPrimaryFilterRule()
+            }
 
+            val bundle = Bundle()
             findNavController().navigate(R.id.action_navigate_to_SelectRuleDialogFragment, bundle)
         }
 
@@ -107,7 +119,19 @@ class CreateFilterFragment : Fragment()
                 return@setOnClickListener
             }
 
-            sharedViewModel.addFilter()
+            sharedViewModel.createFilterModel.currentFilter?.value?.let { filter ->
+                filter.rule?.let { rule ->
+                    if (rule.isSubsetRule)
+                    {
+                        sharedViewModel.addSubsetFilter()
+                    }
+                    else
+                    {
+                        sharedViewModel.addPrimaryFilter()
+                    }
+                }
+            }
+
             findNavController().popBackStack()
         }
     }

@@ -253,7 +253,7 @@ class FilterDAO(private var dao: DAO)
         return filter
     }
 
-    fun getFilters(study : Study) : ArrayList<Filter>
+    fun getPrimaryFilters( study : Study ) : ArrayList<Filter>
     {
         val filters = ArrayList<Filter>()
         val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}'"
@@ -262,8 +262,37 @@ class FilterDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val filter = buildFilter(cursor, study)
-            filter?.let{filter->
-                filters.add( filter)
+            filter?.let { filter ->
+                filter.rule?.let { rule ->
+                    if (!rule.isSubsetRule)
+                    {
+                        filters.add( filter)
+                    }
+                }
+            }
+        }
+
+        cursor.close()
+
+        return filters
+    }
+
+    fun getSubsetFilters( study : Study ) : ArrayList<Filter>
+    {
+        val filters = ArrayList<Filter>()
+        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}'"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val filter = buildFilter(cursor, study)
+            filter?.let { filter ->
+                filter.rule?.let { rule ->
+                    if (rule.isSubsetRule)
+                    {
+                        filters.add( filter)
+                    }
+                }
             }
         }
 

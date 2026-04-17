@@ -116,7 +116,7 @@ class StrataSampleFragment : Fragment()
             }
             else
             {
-                sharedViewModel.createRuleModel.createNewRule(study)
+                sharedViewModel.createRuleModel.createNewPrimaryRule(study)
                 findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment )
             }
         }
@@ -126,7 +126,7 @@ class StrataSampleFragment : Fragment()
     {
         val bundle = Bundle()
         sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
-            if(study.rules.isEmpty())
+            if(study.primaryRules.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_rule_filter_message), Toast.LENGTH_SHORT).show()
             }else

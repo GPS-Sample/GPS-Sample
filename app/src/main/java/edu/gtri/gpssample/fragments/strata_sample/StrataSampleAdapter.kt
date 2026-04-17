@@ -36,8 +36,8 @@ class StrataSampleAdapter(var context: Context) : BaseExpandableListAdapter()
     {
         stratas = study.stratas
         fields = ArrayList<Field>()
-        rules = study.rules
-        filters = study.filters
+        rules = study.primaryRules
+        filters = study.primaryFilters
 
         for (field in study.fields)
         {

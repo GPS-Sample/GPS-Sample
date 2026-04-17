@@ -164,7 +164,8 @@ class FieldDAO(private var dao: DAO)
         val query = "SELECT * FROM ${DAO.TABLE_FIELD} where ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}' ORDER BY ${DAO.COLUMN_FIELD_INDEX} ASC"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
-        study.rules.clear()
+        study.subsetRules.clear()
+        study.primaryRules.clear()
 
         while (cursor.moveToNext())
         {
@@ -178,14 +179,22 @@ class FieldDAO(private var dao: DAO)
 
                     for (blockField in blockFields)
                     {
-                        val rules = DAO.ruleDAO.getRules(blockField)
-                        study.rules.addAll( rules )
+                        val primaryRules = DAO.ruleDAO.getPrimaryRules( blockField )
+                        study.primaryRules.addAll( primaryRules )
+
+                        val subsetRules = DAO.ruleDAO.getSubsetRules( blockField )
+                        study.subsetRules.addAll( subsetRules )
                     }
                 }
 
                 field.fieldOptions = DAO.fieldOptionDAO.getFieldOptions( field )
-                val rules = DAO.ruleDAO.getRules(field)
-                study.rules.addAll(rules)
+
+                val primaryRules = DAO.ruleDAO.getPrimaryRules( field )
+                study.primaryRules.addAll(primaryRules )
+
+                val subsetRules = DAO.ruleDAO.getSubsetRules( field )
+                study.subsetRules.addAll(subsetRules )
+
                 fields.add( field)
             }
         }

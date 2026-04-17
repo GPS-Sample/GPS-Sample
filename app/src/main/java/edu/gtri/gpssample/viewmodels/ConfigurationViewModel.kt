@@ -256,7 +256,7 @@ class ConfigurationViewModel : ViewModel()
 
     fun addStudy()
     {
-        currentConfiguration?.let{configuration->
+        currentConfiguration?.let { configuration->
             createStudyModel.addStudy(configuration.value)
         }
     }
@@ -280,12 +280,20 @@ class ConfigurationViewModel : ViewModel()
         }
     }
 
-    fun addRule()
+    fun addPrimaryRule()
     {
-        createStudyModel.currentStudy?.value?.let{study ->
-            createRuleModel.addRule(study)
+        createStudyModel.currentStudy?.value?.let { study ->
+            createRuleModel.addPrimaryRule( study )
         }
     }
+
+    fun addSubsetRule()
+    {
+        createStudyModel.currentStudy?.value?.let { study ->
+            createRuleModel.addSubsetRule( study )
+        }
+    }
+
     fun setSelectedRule(rule : Rule)
     {
         createRuleModel.setSelectedRule(rule)
@@ -314,14 +322,23 @@ class ConfigurationViewModel : ViewModel()
 
     }
 
-    fun createNewFilterRule()
+    fun createNewPrimaryFilterRule()
     {
         createFilterModel.currentFilter?.value?.let { filter ->
             createStudyModel.currentStudy?.value?.let{study ->
                 // we set the filter on the CreateFilterRuleModel
-                createFilterRuleModel.createNewFilterRule(filter, study)
+                createFilterRuleModel.createNewPrimaryFilterRule(filter, study)
             }
+        }
+    }
 
+    fun createNewSubsetFilterRule()
+    {
+        createFilterModel.currentFilter?.value?.let { filter ->
+            createStudyModel.currentStudy?.value?.let{study ->
+                // we set the filter on the CreateFilterRuleModel
+                createFilterRuleModel.createNewSubsetFilterRule(filter, study)
+            }
         }
     }
 
@@ -333,10 +350,17 @@ class ConfigurationViewModel : ViewModel()
         }
     }
 
-    fun addFilter()
+    fun addPrimaryFilter()
     {
-        createStudyModel.currentStudy?.value?.let{study ->
-            createFilterModel.addFilter(study)
+        createStudyModel.currentStudy?.value?.let { study ->
+            createFilterModel.addPrimaryFilter(study)
+        }
+    }
+
+    fun addSubsetFilter()
+    {
+        createStudyModel.currentStudy?.value?.let { study ->
+            createFilterModel.addSubsetFilter(study)
         }
     }
 }

@@ -72,11 +72,10 @@ class CreateStudyFragment : Fragment()
             activity!!,
             R.array.samling_methods,
             android.R.layout.simple_spinner_item
-        )
-            .also { adapter ->
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.samplingMethodSpinner.adapter = adapter
-            }
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.samplingMethodSpinner.adapter = adapter
+        }
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
             this.study = study
@@ -125,12 +124,22 @@ class CreateStudyFragment : Fragment()
             }
         }
 
-        binding.subsetSampleButton.setOnClickListener {
-            findNavController().navigate( R.id.action_navigate_to_SubsetSampleFragment )
-        }
-
         binding.saveButton.setOnClickListener {
-            updateStudy()
+            if (study.name.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (study.sampleSize == 0)
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.sample_size_error), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            sharedViewModel.addStudy()
+
+            findNavController().popBackStack()
         }
     }
 
@@ -139,25 +148,6 @@ class CreateStudyFragment : Fragment()
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateStudyFragment.value.toString() + ": " + this.javaClass.simpleName
-    }
-
-    private fun updateStudy()
-    {
-        if (study.name.isEmpty())
-        {
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        if (study.sampleSize == 0)
-        {
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.sample_size_error), Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        sharedViewModel.addStudy()
-
-        findNavController().popBackStack()
     }
 
     override fun onDestroyView()

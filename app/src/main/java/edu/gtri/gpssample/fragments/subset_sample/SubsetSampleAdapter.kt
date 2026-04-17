@@ -26,8 +26,8 @@ class SubsetSampleAdapter(var context: Context) : BaseExpandableListAdapter()
 
     fun updateStudy( study: Study)
     {
-        rules = study.rules
-        filters = study.filters
+        rules = study.subsetRules
+        filters = study.subsetFilters
 
         notifyDataSetChanged()
     }

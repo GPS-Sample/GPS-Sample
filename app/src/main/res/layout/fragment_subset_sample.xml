@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"/>
 
         <EditText
-            android:id="@+id/strata_name_edit_text"
+            android:id="@+id/subset_sample_name_edit_text"
             android:inputType="textCapWords"
             android:imeOptions="actionDone"
             android:layout_marginStart="20dp"
@@ -56,7 +56,7 @@
 
             <EditText
                 android:text="1"
-                android:id="@+id/sample_size_edit_text"
+                android:id="@+id/subset_sample_size_edit_text"
                 android:inputType="number"
                 android:imeOptions="actionDone"
                 android:gravity="center"
@@ -74,7 +74,7 @@
                 android:background="@drawable/spinner_frame">
 
                 <Spinner
-                    android:id="@+id/strata_spinner"
+                    android:id="@+id/subset_sample_type_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </FrameLayout>
@@ -100,6 +100,6 @@
             android:layout_marginEnd="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="@string/done" />
+            android:text="@string/save" />
     </LinearLayout>
 </layout>

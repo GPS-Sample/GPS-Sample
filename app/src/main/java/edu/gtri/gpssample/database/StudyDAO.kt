@@ -49,16 +49,28 @@ class StudyDAO(private var dao: DAO)
             DAO.fieldDAO.createOrUpdateField( field, study )
         }
 
-        // add rules
-        for (rule in study.rules)
+        // add primary rules
+        for (rule in study.primaryRules)
         {
             DAO.ruleDAO.createOrUpdateRule( rule )
         }
 
-        // add filters
-        for(filter in study.filters)
+        // add subset rules
+        for (rule in study.subsetRules)
         {
-            DAO.filterDAO.createOrUpdateFilter(filter, study);
+            DAO.ruleDAO.createOrUpdateRule( rule )
+        }
+
+        // add primary filters
+        for (filter in study.primaryFilters)
+        {
+            DAO.filterDAO.createOrUpdateFilter( filter, study );
+        }
+
+        // add subset filters
+        for (filter in study.subsetFilters)
+        {
+            DAO.filterDAO.createOrUpdateFilter( filter, study );
         }
 
         // add stratas
@@ -76,10 +88,20 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, study.creationDate )
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
+        values.put( DAO.COLUMN_STUDY_SUBSET_SAMPLE_SIZE, study.subsetSampleSize )
+
+        if (study.subsetSampleName.isNotEmpty())
+        {
+            values.put( DAO.COLUMN_STUDY_SUBSET_SAMPLE_NAME, study.subsetSampleName )
+        }
 
         // convert enum to int.  Maybe not do this and have look up tables?
         var index = SampleTypeConverter.toIndex(study.sampleType)
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX, index)
+
+        index = SampleTypeConverter.toIndex(study.subsetSampleType)
+        values.put( DAO.COLUMN_STUDY_SUBSET_SAMPLE_SIZE_INDEX, index)
+
         index = SamplingMethodConverter.toIndex(study.samplingMethod)
         values.put( DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX, index )
     }
@@ -97,15 +119,24 @@ class StudyDAO(private var dao: DAO)
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_NAME))
+        var subsetSampleName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_SUBSET_SAMPLE_NAME))
         val samplingMethodIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX))
         val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLE_SIZE))
         val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX))
+        val subsetSampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SUBSET_SAMPLE_SIZE))
+        val subsetSampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SUBSET_SAMPLE_SIZE_INDEX))
 
         // convert enum to int.  Maybe not do this and have look up tables?
         val sampleType = SampleTypeConverter.fromIndex(sampleSizeIndex)
         val samplingMethod = SamplingMethodConverter.fromIndex(samplingMethodIndex)
+        val subsetSampleType = SampleTypeConverter.fromIndex(subsetSampleSizeIndex)
 
-        val study = Study( uuid, creationDate, name, samplingMethod, sampleSize, sampleType )
+        if (subsetSampleName == null)
+        {
+            subsetSampleName = ""
+        }
+
+        val study = Study( uuid, creationDate, name, samplingMethod, sampleSize, sampleType, subsetSampleName, subsetSampleSize, subsetSampleType )
 
         return study
     }
@@ -123,7 +154,8 @@ class StudyDAO(private var dao: DAO)
             study = buildStudy( cursor )
             study.fields = DAO.fieldDAO.getFields(study)
             // study.rules is loaded by getFields()
-            study.filters.addAll(DAO.filterDAO.getFilters(study))
+            study.primaryFilters.addAll(DAO.filterDAO.getPrimaryFilters(study))
+            study.subsetFilters.addAll(DAO.filterDAO.getSubsetFilters(study))
             study.stratas = DAO.strataDAO.getStratasWithStudyUuid(uuid )
         }
 
@@ -147,7 +179,8 @@ class StudyDAO(private var dao: DAO)
             studies.add( study )
             study.fields = DAO.fieldDAO.getFields(study)
             // study.rules is loaded by getFields()
-            study.filters.addAll(DAO.filterDAO.getFilters(study))
+            study.primaryFilters.addAll(DAO.filterDAO.getPrimaryFilters(study))
+            study.subsetFilters.addAll(DAO.filterDAO.getSubsetFilters(study))
             study.stratas = DAO.strataDAO.getStratasWithStudyUuid(study.uuid )
         }
 
@@ -169,7 +202,8 @@ class StudyDAO(private var dao: DAO)
             val study = buildStudy( cursor )
             study.fields = DAO.fieldDAO.getFields(study)
             // study.rules is loaded by getFields()
-            study.filters.addAll(DAO.filterDAO.getFilters(study))
+            study.primaryFilters.addAll(DAO.filterDAO.getPrimaryFilters(study))
+            study.subsetFilters.addAll(DAO.filterDAO.getSubsetFilters(study))
             studies.add( study )
         }
 
@@ -191,23 +225,33 @@ class StudyDAO(private var dao: DAO)
 
     fun deleteStudy( study: Study )
     {
-        val filters = DAO.filterDAO.getFilters( study )
+//        val filters = DAO.filterDAO.getPrimaryFilters( study )
 
-        for (filter in filters)
+        for (filter in study.primaryFilters)
+        {
+            DAO.filterDAO.deleteFilter( filter )
+        }
+
+        for (filter in study.subsetFilters)
         {
             DAO.filterDAO.deleteFilter( filter )
         }
 
         // val rules = DAO.ruleDAO.getRules( study )
 
-        for (rule in study.rules)
+        for (rule in study.primaryRules)
         {
             DAO.ruleDAO.deleteRule( rule )
         }
 
-        val fields = DAO.fieldDAO.getFields( study )
+        for (rule in study.subsetRules)
+        {
+            DAO.ruleDAO.deleteRule( rule )
+        }
 
-        for (field in fields)
+//        val fields = DAO.fieldDAO.getFields( study )
+
+        for (field in study.fields)
         {
             DAO.fieldDAO.deleteField( field )
         }

@@ -15,6 +15,7 @@ import edu.gtri.gpssample.constants.OperatorConverter
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.extensions.toBoolean
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -59,8 +60,9 @@ class RuleDAO(private var dao: DAO)
         values.put(DAO.COLUMN_FIELD_UUID, rule.fieldUuid)
         values.put( DAO.COLUMN_RULE_NAME, rule.name )
         values.put( DAO.COLUMN_RULE_VALUE, rule.value )
+        values.put( DAO.COLUMN_RULE_IS_SUBSET_RULE, rule.isSubsetRule )
 
-        rule.operator?.let{operator ->
+        rule.operator?.let { operator ->
             values.put( DAO.COLUMN_OPERATOR_ID, OperatorConverter.toIndex(operator) )
         }
 
@@ -86,16 +88,15 @@ class RuleDAO(private var dao: DAO)
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val fieldUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_NAME))
-
-        // TODO:  this should be a lookup table
         val operatorId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_OPERATOR_ID))
         val value = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_VALUE))
+        val isSubsetRule = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_RULE_IS_SUBSET_RULE)).toBoolean()
 
         val field = DAO.fieldDAO.getField(fieldUuid)
         val operator = OperatorConverter.fromIndex(operatorId)
 
         field?.let { rule->
-            return Rule( uuid, fieldUuid, name, value, operator, null )
+            return Rule( uuid, fieldUuid, name, value, isSubsetRule, operator, null )
         }
 
         return null
@@ -140,17 +141,38 @@ class RuleDAO(private var dao: DAO)
         return rules
     }
 
-    fun getRules( field : Field) : ArrayList<Rule>
+    fun getPrimaryRules( field : Field ) : ArrayList<Rule>
     {
         val rules = ArrayList<Rule>()
 
-        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_FIELD_UUID} = '${field.uuid}'"
+        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_FIELD_UUID} = '${field.uuid}' AND ${DAO.COLUMN_RULE_IS_SUBSET_RULE} = 0"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
             val rule = buildRule( cursor )
-            rule?.let{rule->
+            rule?.let { rule->
+                rule.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( rule )
+                rules.add( rule)
+            }
+        }
+
+        cursor.close()
+
+        return rules
+    }
+
+    fun getSubsetRules( field : Field ) : ArrayList<Rule>
+    {
+        val rules = ArrayList<Rule>()
+
+        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_FIELD_UUID} = '${field.uuid}' AND ${DAO.COLUMN_RULE_IS_SUBSET_RULE} = 1"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val rule = buildRule( cursor )
+            rule?.let { rule->
                 rule.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( rule )
                 rules.add( rule)
             }

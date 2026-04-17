@@ -87,7 +87,9 @@ class EnumerationItemDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_INCOMPLETE_REASON, enumerationItem.enumerationIncompleteReason )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_NOTES, enumerationItem.enumerationNotes )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SAMPLING, enumerationItem.enumerationEligibleForSampling )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SUBSET_SAMPLING, enumerationItem.enumerationEligibleForSubsetSampling )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_SAMPLING_STATE, enumerationItem.samplingState.format )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_SUBSET_SAMPLING_STATE, enumerationItem.subsetSamplingState.format )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME, enumerationItem.collectorName )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_STATE, enumerationItem.collectionState.format )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_DATE, enumerationItem.collectionDate )
@@ -109,7 +111,9 @@ class EnumerationItemDAO(private var dao: DAO)
         val enumerationIncompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_INCOMPLETE_REASON))
         val enumerationNotes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_NOTES))
         val enumerationEligibleForSampling = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SAMPLING)).toBoolean()
+        val enumerationEligibleForSubsetSampling = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SUBSET_SAMPLING)).toBoolean()
         val samplingState = SamplingState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SAMPLING_STATE)))
+        val subsetSamplingState = SamplingState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SUBSET_SAMPLING_STATE)))
         val collectorName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME))
         val collectionState = CollectionState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_STATE)))
         val collectionDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_DATE))
@@ -133,7 +137,9 @@ class EnumerationItemDAO(private var dao: DAO)
             enumerationIncompleteReason,
             enumerationNotes,
             enumerationEligibleForSampling,
+            enumerationEligibleForSubsetSampling,
             samplingState,
+            subsetSamplingState,
             collectorName,
             collectionState,
             collectionDate,
