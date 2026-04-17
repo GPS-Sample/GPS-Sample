@@ -440,6 +440,14 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 migrateFrom322To323( db )
                 Log.d( "xxx", "migrated from 314 to 323" )
             }
+            else if (newVersion == 324)
+            {
+                migrateFrom314To321( db )
+                migrateFrom321To322( db )
+                migrateFrom322To323( db )
+                migrateFrom323To324( db )
+                Log.d( "xxx", "migrated from 314 to 324" )
+            }
             else
             {
                 dropAllTables( db )
@@ -458,6 +466,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 migrateFrom322To323( db )
                 Log.d( "xxx", "migrated from 321 to 323" )
             }
+            else if (newVersion == 324)
+            {
+                migrateFrom321To322( db )
+                migrateFrom322To323( db )
+                migrateFrom323To324( db )
+                Log.d( "xxx", "migrated from 321 to 324" )
+            }
             else
             {
                 dropAllTables( db )
@@ -470,6 +485,24 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 migrateFrom322To323( db )
                 Log.d( "xxx", "migrated from 322 to 323" )
             }
+            else if (newVersion == 324)
+            {
+                migrateFrom322To323( db )
+                migrateFrom323To324( db )
+                Log.d( "xxx", "migrated from 322 to 324" )
+            }
+            else
+            {
+                dropAllTables( db )
+            }
+        }
+        else if (oldVersion == 323)
+        {
+            if (newVersion == 324)
+            {
+                migrateFrom323To324( db )
+                Log.d( "xxx", "migrated from 323 to 324" )
+            }
             else
             {
                 dropAllTables( db )
@@ -478,6 +511,37 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         else
         {
             dropAllTables( db )
+        }
+    }
+
+    fun migrateFrom323To324(db: SQLiteDatabase)
+    {
+        db.transaction {
+            try {
+                // Update EnumerationItem Table
+                db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SUBSET_SAMPLING INTEGER DEFAULT 0")
+                db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_ENUMERATION_ITEM_SUBSET_SAMPLING_STATE TEXT DEFAULT 'None'")
+
+                // Update Rule Table
+                db.execSQL("ALTER TABLE $TABLE_RULE ADD COLUMN $COLUMN_RULE_IS_SUBSET_RULE INTEGER DEFAULT 0")
+
+                // Update Study Table
+                db.execSQL("ALTER TABLE $TABLE_STUDY ADD COLUMN $COLUMN_STUDY_SUBSET_SAMPLE_NAME TEXT DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_STUDY ADD COLUMN $COLUMN_STUDY_SUBSET_SAMPLE_SIZE INTEGER DEFAULT 0")
+                db.execSQL("ALTER TABLE $TABLE_STUDY ADD COLUMN $COLUMN_STUDY_SUBSET_SAMPLE_SIZE_INDEX INTEGER DEFAULT 0")
+
+                // Update dbVersion in Config
+                val newDbVersion = 324
+                val contentValues = ContentValues().apply {
+                    put(COLUMN_CONFIG_DB_VERSION, newDbVersion)
+                }
+
+                update(TABLE_CONFIG, contentValues, null, null)
+            } catch (ex: Exception) {
+                Log.d("xxx", "Migration from DB 323 to 324 FAILED: ${ex.message}")
+                throw ex // optional: rethrow so Android knows migration failed
+            } finally {
+            }
         }
     }
 
@@ -497,6 +561,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 val contentValues = ContentValues().apply {
                     put(COLUMN_CONFIG_DB_VERSION, newDbVersion)
                 }
+
                 update(TABLE_CONFIG, contentValues, null, null)
             } catch (ex: Exception) {
                 Log.d("xxx", "Migration from DB 322 to 323 FAILED: ${ex.message}")
