@@ -337,11 +337,19 @@ class PerformCollectionFragment : Fragment(),
         }
 
         val items = ArrayList<String>()
-        val sortFilters = resources.getTextArray( R.array.collection_sort_filters )
+        val sortFilters = resources.getTextArray( R.array.sort_filters )
 
         for (sortFilter in sortFilters)
         {
             items.add( sortFilter.toString())
+        }
+
+        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+            if (study.subsetRules.isNotEmpty() && study.subsetFilters.isNotEmpty())
+            {
+                items.add( resources.getString( R.string.primary_sample ))
+                items.add( resources.getString( R.string.subset_sample ))
+            }
         }
 
         binding.filterSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, items )
@@ -464,7 +472,7 @@ class PerformCollectionFragment : Fragment(),
                         {
                             enumerationItem.isVisible = false
 
-                            if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.subsetSamplingState != SamplingState.Sampled)
+                            if (enumerationItem.samplingState == SamplingState.Sampled)
                             {
                                 enumerationItem.isVisible = true
                                 for (location in collectionTeamLocations)
@@ -491,34 +499,7 @@ class PerformCollectionFragment : Fragment(),
                         {
                             enumerationItem.isVisible = false
 
-                            if (enumerationItem.samplingState != SamplingState.Sampled && enumerationItem.subsetSamplingState == SamplingState.Sampled)
-                            {
-                                enumerationItem.isVisible = true
-                                for (location in collectionTeamLocations)
-                                {
-                                    for (enumItem in location.enumerationItems)
-                                    {
-                                        if (enumItem.uuid == enumerationItem.uuid)
-                                        {
-                                            location.isVisible = true
-                                            break
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    7-> { // Primary + Subset Sample
-                        for (location in collectionTeamLocations)
-                        {
-                            location.isVisible = false
-                        }
-
-                        for (enumerationItem in enumerationItems)
-                        {
-                            enumerationItem.isVisible = false
-
-                            if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.subsetSamplingState == SamplingState.Sampled)
+                            if (enumerationItem.subsetSamplingState == SamplingState.Sampled)
                             {
                                 enumerationItem.isVisible = true
                                 for (location in collectionTeamLocations)
@@ -767,7 +748,7 @@ class PerformCollectionFragment : Fragment(),
                 {
                     enumerationCount += 1
                 }
-                if (enumItem.samplingState == SamplingState.Sampled)
+                if (enumItem.samplingState == SamplingState.Sampled || enumItem.subsetSamplingState == SamplingState.Sampled)
                 {
                     sampledCount += 1
                 }

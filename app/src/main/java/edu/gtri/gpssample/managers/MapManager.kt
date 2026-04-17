@@ -971,7 +971,7 @@ class MapManager
         } else if (location.enumerationItems.size == 1) {
             val enumerationItem = location.enumerationItems[0]
 
-            if (enumerationItem.samplingState == SamplingState.Sampled) {
+            if (enumerationItem.samplingState == SamplingState.Sampled || enumerationItem.subsetSamplingState == SamplingState.Sampled) {
                 when (enumerationItem.collectionState) {
                     CollectionState.Undefined -> resourceName = "home_light_blue"
                     CollectionState.Incomplete -> resourceName = "home_orange"
@@ -988,7 +988,7 @@ class MapManager
         else
         {
             for (enumerationItem in location.enumerationItems) {
-                if (enumerationItem.samplingState == SamplingState.Sampled) {
+                if (enumerationItem.samplingState == SamplingState.Sampled || enumerationItem.subsetSamplingState == SamplingState.Sampled) {
                     if (enumerationItem.collectionState == CollectionState.Undefined) {
                         if (resourceName == "home_black") { // set only if not already set
                             resourceName = "multi_home_light_blue"

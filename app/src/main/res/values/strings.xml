@@ -468,15 +468,9 @@
     <string name="subset_sample">Subset Sample</string>
     <string name="subset_name">Subset Name</string>
 
-    <string-array name="collection_sort_filters">
-        <item>Default</item>
-        <item>Undefined</item>
-        <item>Incomplete</item>
-        <item>Complete</item>
-        <item>Points of Interest</item>
+    <string-array name="subset_sort_filters">
         <item>Primary Sample</item>
         <item>Subset Sample</item>
-        <item>Primary + Subset Sample</item>
     </string-array>
 
     <string-array name="sort_filters">

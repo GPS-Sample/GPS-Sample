@@ -457,7 +457,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                     {
                         val enumerationItem = location.enumerationItems[0]
 
-                        if (enumerationItem.samplingState == SamplingState.Sampled)
+                        if (enumerationItem.samplingState == SamplingState.Sampled || enumerationItem.subsetSamplingState == SamplingState.Sampled)
                         {
                             when( enumerationItem.collectionState )
                             {
@@ -484,7 +484,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 {
                     for (enumerationItem in location.enumerationItems)
                     {
-                        if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined)
+                        if ((enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined)
+                        || (enumerationItem.subsetSamplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined))
                         {
                             resourceId = R.drawable.multi_home_light_blue
                             break
@@ -495,7 +496,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                     {
                         for (enumerationItem in location.enumerationItems)
                         {
-                            if (enumerationItem.samplingState == SamplingState.Sampled)
+                            if (enumerationItem.samplingState == SamplingState.Sampled || enumerationItem.subsetSamplingState == SamplingState.Sampled)
                             {
                                 if (enumerationItem.collectionState == CollectionState.Incomplete)
                                 {

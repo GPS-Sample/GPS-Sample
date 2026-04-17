@@ -374,11 +374,11 @@ class ConfigurationFragment : Fragment(),
                         {
                             enumerationCount += 1
                         }
-                        if (enumItem.enumerationEligibleForSampling)
+                        if (enumItem.enumerationEligibleForSampling || enumItem.enumerationEligibleForSubsetSampling)
                         {
                             eligibleCount += 1
                         }
-                        if (enumItem.samplingState == SamplingState.Sampled)
+                        if (enumItem.samplingState == SamplingState.Sampled || enumItem.subsetSamplingState == SamplingState.Sampled)
                         {
                             sampledCount += 1
                         }

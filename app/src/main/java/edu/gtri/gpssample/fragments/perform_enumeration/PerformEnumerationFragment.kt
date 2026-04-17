@@ -578,7 +578,7 @@ class PerformEnumerationFragment : Fragment(),
                 {
                     enumerationCount += 1
                 }
-                if (enumItem.samplingState == SamplingState.Sampled)
+                if (enumItem.samplingState == SamplingState.Sampled || enumItem.subsetSamplingState == SamplingState.Sampled)
                 {
                     sampledCount += 1
                 }

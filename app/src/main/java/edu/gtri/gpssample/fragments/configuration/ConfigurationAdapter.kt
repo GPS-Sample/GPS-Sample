@@ -73,7 +73,7 @@ class ConfigurationAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapte
                 {
                     enumerationCount += 1
                 }
-                if (enumItem.samplingState == SamplingState.Sampled)
+                if (enumItem.samplingState == SamplingState.Sampled || enumItem.subsetSamplingState == SamplingState.Sampled)
                 {
                     sampledCount += 1
                 }
