@@ -589,14 +589,7 @@ class SamplingViewModel : ViewModel()
                 else -> {}
             }
 
-            if (sampleSize == 0)
-            {
-                val fragment = currentFragment as? CreateSampleFragment
-                fragment?.let { fragment ->
-                    Toast.makeText( fragment.activity!!.applicationContext, "${fragment.activity!!.getString(R.string.no_eligible_households)}", Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
+            if (sampleSize > 0)
             {
                 val sampledIndices = ArrayList<Int>()
 

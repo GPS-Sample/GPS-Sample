@@ -179,6 +179,11 @@ class EnumAreaDAO(private var dao: DAO)
             DAO.enumerationTeamDAO.deleteTeam( enumerationTeam )
         }
 
+        for (collectionTeam in enumArea.collectionTeams)
+        {
+            DAO.collectionTeamDAO.deleteTeam( collectionTeam )
+        }
+
         for (location in enumArea.locations)
         {
             DAO.locationDAO.delete( location )
