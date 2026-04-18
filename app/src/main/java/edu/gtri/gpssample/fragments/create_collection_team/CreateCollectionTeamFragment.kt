@@ -248,7 +248,7 @@ class CreateCollectionTeamFragment : Fragment(),
                     {
                         val sampledItem = location.enumerationItems[0]
 
-                        if (sampledItem.samplingState == SamplingState.Sampled)
+                        if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
                         {
                             if (!locationBelongsToTeam( location ))
                             {
@@ -261,7 +261,7 @@ class CreateCollectionTeamFragment : Fragment(),
                     {
                         for (sampledItem in location.enumerationItems)
                         {
-                            if (sampledItem.samplingState == SamplingState.Sampled)
+                            if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
                             {
                                 if (!locationBelongsToTeam( location ))
                                 {

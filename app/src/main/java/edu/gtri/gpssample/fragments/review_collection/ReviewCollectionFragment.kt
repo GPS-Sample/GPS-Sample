@@ -368,7 +368,7 @@ class ReviewCollectionFragment : Fragment(),
                 {
                     val sampledItem = location.enumerationItems[0]
 
-                    if (sampledItem.samplingState == SamplingState.Sampled)
+                    if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
                     {
                         when( sampledItem.collectionState )
                         {
@@ -393,7 +393,7 @@ class ReviewCollectionFragment : Fragment(),
                     {
                         for (sampledItem in location.enumerationItems)
                         {
-                            if (sampledItem.samplingState == SamplingState.Sampled)
+                            if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
                             {
                                 if (sampledItem.collectionState == CollectionState.Incomplete)
                                 {
