@@ -293,6 +293,10 @@
         tools:layout="@layout/fragment_strata_sample">
 
         <action
+            android:id="@+id/action_navigate_to_SubsetSampleFragment"
+            app:destination="@id/SubsetSampleFragment"/>
+
+        <action
             android:id="@+id/action_navigate_to_CreateFieldFragment"
             app:destination="@id/CreateFieldFragment"/>
 

@@ -9,6 +9,7 @@ package edu.gtri.gpssample.fragments.strata_sample
 
 import android.os.Bundle
 import android.view.*
+import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -72,8 +73,26 @@ class StrataSampleFragment : Fragment()
             viewModel = sharedViewModel
         }
 
+        if (study.subsetSampleName.isNotEmpty())
+        {
+            binding.subsetSampleButton.visibility = View.VISIBLE
+            binding.enableSubsetCheckbox.isChecked = true
+        }
+
         binding.expandableListView.setAdapter(strataSampleAdapter)
         binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
+
+        binding.enableSubsetCheckbox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
+        {
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            {
+                binding.subsetSampleButton.visibility = if (isChecked) View.VISIBLE else View.GONE
+            }
+        })
+
+        binding.subsetSampleButton.setOnClickListener {
+            findNavController().navigate( R.id.action_navigate_to_SubsetSampleFragment )
+        }
 
         binding.saveButton.setOnClickListener {
             findNavController().popBackStack()
