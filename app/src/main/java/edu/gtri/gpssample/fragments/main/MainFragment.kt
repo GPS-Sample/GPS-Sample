@@ -187,6 +187,10 @@ class MainFragment : Fragment()
             }
         }
 
+        binding.selectRoleTip.setOnClickListener {
+//            NotificationDialog( requireActivity(), "", resources.getString(R.string.select_role_tip))
+        }
+
         binding.signInButton.setOnClickListener {
             var bundle: Bundle? = null
 

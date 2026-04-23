@@ -12,56 +12,129 @@
         android:layout_width="match_parent"
         android:layout_height="20dp" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_margin="20dp"
-        android:paddingHorizontal="10dp"
-        android:text="@string/select_role"
-        android:textColor="@color/primary_textcolor"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:gravity="center_vertical"/>
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <TextView
+            android:id="@+id/text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="@string/select_role"
+            android:textColor="@color/primary_textcolor"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/select_role_tip"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="15dp"
+            android:layout_margin="0dp"
+            app:srcCompat="@drawable/info2" />
+    </LinearLayout>
 
     <RadioGroup
         android:id="@+id/radioGroupMode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="0dp"
         android:layout_marginStart="30dp"
         android:layout_marginBottom="5dp"
         android:gravity="center_horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/textView">
+        app:layout_constraintTop_toBottomOf="@+id/text_view">
 
-        <RadioButton
-            android:id="@+id/admin_button"
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/admin"
-            android:textSize="20sp"/>
+            android:layout_height="50dp">
 
-        <RadioButton
-            android:id="@+id/supervisor_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/supervisor"
-            android:textSize="20sp" />
+            <RadioButton
+                android:id="@+id/admin_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/admin"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="20sp"/>
 
-        <RadioButton
-            android:id="@+id/enumerator_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/enumerator"
-            android:textSize="20sp" />
+            <ImageView
+                android:id="@+id/admin_tip"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="15dp"
+                android:layout_margin="0dp"
+                app:srcCompat="@drawable/info2" />
+        </LinearLayout>
 
-        <RadioButton
-            android:id="@+id/data_collector_button"
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/data_collector"
-            android:textSize="20sp" />
+            android:layout_height="50dp">
+
+            <RadioButton
+                android:id="@+id/supervisor_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/supervisor"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="20sp"/>
+
+            <ImageView
+                android:id="@+id/supervisor_tip"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="15dp"
+                android:layout_margin="0dp"
+                app:srcCompat="@drawable/info2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <RadioButton
+                android:id="@+id/enumerator_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/enumerator"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="20sp"/>
+
+            <ImageView
+                android:id="@+id/enumerator_tip"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="15dp"
+                android:layout_margin="0dp"
+                app:srcCompat="@drawable/info2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <RadioButton
+                android:id="@+id/data_collector_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/data_collector"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="20sp"/>
+
+            <ImageView
+                android:id="@+id/data_collector_tip"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="15dp"
+                android:layout_margin="0dp"
+                app:srcCompat="@drawable/info2" />
+        </LinearLayout>
     </RadioGroup>
 
     <Space
