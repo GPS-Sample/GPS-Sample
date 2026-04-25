@@ -28,6 +28,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignUpBinding
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.dialogs.NotificationDialog
 
 class SignUpFragment : Fragment()
 {
@@ -99,6 +100,10 @@ class SignUpFragment : Fragment()
             override fun onNothingSelected(parent: AdapterView<*>)
             {
             }
+        }
+
+        binding.pinTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.pin_hint))
         }
 
         binding.nextButton.setOnClickListener {

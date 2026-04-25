@@ -434,8 +434,6 @@
     <string name="strata_name">"Имя слоя"</string>
     <string name="add_strata">"Добавить слой"</string>
     <string name="strata">"Страта"</string>
-    <string name="gpssample_start">""GPSSample — это бесплатное приложение для Android, предназначенное для составления списков домохозяйств, отбора выборок и навигации в полевых условиях. Выберите свою роль, чтобы начать работу, или посетите сайт gpssample.org, чтобы узнать больше""</string>
-    <string name="role_hint">""Администратор: настраивает полную конфигурацию, исследование, метод выборки, правила и фильтры. Супервайзер: управляет полевыми командами, формирует выборку, передает данные. Регистратор: наносит на карту и регистрирует домохозяйства в полевых условиях. Сборщик данных: перемещается к выбранным домохозяйствам и запускает опрос. Примечание: после регистрации роли на этом устройстве будут доступны только эта роль и роли нижестоящего уровня.""</string>
     <string name="password_error">"Введенный пароль неверный."</string>
     <string name="pin_hint">""Создайте цифровой PIN-код из 4–6 цифр, чтобы защитить свой профиль на этом устройстве. Вам будет показан контрольный вопрос на случай, если вы забудете PIN-код.""</string>
     <string name="gpsaccuracy_hint">""Устанавливает минимальную точность GPS, необходимую для записи точки местоположения. Рекомендуется: 20 метров для стандартных опросов, 30 метров для сельских районов. Более низкие значения обеспечивают большую точность, но их сложнее достичь в густонаселенных городских районах или под пологом деревьев.""</string>
@@ -456,6 +454,24 @@
     <string name="duplicate_import">"Выбранный файл GeoJSON уже импортирован. Хотите продолжить импорт?"</string>
     <string name="enumerator_import_error">"С этой конфигурацией не связана ни одна группа перечисления."</string>
     <string name="proximity_warning_value">"Значение предупреждения о приближении?"</string>
+    <string name="menu_team_review_show">"Показать пройденный путь"</string>
+    <string name="menu_team_review_hide">"Скрыть пройденный путь"</string>
+    <string name="continue_button">"Продолжить"</string>
+    <string name="help_button">"Справка"</string>
+    <string name="hide_breadcrumbs">"Скрыть пройденный путь"</string>
+    <string name="stop_recording">"Прекратить запись пройденного пути"</string>
+    <string name="primary_sample">"Основная выборка"</string>
+    <string name="strata_sample">"Выборка по стратам"</string>
+    <string name="subset_sample">"Выборка подмножества"</string>
+    <string name="subset_name">"Название подмножества"</string>
+    <string name="enable_subset_sample">"Включить выборку подмножества"</string>
+    <string name="enable_subset_sample_description">"Место для описания флажка «Включить выборочную выборку»"</string>
+    <string name="details">"Подробнее"</string>
+    <string name="admin_hint">""</string>
+    <string name="supervisor_hint">""</string>
+    <string name="enumerator_hint">""</string>
+    <string name="data_collector_hint">""</string>
+    <string name="role_hint">""</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

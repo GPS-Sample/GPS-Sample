@@ -205,16 +205,29 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="50dp">
 
-                                <TextView
-                                    android:layout_weight="1"
+                                <LinearLayout
+                                    android:orientation="horizontal"
                                     android:layout_width="0dp"
-                                    android:layout_height="50dp"
-                                    android:gravity="center_vertical"
-                                    android:padding="10dp"
-                                    android:text="@string/subaddress"
-                                    android:textColor="@color/primary_textcolor"
-                                    android:textSize="17sp"
-                                    android:textStyle="bold" />
+                                    android:layout_weight="1"
+                                    android:layout_height="match_parent">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="50dp"
+                                        android:gravity="center_vertical"
+                                        android:padding="10dp"
+                                        android:text="@string/subaddress"
+                                        android:textColor="@color/primary_textcolor"
+                                        android:textSize="17sp"
+                                        android:textStyle="bold" />
+
+                                    <ImageView
+                                        android:id="@+id/subaddress_tip"
+                                        android:layout_width="50dp"
+                                        android:layout_height="50dp"
+                                        android:padding="15dp"
+                                        app:srcCompat="@drawable/info2" />
+                                </LinearLayout>
 
                                 <EditText
                                     android:id="@+id/subaddress_edit_text"

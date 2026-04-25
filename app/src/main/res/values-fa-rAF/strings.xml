@@ -434,8 +434,6 @@
     <string name="strata_name">"نام لایه"</string>
     <string name="add_strata">"افزودن طبقه"</string>
     <string name="strata">"لایه"</string>
-    <string name="gpssample_start">"GPSSample یک اپلیکیشن رایگان اندروید برای فهرست"</string>
-    <string name="role_hint">"مدیر: پیکربندی کامل، مطالعه، روش نمونه"</string>
     <string name="password_error">"رمز عبور وارد شده نادرست است."</string>
     <string name="pin_hint">"برای ایمن"</string>
     <string name="gpsaccuracy_hint">"حداقل دقت GPS مورد نیاز برای ثبت یک نقطه مکانی را تعیین می"</string>
@@ -456,6 +454,24 @@
     <string name="duplicate_import">"فایل GeoJson انتخاب شده قبلاً وارد شده است. آیا می"</string>
     <string name="enumerator_import_error">"این پیکربندی هیچ تیم انومره"</string>
     <string name="proximity_warning_value">"مقدار هشدار نزدیکی؟"</string>
+    <string name="menu_team_review_show">"نمایش مسیر طی"</string>
+    <string name="menu_team_review_hide">"پنهان کردن مسیر طی"</string>
+    <string name="continue_button">"ادامه"</string>
+    <string name="help_button">"کمک"</string>
+    <string name="hide_breadcrumbs">"پنهان کردن مسیر طی"</string>
+    <string name="stop_recording">"متوقف کردن ضبط مسیر طی"</string>
+    <string name="primary_sample">"نمونه اصلی"</string>
+    <string name="strata_sample">"نمونه طبقه"</string>
+    <string name="subset_sample">"نمونه زیرمجموعه"</string>
+    <string name="subset_name">"نام زیرمجموعه"</string>
+    <string name="enable_subset_sample">"فعال"</string>
+    <string name="enable_subset_sample_description">"جای"</string>
+    <string name="details">"جزئیات"</string>
+    <string name="admin_hint">""</string>
+    <string name="supervisor_hint">""</string>
+    <string name="enumerator_hint">""</string>
+    <string name="data_collector_hint">""</string>
+    <string name="role_hint">""</string>
     <string-array name="forgot_pin_questions">
         <item>"نام میانی پدر"</item>
         <item>"نام خانوادگی پیش از ازدواج مادر"</item>

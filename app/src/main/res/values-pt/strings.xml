@@ -434,8 +434,6 @@
     <string name="strata_name">"Nome do estrato"</string>
     <string name="add_strata">"Adicionar estratificação"</string>
     <string name="strata">"Estratos"</string>
-    <string name="gpssample_start">""O GPSSample é uma aplicação gratuita para Android destinada ao recenseamento de famílias, amostragem e navegação no terreno. Selecione a sua função para começar ou visite gpssample.org para saber mais""</string>
-    <string name="role_hint">""Administrador: Define a configuração completa, o estudo, o método de amostragem, as regras e os filtros. Supervisor: Gere as equipas de campo, recolhe amostras e transfere dados. Recenseador: Mapeia e regista agregados familiares no terreno. Recolhedor de dados: Navega até aos agregados familiares amostrados e inicia o inquérito. Nota: Depois de registar uma função neste dispositivo, apenas essa função e as funções abaixo dela estarão disponíveis.""</string>
     <string name="password_error">"A palavra-passe introduzida está incorreta."</string>
     <string name="pin_hint">"Crie um PIN numérico com 4 a 6 dígitos para proteger o seu perfil neste dispositivo. Ser-lhe-á apresentada uma pergunta de segurança caso se esqueça do seu PIN."</string>
     <string name="gpsaccuracy_hint">""Define a precisão mínima de GPS necessária para que um ponto de localização possa ser registado. Recomendado: 20 metros para inquéritos padrão, 30 metros para áreas rurais. Valores mais baixos são mais precisos, mas mais difíceis de alcançar em áreas urbanas densas ou sob cobertura arbórea.""</string>
@@ -456,6 +454,24 @@
     <string name="duplicate_import">"O ficheiro GeoJSON selecionado já foi importado. Deseja continuar com esta importação?"</string>
     <string name="enumerator_import_error">"Esta configuração não tem nenhuma equipa de recenseamento associada."</string>
     <string name="proximity_warning_value">"Valor do aviso de proximidade?"</string>
+    <string name="menu_team_review_show">"Mostrar percurso percorrido"</string>
+    <string name="menu_team_review_hide">"Ocultar percurso percorrido"</string>
+    <string name="continue_button">"Continuar"</string>
+    <string name="help_button">"Ajuda"</string>
+    <string name="hide_breadcrumbs">"Ocultar o percurso percorrido"</string>
+    <string name="stop_recording">"Parar de registar o percurso percorrido"</string>
+    <string name="primary_sample">"Amostra principal"</string>
+    <string name="strata_sample">"Amostra de estratos"</string>
+    <string name="subset_sample">"Amostra de subconjunto"</string>
+    <string name="subset_name">"Nome do subconjunto"</string>
+    <string name="enable_subset_sample">"Ativar amostra de subconjunto"</string>
+    <string name="enable_subset_sample_description">"Espaço reservado para a descrição da caixa de seleção «Ativar amostragem de subconjunto»"</string>
+    <string name="details">"Detalhes"</string>
+    <string name="admin_hint">""</string>
+    <string name="supervisor_hint">""</string>
+    <string name="enumerator_hint">""</string>
+    <string name="data_collector_hint">""</string>
+    <string name="role_hint">""</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>

@@ -32,6 +32,8 @@ def translate(appName, language, index):
 	# step 1: pull out all of the <string> elements
 	for i in range(1,lines.__len__()):
 		line = lines[i].rstrip('\r')
+
+		print( line )
   
 		# split words separated by '\t'
 		components = line.split('\t')

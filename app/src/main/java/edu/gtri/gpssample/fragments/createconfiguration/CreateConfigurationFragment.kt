@@ -34,6 +34,7 @@ import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import org.osmdroid.views.MapView
@@ -79,6 +80,30 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
         }
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
+
+        binding.minGpsPrecisionTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.gpsaccuracy_hint))
+        }
+
+        binding.encryptionPasswordTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.encryption_hint))
+        }
+
+        binding.manualEntryTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.manual_hint))
+        }
+
+        binding.subaddressTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.subaddress_hint))
+        }
+
+        binding.autoIncrementTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.autoincrement_hint))
+        }
+
+        binding.proximityWarningHint.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.proximity_hint))
+        }
 
         binding.cancelButton.setOnClickListener {
             findNavController().popBackStack()

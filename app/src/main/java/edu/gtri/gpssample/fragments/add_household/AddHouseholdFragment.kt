@@ -187,6 +187,10 @@ class AddHouseholdFragment : Fragment(),
             }
         }
 
+        binding.subaddressTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.subaddress_hint))
+        }
+
         if (enumerationItem.uuid.isEmpty())
         {
             binding.uuidLayout.visibility = View.GONE

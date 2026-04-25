@@ -35,6 +35,7 @@ import edu.gtri.gpssample.database.models.FieldOption
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
 import edu.gtri.gpssample.fragments.add_household.AddHouseholdAdapter
@@ -130,6 +131,10 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
         }
 
         binding.fieldIndexEditText.setText( "${field.index}.")
+
+        binding.beginBlockTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.field_block_hint))
+        }
 
         binding.fieldBlockContainerCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
@@ -288,7 +293,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
             val numberLayout = view.findViewById<LinearLayout>(R.id.layout_field_number)
             val dateLayout = view.findViewById<LinearLayout>(R.id.layout_field_date)
 
-            binding.fieldBlockContainerCheckBox.visibility = View.GONE
+            binding.fieldBlockContainerLayout.visibility = View.GONE
 
             minimumNumberCheckBox.isChecked = false
             maximumNumberCheckBox.isChecked = false
@@ -322,7 +327,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
                 FieldType.Number -> {
                     if (!isBlockField)
                     {
-                        binding.fieldBlockContainerCheckBox.visibility = View.VISIBLE
+                        binding.fieldBlockContainerLayout.visibility = View.VISIBLE
                     }
                     textLayout.visibility = View.GONE
                     numberLayout.visibility = View.VISIBLE

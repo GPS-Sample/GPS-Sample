@@ -69,15 +69,30 @@
             android:inputType="textCapWords"
             android:text="@={viewModel.createStudyModel.currentStudy.name}" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginStart="20dp"
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_marginTop="20dp"
-            android:gravity="center_vertical"
-            android:text="@string/sampling_method"
-            android:textColor="@color/primary_textcolor"
-            android:textSize="17sp" />
+            android:layout_marginStart="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/sampling_method"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="17sp"
+                android:textStyle="normal" />
+
+            <ImageView
+                android:id="@+id/sampling_method_tip"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="15dp"
+                android:layout_margin="0dp"
+                app:srcCompat="@drawable/info2" />
+        </LinearLayout>
 
         <FrameLayout
             android:layout_width="match_parent"

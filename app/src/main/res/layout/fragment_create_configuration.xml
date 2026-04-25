@@ -157,35 +157,83 @@
                         android:onItemSelected="@{viewModel::onTimeFormatSelected}"/>
                 </FrameLayout>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/min_gps_precision"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
-
-                <EditText
-                    android:id="@+id/min_gps_precision_edit_text"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:imeOptions="actionNext"
-                    android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"
-                    android:hint="@string/enter_min_gps_precision" />
+                    android:layout_height="50dp">
 
-                <TextView
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="@string/min_gps_precision"
+                        android:textColor="@color/primary_textcolor"
+                        android:textSize="17sp"
+                        android:textStyle="normal" />
+
+                    <ImageView
+                        android:id="@+id/min_gps_precision_tip"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:padding="15dp"
+                        android:layout_margin="0dp"
+                        app:srcCompat="@drawable/info2" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
+                    android:layout_height="50dp">
+
+                    <EditText
+                        android:id="@+id/min_gps_precision_edit_text"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:inputType="number"
+                        android:imeOptions="actionNext"
+                        android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"
+                        android:hint="@string/enter_min_gps_precision" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:gravity="center_vertical"
+                        android:text="@{viewModel.distanceFormatString}"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/encryption_password"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="@string/encryption_password"
+                        android:textColor="@color/primary_textcolor"
+                        android:textSize="17sp"
+                        android:textStyle="normal" />
+
+                    <ImageView
+                        android:id="@+id/encryption_password_tip"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:padding="15dp"
+                        android:layout_margin="0dp"
+                        app:srcCompat="@drawable/info2" />
+                </LinearLayout>
 
                 <EditText
                     android:id="@+id/encryption_password_edit_text"
@@ -193,6 +241,7 @@
                     android:layout_height="50dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
+                    android:inputType="text"
                     android:imeOptions="actionNext"
                     android:text="@={viewModel.currentConfiguration.encryptionPassword}"
                     android:hint="@string/enter_encryption_password" />
@@ -200,25 +249,31 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp">
+                    android:layout_height="50dp">
 
                     <TextView
                         android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="20dp"
                         android:layout_marginStart="20dp"
                         android:gravity="center_vertical"
                         android:text="@string/allow_manual_identification_of_locations"
                         android:textSize="17sp"
                         android:textColor="@color/primary_textcolor" />
 
+                    <ImageView
+                        android:id="@+id/manual_entry_tip"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:padding="15dp"
+                        app:srcCompat="@drawable/info2" />
+
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/location_switch"
                         android:checked="@={viewModel.currentConfiguration.allowManualLocationEntry}"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_marginStart="10dp"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp" />
                 </LinearLayout>
 
@@ -236,6 +291,13 @@
                         android:text="@string/subaddress_is_required"
                         android:textSize="17sp"
                         android:textColor="@color/primary_textcolor" />
+
+                    <ImageView
+                        android:id="@+id/subaddress_tip"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:padding="15dp"
+                        app:srcCompat="@drawable/info2" />
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/subaddress_required_switch"
@@ -261,6 +323,13 @@
                         android:textSize="17sp"
                         android:textColor="@color/primary_textcolor" />
 
+                    <ImageView
+                        android:id="@+id/auto_increment_tip"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:padding="15dp"
+                        app:srcCompat="@drawable/info2" />
+
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/auto_subaddress_switch"
                         android:layout_width="50dp"
@@ -285,6 +354,13 @@
                         android:textSize="17sp"
                         android:textColor="@color/primary_textcolor" />
 
+                    <ImageView
+                        android:id="@+id/proximity_warning_hint"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:padding="15dp"
+                        app:srcCompat="@drawable/info2" />
+
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/proximity_warning_enabled_switch"
                         android:checked="@={viewModel.currentConfiguration.proximityWarningIsEnabled}"
@@ -302,7 +378,7 @@
 
                     <EditText
                         android:id="@+id/proximity_warning_edit_text"
-                        android:layout_width="wrap_content"
+                        android:layout_width="300dp"
                         android:layout_height="50dp"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"

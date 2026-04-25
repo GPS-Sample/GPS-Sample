@@ -23,6 +23,7 @@ import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 enum class DeleteMode(val value : Int)
@@ -96,6 +97,10 @@ class CreateStudyFragment : Fragment()
                 }
             }
         })
+
+        binding.samplingMethodTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.sampling_hint))
+        }
 
         binding.deleteImageView.setOnClickListener {
             ConfirmationDialog(activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_study_message), resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->

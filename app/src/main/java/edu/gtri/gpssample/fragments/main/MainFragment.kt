@@ -10,6 +10,7 @@ package edu.gtri.gpssample.fragments.main
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -19,6 +20,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RadioButton
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -188,7 +190,69 @@ class MainFragment : Fragment()
         }
 
         binding.selectRoleTip.setOnClickListener {
-//            NotificationDialog( requireActivity(), "", resources.getString(R.string.select_role_tip))
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.role_hint))
+        }
+
+        val radioButtons = listOf(
+            binding.adminButton,
+            binding.supervisorButton,
+            binding.enumeratorButton,
+            binding.dataCollectorButton
+        )
+
+        fun select(selected: RadioButton) {
+            radioButtons.forEach { it.isChecked = it == selected }
+        }
+
+        binding.adminRow.setOnClickListener {
+            select(binding.adminButton )
+        }
+
+        binding.supervisorRow.setOnClickListener {
+            select(binding.supervisorButton )
+        }
+
+        binding.enumeratorRow.setOnClickListener {
+            select(binding.enumeratorButton )
+        }
+
+        binding.dataCollectorRow.setOnClickListener {
+            select(binding.dataCollectorButton )
+        }
+
+        binding.adminTip.isClickable = true
+        binding.adminTip.isFocusable = true
+
+        binding.supervisorTip.isClickable = true
+        binding.supervisorTip.isFocusable = true
+
+        binding.enumeratorTip.isClickable = true
+        binding.enumeratorTip.isFocusable = true
+
+        binding.dataCollectorTip.isClickable = true
+        binding.dataCollectorTip.isFocusable = true
+
+        binding.adminTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.admin_hint))
+        }
+
+        binding.supervisorTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.supervisor_hint))
+        }
+
+        binding.enumeratorTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.enumerator_hint))
+        }
+
+        binding.dataCollectorTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.data_collector_hint))
+        }
+
+        binding.webpageLink.paintFlags = binding.webpageLink.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+
+        binding.webpageLink.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.gpssample.org"))
+            startActivity(intent)
         }
 
         binding.signInButton.setOnClickListener {

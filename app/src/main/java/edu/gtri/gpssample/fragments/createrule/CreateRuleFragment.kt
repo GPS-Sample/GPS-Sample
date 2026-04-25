@@ -32,6 +32,7 @@ import edu.gtri.gpssample.databinding.FragmentCreateRuleBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import edu.gtri.gpssample.fragments.add_household.CheckboxOptionAdapter
 import edu.gtri.gpssample.utils.DateUtils
@@ -78,6 +79,10 @@ class CreateRuleFragment : Fragment(),
             // Assign the fragment
             createRuleFragment = this@CreateRuleFragment
             this.executePendingBindings()
+        }
+
+        binding.ruleTip.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.rule_hint))
         }
 
         sharedViewModel.currentConfiguration?.value?.let { config ->

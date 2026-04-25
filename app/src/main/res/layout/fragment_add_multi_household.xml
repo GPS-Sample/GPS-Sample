@@ -49,7 +49,7 @@
             android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="@string/back" />
+            android:text="@string/back2" />
 
     </LinearLayout>
 </FrameLayout>
