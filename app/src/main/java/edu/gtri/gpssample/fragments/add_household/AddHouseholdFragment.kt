@@ -139,6 +139,12 @@ class AddHouseholdFragment : Fragment(),
             }
         }
 
+        if (!this::enumerationItem.isInitialized)
+        {
+            Toast.makeText(activity!!.applicationContext, "Oops! Double tap detected.", Toast.LENGTH_SHORT).show()
+            findNavController().popBackStack()
+        }
+
         if (editMode && enumerationItem.uuid.isNotEmpty() && !isMultiHousehold)
         {
             binding.addMultiButton.visibility = View.VISIBLE

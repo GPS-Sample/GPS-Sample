@@ -142,7 +142,7 @@ class MapManager
         var polylineAnnotation: PolylineAnnotation? = null
     }
 
-    private var delegate: MapManagerDelegate? = null
+    var delegate: MapManagerDelegate? = null
 
     private val MIN_ZOOM = 8
     private val MAX_ZOOM = 18
