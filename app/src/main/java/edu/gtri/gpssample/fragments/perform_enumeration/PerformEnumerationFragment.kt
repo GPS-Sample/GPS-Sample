@@ -1148,6 +1148,7 @@ class PerformEnumerationFragment : Fragment(),
                                 }
                             }
                             ConfirmationDialog.ButtonPress.None -> {
+                                MapManager.instance().delegate = this
                             }
                         }
                     }
@@ -1607,6 +1608,8 @@ class PerformEnumerationFragment : Fragment(),
 
     override fun onMarkerTapped( location: Location )
     {
+        MapManager.instance().delegate = null // prevent double taps!
+
         sharedViewModel.currentLocationUuid = location.uuid
 
         if (location.isLandmark)
