@@ -496,70 +496,6 @@ class AddHouseholdFragment : Fragment(),
 
     override fun didSelectSaveButton( incompleteReason: String, notes: String )
     {
-        // first, validate the required inputs
-
-        if (config.subaddressIsrequired && binding.subaddressEditText.text.toString().isEmpty())
-        {
-            Toast.makeText(activity!!.applicationContext, "Subaddress is required", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        for (fieldData in enumerationItem.fieldDataList) {
-            DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
-                if (field.required) {
-                    when (field.type) {
-                        FieldType.Text -> {
-                            if (fieldData.textValue.isEmpty()) {
-                                Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}",Toast.LENGTH_SHORT).show()
-                                return
-                            }
-                        }
-                        FieldType.Number -> {
-                            if (fieldData.numberValue == null) {
-                                Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
-                                return
-                            }
-                        }
-                        FieldType.Date -> {
-                            if (fieldData.dateValue == null) {
-                                Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
-                                return
-                            }
-                        }
-                        FieldType.Dropdown -> {
-                            if (fieldData.dropdownIndex == null)
-                            {
-                                Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
-                                return
-                            }
-                        }
-                        FieldType.Checkbox -> {
-                            var somethingChecked = false
-
-                            for (fieldDataOption in fieldData.fieldDataOptions)
-                            {
-                                if (fieldDataOption.value == true)
-                                {
-                                    somethingChecked = true
-                                    break
-                                }
-                            }
-
-                            if (!somethingChecked)
-                            {
-                                Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
-                                return
-                            }
-                        }
-                        else -> {
-                        }
-                    }
-                }
-            }
-        }
-
-        // Next, save the enumerationItem
-
         if (incompleteReason.isNotEmpty())
         {
             enumerationItem.enumerationIncompleteReason = incompleteReason
@@ -567,6 +503,66 @@ class AddHouseholdFragment : Fragment(),
         }
         else
         {
+            if (config.subaddressIsrequired && binding.subaddressEditText.text.toString().isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "Subaddress is required", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            for (fieldData in enumerationItem.fieldDataList) {
+                DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
+                    if (field.required) {
+                        when (field.type) {
+                            FieldType.Text -> {
+                                if (fieldData.textValue.isEmpty()) {
+                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}",Toast.LENGTH_SHORT).show()
+                                    return
+                                }
+                            }
+                            FieldType.Number -> {
+                                if (fieldData.numberValue == null) {
+                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
+                                    return
+                                }
+                            }
+                            FieldType.Date -> {
+                                if (fieldData.dateValue == null) {
+                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
+                                    return
+                                }
+                            }
+                            FieldType.Dropdown -> {
+                                if (fieldData.dropdownIndex == null)
+                                {
+                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
+                                    return
+                                }
+                            }
+                            FieldType.Checkbox -> {
+                                var somethingChecked = false
+
+                                for (fieldDataOption in fieldData.fieldDataOptions)
+                                {
+                                    if (fieldDataOption.value == true)
+                                    {
+                                        somethingChecked = true
+                                        break
+                                    }
+                                }
+
+                                if (!somethingChecked)
+                                {
+                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
+                                    return
+                                }
+                            }
+                            else -> {
+                            }
+                        }
+                    }
+                }
+            }
+
             enumerationItem.enumerationIncompleteReason = ""
             enumerationItem.enumerationState = EnumerationState.Enumerated
         }
@@ -610,37 +606,6 @@ class AddHouseholdFragment : Fragment(),
 
         location.creationDate = Date().time
         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-
-//        DAO.configDAO.getConfig( config.uuid )?.let {
-//            it.selectedStudyUuid = config.selectedStudyUuid
-//            it.selectedEnumAreaUuid = config.selectedEnumAreaUuid
-//
-//            val enumAreas = it.enumAreas.filter {
-//                it.uuid == config.selectedEnumAreaUuid
-//            }
-//
-//            if (enumAreas.isNotEmpty())
-//            {
-//                enumAreas[0].selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
-//                enumAreas[0].selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
-//            }
-//
-//            sharedViewModel.setCurrentConfig( it )
-//        }
-//
-//        DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
-//            it.selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
-//            it.selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
-//            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
-//        }
-//
-//        DAO.studyDAO.getStudy( study.uuid )?.let {
-//            sharedViewModel.createStudyModel.setStudy( it )
-//        }
-//
-//        DAO.enumerationTeamDAO.getEnumerationTeam( enumTeam.uuid )?.let {
-//            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
-//        }
 
         findNavController().popBackStack()
     }
