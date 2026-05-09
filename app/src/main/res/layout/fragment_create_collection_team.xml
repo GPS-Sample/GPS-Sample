@@ -13,8 +13,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:gravity="center_vertical"
             android:textColor="@color/primary"
             android:text="@string/team_name"
@@ -25,8 +25,8 @@
             android:id="@+id/team_name_edit_text"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:hint="@string/enter_team_name"
             android:imeOptions="actionDone"
             android:inputType="textCapWords"/>
@@ -34,8 +34,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:gravity="center_vertical"
             android:text="@string/assign_households"
             android:textColor="@color/primary"

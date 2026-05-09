@@ -9,8 +9,8 @@
         android:id="@+id/checkbox"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
         android:text="@string/checkbox" />
 
 </LinearLayout>

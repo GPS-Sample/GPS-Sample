@@ -65,8 +65,8 @@
                         android:layout_height="@{viewModel.networkHotspotModel.qrCodeHeight, default=match_parent}"
                         bind:imageBitmap="@{viewModel.networkHotspotModel.qrCodeBitmap}"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
                         android:layout_marginTop="0dp"
                         />
                 </androidx.constraintlayout.widget.ConstraintLayout>

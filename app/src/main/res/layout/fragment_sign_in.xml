@@ -29,8 +29,8 @@
             android:hint="@string/enter_your_user_name"
             android:inputType="textCapWords"
             android:imeOptions="actionDone"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:layout_width="match_parent"
             android:layout_height="50dp"/>
 
@@ -40,8 +40,8 @@
             android:inputType="number"
             android:imeOptions="actionNext"
             android:layout_marginTop="20dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:layout_width="match_parent"
             android:layout_height="50dp"/>
     </androidx.appcompat.widget.LinearLayoutCompat>

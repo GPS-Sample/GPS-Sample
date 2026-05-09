@@ -48,8 +48,8 @@
                     android:id="@+id/config_name_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:inputType="textCapWords"
                     android:imeOptions="actionNext"
                     android:text="@={viewModel.currentConfiguration.name}"
@@ -68,8 +68,8 @@
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:background="@drawable/spinner_frame">
 
                     <Spinner
@@ -91,8 +91,8 @@
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:background="@drawable/spinner_frame">
 
                     <Spinner
@@ -117,8 +117,8 @@
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:background="@drawable/spinner_frame">
 
                     <Spinner
@@ -144,8 +144,8 @@
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:background="@drawable/spinner_frame">
 
                     <Spinner
@@ -192,8 +192,8 @@
                         android:layout_width="0dp"
                         android:layout_height="50dp"
                         android:layout_weight="1"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
                         android:inputType="number"
                         android:imeOptions="actionNext"
                         android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"
@@ -239,8 +239,8 @@
                     android:id="@+id/encryption_password_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:inputType="text"
                     android:imeOptions="actionNext"
                     android:text="@={viewModel.currentConfiguration.encryptionPassword}"
@@ -380,8 +380,8 @@
                         android:id="@+id/proximity_warning_edit_text"
                         android:layout_width="300dp"
                         android:layout_height="50dp"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
                         android:inputType="number"
                         android:imeOptions="actionDone"
                         android:text="@={viewModel.currentConfiguration.proximityWarningStringValue}"

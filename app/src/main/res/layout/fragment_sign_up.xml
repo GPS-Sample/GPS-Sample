@@ -42,8 +42,8 @@
                 android:id="@+id/name_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:inputType="textCapWords"
                 android:imeOptions="actionNext"
                 android:hint="@string/enter_your_name" />
@@ -77,8 +77,8 @@
                 android:id="@+id/pin1_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:inputType="number"
                 android:imeOptions="actionNext"
                 android:hint="@string/enter_your_pin" />
@@ -97,8 +97,8 @@
                 android:id="@+id/pin2_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:inputType="number"
                 android:imeOptions="actionNext"
                 android:hint="@string/reenter_your_pin" />
@@ -116,8 +116,8 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:background="@drawable/spinner_frame">
 
                 <Spinner
@@ -152,8 +152,8 @@
                 android:id="@+id/answer_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:inputType="textCapWords"
                 android:imeOptions="actionDone"
                 android:hint="@string/enter_your_answer" />

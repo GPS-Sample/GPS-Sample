@@ -51,15 +51,15 @@
                 android:focusable="false"
                 android:imeOptions="actionDone"
                 android:inputType="numberDecimal"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="50dp"/>
 
             <Button
                 android:id="@+id/minimum_date_calendar_button"
-                android:layout_marginRight="20dp"
+                android:layout_marginEnd="20dp"
                 android:background="@drawable/calendar_icon"
                 android:layout_width="50dp"
                 android:layout_height="50dp">
@@ -89,15 +89,15 @@
                 android:focusable="false"
                 android:imeOptions="actionDone"
                 android:inputType="numberDecimal"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="50dp"/>
 
             <Button
                 android:id="@+id/maximum_date_calendar_button"
-                android:layout_marginRight="20dp"
+                android:layout_marginEnd="20dp"
                 android:background="@drawable/calendar_icon"
                 android:layout_width="50dp"
                 android:layout_height="50dp">

@@ -18,7 +18,7 @@
         android:layout_marginStart="0dp"
         android:layout_marginEnd="0dp"
         android:paddingStart="10dp"
-        android:gravity="left|center_vertical"
+        android:gravity="start|center_vertical"
         android:includeFontPadding="true"
         android:letterSpacing="-0.02"
         android:lineSpacingExtra="1sp"

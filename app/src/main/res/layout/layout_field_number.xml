@@ -43,8 +43,8 @@
             android:hint="@string/enter_the_minimum_value"
             android:imeOptions="actionDone"
             android:inputType="numberDecimal"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:layout_width="match_parent"
             android:layout_height="50dp"/>
 
@@ -63,8 +63,8 @@
             android:hint="@string/enter_the_maximum_value"
             android:imeOptions="actionDone"
             android:inputType="numberDecimal"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:layout_width="match_parent"
             android:layout_height="50dp"/>
 

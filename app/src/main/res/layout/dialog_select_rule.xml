@@ -22,15 +22,15 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:visibility="@{viewModel.createFilterRuleModel.filterHasRules ? View.GONE : View.VISIBLE}">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="0dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginEnd="20dp"
                 android:focusable="false"
                 android:text="@string/rule"
                 android:gravity="center_vertical"
@@ -41,10 +41,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="40dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/spinner_frame"
-                >
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/spinner_frame">
 
                 <Spinner
                     android:id="@+id/rule_spinner"
@@ -93,17 +92,17 @@
             android:id="@+id/connector_full_frame_layout"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:visibility="@{viewModel.createFilterRuleModel.studyHasMultipleRules ? View.VISIBLE : View.GONE}">
 
             <TextView
                 android:id="@+id/connector_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginEnd="20dp"
                 android:focusable="false"
                 android:text="@string/connector"
                 android:gravity="center_vertical"
@@ -115,8 +114,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="40dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:background="@drawable/spinner_frame">
 
                 <Spinner
@@ -131,15 +130,15 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:visibility="@{viewModel.createFilterRuleModel.studyHasMultipleRules ? View.VISIBLE : View.GONE}">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="0dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginEnd="20dp"
                 android:focusable="false"
                 android:text="@string/rule"
                 android:gravity="center_vertical"
@@ -150,8 +149,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="40dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:background="@drawable/spinner_frame">
 
                 <Spinner
