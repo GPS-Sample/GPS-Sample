@@ -14,7 +14,9 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import edu.gtri.gpssample.database.models.LatLon
 import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
+import org.locationtech.jts.geom.Polygon
 import java.util.ArrayList
 import kotlin.math.*
 
@@ -182,5 +184,52 @@ object GeoUtils {
         }
 
         return points
+    }
+
+    fun createValidPolygon( coordinates: Array<Coordinate> ) : Polygon?
+    {
+        val polygon = GeometryFactory().createPolygon( coordinates )
+
+        if (!polygon.isValid())
+        {
+            val g = polygon.buffer(0.0)
+
+            if (g is Polygon && g.isValid)
+            {
+                return g
+            }
+            else
+            {
+                return null
+            }
+        }
+
+        return polygon
+    }
+
+    fun createValidPolygon( geometry: Geometry ) : Polygon?
+    {
+        if (geometry is Polygon)
+        {
+            if (geometry.isValid)
+            {
+                return geometry
+            }
+            else
+            {
+                val g = geometry.buffer(0.0)
+
+                if (g is Polygon && g.isValid)
+                {
+                    return g
+                }
+                else
+                {
+                    return null
+                }
+            }
+        }
+
+        return null
     }
 }

@@ -303,6 +303,10 @@ class CreateCollectionTeamFragment : Fragment(),
         p1?.let { p1 ->
             if (p1.action == MotionEvent.ACTION_UP)
             {
+                createMode = false
+                binding.mapOverlayView.visibility = View.GONE
+                binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
+
                 fingerPolyline?.let {
                     MapManager.instance().removePolyline( mapView, it )
                     fingerPolyline = null
@@ -331,7 +335,6 @@ class CreateCollectionTeamFragment : Fragment(),
 
                 try {
                     enumAreaPolygon.intersection(selectionPolygon)?.let { intersectedPolygon ->
-
                         if (!intersectedPolygon.isEmpty())
                         {
                             var finalSelectedPolygon = intersectedPolygon.copy()
@@ -341,17 +344,23 @@ class CreateCollectionTeamFragment : Fragment(),
                             {
                                 val points = GeoUtils.ArrayListOfLatLonToArrayListOfCoordinate(collectionTeam.polygon)
 
-                                val teamPolygon = geometryFactory.createPolygon(points.toTypedArray())
-
-                                // compute the intersection of the selected polygon with the existing team polygon
-                                finalSelectedPolygon.intersection(teamPolygon)?.let { intersection ->
-                                    if (!intersection.isEmpty())
-                                    {
-                                        // subtract the intersected polygon from the selectionPolygon
-                                        finalSelectedPolygon.difference(intersection)?.let { remainder ->
-                                            finalSelectedPolygon = remainder
+                                GeoUtils.createValidPolygon(points.toTypedArray())?.let { teamPolygon ->
+                                    // compute the intersection of the selected polygon with the existing team polygon
+                                    finalSelectedPolygon.intersection(teamPolygon)?.let { intersection ->
+                                        if (!intersection.isEmpty())
+                                        {
+                                            // subtract the intersected polygon from the selectionPolygon
+                                            finalSelectedPolygon.difference(intersection)?.let { remainder ->
+                                                GeoUtils.createValidPolygon( remainder )?.let { validPolygon ->
+                                                    finalSelectedPolygon = validPolygon
+                                                } ?: {
+                                                    throw Exception("Polygon difference failed" )
+                                                }
+                                            }
                                         }
                                     }
+                                } ?: {
+                                    throw Exception( "Create valid team polygon failed" )
                                 }
                             }
 
@@ -389,7 +398,7 @@ class CreateCollectionTeamFragment : Fragment(),
                                     }
                                 }
 
-                                if (locationUuids.size == count)
+                                if (locationUuids.size == count) // all HH's are within the EA
                                 {
                                     val vertices = GeoUtils.ArrayListOfCoordinateToArrayListOfPoint( coordinates )
 
@@ -398,7 +407,7 @@ class CreateCollectionTeamFragment : Fragment(),
 
                                     intersectionPolygon = MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x30 )
                                 }
-                                else
+                                else // some HH's are outside of the EA, use the selectionPolygon
                                 {
                                     val vertices = GeoUtils.ArrayListOfCoordinateToArrayListOfPoint( selectionPolygon.coordinates )
 
@@ -415,10 +424,6 @@ class CreateCollectionTeamFragment : Fragment(),
                 {
                     Log.d( "xxx", ex.stackTraceToString())
                 }
-
-                createMode = false
-                binding.mapOverlayView.visibility = View.GONE
-                binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
             }
             else
             {
