@@ -280,6 +280,10 @@ class CreateEnumerationTeamFragment : Fragment(),
 
             if (p1.action == MotionEvent.ACTION_UP)
             {
+                createMode = false
+                binding.mapOverlayView.visibility = View.GONE
+                binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
+
                 fingerPolyline?.let {
                     MapManager.instance().removePolyline( mapView, it )
                     fingerPolyline = null
@@ -317,22 +321,27 @@ class CreateEnumerationTeamFragment : Fragment(),
                             {
                                 val points = GeoUtils.ArrayListOfLatLonToArrayListOfCoordinate( enumTeam.polygon )
 
-                                val teamPolygon = geometryFactory.createPolygon(points.toTypedArray())
-
-                                // compute the intersection of the selected polygon with the existing team polygon
-                                finalSelectedPolygon.intersection(teamPolygon)?.let { intersection ->
-                                    if (!intersection.isEmpty())
-                                    {
-                                        // subtract the intersected polygon from the selectionPolygon
-                                        finalSelectedPolygon.difference( intersection )?.let { remainder ->
-                                            finalSelectedPolygon = remainder
+                                GeoUtils.createValidPolygon(points.toTypedArray())?.let { teamPolygon ->
+                                    // compute the intersection of the selected polygon with the existing team polygon
+                                    finalSelectedPolygon.intersection(teamPolygon)?.let { intersection ->
+                                        if (!intersection.isEmpty())
+                                        {
+                                            // subtract the intersected polygon from the selectionPolygon
+                                            finalSelectedPolygon.difference( intersection )?.let { remainder ->
+                                                GeoUtils.createValidPolygon( remainder )?.let { validPolygon ->
+                                                    finalSelectedPolygon = validPolygon
+                                                } ?: {
+                                                    throw Exception("Polygon difference failed" )
+                                                }
+                                            }
                                         }
                                     }
+                                } ?: {
+                                    throw Exception( "Create valid team polygon failed" )
                                 }
                             }
 
                             finalSelectedPolygon.boundary?.coordinates?.let { coordinates ->
-
                                 val vertices = GeoUtils.ArrayListOfCoordinateToArrayListOfPoint( coordinates )
 
                                 val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
@@ -361,10 +370,6 @@ class CreateEnumerationTeamFragment : Fragment(),
                 {
                     Log.d( "xxx", ex.stackTraceToString())
                 }
-
-                createMode = false
-                binding.mapOverlayView.visibility = View.GONE
-                binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
             }
             else
             {
