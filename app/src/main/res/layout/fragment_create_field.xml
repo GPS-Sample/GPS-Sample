@@ -49,7 +49,8 @@
                     android:layout_height="30dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:text="@string/field_name"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
@@ -74,6 +75,7 @@
                         android:layout_marginEnd="20dp"
                         android:hint="@string/enter_field_name"
                         android:text="@={viewModel.createFieldModel.CurrentField.name}"
+                        android:textAlignment="viewStart"
                         android:imeOptions="actionDone"
                         android:inputType="textCapSentences" />
                 </LinearLayout>
@@ -83,7 +85,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:text="@string/field_type"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
@@ -97,6 +100,7 @@
 
                     <Spinner
                         android:id="@+id/field_type_spinner"
+                        android:textAlignment="viewStart"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:entries="@{viewModel.createFieldModel.fieldTypes}"

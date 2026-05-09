@@ -79,6 +79,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
                     android:hint="@string/enter_rule_name"
+                    android:textAlignment="viewStart"
                     android:text="@={viewModel.createRuleModel.currentRule.name}"/>
 
                 <TextView
@@ -86,7 +87,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:text="@string/field"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
@@ -100,6 +102,7 @@
 
                     <Spinner
                         android:id="@+id/field_spinner"
+                        android:textAlignment="viewStart"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:entries="@{viewModel.createStudyModel.fieldNameList}"
@@ -111,7 +114,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:text="@string/operator"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
@@ -125,6 +129,7 @@
 
                     <Spinner
                         android:id="@+id/operator_spinner"
+                        android:textAlignment="viewStart"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:entries="@{viewModel.createRuleModel.operators}"
@@ -137,7 +142,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:text="@string/value"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
@@ -159,6 +165,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
                         android:hint="@string/enter_value"
+                        android:textAlignment="viewStart"
                         android:text="@={viewModel.createRuleModel.currentRule.value}"/>
 
                     <Spinner
@@ -166,6 +173,7 @@
                         android:id="@+id/dropdown_value_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
+                        android:textAlignment="viewStart"
                         android:selectedItemPosition="@={viewModel.createRuleModel.dropdownPosition}"/>
 
                     <TextView
@@ -173,7 +181,8 @@
                         android:id="@+id/date_value_text_view"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:gravity="center_vertical"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
                         android:paddingStart="20dp"
                         android:paddingEnd="20dp"
                         android:textSize="17sp"

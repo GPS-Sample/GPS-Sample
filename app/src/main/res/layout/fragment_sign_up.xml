@@ -23,8 +23,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_margin="20dp"
-                android:gravity="center_vertical"
+                android:gravity="start|center_vertical"
                 android:text="@string/sign_up"
+                android:textAlignment="viewStart"
                 android:textColor="@color/primary_textcolor"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -33,7 +34,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_marginStart="20dp"
-                android:gravity="center_vertical"
+                android:gravity="start|center_vertical"
+                android:textAlignment="viewStart"
                 android:text="@string/name"
                 android:textSize="17sp"
                 android:textColor="@color/primary_textcolor" />
@@ -44,6 +46,7 @@
                 android:layout_height="50dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:textAlignment="viewStart"
                 android:inputType="textCapWords"
                 android:imeOptions="actionNext"
                 android:hint="@string/enter_your_name" />
@@ -58,7 +61,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:text="@string/pin"
                     android:textColor="@color/primary_textcolor"
                     android:textSize="17sp"
@@ -79,6 +83,7 @@
                 android:layout_height="50dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:textAlignment="viewStart"
                 android:inputType="number"
                 android:imeOptions="actionNext"
                 android:hint="@string/enter_your_pin" />
@@ -88,7 +93,8 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
-                android:gravity="center_vertical"
+                android:gravity="start|center_vertical"
+                android:textAlignment="viewStart"
                 android:text="@string/pin"
                 android:textSize="17sp"
                 android:textColor="@color/primary_textcolor" />
@@ -99,6 +105,7 @@
                 android:layout_height="50dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:textAlignment="viewStart"
                 android:inputType="number"
                 android:imeOptions="actionNext"
                 android:hint="@string/reenter_your_pin" />
@@ -108,7 +115,8 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
-                android:gravity="center_vertical"
+                android:gravity="start|center_vertical"
+                android:textAlignment="viewStart"
                 android:text="@string/forgot_pin_question"
                 android:textSize="17sp"
                 android:textColor="@color/primary_textcolor" />
@@ -122,6 +130,7 @@
 
                 <Spinner
                     android:id="@+id/question_spinner"
+                    android:textAlignment="viewStart"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </FrameLayout>
@@ -143,7 +152,8 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
-                android:gravity="center_vertical"
+                android:gravity="start|center_vertical"
+                android:textAlignment="viewStart"
                 android:text="@string/forgot_pin_answer"
                 android:textSize="17sp"
                 android:textColor="@color/primary_textcolor" />
@@ -154,6 +164,7 @@
                 android:layout_height="50dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:textAlignment="viewStart"
                 android:inputType="textCapWords"
                 android:imeOptions="actionDone"
                 android:hint="@string/enter_your_answer" />

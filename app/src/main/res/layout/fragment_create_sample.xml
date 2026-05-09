@@ -36,6 +36,8 @@
                 android:layout_marginBottom="15dp"
                 android:paddingHorizontal="10dp"
                 android:layout_marginTop="10dp"
+                android:gravity="start|center_vertical"
+                android:textAlignment="viewStart"
                 android:text="@string/create_sample"
                 android:textColor="@color/primary_textcolor"
                 android:textSize="20sp"
@@ -54,7 +56,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginStart="15dp"
-                    android:gravity="start"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:textSize="22sp" />
 
                 <ImageView

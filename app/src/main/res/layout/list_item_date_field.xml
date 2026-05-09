@@ -30,7 +30,8 @@
                     android:layout_weight="1"
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor"/>
 
@@ -50,6 +51,7 @@
 
                 <EditText
                     android:id="@+id/edit_text"
+                    android:textAlignment="viewStart"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"

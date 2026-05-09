@@ -39,7 +39,8 @@
                     android:layout_height="30dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:text="@string/config_name"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
@@ -52,6 +53,7 @@
                     android:layout_marginEnd="20dp"
                     android:inputType="textCapWords"
                     android:imeOptions="actionNext"
+                    android:textAlignment="viewStart"
                     android:text="@={viewModel.currentConfiguration.name}"
                     android:hint="@string/enter_config_name" />
 
@@ -60,7 +62,8 @@
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:text="@string/map_engine"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
@@ -83,7 +86,8 @@
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:text="@string/preferred_units"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
@@ -97,6 +101,7 @@
 
                     <Spinner
                         android:id="@+id/distance_format_spinner"
+                        android:textAlignment="viewStart"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:entries="@{viewModel.distanceFormats}"
@@ -109,7 +114,8 @@
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:text="@string/date_format"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
@@ -123,6 +129,7 @@
 
                     <Spinner
                         android:id="@+id/date_format_spinner"
+                        android:textAlignment="viewStart"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:entries="@{viewModel.dateFormats}"
@@ -136,7 +143,8 @@
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:text="@string/time_format"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
@@ -150,6 +158,7 @@
 
                     <Spinner
                         android:id="@+id/time_format_spinner"
+                        android:textAlignment="viewStart"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:entries="@{viewModel.timeFormats}"
@@ -243,6 +252,7 @@
                     android:layout_marginEnd="20dp"
                     android:inputType="text"
                     android:imeOptions="actionNext"
+                    android:textAlignment="viewStart"
                     android:text="@={viewModel.currentConfiguration.encryptionPassword}"
                     android:hint="@string/enter_encryption_password" />
 
@@ -256,7 +266,8 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
-                        android:gravity="center_vertical"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
                         android:text="@string/allow_manual_identification_of_locations"
                         android:textSize="17sp"
                         android:textColor="@color/primary_textcolor" />
@@ -287,7 +298,8 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
-                        android:gravity="center_vertical"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
                         android:text="@string/subaddress_is_required"
                         android:textSize="17sp"
                         android:textColor="@color/primary_textcolor" />
@@ -318,7 +330,8 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
-                        android:gravity="center_vertical"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
                         android:text="@string/auto_increment_subaddress"
                         android:textSize="17sp"
                         android:textColor="@color/primary_textcolor" />
@@ -349,7 +362,8 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
-                        android:gravity="center_vertical"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
                         android:text="@string/proximity_warning_enabled"
                         android:textSize="17sp"
                         android:textColor="@color/primary_textcolor" />
@@ -461,7 +475,8 @@
                     android:layout_height="30dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:text="@string/enumeration_areas"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
@@ -476,7 +491,8 @@
                     android:layout_height="30dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:text="@string/studies"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />

@@ -23,6 +23,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
+            android:textAlignment="viewStart"
             android:text="@string/date"
             android:textSize="18sp"
             android:checked="@{viewModel.createFieldModel.CurrentField.date}"/>
@@ -35,6 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
+            android:textAlignment="viewStart"
             android:text="@string/minimum_value"
             android:textSize="18sp"/>
 
@@ -51,6 +53,7 @@
                 android:focusable="false"
                 android:imeOptions="actionDone"
                 android:inputType="numberDecimal"
+                android:textAlignment="viewStart"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_weight="1"
@@ -73,6 +76,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
+            android:textAlignment="viewStart"
             android:text="@string/maximum_value"
             android:textSize="18sp"/>
 
@@ -89,6 +93,7 @@
                 android:focusable="false"
                 android:imeOptions="actionDone"
                 android:inputType="numberDecimal"
+                android:textAlignment="viewStart"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_weight="1"
@@ -110,6 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
+            android:textAlignment="viewStart"
             android:text="@string/time"
             android:textSize="18sp"
             android:checked="@{viewModel.createFieldModel.CurrentField.time}"
@@ -121,6 +127,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
+            android:textAlignment="viewStart"
             android:text="@string/personally_identifiable"
             android:textSize="18sp"
             android:checked="@{viewModel.createFieldModel.CurrentField.pii}"
@@ -132,6 +139,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
+            android:textAlignment="viewStart"
             android:text="@string/required"
             android:textSize="18sp"
             android:checked="@{viewModel.createFieldModel.CurrentField.required}"

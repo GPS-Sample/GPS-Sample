@@ -54,7 +54,8 @@
                         android:layout_height="30dp"
                         android:layout_marginTop="20dp"
                         android:layout_marginStart="20dp"
-                        android:gravity="center_vertical"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
                         android:text="@string/filter_name"
                         android:textSize="17sp"
                         android:textColor="@color/primary_textcolor" />
@@ -67,6 +68,7 @@
                         android:layout_height="50dp"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
+                        android:textAlignment="viewStart"
                         android:text="@={viewModel.createFilterModel.currentFilter.name}"
                         android:hint="@string/enter_filter_name" />
 
@@ -75,7 +77,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:layout_marginStart="20dp"
-                        android:gravity="center_vertical"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
                         android:text="@string/filters"
                         android:textSize="17sp"
                         android:textColor="@color/primary_textcolor" />
@@ -86,8 +89,7 @@
                         android:layout_weight="1"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:adapter="@{viewModel.createFilterModel.createFilterAdapter}"
-                        />
+                        android:adapter="@{viewModel.createFilterModel.createFilterAdapter}" />
 
                     <Button
                         android:id="@+id/add_rule_button"

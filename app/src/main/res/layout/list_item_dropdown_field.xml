@@ -30,7 +30,8 @@
                     android:layout_weight="1"
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textAlignment="viewStart"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor"/>
 
@@ -55,6 +56,7 @@
 
                 <Spinner
                     android:id="@+id/spinner"
+                    android:textAlignment="viewStart"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </FrameLayout>

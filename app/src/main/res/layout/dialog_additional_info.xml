@@ -10,6 +10,8 @@
         android:textColor="@color/primary_textcolor"
         android:textSize="17sp"
         android:textStyle="bold"
+        android:gravity="start|center_vertical"
+        android:textAlignment="viewStart"
         android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
@@ -21,6 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:checked="true"
+        android:textAlignment="viewStart"
         android:text="@string/complete" />
 
     <CheckBox
@@ -29,6 +32,7 @@
         android:layout_marginEnd="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textAlignment="viewStart"
         android:text="@string/incomplete" />
 
     <LinearLayout
@@ -43,6 +47,8 @@
             android:textColor="@color/primary_textcolor"
             android:textSize="17sp"
             android:textStyle="bold"
+            android:gravity="start|center_vertical"
+            android:textAlignment="viewStart"
             android:padding="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
@@ -55,6 +61,7 @@
                 android:id="@+id/nobody_home_button"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:textAlignment="viewStart"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/nobody_home" />
@@ -63,6 +70,7 @@
                 android:id="@+id/does_not_exist_button"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:textAlignment="viewStart"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/does_not_exist" />
@@ -71,6 +79,7 @@
                 android:id="@+id/other_button"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:textAlignment="viewStart"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/other" />
@@ -82,12 +91,15 @@
         android:textColor="@color/primary_textcolor"
         android:textSize="17sp"
         android:textStyle="bold"
+        android:gravity="start|center_vertical"
+        android:textAlignment="viewStart"
         android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <EditText
         android:id="@+id/notes_edit_text"
+        android:textAlignment="viewStart"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_width="match_parent"
