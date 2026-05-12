@@ -472,6 +472,8 @@
     <string name="enumerator_hint">"Enumerator: Maps and lists households in the field."</string>
     <string name="data_collector_hint">"Data Collector: Navigates to sampled households and launches the survey."</string>
     <string name="role_hint">""GPSSample is a free Android app for field-based household listing, sampling, and navigation. Select your role to get started, or visit gpssample.org to learn more. Note: Once you register a role on this device, only that role and roles below it will be available.""</string>
+    <string name="enter_forgot_pin_question">Enter Forgot PIN question</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

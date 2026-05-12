@@ -135,16 +135,18 @@
                     android:layout_height="match_parent" />
             </FrameLayout>
 
-            <TextView
+            <EditText
                 android:visibility="gone"
-                android:id="@+id/other_question_text_view"
+                android:id="@+id/other_question_edit_text"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="50dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                android:gravity="center_vertical"
+                android:gravity="start|center_vertical"
+                android:textAlignment="viewStart"
                 android:textColor="@color/primary_textcolor"
+                android:hint="@string/enter_forgot_pin_question"
                 android:textSize="17sp"/>
 
             <TextView

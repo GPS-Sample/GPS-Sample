@@ -82,19 +82,21 @@ class SignUpFragment : Fragment()
         {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
             {
-                if (position == 7)
-                {
-                    InputDialog( activity!!, false, resources.getString(R.string.enter_other_question), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
-                        when (action) {
-                            InputDialog.Action.DidCancel -> {}
-                            InputDialog.Action.DidEnterText -> {
-                                binding.otherQuestionTextView.text = text
-                                binding.otherQuestionTextView.visibility = View.VISIBLE
-                            }
-                            InputDialog.Action.DidPressQRButton -> {}
-                        }
-                    }
-                }
+                binding.otherQuestionEditText.visibility = if (position == 6) View.VISIBLE else View.GONE
+
+//                if (position == 6)
+//                {
+//                    InputDialog( activity!!, false, resources.getString(R.string.enter_other_question), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
+//                        when (action) {
+//                            InputDialog.Action.DidCancel -> {}
+//                            InputDialog.Action.DidEnterText -> {
+//                                binding.otherQuestionTextView.text = text
+//                                binding.otherQuestionTextView.visibility = View.VISIBLE
+//                            }
+//                            InputDialog.Action.DidPressQRButton -> {}
+//                        }
+//                    }
+//                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>)
@@ -140,17 +142,18 @@ class SignUpFragment : Fragment()
 
             if (question == resources.getString(R.string.other_question))
             {
-                question = binding.otherQuestionTextView.text.toString()
+                question = binding.otherQuestionEditText.text.toString()
 
                 if (question.length == 0)
                 {
-                    InputDialog( activity!!, false, resources.getString(R.string.enter_other_question), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
-                        when (action) {
-                            InputDialog.Action.DidCancel -> {}
-                            InputDialog.Action.DidEnterText -> {}
-                            InputDialog.Action.DidPressQRButton -> {}
-                        }
-                    }
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_forgot_pin_question), Toast.LENGTH_SHORT).show()
+//                    InputDialog( activity!!, false, resources.getString(R.string.enter_other_question), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
+//                        when (action) {
+//                            InputDialog.Action.DidCancel -> {}
+//                            InputDialog.Action.DidEnterText -> {}
+//                            InputDialog.Action.DidPressQRButton -> {}
+//                        }
+//                    }
                     return@setOnClickListener
                 }
             }
