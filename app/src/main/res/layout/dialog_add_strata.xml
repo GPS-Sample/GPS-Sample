@@ -35,6 +35,7 @@
         android:textColor="@color/primary_textcolor"
         android:textSize="17sp"
         android:textStyle="bold"
+        android:textAlignment="viewStart"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
@@ -45,6 +46,7 @@
         android:id="@+id/strata_name_edit_text"
         android:inputType="textCapWords"
         android:imeOptions="actionDone"
+        android:textAlignment="viewStart"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
@@ -61,7 +63,8 @@
             android:textColor="@color/primary_textcolor"
             android:textSize="17sp"
             android:textStyle="bold"
-            android:gravity="center_vertical"
+            android:gravity="start|center_vertical"
+            android:textAlignment="viewStart"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="0dp"
             android:layout_width="wrap_content"
@@ -88,6 +91,7 @@
 
             <Spinner
                 android:id="@+id/strata_spinner"
+                android:textAlignment="viewStart"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </FrameLayout>

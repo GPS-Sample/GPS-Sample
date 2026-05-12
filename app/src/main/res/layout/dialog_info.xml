@@ -13,7 +13,8 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:focusable="false"
-        android:gravity="center_vertical"
+        android:gravity="start|center_vertical"
+        android:textAlignment="viewStart"
         android:textColor="@color/primary_textcolor"
         android:textSize="16sp" />
 
@@ -34,8 +35,5 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:text="@string/ok" />
-
-
     </LinearLayout>
-
 </LinearLayout>
