@@ -19,9 +19,9 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Rule
 
-class CreateFilterAdapter(var filterRules: List<Rule>?) : RecyclerView.Adapter<CreateFilterAdapter.ViewHolder>()
+class CreateFilterAdapter(var filterRules: List<Rule>) : RecyclerView.Adapter<CreateFilterAdapter.ViewHolder>()
 {
-    override fun getItemCount() = filterRules!!.size
+    override fun getItemCount() = filterRules.size
 
     private var context: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
@@ -42,7 +42,7 @@ class CreateFilterAdapter(var filterRules: List<Rule>?) : RecyclerView.Adapter<C
 
     fun updateRules( rule: Rule? )
     {
-        var rulesArray = ArrayList<Rule>()
+        val rulesArray = ArrayList<Rule>()
         rule?.let{rule->
             var looprRule : Rule? = rule
 
@@ -58,8 +58,6 @@ class CreateFilterAdapter(var filterRules: List<Rule>?) : RecyclerView.Adapter<C
                  op?.let{ op ->
                      looprRule = op.rule
                  }?: run{ looprRule = null }
-
-
             }
         }
 
@@ -78,29 +76,29 @@ class CreateFilterAdapter(var filterRules: List<Rule>?) : RecyclerView.Adapter<C
     {
         holder.itemView.isSelected = false
 
-        val rule = filterRules!!.get(holder.adapterPosition)
+        val rule = filterRules.get(holder.adapterPosition)
         var previousRule : Rule? = null
+
         if(holder.adapterPosition > 0)
         {
-            previousRule = filterRules!!.get(holder.adapterPosition - 1)
+            previousRule = filterRules.get(holder.adapterPosition - 1)
         }
 
-        rule?.let { rule ->
-            if (position == 0 && rule.filterOperator == null)
-            {
+        if (position == 0 && rule.filterOperator == null)
+        {
+            holder.titleTextView.text = rule.name
+        }
+        else
+        {
+            // TODO: use resource holder
+            rule.filterOperator?.let{operator->
+                holder.titleTextView.text = rule.name + " " + operator.connector.format    //rule!!.connector.format + " " + rule.name
+            }?: run{
                 holder.titleTextView.text = rule.name
             }
-            else
-            {
-                // TODO: use resource holder
-                rule.filterOperator?.let{operator->
-                    holder.titleTextView.text = rule.name + " " + operator.connector.format    //rule!!.connector.format + " " + rule.name
-                }?: run{
-                    holder.titleTextView.text = rule.name
-                }
-
-            }
         }
+
+        holder.deleteButton.visibility = if (position == filterRules.size - 1) View.VISIBLE else View.GONE
 
         holder.deleteButton.setOnClickListener {
             shouldDeleteFilterRule( rule, previousRule )

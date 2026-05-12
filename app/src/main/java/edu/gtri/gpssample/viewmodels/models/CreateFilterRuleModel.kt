@@ -110,8 +110,8 @@ class CreateFilterRuleModel {
 
     private fun createNewFilterRule( filter : Filter, study : Study, isSubsetRule: Boolean )
     {
+//        _createFilterAdapter?.updateRules(null)
 
-        _createFilterAdapter?.updateRules(null)
         _currentFilter?.let{ filterObservable->
             filterObservable.value = filter
             filterObservable.postValue(filter)
@@ -121,7 +121,6 @@ class CreateFilterRuleModel {
             studyObservable.value = study
             studyObservable.postValue(study)
         } ?: run { _currentStudy = MutableLiveData(study) }
-
 
         // this list needs to be a copy every time.
         if (isSubsetRule)
@@ -137,6 +136,7 @@ class CreateFilterRuleModel {
         allRules.clear()
        // secondRules.clear()
         _secondRule  = null
+
         _currentFilter?.value?.let { filter ->
 
             val rule = FilterUtils.findLastRule(filter)
@@ -156,12 +156,13 @@ class CreateFilterRuleModel {
                 }
             }
         }
+
         // build list of rules
         for (rule in ruleList)
         {
             allRules.add(rule.name)
-
         }
+
         _firstStringRuleList.value = allRules
         _firstStringRuleList.postValue(allRules)
     }
@@ -178,8 +179,8 @@ class CreateFilterRuleModel {
                 filter.rule = currentRule
             }
 
-                // walk down the tree of rule -> connector -> rule
-                // the first rule in the UI is the last rule in the list normally,
+            // walk down the tree of rule -> connector -> rule
+            // the first rule in the UI is the last rule in the list normally,
 
             _secondRule?.value?.let{secondRule ->
                 // build operator
@@ -190,10 +191,7 @@ class CreateFilterRuleModel {
             filter.rule?.let{rule ->
                 _createFilterAdapter?.updateRules(rule)
             }
-
-
         }
-
     }
 
     fun setupFirstRuleList(newPosition : Int)
@@ -215,21 +213,27 @@ class CreateFilterRuleModel {
 
     fun setupSecondRuleList(newPosition : Int)
     {
-
-        _currentRule?.value?.let{firstRule ->
-            _secondRule?.value?.let{secondRule ->
-                if(firstRule == secondRule)
-                {
-
-                    val newIndex = (newPosition + 1 ) % ruleList.size
-                    _secondRule = MutableLiveData(ruleList[newIndex])
-
-                    _secondRuleFieldPosition.value = newIndex
-                    _secondRuleFieldPosition.postValue(newIndex)
+        _currentRule?.value?.let{ firstRule ->
+            if (_secondRule == null)
+            {
+                val newIndex = (newPosition + 1 ) % ruleList.size
+                _secondRule = MutableLiveData(ruleList[newIndex])
+                _secondRuleFieldPosition.value = newIndex
+                _secondRuleFieldPosition.postValue(newIndex)
+            }
+            else
+            {
+                _secondRule?.value?.let{ secondRule ->
+                    if(firstRule == secondRule)
+                    {
+                        val newIndex = (newPosition + 1 ) % ruleList.size
+                        _secondRule = MutableLiveData(ruleList[newIndex])
+                        _secondRuleFieldPosition.value = newIndex
+                        _secondRuleFieldPosition.postValue(newIndex)
+                    }
                 }
             }
         }
-
     }
 
     fun onFirstRuleFieldSelected (study : Study, position : Int)

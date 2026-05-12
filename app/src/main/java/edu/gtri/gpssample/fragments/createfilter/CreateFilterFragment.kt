@@ -144,46 +144,50 @@ class CreateFilterFragment : Fragment()
        // createFilterAdapter.updateFilterRules(filterRules)
     }
 
-    private var selectedFilterRule: Rule? = null
-    private var previousSelectedFilterRule: Rule? = null
-
     fun shouldEditFilterRule( filterRule: Rule )
     {
        // SelectRuleDialog( activity!!, study_uuid, filter.uuid, filterRule,this )
     }
 
-    fun shouldDeleteFilterRule( filterRule: Rule, previousRule: Rule? )
+    fun shouldDeleteFilterRule( firstRule: Rule, previousRule: Rule? )
     {
-        selectedFilterRule = filterRule
-        previousSelectedFilterRule = previousRule
-        ConfirmationDialog( activity!!, resources.getString(R.string.please_confirm), "Are you sure you want to delete this Filter Rule?", "No", "Yes", null, false ) { buttonPressed, tag ->
-            when( buttonPressed )
-            {
-                ConfirmationDialog.ButtonPress.Left -> {
-                }
-                ConfirmationDialog.ButtonPress.Right -> {
-                    selectedFilterRule?.let {rule->
-                        previousSelectedFilterRule?.let{previousRule->
-                            rule.filterOperator?.rule?.let{operatorRule->
-                                // attach operatorrule to previous filteroperator
-                                previousRule.filterOperator?.let{previousFilterOperator->
-                                    previousFilterOperator.rule = operatorRule
-                                    sharedViewModel.createFilterModel.currentFilter?.value?.let{filter->
-                                        createFilterAdapter.updateRules(filter.rule)
-                                    }
-                                }
+        var isOnlyRule = false
+        var isLastRule = false
 
-                            }
-                        }?:run{
-                            //filter
-                            sharedViewModel.createFilterModel.currentFilter?.value?.let{filter->
+        if (previousRule == null && firstRule.filterOperator == null)
+        {
+            isOnlyRule = true
+        }
+        else if (previousRule != null && firstRule.filterOperator == null)
+        {
+            isLastRule = true
+        }
+
+        if (isOnlyRule || isLastRule)
+        {
+            ConfirmationDialog( activity!!, resources.getString(R.string.please_confirm), "Are you sure you want to delete this Filter Rule?", "No", "Yes", null, false ) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        if (isOnlyRule)
+                        {
+                            sharedViewModel.createFilterModel.currentFilter?.value?.let{ filter->
                                 filter.rule = null
-                                createFilterAdapter.updateRules(null)
+                                createFilterAdapter.updateRules(filter.rule )
+                            }
+                        }
+                        else if (isLastRule)
+                        {
+                            previousRule?.filterOperator = null
+                            sharedViewModel.createFilterModel.currentFilter?.value?.let{ filter->
+                                createFilterAdapter.updateRules(filter.rule )
                             }
                         }
                     }
-                }
-                ConfirmationDialog.ButtonPress.None -> {
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
                 }
             }
         }
