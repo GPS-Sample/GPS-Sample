@@ -149,7 +149,7 @@ class MainFragment : Fragment()
                         binding.supervisorButton.isChecked = true
                         if (highestRole == Role.Supervisor)
                         {
-                            binding.adminButton.visibility = View.GONE
+                            binding.adminRow.visibility = View.GONE
                         }
                     }
                     Role.Enumerator.value ->
@@ -157,12 +157,12 @@ class MainFragment : Fragment()
                         binding.enumeratorButton.isChecked = true
                         if (highestRole == Role.Enumerator)
                         {
-                            binding.adminButton.visibility = View.GONE
-                            binding.supervisorButton.visibility = View.GONE
+                            binding.adminRow.visibility = View.GONE
+                            binding.supervisorRow.visibility = View.GONE
                         }
                         else if (highestRole == Role.Supervisor)
                         {
-                            binding.adminButton.visibility = View.GONE
+                            binding.adminRow.visibility = View.GONE
                         }
                     }
                     Role.DataCollector.value ->
@@ -170,19 +170,19 @@ class MainFragment : Fragment()
                         binding.dataCollectorButton.isChecked = true
                         if (highestRole == Role.DataCollector)
                         {
-                            binding.adminButton.visibility = View.GONE
-                            binding.supervisorButton.visibility = View.GONE
-                            binding.enumeratorButton.visibility = View.GONE
+                            binding.adminRow.visibility = View.GONE
+                            binding.supervisorRow.visibility = View.GONE
+                            binding.enumeratorRow.visibility = View.GONE
                             binding.signUpButton.visibility = View.GONE
                         }
                         else if (highestRole == Role.Enumerator)
                         {
-                            binding.adminButton.visibility = View.GONE
-                            binding.supervisorButton.visibility = View.GONE
+                            binding.adminRow.visibility = View.GONE
+                            binding.supervisorRow.visibility = View.GONE
                         }
                         else if (highestRole == Role.Supervisor)
                         {
-                            binding.adminButton.visibility = View.GONE
+                            binding.adminRow.visibility = View.GONE
                         }
                     }
                 }
