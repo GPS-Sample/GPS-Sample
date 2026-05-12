@@ -175,7 +175,10 @@ class ManageConfigurationsFragment : Fragment(),
             if (configurations.size == 1)
             {
                 encryptionPassword = configurations[0].encryptionPassword
-                password = "******"
+                for (i in 1..encryptionPassword.length)
+                {
+                    password += "*"
+                }
             }
 
             if ((configurations.size == 1) && ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())))
@@ -190,7 +193,7 @@ class ManageConfigurationsFragment : Fragment(),
                             ImageDAO.deleteAll()
                             configurations.clear()
                             manageConfigurationsAdapter.updateConfigurations(configurations)
-                            InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), "******", resources.getString(R.string.cancel), resources.getString(R.string.next), null, false )  { action, text, tag ->
+                            InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false )  { action, text, tag ->
                                 when (action) {
                                     InputDialog.Action.DidCancel -> {}
                                     InputDialog.Action.DidEnterText -> {didEnterPassword( text )}
@@ -202,7 +205,6 @@ class ManageConfigurationsFragment : Fragment(),
                         }
                     }
                 }
-
             }
             else
             {
