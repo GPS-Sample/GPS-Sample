@@ -14,6 +14,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FieldType
@@ -30,7 +33,8 @@ class PrimarySampleFragment : Fragment()
     private lateinit var study: Study
     private var _binding: FragmentPrimarySampleBinding? = null
     private val binding get() = _binding!!
-    private lateinit var primarySampleAdapter: PrimarySampleAdapter
+    private lateinit var primarySampleRecyclerAdapter: PrimarySampleRecyclerAdapter
+
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -51,17 +55,17 @@ class PrimarySampleFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        primarySampleAdapter = PrimarySampleAdapter(activity!!)
-        primarySampleAdapter.didSelectField = this::didSelectField
-        primarySampleAdapter.didSelectRule = this::didSelectRule
-        primarySampleAdapter.didSelectFilter = this::didSelectFilter
-        primarySampleAdapter.shouldAddField = this::shouldAddField
-        primarySampleAdapter.shouldAddRule = this::shouldAddRule
-        primarySampleAdapter.shouldAddFilter = this::shouldAddFilter
+        primarySampleRecyclerAdapter = PrimarySampleRecyclerAdapter(requireContext())
+        primarySampleRecyclerAdapter.didSelectField = this::didSelectField
+        primarySampleRecyclerAdapter.didSelectRule = this::didSelectRule
+        primarySampleRecyclerAdapter.didSelectFilter = this::didSelectFilter
+        primarySampleRecyclerAdapter.shouldAddField = this::shouldAddField
+        primarySampleRecyclerAdapter.shouldAddRule = this::shouldAddRule
+        primarySampleRecyclerAdapter.shouldAddFilter = this::shouldAddFilter
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let { study->
             this.study = study
-            primarySampleAdapter.updateStudy( study )
+            primarySampleRecyclerAdapter.updateStudy( study )
         }
 
         binding.apply {
@@ -75,8 +79,30 @@ class PrimarySampleFragment : Fragment()
             binding.enableSubsetCheckbox.isChecked = true
         }
 
-        binding.expandableListView.setAdapter(primarySampleAdapter)
-        binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
+        val callback = object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0)
+        {
+            override fun onMove( recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean
+            {
+                val from = viewHolder.adapterPosition
+                val to = target.adapterPosition
+
+                if (from == RecyclerView.NO_POSITION || to == RecyclerView.NO_POSITION)
+                    return false
+
+                if (!primarySampleRecyclerAdapter.isFieldRow(from) || !primarySampleRecyclerAdapter.isFieldRow(to))
+                    return false
+
+                primarySampleRecyclerAdapter.moveField(from, to)
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+        }
+
+        ItemTouchHelper(callback).attachToRecyclerView(binding.recyclerView )
+
+        binding.recyclerView.setAdapter(primarySampleRecyclerAdapter)
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         binding.enableSubsetCheckbox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
