@@ -472,6 +472,7 @@
     <string name="data_collector_hint">""</string>
     <string name="role_hint">""</string>
     <string name="sampling_hint">""</string>
+    <string name="enter_forgot_pin_question">""</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>
