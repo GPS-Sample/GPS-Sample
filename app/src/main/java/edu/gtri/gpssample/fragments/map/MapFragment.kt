@@ -45,6 +45,7 @@ import edu.gtri.gpssample.dialogs.SelectionDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import kotlinx.coroutines.selects.select
 import java.util.ArrayList
 import java.util.Date
 
@@ -185,6 +186,8 @@ class MapFragment : Fragment(),
                 binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
             }
         }
+
+        selectMapEngine()
     }
 
     override fun onResume()
@@ -315,57 +318,7 @@ class MapFragment : Fragment(),
         {
             R.id.select_map_engine ->
             {
-                val mapEngines = resources.getTextArray( R.array.map_engines )
-
-                ConfirmationDialog( activity, resources.getString(R.string.select_map_engine), "", mapEngines[0].toString(), mapEngines[1].toString(), null, false ) { buttonPressed, tag ->
-                    when( buttonPressed )
-                    {
-                        ConfirmationDialog.ButtonPress.Left -> {
-                            binding.osmLabel.visibility = View.VISIBLE
-                            binding.osmMapView.visibility = View.VISIBLE
-                            binding.mapboxMapView.visibility = View.GONE
-                            MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
-                                this.mapView = mapView
-
-                                if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                                {
-                                    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-
-                                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                                        if (location != null)
-                                        {
-                                            val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
-                                            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                                                MapManager.instance().centerMap( point, currentZoomLevel, mapView )
-                                                MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                                                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                                                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        ConfirmationDialog.ButtonPress.Right -> {
-                            binding.osmLabel.visibility = View.GONE
-                            binding.osmMapView.visibility = View.GONE
-                            binding.northUpImageView.visibility = View.GONE
-                            binding.mapboxMapView.visibility = View.VISIBLE
-                            val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-                            MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null, zoom ) { mapView ->
-                                this.mapView = mapView
-                                MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
-                                }
-                            }
-                        }
-                        ConfirmationDialog.ButtonPress.None -> {
-                        }
-                    }
-                }
+                selectMapEngine()
             }
 
             R.id.mapbox_streets ->
@@ -482,6 +435,60 @@ class MapFragment : Fragment(),
         return super.onOptionsItemSelected(item)
     }
 
+    fun selectMapEngine()
+    {
+        val mapEngines = resources.getTextArray( R.array.map_engines )
+
+        ConfirmationDialog( activity, resources.getString(R.string.select_map_engine), "", mapEngines[0].toString(), mapEngines[1].toString(), null, false ) { buttonPressed, tag ->
+            when( buttonPressed )
+            {
+                ConfirmationDialog.ButtonPress.Left -> {
+                    binding.osmLabel.visibility = View.VISIBLE
+                    binding.osmMapView.visibility = View.VISIBLE
+                    binding.mapboxMapView.visibility = View.GONE
+                    MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
+                        this.mapView = mapView
+
+                        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                        {
+                            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+                            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                                if (location != null)
+                                {
+                                    val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
+                                    sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                                        MapManager.instance().centerMap( point, currentZoomLevel, mapView )
+                                        MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                                        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                ConfirmationDialog.ButtonPress.Right -> {
+                    binding.osmLabel.visibility = View.GONE
+                    binding.osmMapView.visibility = View.GONE
+                    binding.northUpImageView.visibility = View.GONE
+                    binding.mapboxMapView.visibility = View.VISIBLE
+                    val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null, zoom ) { mapView ->
+                        this.mapView = mapView
+                        MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                        sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                            MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
+                        }
+                    }
+                }
+                ConfirmationDialog.ButtonPress.None -> {
+                }
+            }
+        }
+    }
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
 //            TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
