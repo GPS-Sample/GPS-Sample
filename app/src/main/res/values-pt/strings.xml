@@ -441,7 +441,6 @@
     <string name="autoincrement_hint">""Quando ativado (padrão): é atribuído automaticamente um número sequencial (1, 2, 3...) a cada agregado familiar. Desative se o seu inquérito utilizar identificadores de agregados familiares pré-atribuídos.""</string>
     <string name="proximity_hint">"Quando ativado: os recenseadores recebem um alerta se tentarem adicionar um agregado familiar a menos de [X] metros de um registo já existente. Ajuda a evitar entradas duplicadas."</string>
     <string name="encryption_hint">""Crie uma palavra-passe que será partilhada com todos os supervisores, recenseadores e recolhedores de dados deste projeto. Esta palavra-passe é necessária para importar a configuração em qualquer dispositivo. Utilize apenas letras e números — sem espaços nem caracteres especiais.""</string>
-    <string name="sampling_hint">"Descrições dos métodos: /nAmostra Aleatória Simples: Cada agregado familiar tem a mesma probabilidade de ser selecionado. /nAmostra por Agrupamento (n.º de agregados familiares): Selecione um número fixo de agregados familiares de cada agrupamento. /nAmostra por Agrupamento (% de agregados familiares): Selecione uma percentagem de agregados familiares de cada agrupamento."</string>
     <string name="pii_hint">""Marque este campo como PII se puder identificar um indivíduo específico. Exemplos: nome completo, número de telefone, número de identificação nacional.""</string>
     <string name="field_block_hint">""Utilize um bloco de campos para repetir um conjunto de perguntas com base neste número. Exemplo: se este campo capturar o número de crianças, as perguntas no bloco serão feitas uma vez por criança. Marque a última pergunta do grupo com «Fim do bloco de campos»""</string>
     <string name="rule_hint">""Dê a esta regra um nome descritivo curto para sua referência (por exemplo, «Tem criança de 12 a 23 meses», «É um agregado familiar» poderia ser «agregado_familiar_com_criança»). Este nome aparece na etapa de configuração do filtro, onde as regras são combinadas""</string>
@@ -472,6 +471,7 @@
     <string name="enumerator_hint">""</string>
     <string name="data_collector_hint">""</string>
     <string name="role_hint">""</string>
+    <string name="sampling_hint">""</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>

@@ -419,7 +419,7 @@
     <string name="select_map_engine">"Sélectionnez le moteur de carte"</string>
     <string name="import_failed">"Erreur. L'importation a échoué. Assurez-vous que les versions GPSSample sont identiques."</string>
     <string name="privacy_policy_statement">""GPSSample enregistre votre itinéraire (fil d\'Ariane) lorsque vous vous déplacez entre les foyers et cartographiez les foyers.\n\nL\'enregistrement ne commence que lorsque vous appuyez sur le bouton ENREGISTRER dans l\'application et s\'arrête lorsque vous appuyez sur le bouton ARRÊTER.\n\nLa localisation est collectée en continu pendant l\'enregistrement, même si l\'application est en arrière-plan ou si votre appareil est verrouillé.\n\nVos données de localisation sont stockées en toute sécurité sur votre appareil et ne sont exportées que si vous le souhaitez.\n\nVous pouvez révoquer l\'accès à la localisation en arrière-plan à tout moment dans les paramètres Android.""</string>
-    <string name="accept_privacy_policy">"Activer la localisation en arrière-plan : \nTOUJOURS AUTORISER"</string>
+    <string name="accept_privacy_policy">"Activer la localisation en arrière-plan :\nTOUJOURS AUTORISER"</string>
     <string name="decline_privacy_policy">"Pas maintenant : \nla fonction de suivi ne fonctionnera pas"</string>
     <string name="background_location_permission">"Autorisation de localisation en arrière-plan"</string>
     <string name="enable_background_activity_title">"Activer l'activité en arrière-plan"</string>
@@ -441,7 +441,6 @@
     <string name="autoincrement_hint">""Lorsque cette option est activée (par défaut) : un numéro séquentiel (1, 2, 3...) est automatiquement attribué à chaque ménage. Désactivez cette option si votre enquête utilise des identifiants de ménage pré-attribués.""</string>
     <string name="proximity_hint">"Lorsque cette option est activée : les enquêteurs reçoivent une alerte s'ils tentent d'ajouter un ménage situé à moins de [X] mètres d'un enregistrement existant. Cela permet d'éviter les doublons."</string>
     <string name="encryption_hint">""Créez un mot de passe qui sera partagé avec tous les superviseurs, enquêteurs et collecteurs de données participant à ce projet. Ce mot de passe est nécessaire pour importer la configuration sur n\'importe quel appareil. Utilisez uniquement des lettres et des chiffres – pas d\'espaces ni de caractères spéciaux.""</string>
-    <string name="sampling_hint">"Descriptions des méthodes : /nÉchantillon aléatoire simple : chaque ménage a une chance égale d'être sélectionné. /nÉchantillon par grappes (nombre de ménages) : sélectionnez un nombre fixe de ménages dans chaque grappe. /nÉchantillon par grappes (pourcentage de ménages) : sélectionnez un pourcentage de ménages dans chaque grappe."</string>
     <string name="pii_hint">""Marquez ce champ comme « PII » (informations personnelles identifiables) s\'il permet d\'identifier une personne spécifique. Exemples : nom complet, numéro de téléphone, numéro d\'identité national.""</string>
     <string name="field_block_hint">""Utilisez un bloc de champs pour répéter une série de questions en fonction de ce nombre. Exemple : si ce champ recense le nombre d\'enfants, les questions du bloc seront posées une fois par enfant. Marquez la dernière question du groupe avec « Fin du bloc de champs ».""</string>
     <string name="rule_hint">""Donnez à cette règle un nom descriptif court pour votre référence (par exemple, « A un enfant de 12 à 23 mois », « Est un ménage » pourrait être « child_household »). Ce nom apparaît à l\'étape de configuration du filtre où les règles sont combinées""</string>
@@ -472,6 +471,7 @@
     <string name="enumerator_hint">""</string>
     <string name="data_collector_hint">""</string>
     <string name="role_hint">""</string>
+    <string name="sampling_hint">""</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>

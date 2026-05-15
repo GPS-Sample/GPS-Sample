@@ -418,12 +418,12 @@
     <string name="export_failed">"صادر کول ناکام شول"</string>
     <string name="select_map_engine">"نقشې انجن وټاکئ"</string>
     <string name="import_failed">"تېروتنه. واردول ناکام شول. ډاډ ترلاسه کړئ چې د GPSSample نسخې یو شان دي."</string>
-    <string name="privacy_policy_statement">""GPSSample ستاسو د تګ لاره ثبتوي کله چې تاسو د کورونو ترمنځ ګرځئ او کورونه په نقشه کې نښه کوئ.\n\n ثبت هغه وخت پیل کېږي کله چې تاسو د ثبت تڼۍ ووهئ، او هغه وخت بندېږي کله چې د بندولو تڼۍ ووهئ.\n\n کله چې ثبت روان وي، موقعیت تل اخیستل کېږي، حتی که اپلېکېشن په شالید کې وي یا موبایل لاک وي.\n\n ستاسو د موقعیت معلومات ستاسو په موبایل کې په خوندي ډول ساتل کېږي او یوازې ستاسو په اجازه لېږدول کېږي.\n\n تاسو کولی شئ د شالید موقعیت اجازه هر وخت د Android له تنظیماتو څخه بنده کړئ.""</string>
-    <string name="accept_privacy_policy">"د شاليد موقعيت فعال کړئ:\nتل اجازه ورکړئ"</string>
+    <string name="privacy_policy_statement">""</string>
+    <string name="accept_privacy_policy">""</string>
     <string name="decline_privacy_policy">"اوس نه:\nتعقیب به کار ونه کړي"</string>
     <string name="background_location_permission">"د شالید موقعیت اجازه"</string>
     <string name="enable_background_activity_title">"پټ فعالیت فعال کړئ"</string>
-    <string name="enable_background_activity_body">""1. د تنظیماتو پرانیزئ (OPEN SETTINGS) تڼۍ ووهئ\n 2. په لست کې GPSSample ومومئ.\n 3. د شالید فعالیت اجازه (ALLOW BACKGROUND ACTIVITY) فعاله کړئ.\n 4. بېرته دې اپلېکېشن ته راستانه شئ.""</string>
+    <string name="enable_background_activity_body">""</string>
     <string name="open_settings">"تنظیمات خلاص کړئ"</string>
     <string name="note">"یادښت"</string>
     <string name="edit_location">"موقعیت ایډیټ کړئ"</string>
@@ -441,9 +441,8 @@
     <string name="autoincrement_hint">"کله چې فعال وي (اصلي): هر کورنۍ ته په اتوماتيک ډول یو پرله پسې شمېره (۱، ۲، ۳...) ورکول کیږي. که ستاسو سروې له مخکې ټاکل شوي کورنیو پېژندونکو څخه کار اخلي، نو دا بند کړئ."</string>
     <string name="proximity_hint">"کله چې فعال وي: شمېرونکي هشدار ترلاسه کوي که دوی د یو موجوده ریکارډ څخه په [X] متره کې د کورنۍ اضافه کولو هڅه وکړي. د دوه ګوني داخلونو په مخنیوي کې مرسته کوي."</string>
     <string name="encryption_hint">"یوه پټنوم جوړ کړئ چې په دې پروژه کې به له ټولو څارونکو، شمېرونکو، او د معلوماتو راټولوونکو سره شریک شي. دا پټنوم په هره وسیله کې د تشکیلاتو د واردولو لپاره اړین دی. یوازې له تورو او عددونو څخه کار واخلئ - تشې یا ځانګړي توري مه کاروئ."</string>
-    <string name="sampling_hint">"د میتودونو توضیحات: /n ساده تصادفي نمونه: هر کور د ټاکل کېدو مساوي چانس لري. /n د خوشې نمونه (د کورونو شمېر): له هرې خوشې څخه یو ټاکلی شمیر کورونه وټاکئ. /n د خوشې نمونه (د کورونو٪): له هرې خوشې څخه د کورونو یو سلنه وټاکئ."</string>
     <string name="pii_hint">"دا ساحه د PII په توګه نښه کړئ که دا کولی شي یو ځانګړی فرد وپیژني. مثالونه: بشپړ نوم، د تلیفون شمېره، د ملي پېژندپاڼې شمېره."</string>
-    <string name="field_block_hint">"" د دې شمېرې پر بنسټ د پوښتنو د یوې ټولګې د تکرار لپاره د فیلډ بلاک وکاروئ. بېلګه: که دا فیلډ د ماشومانو شمېر ثبتوي، په بلاک کې پوښتنې به د هر ماشوم لپاره یو ځل وپوښتل شي. په ډله کې وروستۍ پوښتنه د End Field Block سره نښه کړئ.""</string>
+    <string name="field_block_hint">""</string>
     <string name="rule_hint">"د خپلې مراجعې لپاره دې قانون ته یو لنډ تشریحي نوم ورکړئ (د بېلګې په توګه، '12-23 میاشتني ماشوم لري'، 'یو کور دی' کیدای شي child_household وي). دا نوم د فلټر تنظیم کولو په ګام کې ښکاري چیرې چې اصول سره یوځای کیږي."</string>
     <string name="filter_hint">"فلټرونه د AND، OR، یا NOT منطق په کارولو سره یو یا ډیر اصول سره یوځای کوي ترڅو دا تعریف کړي چې کوم کورنۍ د نمونې اخیستنې لپاره وړ دي. فلټر اړین دی حتی که تاسو یوازې یو اصول ولرئ."</string>
     <string name="team_draw_hint">"هغه ساحه تعریف کړئ چې هر فیلډ ټیم به یې شمېرنه کوي. د هر ټیم لپاره په نقشه کې یوه پوله رسم کړئ."</string>
@@ -472,6 +471,7 @@
     <string name="enumerator_hint">""</string>
     <string name="data_collector_hint">""</string>
     <string name="role_hint">""</string>
+    <string name="sampling_hint">""</string>
     <string-array name="forgot_pin_questions">
         <item>"د پلار منځنی نوم"</item>
         <item>"د مور د واده څخه مخکې تخلص"</item>

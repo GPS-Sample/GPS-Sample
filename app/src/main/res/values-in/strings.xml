@@ -419,7 +419,7 @@
     <string name="select_map_engine">"Pilih Mensin Peta"</string>
     <string name="import_failed">"Kesalahan. Impor gagal. Pastikan versi GPSSample sama."</string>
     <string name="privacy_policy_statement">""GPSSample merekam rute Anda (jejak perjalanan) saat Anda bepergian antar rumah tangga dan memetakan rumah tangga.\n\nPerekaman hanya dimulai saat Anda mengetuk tombol REKAM di aplikasi dan berhenti merekam saat Anda mengetuk tombol BERHENTI.\n\nLokasi dikumpulkan terus menerus selama perekaman, bahkan jika aplikasi berada di latar belakang atau perangkat Anda terkunci.\n\nData lokasi Anda disimpan dengan aman di perangkat Anda dan hanya diekspor jika Anda memilih untuk melakukannya.\n\nAnda dapat mencabut akses lokasi latar belakang kapan saja di Pengaturan Android.""</string>
-    <string name="accept_privacy_policy">""Aktifkan Lokasi Latar Belakang: IZINKAN SEPANJANG WAKTU""</string>
+    <string name="accept_privacy_policy">"Aktifkan Lokasi Latar Belakang:&#10;IZINKAN SEPANJANG WAKTU"</string>
     <string name="decline_privacy_policy">"Nanti: fitur pelacakan tidak akan berfungsi"</string>
     <string name="background_location_permission">"Izin Lokasi Latar Belakang"</string>
     <string name="enable_background_activity_title">"Aktifkan Aktivitas Latar Belakang"</string>
@@ -441,7 +441,6 @@
     <string name="autoincrement_hint">""Saat aktif (bawaan): setiap rumah tangga secara otomatis diberikan nomor urut (1, 2, 3...). Nonaktifkan fitur ini jika survei Anda menggunakan pengidentifikasi rumah tangga yang telah ditetapkan sebelumnya.""</string>
     <string name="proximity_hint">"Saat diaktifkan: enumerator akan menerima peringatan jika mereka mencoba menambahkan rumah tangga yang berada dalam jarak [X] meter dari data yang sudah ada. Fitur ini membantu mencegah entri data ganda."</string>
     <string name="encryption_hint">""Buatlah kata sandi yang akan dibagikan kepada semua supervisor, enumerator, dan pengumpul data dalam proyek ini. Kata sandi ini diperlukan untuk mengimpor konfigurasi pada perangkat apa pun. Gunakan hanya huruf dan angka—tanpa spasi atau karakter khusus.""</string>
-    <string name="sampling_hint">"Deskripsi metode: /nSampel Acak Sederhana: Setiap rumah tangga memiliki peluang yang sama untuk terpilih. /nSampel Klaster (Jumlah rumah tangga): Pilih sejumlah rumah tangga yang tetap dari setiap klaster. /nSampel Klaster (% rumah tangga): Pilih persentase tertentu dari rumah tangga di setiap klaster."</string>
     <string name="pii_hint">""Tandai kolom ini sebagai PII (Informasi Identitas Pribadi) jika kolom tersebut dapat mengidentifikasi individu tertentu. Contoh: nama lengkap, nomor telepon, nomor identitas nasional.""</string>
     <string name="field_block_hint">""Gunakan blok kolom untuk mengulang serangkaian pertanyaan berdasarkan angka yang dimasukkan di kolom ini. Contoh: jika kolom ini mencatat jumlah anak, pertanyaan-pertanyaan di dalam blok tersebut akan diajukan satu kali untuk setiap anak. Tandai pertanyaan terakhir dalam kelompok tersebut dengan ""End Field Block"" (Akhiri Blok Kolom).""</string>
     <string name="rule_hint">""Berikan nama yang singkat dan deskriptif pada aturan ini sebagai referensi Anda (contoh: ""Memiliki anak usia 12-23 bulan"", ""Merupakan rumah tangga""—bisa disingkat menjadi ""child_household""). Nama ini akan muncul pada langkah pengaturan filter, di mana berbagai aturan digabungkan.""</string>
@@ -472,6 +471,7 @@
     <string name="enumerator_hint">""</string>
     <string name="data_collector_hint">""</string>
     <string name="role_hint">""</string>
+    <string name="sampling_hint">""</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>

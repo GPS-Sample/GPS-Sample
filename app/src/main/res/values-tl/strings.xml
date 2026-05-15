@@ -441,7 +441,6 @@
     <string name="autoincrement_hint">""Kapag naka-on (default): ang bawat sambahayan ay awtomatikong binibigyan ng sunod-sunod na numero (1, 2, 3...). Patayin kung ang iyong survey ay gumagamit ng mga paunang nakatalagang household identifier.""</string>
     <string name="proximity_hint">"Kapag naka-on: makakatanggap ang mga enumerator ng alerto kung susubukan nilang magdagdag ng isang sambahayan sa loob ng [X] metro mula sa isang umiiral na tala. Nakakatulong na maiwasan ang mga dobleng entry."</string>
     <string name="encryption_hint">""Gumawa ng password na ibabahagi sa lahat ng superbisor, enumerator, at mga tagakolekta ng datos sa proyektong ito. Kinakailangan ang password na ito upang ma-import ang configuration sa anumang device. Gumamit lamang ng mga letra at numero - walang mga espasyo o mga espesyal na karakter.""</string>
-    <string name="sampling_hint">"Mga paglalarawan ng pamamaraan: /nSimple Random Sample: Ang bawat sambahayan ay may pantay na pagkakataong mapili. /nCluster Sample (# ng mga sambahayan): Pumili ng isang takdang bilang ng mga sambahayan mula sa bawat kumpol. /nCluster Sample (% ng mga sambahayan): Pumili ng porsyento ng mga sambahayan mula sa bawat kumpol."</string>
     <string name="pii_hint">""Markahan ang field na ito bilang PII kung makikilala nito ang isang partikular na indibidwal. Mga Halimbawa: buong pangalan, numero ng telepono, numero ng pambansang ID.""</string>
     <string name="field_block_hint">""Gumamit ng field block upang ulitin ang isang hanay ng mga tanong batay sa numerong ito. Halimbawa: kung nakukuha ng field na ito ang bilang ng mga bata, ang mga tanong sa block ay itatanong nang isang beses bawat bata. Markahan ang huling tanong sa grupo gamit ang End Field Block""</string>
     <string name="rule_hint">""Bigyan ang panuntunang ito ng maikling naglalarawang pangalan para sa iyong sanggunian (hal., May anak na 12-23 buwan, Ang isang sambahayan ay maaaring child_household). Ang pangalang ito ay lilitaw sa hakbang ng pag-setup ng filter kung saan pinagsama ang mga panuntunan.""</string>
@@ -472,6 +471,7 @@
     <string name="enumerator_hint">""</string>
     <string name="data_collector_hint">""</string>
     <string name="role_hint">""</string>
+    <string name="sampling_hint">""</string>
     <string-array name="forgot_pin_questions">
         <item>"Panggitnang pangalan ng ama"</item>
         <item>"Pangalan ng dalaga ng ina"</item>

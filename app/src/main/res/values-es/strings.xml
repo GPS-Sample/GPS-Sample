@@ -441,7 +441,6 @@
     <string name="autoincrement_hint">""Cuando está activada (por defecto): a cada hogar se le asigna automáticamente un número secuencial (1, 2, 3...). Desactívela si su encuesta utiliza identificadores de hogares preasignados.""</string>
     <string name="proximity_hint">"Cuando está activada: los encuestadores reciben una alerta si intentan añadir un hogar que se encuentre a menos de [X] metros de un registro ya existente. Esto ayuda a evitar entradas duplicadas."</string>
     <string name="encryption_hint">""Crea una contraseña que se compartirá con todos los supervisores, encuestadores y recopiladores de datos de este proyecto. Esta contraseña es necesaria para importar la configuración en cualquier dispositivo. Utiliza solo letras y números; no incluyas espacios ni caracteres especiales.""</string>
-    <string name="sampling_hint">"" Descripciones de los métodos: /nMuestra aleatoria simple: cada hogar tiene las mismas posibilidades de ser seleccionado. /nMuestra por conglomerados (n.º de hogares): seleccione un número fijo de hogares de cada conglomerado. /nMuestra por conglomerados (% de hogares): seleccione un porcentaje de hogares de cada conglomerado.""</string>
     <string name="pii_hint">""Marque este campo como PII si pudiera identificar a una persona concreta. Ejemplos: nombre completo, número de teléfono, número de identificación nacional.""</string>
     <string name="field_block_hint">""Utilice un bloque de campos para repetir un conjunto de preguntas en función de este número. Ejemplo: si este campo recoge el número de hijos, las preguntas del bloque se formularán una vez por cada hijo. Marque la última pregunta del grupo con «Finalizar bloque de campos».""</string>
     <string name="rule_hint">""Asigne a esta regla un nombre descriptivo breve para su referencia (por ejemplo, «Tiene hijos de 12 a 23 meses», «Es un hogar» podría ser «hijo_hogar»). Este nombre aparece en el paso de configuración del filtro, donde se combinan las reglas""</string>
@@ -472,6 +471,7 @@
     <string name="enumerator_hint">""</string>
     <string name="data_collector_hint">""</string>
     <string name="role_hint">""</string>
+    <string name="sampling_hint">""</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>
