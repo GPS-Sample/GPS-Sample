@@ -34,7 +34,6 @@ class PrimarySampleFragment : Fragment()
     private var _binding: FragmentPrimarySampleBinding? = null
     private val binding get() = _binding!!
     private lateinit var primarySampleRecyclerAdapter: PrimarySampleRecyclerAdapter
-
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -117,6 +116,7 @@ class PrimarySampleFragment : Fragment()
         }
 
         binding.saveButton.setOnClickListener {
+            study.fields.sortBy{ it.index }
             findNavController().popBackStack()
         }
     }
