@@ -92,6 +92,9 @@ class PrimarySampleFragment : Fragment()
                     return false
 
                 primarySampleRecyclerAdapter.moveField(from, to)
+
+                study.fields.sortBy { it.index }
+
                 return true
             }
 
@@ -116,7 +119,6 @@ class PrimarySampleFragment : Fragment()
         }
 
         binding.saveButton.setOnClickListener {
-            study.fields.sortBy{ it.index }
             findNavController().popBackStack()
         }
     }
