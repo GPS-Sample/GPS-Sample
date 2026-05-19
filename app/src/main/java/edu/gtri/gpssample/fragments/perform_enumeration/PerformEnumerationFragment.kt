@@ -1493,7 +1493,7 @@ class PerformEnumerationFragment : Fragment(),
                         val itemLatLng = LatLng( loc.latitude, loc.longitude )
                         val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
                         var (distanceValue, distanceUnits) = formatDistance( config, distance )
-                        loc.distance = distance
+                        loc.distance = distanceValue
                         loc.distanceUnits = distanceUnits
                     }
 

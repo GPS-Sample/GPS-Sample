@@ -1342,7 +1342,7 @@ class PerformCollectionFragment : Fragment(),
                         val itemLatLng = LatLng( location.latitude, location.longitude )
                         val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
                         var (distanceValue, distanceUnits) = formatDistance( config, distance )
-                        location.distance = distance
+                        location.distance = distanceValue
                         location.distanceUnits = distanceUnits
                     }
                 }

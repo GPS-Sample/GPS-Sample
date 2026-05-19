@@ -32,7 +32,7 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var 
     override fun getItemCount() = enumerationItems.size + locations.size
 
     var items = ArrayList<Any>()
-    private var mContext: Context? = null
+    private lateinit var mContext: Context
     private var allHolders = ArrayList<ViewHolder>()
     lateinit var didSelectItem: ((item: Any) -> Unit)
 
@@ -105,7 +105,7 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var 
 
             if (item.distance > 0)
             {
-                holder.thirdTextView.setText("Distance: ${String.format( "%.1f", item.distance )} ${item.distanceUnits}")
+                holder.thirdTextView.setText("${mContext.resources.getString(R.string.distance)}: ${String.format( "%.1f", item.distance )} ${item.distanceUnits}")
             }
         }
         else if (item is EnumerationItem)
@@ -121,7 +121,7 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var 
 
             if (item.distance > 0)
             {
-                holder.thirdTextView.setText("Distance: ${String.format( "%.1f", item.distance )} ${item.distanceUnits}")
+                holder.thirdTextView.setText("${mContext.resources.getString(R.string.distance)}: ${String.format( "%.1f", item.distance )} ${item.distanceUnits}")
             }
 
             if (item.collectionState == CollectionState.Complete)

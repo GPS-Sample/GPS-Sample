@@ -28,7 +28,7 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
 {
     override fun getItemCount() = locations.size
 
-    private var mContext: Context? = null
+    private lateinit var mContext: Context
     private var allHolders = ArrayList<ViewHolder>()
     lateinit var didSelectLocation: ((location: Location) -> Unit)
 
@@ -76,7 +76,7 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
 
         if (location.distance > 0)
         {
-            holder.thirdTextView.setText("Distance: ${String.format( "%.1f", location.distance )} ${location.distanceUnits}")
+            holder.thirdTextView.setText("${mContext.resources.getString(R.string.distance)}: ${String.format( "%.1f", location.distance )} ${location.distanceUnits}")
         }
 
         if (location.isLandmark)
