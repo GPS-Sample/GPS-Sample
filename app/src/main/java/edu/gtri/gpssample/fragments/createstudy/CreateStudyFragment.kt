@@ -78,6 +78,12 @@ class CreateStudyFragment : Fragment()
             binding.samplingMethodSpinner.adapter = adapter
         }
 
+        ArrayAdapter.createFromResource(activity!!, R.array.collection_apps, android.R.layout.simple_spinner_item)
+            .also { adapter ->
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.collectionAppSpinner.adapter = adapter
+            }
+
         sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
             this.study = study
         } ?: run {

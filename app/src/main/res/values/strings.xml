@@ -474,6 +474,12 @@
     <string name="sampling_hint">"Method descriptions:\n\nSimple Random Sample:\nEach household has an equal chance of being selected.\n\nCluster Sample (# of households):\nSelect a fixed number of households from each cluster.\n\nCluster Sample (% of households):\nSelect a percentage of households from each cluster."</string>
     <string name="enter_forgot_pin_question">"Enter the forgot PIN question"</string>
     <string name="distance">Distance</string>
+    <string name="collection_app">Collection App</string>
+
+    <string-array name="collection_apps">
+        <item>"ODK Collect"</item>
+        <item>"Kobo Collect"</item>
+    </string-array>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

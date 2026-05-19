@@ -168,6 +168,47 @@
             </FrameLayout>
         </LinearLayout>
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/collection_app"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="17sp"
+                android:textStyle="normal" />
+
+            <ImageView
+                android:id="@+id/collection_app_tip"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="15dp"
+                android:layout_margin="0dp"
+                app:srcCompat="@drawable/info2" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/spinner_frame">
+
+            <Spinner
+                android:id="@+id/collection_app_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textAlignment="viewStart"
+                android:contentDescription="@string/collection_app"/>
+        </FrameLayout>
+
         <Button
             android:id="@+id/primary_sample_button"
             android:layout_width="match_parent"
