@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.EnumerationTeam
+import edu.gtri.gpssample.extensions.toLocalizedDateTimeString
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -55,7 +56,7 @@ class ManageEnumerationTeamsAdapter(var enumerationTeams: List<EnumerationTeam>?
 
         holder.nameTextView.setText( team.name )
         holder.imageView.visibility = View.VISIBLE
-        holder.dateTextView.setText( Date(team.creationDate).toString())
+        holder.dateTextView.setText( Date(team.creationDate).toLocalizedDateTimeString())
 
         holder.imageView.setOnClickListener {
             shouldDeleteTeam(team)

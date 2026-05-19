@@ -7,6 +7,15 @@
 
 package edu.gtri.gpssample.extensions
 
+import java.text.DateFormat
+import java.util.Date
+
 fun Int.toBoolean() = this == 1
 
 fun Boolean.toInt() = if (this) 1 else 0
+
+
+fun Date.toLocalizedDateTimeString() : String
+{
+    return DateFormat.getDateTimeInstance(DateFormat.MEDIUM,DateFormat.SHORT ).format(this )
+}

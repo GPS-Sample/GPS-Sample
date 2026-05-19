@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.extensions.toLocalizedDateTimeString
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -32,7 +33,7 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
     {
         this.mContext = parent.context
 
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
 
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)
@@ -53,7 +54,7 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
         val config = configurations!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( config.name )
-        holder.dateTextView.setText( Date(config.creationDate).toString())
+        holder.dateTextView.setText( Date(config.creationDate).toLocalizedDateTimeString())
         holder.itemView.setOnClickListener {
             didSelectConfig(config)
         }
