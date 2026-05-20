@@ -28,12 +28,13 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
     lateinit var didSelectConfig: ((config: Config) -> Unit)
+    lateinit var shouldCloneConfig: ((config: Config) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         this.mContext = parent.context
 
-        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_configurations, parent, false))
 
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)
@@ -58,11 +59,16 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
         holder.itemView.setOnClickListener {
             didSelectConfig(config)
         }
+
+        holder.cloneImageView.setOnClickListener {
+            shouldCloneConfig( config )
+        }
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
         val dateTextView: TextView = itemView.findViewById(R.id.date_text_view);
+        val cloneImageView: ImageView = itemView.findViewById(R.id.clone_image_view);
     }
 }

@@ -192,7 +192,7 @@ class ConfigDAO(private var dao: DAO)
         val configs = ArrayList<Config>()
 
         MainApplication.instance.user?.let { user ->
-            val query = "SELECT * FROM ${DAO.TABLE_CONFIG}"
+            val query = "SELECT * FROM ${DAO.TABLE_CONFIG} ORDER BY ${DAO.COLUMN_CREATION_DATE}"
             val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext()) {

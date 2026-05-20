@@ -353,12 +353,15 @@ class CreateEnumerationTeamFragment : Fragment(),
 
                                 for (location in enumArea.locations)
                                 {
-                                    val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
-                                    if (finalSelectedPolygon.contains(geometry3))
+                                    if (!location.isLandmark)
                                     {
-                                        if (!locationBelongsToTeam( location ))
+                                        val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
+                                        if (finalSelectedPolygon.contains(geometry3))
                                         {
-                                            locationUuids.add( location.uuid )
+                                            if (!locationBelongsToTeam( location ))
+                                            {
+                                                locationUuids.add( location.uuid )
+                                            }
                                         }
                                     }
                                 }

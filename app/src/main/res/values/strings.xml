@@ -475,6 +475,8 @@
     <string name="enter_forgot_pin_question">"Enter the forgot PIN question"</string>
     <string name="distance">Distance</string>
     <string name="collection_app">Collection App</string>
+    <string name="clone_configuration">"Clone Configuration"</string>
+    <string name="confirm_clone_configuration">"Are you sure you want to Clone this Configuration?"</string>
 
     <string-array name="collection_apps">
         <item>"ODK Collect"</item>

@@ -41,6 +41,8 @@ import edu.gtri.gpssample.viewmodels.models.NetworkClientModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
+import java.util.Date
+import java.util.UUID
 import kotlin.collections.ArrayList
 
 class ManageConfigurationsFragment : Fragment(),
@@ -143,6 +145,7 @@ class ManageConfigurationsFragment : Fragment(),
 
         manageConfigurationsAdapter = ManageConfigurationsAdapter(configurations)
         manageConfigurationsAdapter.didSelectConfig = this::didSelectConfig
+        manageConfigurationsAdapter.shouldCloneConfig = this::shouldCloneConfig
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = manageConfigurationsAdapter
@@ -246,9 +249,153 @@ class ManageConfigurationsFragment : Fragment(),
         return super.onOptionsItemSelected(item)
     }
 
+    private fun shouldCloneConfig( config: Config )
+    {
+        ConfirmationDialog( activity, resources.getString(R.string.clone_configuration), resources.getString(R.string.confirm_clone_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+            when( buttonPressed )
+            {
+                ConfirmationDialog.ButtonPress.Left -> {
+                }
+                ConfirmationDialog.ButtonPress.Right -> {
+                    cloneConfig( config )
+                }
+                ConfirmationDialog.ButtonPress.None -> {
+                }
+            }
+        }
+    }
+
+    private fun cloneConfig( config: Config )
+    {
+        val newConfig = config.copy()
+
+        // update config base
+        newConfig.uuid = UUID.randomUUID().toString()
+        newConfig.creationDate = Date().time
+        newConfig.name += "-copy"
+        newConfig.selectedStudyUuid = ""
+        newConfig.validUsers = ""
+
+        // update enumAreas
+        for (enumArea in newConfig.enumAreas)
+        {
+            enumArea.uuid = UUID.randomUUID().toString()
+            enumArea.creationDate = Date().time
+            enumArea.configUuid = newConfig.uuid
+            enumArea.enumerationTeams.clear()
+            enumArea.collectionTeams.clear()
+            enumArea.selectedEnumerationTeamUuid = ""
+            enumArea.selectedCollectionTeamUuid = ""
+
+            var creationDate = Date().time
+
+            // update vertices
+            for (vertice in enumArea.vertices)
+            {
+                vertice.uuid = UUID.randomUUID().toString()
+                vertice.creationDate = creationDate
+                creationDate += 1
+            }
+
+            // update locations
+            for (location in enumArea.locations)
+            {
+                location.uuid = UUID.randomUUID().toString()
+                location.creationDate = Date().time
+                location.enumerationItems.clear()
+
+                // update images
+                if (location.imageUuid.isNotEmpty())
+                {
+                    // create a copy of the image
+                    ImageDAO.instance().getImage( location.imageUuid )?.let { image ->
+                        image.uuid = UUID.randomUUID().toString()
+                        image.creationDate = Date().time
+                        image.locationUuid = location.uuid
+                        location.imageUuid = image.uuid
+                        // save the copy of the image to the image database
+                        ImageDAO.instance().createImage( image )
+                    }
+                }
+            }
+        }
+
+        // update studies
+        if (newConfig.studies.isNotEmpty())
+        {
+            var numStudies = newConfig.studies.count()
+
+            // HACK! remove all studies except the first
+            while (numStudies > 1)
+            {
+                newConfig.studies.remove(newConfig.studies.last())
+                numStudies -= 1
+            }
+
+            newConfig.studies[0].uuid = UUID.randomUUID().toString()
+            newConfig.studies[0].creationDate = Date().time
+            newConfig.studies[0].primaryFilters.clear()
+            newConfig.studies[0].subsetFilters.clear()
+
+            // update fields
+            for (field in newConfig.studies[0].fields)
+            {
+                val oldFieldUuid = field.uuid
+
+                field.uuid = UUID.randomUUID().toString()
+                field.creationDate = Date().time
+
+                // update primary rules
+                for (rule in newConfig.studies[0].primaryRules)
+                {
+                    if (rule.fieldUuid == oldFieldUuid)
+                    {
+                        rule.fieldUuid = field.uuid
+                        rule.uuid = UUID.randomUUID().toString()
+                        break
+                    }
+                }
+
+                // update subset rules
+                for (rule in newConfig.studies[0].subsetRules)
+                {
+                    if (rule.fieldUuid == oldFieldUuid)
+                    {
+                        rule.fieldUuid = field.uuid
+                        rule.uuid = UUID.randomUUID().toString()
+                        break
+                    }
+                }
+            }
+
+            // update stratas
+            for (strata in newConfig.studies[0].stratas)
+            {
+                val oldStrataUuid = strata.uuid
+
+                strata.uuid = UUID.randomUUID().toString()
+                strata.creationDate = Date().time
+                strata.studyUuid = newConfig.studies[0].uuid
+
+                for (enumArea in newConfig.enumAreas)
+                {
+                    if (enumArea.strataUuid == oldStrataUuid)
+                    {
+                        enumArea.strataUuid = strata.uuid
+                        break
+                    }
+                }
+            }
+        }
+
+        // save the new config to the database
+        DAO.configDAO.createOrUpdateConfig( newConfig )
+        configurations.add( newConfig )
+        manageConfigurationsAdapter.updateConfigurations( configurations )
+    }
+
     private fun didSelectConfig( config: Config )
     {
-        val bundle = Bundle()
         sharedViewModel.setCurrentConfig(config)
 
         when (user.role)
@@ -266,7 +413,7 @@ class ManageConfigurationsFragment : Fragment(),
             }
             Role.Admin.toString(), Role.Supervisor.toString() ->
             {
-                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment, bundle)
+                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment )
             }
         }
     }
