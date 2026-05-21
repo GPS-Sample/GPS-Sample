@@ -121,6 +121,12 @@ class ManageConfigurationsFragment : Fragment(),
             this.user = user
         }
 
+        if (!this::user.isInitialized)
+        {
+            findNavController().popBackStack()
+            return
+        }
+
         if (user.role != Role.Admin.value)
         {
             binding.addButton.visibility = View.GONE
