@@ -213,6 +213,29 @@ class ConfigDAO(private var dao: DAO)
         return configs
     }
 
+    fun getMinimalConfigs(): ArrayList<Config>
+    {
+        val configs = ArrayList<Config>()
+
+        MainApplication.instance.user?.let { user ->
+            val query = "SELECT * FROM ${DAO.TABLE_CONFIG} ORDER BY ${DAO.COLUMN_CREATION_DATE}"
+            val cursor = dao.writableDatabase.rawQuery(query, null)
+
+            while (cursor.moveToNext()) {
+                val config = buildConfig(cursor)
+
+                if (config.validUsers.contains(user.uuid))
+                {
+                    configs.add( config)
+                }
+            }
+
+            cursor.close()
+        }
+
+        return configs
+    }
+
     private fun createOrUpdateStudies(config : Config)
     {
         // remove all studies from connector table

@@ -194,6 +194,11 @@ class ConfigurationFragment : Fragment(),
             ConfirmationDialog( activity, resources.getString(R.string.export_configuration), resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
                 sharedViewModel.currentConfiguration?.value?.let{ config ->
                     config.selectedEnumAreaUuid = ""
+
+                    sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                        config.selectedStudyUuid = study.uuid
+                    }
+
                     for (enumArea in config.enumAreas)
                     {
                         enumArea.selectedEnumerationTeamUuid = ""

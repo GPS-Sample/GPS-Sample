@@ -63,7 +63,6 @@ class WalkEnumerationAreaFragment : Fragment(),
     private lateinit var fusedLocationClient : FusedLocationProviderClient
 
     private var inputDialog: InputDialog? = null
-    private var selectedEnumArea: EnumArea? = null
 
     private var isRecording = false
     private val binding get() = _binding!!
@@ -479,19 +478,18 @@ class WalkEnumerationAreaFragment : Fragment(),
             val latLngBounds = GeoUtils.findGeobounds(vertices)
             val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
             val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-
             val mapTileRegion = MapTileRegion( northEast, southWest )
 
-            selectedEnumArea = EnumArea( config.uuid,"", name2, "", 0, vertices, mapTileRegion )
-            config.enumAreas.add( selectedEnumArea!! )
+            val enumArea = EnumArea( config.uuid,"", name2, "", 0, vertices, mapTileRegion )
+            val enumerationTeam = EnumerationTeam( enumArea.uuid, "Auto Gen", enumArea.vertices, ArrayList<String>())
 
-            DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
-                config.enumAreas[0].let { enumArea ->
-                    DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "Auto Gen", enumArea.vertices, ArrayList<String>()))?.let { enumerationTeam ->
-                        enumArea.enumerationTeams.add( enumerationTeam )
-                    }
-                }
-            }
+            config.enumAreas.add( enumArea )
+            config.selectedEnumAreaUuid = enumArea.uuid
+
+            enumArea.enumerationTeams.add( enumerationTeam )
+            enumArea.selectedEnumerationTeamUuid = enumerationTeam.uuid
+
+            DAO.configDAO.createOrUpdateConfig( config )
 
             binding.saveButton.isEnabled = false
             binding.walkButton.isEnabled = false
@@ -500,9 +498,7 @@ class WalkEnumerationAreaFragment : Fragment(),
 
             if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
             {
-                selectedEnumArea?.let { selectedEnumArea ->
-                    presentStrataSelectionDialog( selectedEnumArea )
-                }
+                presentStrataSelectionDialog( enumArea )
             }
 
             refreshMap()
