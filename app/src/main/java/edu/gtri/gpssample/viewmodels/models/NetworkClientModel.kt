@@ -185,12 +185,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
                     }
                     else
                     {
-                        DAO.instance().writableDatabase.beginTransaction()
-
                         DAO.configDAO.createOrUpdateConfig(config)
-
-                        DAO.instance().writableDatabase.setTransactionSuccessful()
-                        DAO.instance().writableDatabase.endTransaction()
 
                         fetchImages( config )
                         fetchMbTiles( config )

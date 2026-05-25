@@ -328,16 +328,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 {
                     delegate?.didStartImport()
 
-                    DAO.instance().writableDatabase.beginTransaction()
-
                     DAO.configDAO.createOrUpdateConfig( config )
 
-                    DAO.instance().writableDatabase.setTransactionSuccessful()
-                    DAO.instance().writableDatabase.endTransaction()
-
-                    DAO.configDAO.getConfig( config.uuid )?.let {
-                        sharedViewModel?.setCurrentConfig(it)
-                    }
+                    sharedViewModel?.setCurrentConfig( config )
 
                     fetchImages( config, socket )
 

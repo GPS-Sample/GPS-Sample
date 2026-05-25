@@ -613,12 +613,7 @@ class ManageConfigurationsFragment : Fragment(),
                         }
                         else
                         {
-                            DAO.instance().writableDatabase.beginTransaction()
-
                             DAO.configDAO.createOrUpdateConfig( config )
-
-                            DAO.instance().writableDatabase.setTransactionSuccessful()
-                            DAO.instance().writableDatabase.endTransaction()
 
                             sharedViewModel.setCurrentConfig( config )
 

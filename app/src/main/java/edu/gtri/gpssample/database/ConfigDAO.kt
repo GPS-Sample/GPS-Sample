@@ -24,8 +24,12 @@ import kotlin.math.min
 
 class ConfigDAO(private var dao: DAO)
 {
-    fun createOrUpdateConfig( config: Config ) : Config?
+    fun createOrUpdateConfig( config: Config ) : Boolean
     {
+        dao.writableDatabase.beginTransaction()
+
+        var success = true
+
         MainApplication.instance.user?.let { user ->
             if (!config.validUsers.contains(user.uuid))
             {
@@ -51,15 +55,21 @@ class ConfigDAO(private var dao: DAO)
             putConfig( config, values )
             if (dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values) < 0)
             {
-                return null
+                success = false
             }
             Log.d( "xxx", "Created Config with ID = ${config.uuid}")
         }
 
-        createOrUpdateEnumAreas(config)
-        createOrUpdateStudies(config)
+        if (success)
+        {
+            createOrUpdateEnumAreas(config)
+            createOrUpdateStudies(config)
+        }
 
-        return config
+        dao.writableDatabase.setTransactionSuccessful()
+        dao.writableDatabase.endTransaction()
+
+        return success
     }
 
     fun mergeValidUsers( newConfig: Config, oldConfig: Config )
