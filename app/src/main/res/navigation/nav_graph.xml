@@ -65,6 +65,10 @@
         tools:layout="@layout/fragment_manage_configurations">
 
         <action
+            android:id="@+id/action_navigate_to_MainFragment"
+            app:destination="@id/MainFragment"/>
+
+        <action
             android:id="@+id/action_navigate_to_CreateConfigurationFragment"
             app:destination="@id/CreateConfigurationFragment"/>
 
@@ -125,6 +129,9 @@
         android:name="edu.gtri.gpssample.fragments.configuration.ConfigurationFragment"
         tools:layout="@layout/fragment_configuration">
 
+        <action
+            android:id="@+id/action_navigate_to_MainFragment"
+            app:destination="@id/MainFragment"/>
         <action
             android:id="@+id/action_navigate_to_CreateConfigurationFragment"
             app:destination="@id/CreateConfigurationFragment"/>
@@ -443,6 +450,11 @@
         android:id="@+id/PerformEnumerationFragment"
         android:name="edu.gtri.gpssample.fragments.perform_enumeration.PerformEnumerationFragment"
         tools:layout="@layout/fragment_perform_enumeration">
+
+        <action
+            android:id="@+id/action_navigate_to_MainFragment"
+            app:destination="@id/MainFragment"/>
+
         <action
             android:id="@+id/action_navigate_to_HotspotFragment"
             app:destination="@id/HotspotFragment" />
@@ -494,6 +506,10 @@
         android:id="@+id/PerformCollectionFragment"
         android:name="edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment"
         tools:layout="@layout/fragment_perform_collection">
+
+        <action
+            android:id="@+id/action_navigate_to_MainFragment"
+            app:destination="@id/MainFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"

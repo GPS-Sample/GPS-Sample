@@ -30,6 +30,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -170,6 +171,16 @@ class PerformCollectionFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        if ((requireActivity().application as MainApplication).user == null)
+        {
+            findNavController().navigate(R.id.action_navigate_to_MainFragment, null,
+                NavOptions.Builder()
+                    .setLaunchSingleTop(true)
+                    .setPopUpTo(R.id.action_navigate_to_MainFragment, false)
+                    .build())
+            return
+        }
 
         lateinit var config: Config
 
@@ -1448,7 +1459,10 @@ class PerformCollectionFragment : Fragment(),
     {
         super.onDestroyView()
 
-        fusedLocationClient.removeLocationUpdates( locationCallback )
+        if (this::fusedLocationClient.isInitialized)
+        {
+            fusedLocationClient.removeLocationUpdates( locationCallback )
+        }
 
         _binding = null
     }

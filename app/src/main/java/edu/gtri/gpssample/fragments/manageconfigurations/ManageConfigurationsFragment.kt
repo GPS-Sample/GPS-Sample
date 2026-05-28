@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.*
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -101,6 +102,16 @@ class ManageConfigurationsFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
+        if ((requireActivity().application as MainApplication).user == null)
+        {
+            findNavController().navigate(R.id.action_navigate_to_MainFragment, null,
+                NavOptions.Builder()
+                    .setLaunchSingleTop(true)
+                    .setPopUpTo(R.id.action_navigate_to_MainFragment, false)
+                    .build())
+            return
+        }
+
         val distanceFormats = resources.getTextArray( R.array.distance_formats )
         sharedViewModel.distanceFormats[0] = distanceFormats[0].toString()
         sharedViewModel.distanceFormats[1] = distanceFormats[1].toString()
@@ -119,12 +130,6 @@ class ManageConfigurationsFragment : Fragment(),
 
         (activity!!.application as MainApplication).user?.let { user ->
             this.user = user
-        }
-
-        if (!this::user.isInitialized)
-        {
-            findNavController().popBackStack()
-            return
         }
 
         if (user.role != Role.Admin.value)
@@ -617,11 +622,12 @@ class ManageConfigurationsFragment : Fragment(),
 
                             sharedViewModel.setCurrentConfig( config )
 
-                            if (!configurations.contains( config ))
-                            {
-                                configurations.add( config )
-                                manageConfigurationsAdapter.updateConfigurations( configurations )
+                            configurations.find { it.uuid == config.uuid } ?.let {
+                                configurations.remove(it )
                             }
+
+                            configurations.add( config )
+                            manageConfigurationsAdapter.updateConfigurations( configurations )
 
                             binding.overlayView.visibility = View.GONE
 
