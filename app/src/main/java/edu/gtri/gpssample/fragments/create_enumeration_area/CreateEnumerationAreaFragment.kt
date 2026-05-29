@@ -241,6 +241,28 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
         }
 
+        binding.deleteButton.setOnClickListener {
+            ConfirmationDialog( activity,
+                resources.getString(R.string.delete_all_enumeration_areas_message), "",
+                resources.getString(R.string.no),
+                resources.getString(R.string.yes),
+                null, false ) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        unsavedEnumAreas.clear()
+                        config.enumAreas.clear()
+                        PreferencesManager.removeAllHashes(config.uuid )
+                        refreshMap()
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
+                }
+            }
+        }
+
         binding.importButton.setOnClickListener {
             if (currentTapType != TapType.None)
             {

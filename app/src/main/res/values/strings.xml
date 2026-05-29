@@ -475,13 +475,16 @@
     <string name="enter_forgot_pin_question">"Enter the forgot PIN question"</string>
     <string name="distance">Distance</string>
     <string name="collection_app">Collection App</string>
-    <string name="clone_configuration">"Clone Configuration"</string>
-    <string name="confirm_clone_configuration">"Are you sure you want to Clone this Configuration?"</string>
-    <string name="collector_import_error">"This configuration does not have an collection team associated with it."</string>
-    <string name="missing_enumeration_area">"This configuration does not have an Enumeration Area associated with it."</string>
-    <string name="missing_study">"This configuration does not have a Study associated with it."</string>
-    <string name="missing_enumeration_team">"This configuration does not have an Enumeration Team associated with it."</string>
-    <string name="missing_collection_team">"This configuration does not have a Collection Team associated with it."</string>
+    <string name="clone_configuration">Clone Configuration</string>
+    <string name="confirm_clone_configuration">Are you sure you want to Clone this Configuration?</string>
+    <string name="collector_import_error">This configuration does not have an collection team associated with it.</string>
+    <string name="missing_enumeration_area">This configuration does not have an Enumeration Area associated with it.</string>
+    <string name="missing_study">This configuration does not have a Study associated with it.</string>
+    <string name="missing_enumeration_team">This configuration does not have an Enumeration Team associated with it.</string>
+    <string name="missing_collection_team">This configuration does not have a Collection Team associated with it.</string>
+    <string name="edit_enumeration_area">Edit Enumeration Area</string>
+    <string name="delete_all_enumeration_areas">Delete all Enumeration Areas</string>
+    <string name="delete_all_enumeration_areas_message">"Are you sure you want to permanently delete all Enumeration Areas?"</string>
 
     <string-array name="collection_apps">
         <item>"ODK Collect"</item>
