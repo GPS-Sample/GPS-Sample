@@ -178,8 +178,30 @@ class PrimarySampleRecyclerAdapter( private val context: Context ) : RecyclerVie
 
         java.util.Collections.swap(fields, fromIndex, toIndex)
 
+        var index = 1
+        var groupUuid = ""
+        var primaryIndex = 0
+
         fields.forEachIndexed { i, field ->
-            field.index = i + 1
+            if (field.parentUUID != null)
+            {
+                if (groupUuid.isEmpty())
+                {
+                    index = 1
+                    groupUuid = field.parentUUID!!
+                }
+                else
+                {
+                    index = index + 1
+                }
+                field.index = index
+            }
+            else
+            {
+                groupUuid = ""
+                primaryIndex += 1
+                field.index = primaryIndex
+            }
         }
 
         rebuildRows()

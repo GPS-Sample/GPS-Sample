@@ -550,7 +550,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
             }
             else
             {
-                findNavController().popBackStack( R.id.CreateStudyFragment, false )
+                findNavController().popBackStack( R.id.PrimarySampleFragment, false )
             }
         }
     }

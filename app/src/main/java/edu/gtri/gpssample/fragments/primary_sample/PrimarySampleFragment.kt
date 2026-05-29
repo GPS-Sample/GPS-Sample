@@ -119,6 +119,15 @@ class PrimarySampleFragment : Fragment()
         }
 
         binding.saveButton.setOnClickListener {
+            for (field in study.fields)
+            {
+                field.fields?.let { fields ->
+                    if (fields.isNotEmpty())
+                    {
+                        fields.sortBy { it.index }
+                    }
+                }
+            }
             findNavController().popBackStack()
         }
     }
