@@ -213,6 +213,10 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                     }
                     ConfirmationDialog.ButtonPress.Right -> {
                         unsavedEnumAreas.clear()
+                        for (enumArea in config.enumAreas)
+                        {
+                            DAO.enumAreaDAO.delete( enumArea )
+                        }
                         config.enumAreas.clear()
                         PreferencesManager.removeAllHashes(config.uuid )
                         refreshMap()

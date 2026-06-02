@@ -9,14 +9,19 @@ package edu.gtri.gpssample.fragments.manageconfigurations
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidmads.library.qrgenearator.QRGContents
+import androidmads.library.qrgenearator.QRGEncoder
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -34,14 +39,17 @@ import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
+import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
+import edu.gtri.gpssample.managers.NearbySessionManager
+import edu.gtri.gpssample.managers.NearbySessionState
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import edu.gtri.gpssample.viewmodels.models.NetworkClientModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.json.JSONObject
 import java.util.Date
 import java.util.UUID
 import kotlin.collections.ArrayList
@@ -55,6 +63,8 @@ class ManageConfigurationsFragment : Fragment(),
     private var configurations = ArrayList<Config>()
     private var encryptionPassword = ""
 
+    private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
+    private lateinit var nearbySessionManager: NearbySessionManager
     private lateinit var user: User
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
     private lateinit var sharedViewModel: ConfigurationViewModel
@@ -418,21 +428,78 @@ class ManageConfigurationsFragment : Fragment(),
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == ResultCode.BarcodeScanned.value) {
-                val payload = it.data!!.getStringExtra(Keys.kPayload.value)
+                val sessionId = it.data!!.getStringExtra(Keys.kPayload.value )
 
-                val jsonObject = JSONObject(payload);
+                nearbySessionStatusDialog = NearbySessionStatusDialog( requireContext(), resources.getString( R.string.import_configuration )) {
+                    nearbySessionManager.clientClose()
+                }
 
-                Log.d("xxx", jsonObject.toString(2))
-
-                val ssid = jsonObject.getString(Keys.kSSID.value)
-                val pass = jsonObject.getString(Keys.kPass.value)
-                val serverIp = jsonObject.getString(Keys.kIpAddress.value)
-
-                Log.d("xxxx", "the ssid, pass, serverIP ${ssid}, ${pass}, ${serverIp}")
-
-                sharedNetworkViewModel.connectHotspot(ssid, pass, serverIp)
+                nearbySessionManager = NearbySessionManager(requireContext(), lifecycleScope, null )
+                handleNearbySessionStateChange( nearbySessionManager )
+                nearbySessionManager.clientConnect( sessionId!! )
             }
         }
+
+    fun handleNearbySessionStateChange( nearbySessionManager: NearbySessionManager )
+    {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(
+                Lifecycle.State.STARTED
+            ) {
+                nearbySessionManager.nearbySessionState.collect { state ->
+
+                    when (state) {
+                        is NearbySessionState.Advertising -> {
+                            val qrgEncoder = QRGEncoder(state.sessionId, null, QRGContents.Type.TEXT, 400 )
+                            qrgEncoder.colorBlack = Color.WHITE;
+                            qrgEncoder.colorWhite = Color.BLACK;
+                            nearbySessionStatusDialog?.showQrCode( qrgEncoder.bitmap )
+                        }
+
+                        NearbySessionState.Connecting -> {
+                            nearbySessionStatusDialog?.setStatus( "Connecting..." )
+                        }
+
+                        NearbySessionState.Connected -> {
+                            nearbySessionStatusDialog?.setStatus( "Connected." )
+
+                            val config = nearbySessionManager.requestConfig()
+
+                            DAO.configDAO.createOrUpdateConfig( config )
+
+                            sharedViewModel.setCurrentConfig( config )
+
+                            configurations.find { it.uuid == config.uuid } ?.let {
+                                configurations.remove(it )
+                            }
+
+                            configurations.add( config )
+                            manageConfigurationsAdapter.updateConfigurations( configurations )
+
+                            didReceiveConfiguration( Config.ErrorCode.None )
+
+                            nearbySessionStatusDialog?.dismiss()
+                            nearbySessionStatusDialog = null
+
+                            nearbySessionManager.clientClose()
+                        }
+
+                        NearbySessionState.Idle -> {
+//                            presentQrCodeDialog?.setStatus( "Idle." )
+                        }
+
+                        is NearbySessionState.Error -> {
+                            nearbySessionStatusDialog?.setStatus( state.message )
+                        }
+
+                        NearbySessionState.Closed -> {
+                            nearbySessionStatusDialog?.setStatus( "Closed." )
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     override fun configurationReceived(config: Config)
     {
@@ -573,10 +640,14 @@ class ManageConfigurationsFragment : Fragment(),
             when( buttonPressed )
             {
                 ConfirmationDialog.ButtonPress.Left -> {
-                    sharedNetworkViewModel.networkClientModel.encryptionPassword = encryptionPassword
-                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.Configuration)
+
                     val intent = Intent(context, CameraXLivePreviewActivity::class.java)
                     getResult.launch(intent)
+
+//                    sharedNetworkViewModel.networkClientModel.encryptionPassword = encryptionPassword
+//                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.Configuration)
+//                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+//                    getResult.launch(intent)
                 }
                 ConfirmationDialog.ButtonPress.Right -> {
                     Toast.makeText(activity!!.applicationContext, resources.getString(R.string.select_configuration_file), Toast.LENGTH_LONG).show()

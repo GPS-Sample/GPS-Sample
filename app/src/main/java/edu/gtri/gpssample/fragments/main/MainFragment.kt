@@ -493,7 +493,10 @@ class MainFragment : Fragment()
                     Manifest.permission.CHANGE_NETWORK_STATE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.NEARBY_WIFI_DEVICES
+                    Manifest.permission.NEARBY_WIFI_DEVICES,
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_ADVERTISE,
                 )
             } else {
                 arrayOf(
