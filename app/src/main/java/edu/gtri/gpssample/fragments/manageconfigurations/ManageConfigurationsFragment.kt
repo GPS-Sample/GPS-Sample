@@ -63,7 +63,6 @@ class ManageConfigurationsFragment : Fragment(),
     private var configurations = ArrayList<Config>()
     private var encryptionPassword = ""
 
-    private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private lateinit var nearbySessionManager: NearbySessionManager
     private lateinit var user: User
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
@@ -209,10 +208,10 @@ class ManageConfigurationsFragment : Fragment(),
                             ImageDAO.deleteAll()
                             configurations.clear()
                             manageConfigurationsAdapter.updateConfigurations(configurations)
-                            InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false )  { action, text, tag ->
+                            InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false )  { action, password, tag ->
                                 when (action) {
                                     InputDialog.Action.DidCancel -> {}
-                                    InputDialog.Action.DidEnterText -> {didEnterPassword( text )}
+                                    InputDialog.Action.DidEnterText -> {importConfiguration( password )}
                                     InputDialog.Action.DidPressQRButton -> {}
                                 }
                             }
@@ -224,10 +223,10 @@ class ManageConfigurationsFragment : Fragment(),
             }
             else
             {
-                InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false)  { action, text, tag ->
+                InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false)  { action, password, tag ->
                     when (action) {
                         InputDialog.Action.DidCancel -> {}
-                        InputDialog.Action.DidEnterText -> {didEnterPassword( text )}
+                        InputDialog.Action.DidEnterText -> {importConfiguration( password )}
                         InputDialog.Action.DidPressQRButton -> {}
                     }
                 }
@@ -424,80 +423,39 @@ class ManageConfigurationsFragment : Fragment(),
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private val getResult =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == ResultCode.BarcodeScanned.value) {
-                val sessionId = it.data!!.getStringExtra(Keys.kPayload.value )
-
-                nearbySessionStatusDialog = NearbySessionStatusDialog( requireContext(), resources.getString( R.string.import_configuration )) {
-                    nearbySessionManager.clientClose()
-                }
-
-                nearbySessionManager = NearbySessionManager(requireContext(), lifecycleScope, null )
-                handleNearbySessionStateChange( nearbySessionManager )
-                nearbySessionManager.clientConnect( sessionId!! )
-            }
-        }
-
-    fun handleNearbySessionStateChange( nearbySessionManager: NearbySessionManager )
+    private val getQrCode = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
     {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(
-                Lifecycle.State.STARTED
-            ) {
-                nearbySessionManager.nearbySessionState.collect { state ->
+        if (it.resultCode == ResultCode.BarcodeScanned.value)
+        {
+            val sessionId = it.data!!.getStringExtra(Keys.kPayload.value )
 
-                    when (state) {
-                        is NearbySessionState.Advertising -> {
-                            val qrgEncoder = QRGEncoder(state.sessionId, null, QRGContents.Type.TEXT, 400 )
-                            qrgEncoder.colorBlack = Color.WHITE;
-                            qrgEncoder.colorWhite = Color.BLACK;
-                            nearbySessionStatusDialog?.showQrCode( qrgEncoder.bitmap )
-                        }
+            nearbySessionManager = NearbySessionManager(requireContext(), viewLifecycleOwner, null )
 
-                        NearbySessionState.Connecting -> {
-                            nearbySessionStatusDialog?.setStatus( "Connecting..." )
-                        }
-
-                        NearbySessionState.Connected -> {
-                            nearbySessionStatusDialog?.setStatus( "Connected." )
-
-                            val config = nearbySessionManager.requestConfig()
-
-                            DAO.configDAO.createOrUpdateConfig( config )
-
-                            sharedViewModel.setCurrentConfig( config )
-
-                            configurations.find { it.uuid == config.uuid } ?.let {
-                                configurations.remove(it )
-                            }
-
-                            configurations.add( config )
-                            manageConfigurationsAdapter.updateConfigurations( configurations )
-
-                            didReceiveConfiguration( Config.ErrorCode.None )
-
-                            nearbySessionStatusDialog?.dismiss()
-                            nearbySessionStatusDialog = null
-
-                            nearbySessionManager.clientClose()
-                        }
-
-                        NearbySessionState.Idle -> {
-//                            presentQrCodeDialog?.setStatus( "Idle." )
-                        }
-
-                        is NearbySessionState.Error -> {
-                            nearbySessionStatusDialog?.setStatus( state.message )
-                        }
-
-                        NearbySessionState.Closed -> {
-                            nearbySessionStatusDialog?.setStatus( "Closed." )
-                        }
-                    }
-                }
+            val nearbySessionStatusDialog = NearbySessionStatusDialog( requireContext(), resources.getString( R.string.import_configuration )) {
+                nearbySessionManager.clientClose()
             }
+
+            nearbySessionManager.handleNearbySessionStatusForClient( nearbySessionStatusDialog ) { config ->
+
+                DAO.configDAO.createOrUpdateConfig( config )
+
+                sharedViewModel.setCurrentConfig( config )
+
+                configurations.find { it.uuid == config.uuid } ?.let {
+                    configurations.remove(it )
+                }
+
+                configurations.add( config )
+                manageConfigurationsAdapter.updateConfigurations( configurations )
+
+                nearbySessionStatusDialog.dismiss()
+
+                nearbySessionManager.clientClose()
+
+                didReceiveConfiguration(Config.ErrorCode.None )
+            }
+
+            nearbySessionManager.clientConnect(sessionId!! )
         }
     }
 
@@ -629,7 +587,7 @@ class ManageConfigurationsFragment : Fragment(),
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    fun didEnterPassword( password: String )
+    fun importConfiguration( password: String )
     {
         if (password != "******")
         {
@@ -640,14 +598,9 @@ class ManageConfigurationsFragment : Fragment(),
             when( buttonPressed )
             {
                 ConfirmationDialog.ButtonPress.Left -> {
-
                     val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                    getResult.launch(intent)
 
-//                    sharedNetworkViewModel.networkClientModel.encryptionPassword = encryptionPassword
-//                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.Configuration)
-//                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-//                    getResult.launch(intent)
+                    getQrCode.launch(intent)
                 }
                 ConfirmationDialog.ButtonPress.Right -> {
                     Toast.makeText(activity!!.applicationContext, resources.getString(R.string.select_configuration_file), Toast.LENGTH_LONG).show()

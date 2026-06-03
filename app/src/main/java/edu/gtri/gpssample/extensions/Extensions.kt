@@ -19,3 +19,10 @@ fun Date.toLocalizedDateTimeString() : String
 {
     return DateFormat.getDateTimeInstance(DateFormat.MEDIUM,DateFormat.SHORT ).format(this )
 }
+
+fun String.getSimpleUuid() : String
+{
+    val parts: List<String> = this.split("-").map { it }
+
+    return if (parts.isNotEmpty()) parts[0].take(4 ) else ""
+}

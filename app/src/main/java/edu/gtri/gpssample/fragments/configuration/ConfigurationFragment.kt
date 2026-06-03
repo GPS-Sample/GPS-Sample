@@ -11,22 +11,16 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
 import android.view.*
 import android.widget.Toast
-import androidmads.library.qrgenearator.QRGContents
-import androidmads.library.qrgenearator.QRGEncoder
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -54,11 +48,9 @@ import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionManager
-import edu.gtri.gpssample.managers.NearbySessionState
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
-import kotlinx.coroutines.launch
 import org.osmdroid.views.MapView
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -76,8 +68,6 @@ class ConfigurationFragment : Fragment(),
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
     private lateinit var nearbySessionManager: NearbySessionManager
-
-    private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
 
     private var includeConfig = false
     private var includeImages = false
@@ -229,12 +219,15 @@ class ConfigurationFragment : Fragment(),
                 {
                     ConfirmationDialog.ButtonPress.Left -> {
                         sharedViewModel.currentConfiguration?.value?.let { config ->
-                            nearbySessionStatusDialog = NearbySessionStatusDialog( requireContext(), resources.getString( R.string.export_configuration )) {
+
+                            nearbySessionManager = NearbySessionManager(requireContext(), viewLifecycleOwner, config )
+
+                            val nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
                                 nearbySessionManager.stopHosting()
                             }
 
-                            nearbySessionManager = NearbySessionManager(requireContext(), lifecycleScope, config )
-                            handleNearbySessionStateChange( nearbySessionManager )
+                            nearbySessionManager.handleNearbySessionStatusForHost( nearbySessionStatusDialog )
+
                             nearbySessionManager.startHosting()
                         }
                     }
@@ -351,47 +344,6 @@ class ConfigurationFragment : Fragment(),
         binding.enumAreasRecycler.layoutManager = LinearLayoutManager(activity )
 
         updateOverview()
-    }
-
-    fun handleNearbySessionStateChange( nearbySessionManager: NearbySessionManager )
-    {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(
-                Lifecycle.State.STARTED
-            ) {
-                nearbySessionManager.nearbySessionState.collect { state ->
-
-                    when (state) {
-                        is NearbySessionState.Advertising -> {
-                            val qrgEncoder = QRGEncoder(state.sessionId, null, QRGContents.Type.TEXT, 300 )
-                            qrgEncoder.colorBlack = Color.WHITE;
-                            qrgEncoder.colorWhite = Color.BLACK;
-                            nearbySessionStatusDialog?.showQrCode( qrgEncoder.bitmap )
-                        }
-
-                        NearbySessionState.Connecting -> {
-                            nearbySessionStatusDialog?.setStatus( "Connecting..." )
-                        }
-
-                        NearbySessionState.Connected -> {
-                            nearbySessionStatusDialog?.setStatus( "Connected." )
-                        }
-
-                        NearbySessionState.Idle -> {
-//                            presentQrCodeDialog?.setStatus( "Idle." )
-                        }
-
-                        is NearbySessionState.Error -> {
-                            nearbySessionStatusDialog?.setStatus( state.message )
-                        }
-
-                        NearbySessionState.Closed -> {
-                            nearbySessionStatusDialog?.setStatus( "Closed." )
-                        }
-                    }
-                }
-            }
-        }
     }
 
     fun getFileName() : String

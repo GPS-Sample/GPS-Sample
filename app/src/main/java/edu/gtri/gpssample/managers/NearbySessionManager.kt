@@ -1,12 +1,23 @@
 package edu.gtri.gpssample.managers
 
 import android.content.Context
+import android.graphics.Color
 import android.util.Log
+import androidmads.library.qrgenearator.QRGContents
+import androidmads.library.qrgenearator.QRGEncoder
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Image
+import edu.gtri.gpssample.dialogs.ConfirmationDialog.ButtonPress
+import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
+import edu.gtri.gpssample.extensions.getSimpleUuid
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +27,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import java.io.*
+import java.lang.Thread.sleep
 import java.util.UUID
 
 /**
@@ -27,7 +39,7 @@ import java.util.UUID
 @Serializable
 data class Request(
     val command: Command,
-    val key: String? = null
+    val imageUuid: String? = null
 )
 
 @Serializable
@@ -70,7 +82,7 @@ sealed interface NearbySessionState
  * ============================================================================
  */
 
-class NearbySessionManager( private val context: Context, private val scope: CoroutineScope, private val config: Config? )
+class NearbySessionManager( private val context: Context, private val lifecycleOwner: LifecycleOwner, private val config: Config? )
 {
     companion object
     {
@@ -109,6 +121,7 @@ class NearbySessionManager( private val context: Context, private val scope: Cor
     private var pendingRequest: PendingRequest? = null
     private var configDeferred: CompletableDeferred<Config>? = null
     private var imageDeferred: CompletableDeferred<Image>? = null
+    private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
 
     // =========================================================================
     // HOST API
@@ -133,8 +146,7 @@ class NearbySessionManager( private val context: Context, private val scope: Cor
         ).addOnSuccessListener {
             _nearbySessionState.value = NearbySessionState.Advertising(id)
         }.addOnFailureListener {
-            throw(it)
-//            _nearbySessionState.value = NearbySessionState.Error("Advertising failed", it)
+            _nearbySessionState.value = NearbySessionState.Error("Advertising failed", it)
         }
 
         return id
@@ -146,6 +158,47 @@ class NearbySessionManager( private val context: Context, private val scope: Cor
         client.stopAdvertising()
         connectedEndpointId = null
         _nearbySessionState.value = NearbySessionState.Idle
+    }
+
+    fun handleNearbySessionStatusForHost( nearbySessionStatusDialog: NearbySessionStatusDialog )
+    {
+        this.nearbySessionStatusDialog = nearbySessionStatusDialog
+
+        lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED )
+            {
+                nearbySessionState.collect { state ->
+
+                    when (state) {
+                        is NearbySessionState.Advertising -> {
+                            val qrgEncoder = QRGEncoder(state.sessionId, null, QRGContents.Type.TEXT, 300 )
+                            qrgEncoder.colorBlack = Color.WHITE;
+                            qrgEncoder.colorWhite = Color.BLACK;
+                            nearbySessionStatusDialog.showQrCode( qrgEncoder.bitmap )
+                        }
+
+                        NearbySessionState.Connecting -> {
+                            nearbySessionStatusDialog.setStatus( "Connecting..." )
+                        }
+
+                        NearbySessionState.Connected -> {
+                            nearbySessionStatusDialog.setStatus( "Connected." )
+                        }
+
+                        NearbySessionState.Idle -> {
+                        }
+
+                        is NearbySessionState.Error -> {
+                            nearbySessionStatusDialog.setStatus( state.message )
+                        }
+
+                        NearbySessionState.Closed -> {
+                            nearbySessionStatusDialog.setStatus( "Closed." )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // =========================================================================
@@ -182,6 +235,69 @@ class NearbySessionManager( private val context: Context, private val scope: Cor
             },
             options
         )
+    }
+
+    fun handleNearbySessionStatusForClient( nearbySessionStatusDialog: NearbySessionStatusDialog, completion: (( config: Config )->Unit))
+    {
+        lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED)
+            {
+                nearbySessionState.collect { state ->
+
+                    when (state) {
+                        is NearbySessionState.Advertising -> {
+                            val qrgEncoder = QRGEncoder(state.sessionId, null, QRGContents.Type.TEXT, 400 )
+                            qrgEncoder.colorBlack = Color.WHITE;
+                            qrgEncoder.colorWhite = Color.BLACK;
+                            nearbySessionStatusDialog.showQrCode( qrgEncoder.bitmap )
+                        }
+
+                        NearbySessionState.Connecting -> {
+                            nearbySessionStatusDialog.setStatus( "Connecting..." )
+                        }
+
+                        NearbySessionState.Connected -> {
+                            nearbySessionStatusDialog.setStatus( "Connected." )
+                            sleep(1000 )
+                            nearbySessionStatusDialog.setStatus( "Requesting Configuration..." )
+
+                            val config = requestConfig()
+
+                            nearbySessionStatusDialog.setStatus( "Received Configuration." )
+
+                            for (enumArea in config.enumAreas)
+                            {
+                                for (location in enumArea.locations)
+                                {
+                                    if (location.imageUuid.isNotEmpty())
+                                    {
+                                        if (ImageDAO.instance().doesNotExist( location.imageUuid))
+                                        {
+                                            nearbySessionStatusDialog.setStatus( "Requesting Image ${location.imageUuid.getSimpleUuid()}..." )
+                                            val image = requestImage( location.imageUuid )
+                                            ImageDAO.instance().createImage( image )
+                                        }
+                                    }
+                                }
+                            }
+
+                            completion( config )
+                        }
+
+                        NearbySessionState.Idle -> {
+                        }
+
+                        is NearbySessionState.Error -> {
+                            nearbySessionStatusDialog.setStatus( state.message )
+                        }
+
+                        NearbySessionState.Closed -> {
+                            nearbySessionStatusDialog.setStatus( "Closed." )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     suspend fun requestConfig(): Config
@@ -222,7 +338,7 @@ class NearbySessionManager( private val context: Context, private val scope: Cor
         val deferred = CompletableDeferred<Image>()
         imageDeferred = deferred
 
-        sendRequest( Request( command = Command.GET_IMAGE, key = imageId ))
+        sendRequest( Request( Command.GET_IMAGE, imageId ))
 
         return try {
             deferred.await()
@@ -250,128 +366,130 @@ class NearbySessionManager( private val context: Context, private val scope: Cor
     // HOST CALLBACK
     // =========================================================================
 
-    private val hostConnectionCallback =
-        object : ConnectionLifecycleCallback()
+    private val hostConnectionCallback = object : ConnectionLifecycleCallback()
+    {
+        override fun onConnectionInitiated( endpointId: String, connectionInfo: ConnectionInfo)
         {
-            override fun onConnectionInitiated( endpointId: String, connectionInfo: ConnectionInfo)
+            if (connectedEndpointId != null)
             {
-                if (connectedEndpointId != null)
-                {
-                    client.rejectConnection(endpointId)
-                    return
-                }
-
-                Log.d( "xxx", "Connection Accepted" )
-
-                client.acceptConnection(endpointId, hostPayloadCallback )
+                client.rejectConnection(endpointId)
+                return
             }
 
-            override fun onConnectionResult(endpointId: String, result: ConnectionResolution)
-            {
-                Log.d( "xxx", "Connection Result Received" )
-                if (result.status.isSuccess)
-                {
-                    connectedEndpointId = endpointId
-                    _nearbySessionState.value = NearbySessionState.Connected
-                }
-            }
+            Log.d( "xxx", "Connection Accepted" )
 
-            override fun onDisconnected(endpointId: String)
-            {
-                Log.d( "xxx", "Connection Disconnected" )
+            client.acceptConnection(endpointId, hostPayloadCallback )
+        }
 
-                stopHosting()
-                startHosting()
+        override fun onConnectionResult(endpointId: String, result: ConnectionResolution)
+        {
+            Log.d( "xxx", "Connection Result Received" )
+            if (result.status.isSuccess)
+            {
+                connectedEndpointId = endpointId
+                _nearbySessionState.value = NearbySessionState.Connected
             }
         }
+
+        override fun onDisconnected(endpointId: String)
+        {
+            Log.d( "xxx", "Connection Disconnected" )
+
+            stopHosting()
+            startHosting()
+        }
+    }
 
     // =========================================================================
     // CLIENT CALLBACK
     // =========================================================================
 
-    private val clientConnectionCallback =
-        object : ConnectionLifecycleCallback()
+    private val clientConnectionCallback = object : ConnectionLifecycleCallback()
+    {
+        override fun onConnectionInitiated( endpointId: String, connectionInfo: ConnectionInfo )
         {
-            override fun onConnectionInitiated( endpointId: String, connectionInfo: ConnectionInfo )
-            {
-                Log.d( "xxx", "Connection Accepted" )
-                client.acceptConnection(endpointId, clientPayloadCallback )
-            }
+            Log.d( "xxx", "Connection Accepted" )
+            client.acceptConnection(endpointId, clientPayloadCallback )
+        }
 
-            override fun onConnectionResult( endpointId: String, result: ConnectionResolution )
+        override fun onConnectionResult( endpointId: String, result: ConnectionResolution )
+        {
+            Log.d( "xxx", "Connection Result Received" )
+            if (result.status.isSuccess)
             {
-                Log.d( "xxx", "Connection Result Received" )
-                if (result.status.isSuccess)
-                {
-                    connectedEndpointId = endpointId
-                    _nearbySessionState.value = NearbySessionState.Connected
-                }
-            }
-
-            override fun onDisconnected(endpointId: String)
-            {
-                Log.d( "xxx", "Connection Disconnected" )
-                connectedEndpointId = null
-                _nearbySessionState.value = NearbySessionState.Idle
+                connectedEndpointId = endpointId
+                _nearbySessionState.value = NearbySessionState.Connected
             }
         }
+
+        override fun onDisconnected(endpointId: String)
+        {
+            Log.d( "xxx", "Connection Disconnected" )
+            connectedEndpointId = null
+            _nearbySessionState.value = NearbySessionState.Idle
+        }
+    }
 
     // =========================================================================
     // HOST PAYLOAD HANDLER
     // =========================================================================
 
-    private val hostPayloadCallback =
-        object : PayloadCallback()
+    private val hostPayloadCallback = object : PayloadCallback()
+    {
+        override fun onPayloadReceived( endpointId: String, payload: Payload )
         {
-            override fun onPayloadReceived( endpointId: String, payload: Payload )
+            if (payload.type != Payload.Type.BYTES) return
+
+            val request = json.decodeFromString(Request.serializer(), String(payload.asBytes()!!))
+
+            when (request.command)
             {
-                if (payload.type != Payload.Type.BYTES) return
-
-                val request = json.decodeFromString(Request.serializer(), String(payload.asBytes()!!))
-
-                when (request.command)
-                {
-                    Command.GET_CONFIG -> sendConfig()
-                    Command.GET_IMAGE -> sendImage(request.key!!)
-                    Command.DONE -> {
-                        client.disconnectFromEndpoint(endpointId)
-//                        stopHosting()
-//                        startHosting()
-//                        _nearbySessionState.value = NearbySessionState.Advertising( sessionId!! )
+                Command.GET_CONFIG -> {
+                    nearbySessionStatusDialog?.setStatus( "Sending Configuration..." )
+                    sendConfig()
+                }
+                Command.GET_IMAGE -> {
+                    request.imageUuid?.let { imageUuid ->
+                        nearbySessionStatusDialog?.setStatus( "Sending Image ${imageUuid.getSimpleUuid()}..." )
+                        sendImage(imageUuid )
                     }
                 }
-            }
-
-            override fun onPayloadTransferUpdate( endpointId: String, update: PayloadTransferUpdate)
-            {
+                Command.DONE -> {
+                    nearbySessionStatusDialog?.setStatus( "Done." )
+                    client.disconnectFromEndpoint(endpointId)
+                }
             }
         }
+
+        override fun onPayloadTransferUpdate( endpointId: String, update: PayloadTransferUpdate)
+        {
+        }
+    }
 
     // =========================================================================
     // CLIENT PAYLOAD HANDLER
     // =========================================================================
 
-    private val clientPayloadCallback =
-        object : PayloadCallback()
+    private val clientPayloadCallback = object : PayloadCallback()
+    {
+        override fun onPayloadReceived( endpointId: String, payload: Payload )
         {
-            override fun onPayloadReceived( endpointId: String, payload: Payload )
+            if (payload.type != Payload.Type.STREAM) return
+
+            val input = payload.asStream()?.asInputStream() ?: return
+
+            when (pendingRequest)
             {
-                if (payload.type != Payload.Type.STREAM) return
-
-                val input = payload.asStream()?.asInputStream() ?: return
-
-                when (pendingRequest)
-                {
-                    PendingRequest.CONFIG -> receiveConfig(input)
-                    PendingRequest.IMAGE -> receiveImage(input)
-                    null -> Log.w(TAG, "Unexpected payload")
-                }
-            }
-
-            override fun onPayloadTransferUpdate( endpointId: String, update: PayloadTransferUpdate)
-            {
+                PendingRequest.CONFIG -> receiveConfig(input)
+                PendingRequest.IMAGE -> receiveImage(input)
+                null -> Log.w(TAG, "Unexpected payload")
             }
         }
+
+        override fun onPayloadTransferUpdate( endpointId: String, update: PayloadTransferUpdate)
+        {
+        }
+    }
 
     // =========================================================================
     // HOST SENDERS
@@ -387,7 +505,7 @@ class NearbySessionManager( private val context: Context, private val scope: Cor
 
         client.sendPayload(endpoint, Payload.fromStream(input))
 
-        scope.launch(Dispatchers.IO) {
+        lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
                 json.encodeToStream(Config.serializer(), config!!, output )
             } finally {
@@ -406,7 +524,7 @@ class NearbySessionManager( private val context: Context, private val scope: Cor
 
             client.sendPayload(endpoint, Payload.fromStream(input))
 
-            scope.launch(Dispatchers.IO) {
+            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 try {
                     json.encodeToStream(Image.serializer(), image, output )
                 } finally {
@@ -423,7 +541,7 @@ class NearbySessionManager( private val context: Context, private val scope: Cor
     @OptIn(ExperimentalSerializationApi::class)
     private fun receiveConfig(input: InputStream)
     {
-        scope.launch(Dispatchers.IO) {
+        lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val config = json.decodeFromStream(
                 Config.serializer(),
                 input
@@ -436,7 +554,7 @@ class NearbySessionManager( private val context: Context, private val scope: Cor
     @OptIn(ExperimentalSerializationApi::class)
     private fun receiveImage(input: InputStream)
     {
-        scope.launch(Dispatchers.IO) {
+        lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val image = json.decodeFromStream(
                 Image.serializer(),
                 input
