@@ -33,6 +33,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -57,8 +58,12 @@ import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.File
+import java.lang.Thread.sleep
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -115,6 +120,7 @@ class PerformEnumerationFragment : Fragment(),
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         _binding = FragmentPerformEnumerationBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 
@@ -146,181 +152,231 @@ class PerformEnumerationFragment : Fragment(),
         }
 
         enumArea.enumerationTeams.find { it.uuid == sharedViewModel.currentEnumerationTeamUuid }?.let { enumerationTeam ->
-            this.enumerationTeam = enumerationTeam
+            this@PerformEnumerationFragment.enumerationTeam = enumerationTeam
         }
 
-        if (sharedViewModel.currentCenterPoint?.value == null)
-        {
-            val latLngBounds = GeoUtils.findGeobounds(enumerationTeam.polygon)
-            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-            sharedViewModel.setCurrentCenterPoint( point )
-        }
-
-        enumerationTeamLocations.clear()
-
-        for (teamLocationUuid in enumerationTeam.locationUuids)
-        {
-            enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
-                enumerationTeamLocations.add( location )
-            }
-        }
-
-        for (location in enumArea.locations)
-        {
-            if (location.isLandmark)
+        sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+            if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
             {
-                enumerationTeamLocations.add( location )
+                binding.osmMapView.visibility = View.VISIBLE
+                binding.mapboxMapView.visibility = View.GONE
+                MapManager.instance().centerMap( enumerationTeam.polygon, currentZoomLevel, binding.osmMapView )
             }
-        }
-
-        for (location in enumerationTeamLocations) {
-            location.isVisible = true
-        }
-
-        (activity!!.application as? MainApplication)?.user?.let {
-            user = it
-        }
-
-        performEnumerationAdapter = PerformEnumerationAdapter( enumerationTeamLocations, enumArea.name )
-        performEnumerationAdapter.didSelectLocation = this::didSelectLocation
-
-        binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = performEnumerationAdapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(activity )
-        binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
-
-        binding.titleTextView.text =  enumArea.name + " (" + enumerationTeam.name + " " +  resources.getString(R.string.team) + ")"
-
-        val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
-
-        if (centerOnCurrentLocation == null)
-        {
-            sharedViewModel.setCenterOnCurrentLocation( false )
-        }
-
-        binding.addHouseholdButton.backgroundTintList?.let {
-            defaultColorList = it
-        }
-
-        if (enumArea.mbTilesPath.isNotEmpty())
-        {
-            TileServer.startServer( enumArea.mbTilesPath )
-        }
-
-        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
-            this.mapView = mapView
-
-            MapManager.instance().enableLocationUpdates( activity!!, mapView )
-
-            binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
-
-            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                MapManager.instance().centerMap( enumerationTeam.polygon, currentZoomLevel, mapView )
-            }
-
-            sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
-                if (centerOnCurrentLocation)
-                {
-                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                    binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                }
-                else
-                {
-                    MapManager.instance().stopCenteringOnLocation( mapView )
-                    binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
-                }
-            }
-
-            refreshMap()
-        }
-
-        binding.mapOverlayView.setOnTouchListener(this)
-
-        if (ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-        {
-            if (!LocationService.started)
+            else
             {
-                LocationService.locationCallback = locationCallback
-                val intent = Intent(activity!!, LocationService::class.java)
-                ContextCompat.startForegroundService(activity!!, intent)
+                binding.osmMapView.visibility = View.GONE
+                binding.mapboxMapView.visibility = View.VISIBLE
+                MapManager.instance().centerMap( enumerationTeam.polygon, currentZoomLevel, binding.mapboxMapView )
             }
         }
 
-        val views = ArrayList<String>()
-        val showViews = resources.getTextArray( R.array.show_views )
+        binding.progressOverlayView.visibility = View.VISIBLE
 
-        for (showView in showViews)
-        {
-            views.add( showView.toString())
-        }
-
-        binding.showSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, views )
-
-        binding.showSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
-        {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
-            {
-                // Note! OnItemSelected fires automatically when the fragment is created
-                when( position )
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                for (location in enumArea.locations)
                 {
-                    0-> { // nothing
-                        binding.mapLayout.visibility = View.VISIBLE
-                        binding.recyclerView.visibility = View.VISIBLE
-                    }
-                    1-> { // Map Only
-                        binding.mapLayout.visibility = View.VISIBLE
-                        binding.recyclerView.visibility = View.GONE
-                    }
-                    2-> { // List Only
-                        binding.mapLayout.visibility = View.GONE
-                        binding.recyclerView.visibility = View.VISIBLE
+                    if (location.enumerationItems.isEmpty())
+                    {
+                        location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
                     }
                 }
             }
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
 
-        val filters = ArrayList<String>()
-        val sortFilters = resources.getTextArray( R.array.sort_filters )
+            // back on the main thread...
 
-        for (sortFilter in sortFilters)
-        {
-            filters.add( sortFilter.toString())
-        }
+            binding.progressOverlayView.visibility = View.GONE
 
-        binding.filterSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, filters )
+            if (sharedViewModel.currentCenterPoint?.value == null)
+            {
+                val latLngBounds = GeoUtils.findGeobounds(enumerationTeam.polygon)
+                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                sharedViewModel.setCurrentCenterPoint( point )
+            }
 
-        // Note! OnItemSelected fires automatically when the fragment is created
-        // using post will ensure that this will not happen
-        binding.filterSpinner.post {
-            binding.filterSpinner.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long)
+            enumerationTeamLocations.clear()
+
+            for (teamLocationUuid in enumerationTeam.locationUuids)
+            {
+                enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
+                    enumerationTeamLocations.add( location )
+                }
+            }
+
+            for (location in enumArea.locations)
+            {
+                if (location.isLandmark)
                 {
+                    enumerationTeamLocations.add( location )
+                }
+            }
+
+            for (location in enumerationTeamLocations) {
+                location.isVisible = true
+            }
+
+            (activity!!.application as? MainApplication)?.user?.let {
+                user = it
+            }
+
+            performEnumerationAdapter = PerformEnumerationAdapter( enumerationTeamLocations, enumArea.name )
+            performEnumerationAdapter.didSelectLocation = this@PerformEnumerationFragment::didSelectLocation
+
+            binding.recyclerView.itemAnimator = DefaultItemAnimator()
+            binding.recyclerView.adapter = performEnumerationAdapter
+            binding.recyclerView.layoutManager = LinearLayoutManager(activity )
+            binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
+
+            binding.titleTextView.text =  enumArea.name + " (" + enumerationTeam.name + " " +  resources.getString(R.string.team) + ")"
+
+            val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
+
+            if (centerOnCurrentLocation == null)
+            {
+                sharedViewModel.setCenterOnCurrentLocation( false )
+            }
+
+            binding.addHouseholdButton.backgroundTintList?.let {
+                defaultColorList = it
+            }
+
+            if (enumArea.mbTilesPath.isNotEmpty())
+            {
+                TileServer.startServer( enumArea.mbTilesPath )
+            }
+
+            val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+            MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this@PerformEnumerationFragment ) { mapView ->
+                this@PerformEnumerationFragment.mapView = mapView
+
+                MapManager.instance().enableLocationUpdates( activity!!, mapView )
+
+                binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
+
+                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                    MapManager.instance().centerMap( enumerationTeam.polygon, currentZoomLevel, mapView )
+                }
+
+                sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
+                    if (centerOnCurrentLocation)
+                    {
+                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                    }
+                    else
+                    {
+                        MapManager.instance().stopCenteringOnLocation( mapView )
+                        binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                    }
+                }
+
+                refreshMap()
+            }
+
+            binding.mapOverlayView.setOnTouchListener(this@PerformEnumerationFragment)
+
+            if (ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            {
+                if (!LocationService.started)
+                {
+                    LocationService.locationCallback = locationCallback
+                    val intent = Intent(activity!!, LocationService::class.java)
+                    ContextCompat.startForegroundService(activity!!, intent)
+                }
+            }
+
+            val views = ArrayList<String>()
+            val showViews = resources.getTextArray( R.array.show_views )
+
+            for (showView in showViews)
+            {
+                views.add( showView.toString())
+            }
+
+            binding.showSpinner.adapter = ArrayAdapter<String>(this@PerformEnumerationFragment.requireContext(), android.R.layout.simple_spinner_dropdown_item, views )
+
+            binding.showSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+            {
+                override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
+                {
+                    // Note! OnItemSelected fires automatically when the fragment is created
                     when( position )
                     {
                         0-> { // nothing
-                            for (location in enumerationTeamLocations) {
-                                location.isVisible = true
-                            }
+                            binding.mapLayout.visibility = View.VISIBLE
+                            binding.recyclerView.visibility = View.VISIBLE
                         }
-                        1-> { // undefined
-                            for (location in enumerationTeamLocations)
-                            {
-                                location.isVisible = false
-                                if (!location.isLandmark)
+                        1-> { // Map Only
+                            binding.mapLayout.visibility = View.VISIBLE
+                            binding.recyclerView.visibility = View.GONE
+                        }
+                        2-> { // List Only
+                            binding.mapLayout.visibility = View.GONE
+                            binding.recyclerView.visibility = View.VISIBLE
+                        }
+                    }
+                }
+                override fun onNothingSelected(parent: AdapterView<*>) {}
+            }
+
+            val filters = ArrayList<String>()
+            val sortFilters = resources.getTextArray( R.array.sort_filters )
+
+            for (sortFilter in sortFilters)
+            {
+                filters.add( sortFilter.toString())
+            }
+
+            binding.filterSpinner.adapter = ArrayAdapter<String>(this@PerformEnumerationFragment.requireContext(), android.R.layout.simple_spinner_dropdown_item, filters )
+
+            // Note! OnItemSelected fires automatically when the fragment is created
+            // using post will ensure that this will not happen
+            binding.filterSpinner.post {
+                binding.filterSpinner.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long)
+                    {
+                        when( position )
+                        {
+                            0-> { // nothing
+                                for (location in enumerationTeamLocations) {
+                                    location.isVisible = true
+                                }
+                            }
+                            1-> { // undefined
+                                for (location in enumerationTeamLocations)
                                 {
-                                    if (location.enumerationItems.isEmpty())
+                                    location.isVisible = false
+                                    if (!location.isLandmark)
                                     {
-                                        location.isVisible = true
+                                        if (location.enumerationItems.isEmpty())
+                                        {
+                                            location.isVisible = true
+                                        }
+                                        else
+                                        {
+                                            for (enumerationItem in location.enumerationItems)
+                                            {
+                                                if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                                                {
+                                                    location.isVisible = true
+                                                    break
+                                                }
+                                            }
+                                        }
                                     }
-                                    else
+                                }
+                            }
+                            2-> { // incomplete
+                                for (location in enumerationTeamLocations)
+                                {
+                                    location.isVisible = false
+                                    if (!location.isLandmark)
                                     {
                                         for (enumerationItem in location.enumerationItems)
                                         {
-                                            if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                                            if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                                             {
                                                 location.isVisible = true
                                                 break
@@ -329,362 +385,345 @@ class PerformEnumerationFragment : Fragment(),
                                     }
                                 }
                             }
-                        }
-                        2-> { // incomplete
-                            for (location in enumerationTeamLocations)
-                            {
-                                location.isVisible = false
-                                if (!location.isLandmark)
+                            3-> { // complete
+                                for (location in enumerationTeamLocations)
                                 {
-                                    for (enumerationItem in location.enumerationItems)
+                                    location.isVisible = false
+                                    if (!location.isLandmark)
                                     {
-                                        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                                        for (enumerationItem in location.enumerationItems)
                                         {
-                                            location.isVisible = true
-                                            break
+                                            if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                                            {
+                                                location.isVisible = true
+                                                break
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        3-> { // complete
-                            for (location in enumerationTeamLocations)
-                            {
-                                location.isVisible = false
-                                if (!location.isLandmark)
+                            4-> { // points of interest
+                                for (location in enumerationTeamLocations)
                                 {
-                                    for (enumerationItem in location.enumerationItems)
-                                    {
-                                        if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                                        {
-                                            location.isVisible = true
-                                            break
-                                        }
-                                    }
+                                    location.isVisible = if (location.isLandmark) true else false
                                 }
                             }
                         }
-                        4-> { // points of interest
-                            for (location in enumerationTeamLocations)
-                            {
-                                location.isVisible = if (location.isLandmark) true else false
-                            }
-                        }
+
+                        performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+                        refreshMap()
                     }
 
-                    performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                })
+            }
+
+            binding.legendTextView.setOnClickListener {
+                MapLegendDialog( activity!! )
+            }
+
+            binding.legendImageView.setOnClickListener {
+                MapLegendDialog( activity!! )
+            }
+
+            binding.helpButton.setOnClickListener {
+                PerformEnumerationHelpDialog( activity!! )
+            }
+
+            binding.deleteBreadcrumbsButton.setOnClickListener {
+                if (enumArea.breadcrumbs.isNotEmpty())
+                {
+                    val breadcrumb = enumArea.breadcrumbs.last()
+                    DAO.breadcrumbDAO.delete( breadcrumb )
+                    enumArea.breadcrumbs.remove( breadcrumb )
                     refreshMap()
                 }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
-            })
-        }
-
-        binding.legendTextView.setOnClickListener {
-            MapLegendDialog( activity!! )
-        }
-
-        binding.legendImageView.setOnClickListener {
-            MapLegendDialog( activity!! )
-        }
-
-        binding.helpButton.setOnClickListener {
-            PerformEnumerationHelpDialog( activity!! )
-        }
-
-        binding.deleteBreadcrumbsButton.setOnClickListener {
-            if (enumArea.breadcrumbs.isNotEmpty())
-            {
-                val breadcrumb = enumArea.breadcrumbs.last()
-                DAO.breadcrumbDAO.delete( breadcrumb )
-                enumArea.breadcrumbs.remove( breadcrumb )
-                refreshMap()
             }
-        }
 
-        binding.mapTileCacheButton.setOnClickListener {
-            enumArea.mapTileRegion?.let {
-                val mapTileRegions = ArrayList<MapTileRegion>()
-                mapTileRegions.add( it )
-                busyIndicatorDialog = BusyIndicatorDialog(activity!!, resources.getString(R.string.downloading_map_tiles), this )
-                MapManager.instance().cacheMapTiles(activity!!, mapView, mapTileRegions, this )
-            }
-        }
-
-        binding.centerOnLocationButton.setOnClickListener {
-            sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
-                if (centerOnCurrentLocation)
-                {
-                    MapManager.instance().stopCenteringOnLocation( mapView )
-                    sharedViewModel.setCenterOnCurrentLocation( false )
-                    binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
-                }
-                else
-                {
-                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                    sharedViewModel.setCenterOnCurrentLocation( true )
-                    binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            binding.mapTileCacheButton.setOnClickListener {
+                enumArea.mapTileRegion?.let {
+                    val mapTileRegions = ArrayList<MapTileRegion>()
+                    mapTileRegions.add( it )
+                    busyIndicatorDialog = BusyIndicatorDialog(activity!!, resources.getString(R.string.downloading_map_tiles), this@PerformEnumerationFragment )
+                    MapManager.instance().cacheMapTiles(activity!!, mapView, mapTileRegions, this@PerformEnumerationFragment )
                 }
             }
-        }
 
-        binding.addHouseholdButton.setOnClickListener {
-            if (dropMode)
-            {
-                dropMode = false
-                binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
-            }
-
-            if (gpsAccuracyIsGood())
-            {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    if (config.allowManualLocationEntry)
+            binding.centerOnLocationButton.setOnClickListener {
+                sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
+                    if (centerOnCurrentLocation)
                     {
-                        ConfirmationDialog( activity, resources.getString(R.string.select_location), "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), null, true ) { buttonPressed, tag ->
-                            when( buttonPressed )
-                            {
-                                ConfirmationDialog.ButtonPress.Left -> {
-                                    addHouseholdButtonPress()
-                                }
-                                ConfirmationDialog.ButtonPress.Right -> {
-                                    dropMode = true
-                                    binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                                }
-                                ConfirmationDialog.ButtonPress.None -> {
-                                }
-                            }
-                        }
+                        MapManager.instance().stopCenteringOnLocation( mapView )
+                        sharedViewModel.setCenterOnCurrentLocation( false )
+                        binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
                     }
                     else
                     {
-                        addHouseholdButtonPress()
+                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                        sharedViewModel.setCenterOnCurrentLocation( true )
+                        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                     }
                 }
             }
-            else
-            {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
-            }
-        }
 
-        binding.addLandmarkButton.setOnClickListener {
-            if (dropMode)
-            {
-                dropMode = false
-                binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
-            }
-
-            if (gpsAccuracyIsGood())
-            {
-                currentGPSAccuracy?.let { accuracy ->
-                    currentGPSLocation?.let { point ->
-                        val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                        val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), true, "", "")
-
-                        DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-                        enumArea.locations.add(location)
-                        sharedViewModel.currentLocationUuid = location.uuid
-                        findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-                    } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
-                }
-            }
-            else
-            {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
-            }
-        }
-
-        binding.exportButton.setOnClickListener {
-            if (dropMode)
-            {
-                dropMode = false
-                binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
-            }
-
-            val title = if (user.role == Role.Enumerator.value) resources.getString(R.string.export_enum_data) else resources.getString(R.string.export_configuration)
-
-            ConfirmationDialog( activity, title, resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
-                when( buttonPressed )
+            binding.addHouseholdButton.setOnClickListener {
+                if (dropMode)
                 {
-                    ConfirmationDialog.ButtonPress.Left -> {
-                        sharedViewModel.currentConfiguration?.value?.let { config ->
-                            sharedNetworkViewModel.setCurrentConfig(config)
+                    dropMode = false
+                    binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+                }
 
-                            when(user.role)
-                            {
-                                Role.Admin.toString(),
-                                Role.Supervisor.toString() ->
+                if (gpsAccuracyIsGood())
+                {
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                        if (config.allowManualLocationEntry)
+                        {
+                            ConfirmationDialog( activity, resources.getString(R.string.select_location), "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), null, true ) { buttonPressed, tag ->
+                                when( buttonPressed )
                                 {
-                                    sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
-                                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
-                                    sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-                                    startHotspot(view)
-                                }
-
-                                Role.Enumerator.toString() ->
-                                {
-                                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
-                                    sharedNetworkViewModel.networkClientModel.currentConfig = config
-                                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                                    getResult.launch(intent)
+                                    ConfirmationDialog.ButtonPress.Left -> {
+                                        addHouseholdButtonPress()
+                                    }
+                                    ConfirmationDialog.ButtonPress.Right -> {
+                                        dropMode = true
+                                        binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                                    }
+                                    ConfirmationDialog.ButtonPress.None -> {
+                                    }
                                 }
                             }
                         }
+                        else
+                        {
+                            addHouseholdButtonPress()
+                        }
                     }
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        val items = ArrayList<String>()
-                        items.add( "Configuration Files" )
-                        items.add( "Image Files" )
-                        CheckboxDialog( activity!!, "Select the file types to export", items ) { selections ->
-                            includeConfig = false
-                            includeImages = false
+                }
+                else
+                {
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
+                }
+            }
 
-                            for (selection in selections) {
-                                if (selection == items[0]) includeConfig = true
-                                if (selection == items[1]) includeImages = true
-                            }
+            binding.addLandmarkButton.setOnClickListener {
+                if (dropMode)
+                {
+                    dropMode = false
+                    binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+                }
 
-                            if (includeConfig || includeImages)
-                            {
-                                ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null, true) { buttonPressed, tag ->
-                                    when( buttonPressed )
+                if (gpsAccuracyIsGood())
+                {
+                    currentGPSAccuracy?.let { accuracy ->
+                        currentGPSLocation?.let { point ->
+                            val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+                            val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), true, "", "")
+
+                            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                            enumArea.locations.add(location)
+                            sharedViewModel.currentLocationUuid = location.uuid
+                            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+                        } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
+                    }
+                }
+                else
+                {
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
+                }
+            }
+
+            binding.exportButton.setOnClickListener {
+                if (dropMode)
+                {
+                    dropMode = false
+                    binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+                }
+
+                val title = if (user.role == Role.Enumerator.value) resources.getString(R.string.export_enum_data) else resources.getString(R.string.export_configuration)
+
+                ConfirmationDialog( activity, title, resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
+                    when( buttonPressed )
+                    {
+                        ConfirmationDialog.ButtonPress.Left -> {
+                            sharedViewModel.currentConfiguration?.value?.let { config ->
+                                sharedNetworkViewModel.setCurrentConfig(config)
+
+                                when(user.role)
+                                {
+                                    Role.Admin.toString(),
+                                    Role.Supervisor.toString() ->
                                     {
-                                        ConfirmationDialog.ButtonPress.Left -> {
-                                            ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Enumerated", includeConfig, includeImages, shouldPackMinimal()) { success ->
-                                                if (success)
-                                                {
-                                                    Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
-                                                }
-                                                else
-                                                {
-                                                    NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
+                                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
+                                        sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+                                        startHotspot(view)
+                                    }
+
+                                    Role.Enumerator.toString() ->
+                                    {
+                                        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
+                                        sharedNetworkViewModel.networkClientModel.currentConfig = config
+                                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                        getResult.launch(intent)
+                                    }
+                                }
+                            }
+                        }
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            val items = ArrayList<String>()
+                            items.add( "Configuration Files" )
+                            items.add( "Image Files" )
+                            CheckboxDialog( activity!!, "Select the file types to export", items ) { selections ->
+                                includeConfig = false
+                                includeImages = false
+
+                                for (selection in selections) {
+                                    if (selection == items[0]) includeConfig = true
+                                    if (selection == items[1]) includeImages = true
+                                }
+
+                                if (includeConfig || includeImages)
+                                {
+                                    ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null, true) { buttonPressed, tag ->
+                                        when( buttonPressed )
+                                        {
+                                            ConfirmationDialog.ButtonPress.Left -> {
+                                                ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Enumerated", includeConfig, includeImages, shouldPackMinimal()) { success ->
+                                                    if (success)
+                                                    {
+                                                        Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                                    }
+                                                    else
+                                                    {
+                                                        NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                                    }
                                                 }
                                             }
-                                        }
-                                        ConfirmationDialog.ButtonPress.Right -> {
-                                            exportToDevice()
-                                        }
-                                        ConfirmationDialog.ButtonPress.None -> {
+                                            ConfirmationDialog.ButtonPress.Right -> {
+                                                exportToDevice()
+                                            }
+                                            ConfirmationDialog.ButtonPress.None -> {
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    ConfirmationDialog.ButtonPress.None -> {
-                    }
-                }
-            }
-        }
-
-        var sampledCount = 0
-        var surveyedCount = 0
-        var enumerationCount = 0
-
-        for (location in enumerationTeamLocations)
-        {
-            for (enumItem in location.enumerationItems)
-            {
-                if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
-                {
-                    enumerationCount += 1
-                }
-                if (enumItem.samplingState == SamplingState.Sampled || enumItem.subsetSamplingState == SamplingState.Sampled)
-                {
-                    sampledCount += 1
-                }
-                if (enumItem.collectionState == CollectionState.Complete)
-                {
-                    surveyedCount += 1
-                }
-            }
-        }
-
-        for (location in enumArea.locations)
-        {
-            for (enumItem in location.enumerationItems)
-            {
-                if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
-                {
-                    enumItem.subAddress.toIntOrNull()?.let {
-                        if (it > maxSubaddress)
-                        {
-                            maxSubaddress = it
+                        ConfirmationDialog.ButtonPress.None -> {
                         }
                     }
                 }
             }
-        }
 
-        if (enumerationCount == 0)
-        {
-            InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "1", resources.getString(R.string.cancel), resources.getString(R.string.save), null, false, true, true )  { action, text, tag ->
-                when (action) {
-                    InputDialog.Action.DidCancel -> {}
-                    InputDialog.Action.DidEnterText -> {
-                        text.toIntOrNull()?.let {
-                            maxSubaddress = it - 1
-                        }
+            var sampledCount = 0
+            var surveyedCount = 0
+            var enumerationCount = 0
+
+            for (location in enumerationTeamLocations)
+            {
+                for (enumItem in location.enumerationItems)
+                {
+                    if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
+                    {
+                        enumerationCount += 1
                     }
-                    InputDialog.Action.DidPressQRButton -> {}
+                    if (enumItem.samplingState == SamplingState.Sampled || enumItem.subsetSamplingState == SamplingState.Sampled)
+                    {
+                        sampledCount += 1
+                    }
+                    if (enumItem.collectionState == CollectionState.Complete)
+                    {
+                        surveyedCount += 1
+                    }
                 }
             }
-        }
 
-        binding.listItemEnumArea.titleLayout.visibility = View.GONE
-        binding.listItemEnumArea.numberEnumeratedTextView.text = "$enumerationCount"
-        binding.listItemEnumArea.numberSampledTextView.text = "$sampledCount"
-        binding.listItemEnumArea.numberSurveyedTextView.text = "$surveyedCount"
-
-        trimToolbarToFit( binding.toolbar )
-
-        if (isRecordingBreadcrumbs)
-        {
-            binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.pause )
-            binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-        }
-
-        if (isShowingBreadcrumbs)
-        {
-            binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-        }
-
-        binding.recordBreadcrumbsButton.setOnClickListener {
-            if (!isRecordingBreadcrumbs)
+            for (location in enumArea.locations)
             {
-                isShowingBreadcrumbs = true
-                isRecordingBreadcrumbs = true
-                lastBreadcrumbGroupId = UUID.randomUUID().toString()
-                binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.pause )
-                binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                for (enumItem in location.enumerationItems)
+                {
+                    if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
+                    {
+                        enumItem.subAddress.toIntOrNull()?.let {
+                            if (it > maxSubaddress)
+                            {
+                                maxSubaddress = it
+                            }
+                        }
+                    }
+                }
             }
-            else
-            {
-                isRecordingBreadcrumbs = false
-                binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.record )
-                binding.recordBreadcrumbsButton.setBackgroundTintList(defaultColorList);
-            }
-        }
 
-        binding.showBreadcrumbsButton.setOnClickListener {
+            if (enumerationCount == 0)
+            {
+                InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "1", resources.getString(R.string.cancel), resources.getString(R.string.save), null, false, true, true )  { action, text, tag ->
+                    when (action) {
+                        InputDialog.Action.DidCancel -> {}
+                        InputDialog.Action.DidEnterText -> {
+                            text.toIntOrNull()?.let {
+                                maxSubaddress = it - 1
+                            }
+                        }
+                        InputDialog.Action.DidPressQRButton -> {}
+                    }
+                }
+            }
+
+            binding.listItemEnumArea.titleLayout.visibility = View.GONE
+            binding.listItemEnumArea.numberEnumeratedTextView.text = "$enumerationCount"
+            binding.listItemEnumArea.numberSampledTextView.text = "$sampledCount"
+            binding.listItemEnumArea.numberSurveyedTextView.text = "$surveyedCount"
+
+            trimToolbarToFit( binding.toolbar )
+
             if (isRecordingBreadcrumbs)
             {
-                return@setOnClickListener
+                binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.pause )
+                binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
 
-            if (!isShowingBreadcrumbs)
+            if (isShowingBreadcrumbs)
             {
-                isShowingBreadcrumbs = true
                 binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
-            else
-            {
-                isShowingBreadcrumbs = false
-                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+
+            binding.recordBreadcrumbsButton.setOnClickListener {
+                if (!isRecordingBreadcrumbs)
+                {
+                    isShowingBreadcrumbs = true
+                    isRecordingBreadcrumbs = true
+                    lastBreadcrumbGroupId = UUID.randomUUID().toString()
+                    binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.pause )
+                    binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                    binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                }
+                else
+                {
+                    isRecordingBreadcrumbs = false
+                    binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.record )
+                    binding.recordBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+                }
             }
 
-            refreshMap()
+            binding.showBreadcrumbsButton.setOnClickListener {
+                if (isRecordingBreadcrumbs)
+                {
+                    return@setOnClickListener
+                }
+
+                if (!isShowingBreadcrumbs)
+                {
+                    isShowingBreadcrumbs = true
+                    binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                }
+                else
+                {
+                    isShowingBreadcrumbs = false
+                    binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+                }
+
+                refreshMap()
+            }
         }
     }
 

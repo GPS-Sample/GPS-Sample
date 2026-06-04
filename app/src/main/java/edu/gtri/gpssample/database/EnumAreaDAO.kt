@@ -19,14 +19,14 @@ class EnumAreaDAO(private var dao: DAO)
 {
     fun createOrUpdateEnumArea( enumArea: EnumArea ) : EnumArea?
     {
-        val existingEnumArea = getEnumArea( enumArea.uuid )
-
-        if (existingEnumArea != null)
+        if (dao.exists( DAO.TABLE_ENUM_AREA, DAO.COLUMN_UUID, enumArea.uuid ))
         {
-            if (enumArea.doesNotEqual( existingEnumArea ))
-            {
-                updateEnumArea( enumArea )
-                Log.d( "xxx", "Updated EnumerationArea with ID ${enumArea.uuid}" )
+            getEnumArea( enumArea.uuid )?.let { existingEnumArea ->
+                if (enumArea.doesNotEqual( existingEnumArea ))
+                {
+                    updateEnumArea( enumArea )
+                    Log.d( "xxx", "Updated EnumerationArea with ID ${enumArea.uuid}" )
+                }
             }
         }
         else
@@ -95,13 +95,6 @@ class EnumAreaDAO(private var dao: DAO)
         val selectedCollectionTeamUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_UUID))
 
         return EnumArea( uuid, creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, selectedEnumerationTeamUuid, selectedCollectionTeamUuid )
-    }
-
-    fun exists( enumArea: EnumArea ): Boolean
-    {
-        getEnumArea( enumArea.uuid )?.let {
-            return true
-        } ?: return false
     }
 
     fun updateEnumArea( enumArea: EnumArea )

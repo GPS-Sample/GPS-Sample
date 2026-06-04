@@ -70,16 +70,9 @@ class ImageDAO(private var context: Context, name: String?, factory: SQLiteDatab
         return Image( uuid, creationDate, locationUuid, data )
     }
 
-    fun exists( uuid: String ) : Boolean
+    fun exists( uuid: String ): Boolean
     {
-        val query = "SELECT * FROM ${TABLE_IMAGE} WHERE ${COLUMN_UUID} = '$uuid'"
-        val cursor = writableDatabase.rawQuery(query, null)
-
-        val count = cursor.count
-
-        cursor.close()
-
-        return count > 0
+        return readableDatabase.rawQuery("""SELECT 1 FROM ${TABLE_IMAGE} WHERE ${COLUMN_UUID} = ? LIMIT 1""".trimIndent(),arrayOf(uuid)).use { it.moveToFirst() }
     }
 
     fun doesNotExist( uuid: String ) : Boolean

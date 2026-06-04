@@ -17,11 +17,11 @@ class CollectionTeamDAO(private var dao: DAO)
 {
     fun createOrUpdateCollectionTeam(collectionTeam: CollectionTeam) : CollectionTeam?
     {
-        val existingCollectionTeam = getCollectionTeam( collectionTeam.uuid )
-
-        if (existingCollectionTeam != null)
+        if (dao.exists( DAO.TABLE_COLLECTION_TEAM, DAO.COLUMN_UUID, collectionTeam.uuid ))
         {
-            if (collectionTeam.doesNotEqual( existingCollectionTeam ))
+            val existingCollectionTeam = getCollectionTeam( collectionTeam.uuid )
+
+            if (existingCollectionTeam != null && collectionTeam.doesNotEqual( existingCollectionTeam ))
             {
                 updateTeam( collectionTeam )
                 Log.d( "xxx", "Updated CollectionTeam with ID ${collectionTeam.uuid}" )
@@ -85,19 +85,6 @@ class CollectionTeamDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, collectionTeam.creationDate )
         values.put( DAO.COLUMN_ENUM_AREA_UUID, collectionTeam.enumAreaUuid )
         values.put( DAO.COLUMN_COLLECTION_TEAM_NAME, collectionTeam.name )
-    }
-
-    fun exists(collectionTeam: CollectionTeam): Boolean
-    {
-        for (existingCollectionTeam in getCollectionTeams())
-        {
-            if (existingCollectionTeam.uuid == collectionTeam.uuid)
-            {
-                return true
-            }
-        }
-
-        return false
     }
 
     @SuppressLint("Range")

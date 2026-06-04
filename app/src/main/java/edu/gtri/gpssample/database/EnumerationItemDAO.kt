@@ -23,9 +23,10 @@ class EnumerationItemDAO(private var dao: DAO)
 {
     fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location ) : EnumerationItem?
     {
-        if (exists( enumerationItem ))
+        if (dao.exists( DAO.TABLE_ENUMERATION_ITEM, DAO.COLUMN_UUID, enumerationItem.uuid ))
         {
             updateEnumerationItem( enumerationItem, location )
+            Log.d( "xxx", "Updated EnumerationItem with ID ${enumerationItem.uuid}" )
         }
         else
         {

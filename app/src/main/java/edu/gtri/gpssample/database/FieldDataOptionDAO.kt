@@ -18,16 +18,18 @@ import edu.gtri.gpssample.extensions.toBoolean
 
 class FieldDataOptionDAO(private var dao: DAO)
 {
+    val fieldDataOptionCache = HashMap<String, FieldDataOption>()
+
     fun createOrUpdateFieldDataOption(fieldDataOption: FieldDataOption, obj: Any) : FieldDataOption?
     {
-        val existingFieldDataOption = getFieldDataOption( fieldDataOption.uuid )
-
-        if (existingFieldDataOption != null)
+        if (dao.exists( DAO.TABLE_FIELD_DATA_OPTION, DAO.COLUMN_UUID, fieldDataOption.uuid ))
         {
-            if (fieldDataOption.doesNotEqual( existingFieldDataOption ))
-            {
-                updateFieldDataOption( fieldDataOption )
-                Log.d( "xxx", "Updated FieldDataOption with ID ${fieldDataOption.uuid}")
+            getFieldDataOption( fieldDataOption.uuid )?.let { existingFieldDataOption ->
+                if (fieldDataOption.doesNotEqual( existingFieldDataOption ))
+                {
+                    updateFieldDataOption( fieldDataOption )
+                    Log.d( "xxx", "Updated FieldDataOption with ID ${fieldDataOption.uuid}")
+                }
             }
         }
         else
@@ -67,6 +69,7 @@ class FieldDataOptionDAO(private var dao: DAO)
             values.put( DAO.COLUMN_FIELD_DATA_OPTION_UUID, fieldDataOption.uuid )
             dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION, null, values).toInt()
         }
+        cursor.close()
     }
 
     private fun createRuleConnection(fieldDataOption: FieldDataOption, rule: Rule)
@@ -80,6 +83,7 @@ class FieldDataOptionDAO(private var dao: DAO)
             values.put( DAO.COLUMN_FIELD_DATA_OPTION_UUID, fieldDataOption.uuid )
             dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION, null, values).toInt()
         }
+        cursor.close()
     }
 
     fun putFieldDataOption(fieldDataOption: FieldDataOption, values: ContentValues)
@@ -98,13 +102,6 @@ class FieldDataOptionDAO(private var dao: DAO)
         putFieldDataOption( fieldDataOption, values )
 
         dao.writableDatabase.update(DAO.TABLE_FIELD_DATA_OPTION, values, whereClause, args )
-    }
-
-    fun exists( fieldDataOption: FieldDataOption): Boolean
-    {
-        getFieldDataOption( fieldDataOption.uuid )?.let {
-            return true
-        } ?: return false
     }
 
     fun modified( fieldDataOption : FieldDataOption ) : Boolean
@@ -129,42 +126,31 @@ class FieldDataOptionDAO(private var dao: DAO)
         return FieldDataOption(uuid, name, value)
     }
 
-    fun getFieldDataOption( id : Int ): FieldDataOption?
+    fun loadCache()
     {
-        var fieldDataOption: FieldDataOption? = null
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA_OPTION} where id=${id}"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
+        fieldDataOptionCache.clear()
 
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            fieldDataOption = buildFieldDataOption( cursor )
+        val cursor = dao.writableDatabase.rawQuery("SELECT * FROM ${DAO.TABLE_FIELD_DATA_OPTION}", null)
+
+        while (cursor.moveToNext()) {
+            val option = buildFieldDataOption(cursor)
+            fieldDataOptionCache[option.uuid] = option
         }
 
         cursor.close()
-
-        return fieldDataOption
     }
 
     fun getFieldDataOption( uuid: String ): FieldDataOption?
     {
-        var fieldDataOption: FieldDataOption? = null
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA_OPTION} where ${DAO.COLUMN_UUID} = '${uuid}'"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            fieldDataOption = buildFieldDataOption( cursor )
+        fieldDataOptionCache[uuid]?.let {
+            return it
         }
 
-        cursor.close()
-
-        return fieldDataOption
+        return null
     }
 
     @SuppressLint("Range")
-    fun getFieldDataOptions( fieldData: FieldData) : ArrayList<FieldDataOption>
+    fun getFieldDataOptions( fieldData: FieldData ) : ArrayList<FieldDataOption>
     {
         val fieldDataOptions = ArrayList<FieldDataOption>()
 
@@ -173,10 +159,10 @@ class FieldDataOptionDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val fieldDataOptionId = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_UUID))
-            val fieldDataOption = getFieldDataOption( fieldDataOptionId )
-            fieldDataOption?.let {
-                fieldDataOptions.add( it )
+            val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_UUID))
+
+            fieldDataOptionCache[uuid]?.let {
+                fieldDataOptions.add(it)
             }
         }
 

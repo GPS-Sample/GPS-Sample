@@ -18,11 +18,12 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.SamplingState
+import edu.gtri.gpssample.database.ConfigDAO.EnumAreaSummary
 import edu.gtri.gpssample.database.models.EnumArea
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ConfigurationAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapter<ConfigurationAdapter.ViewHolder>()
+class ConfigurationAdapter(var enumAreas: List<EnumArea>?, var enumAreaSummaries: List<EnumAreaSummary>) : RecyclerView.Adapter<ConfigurationAdapter.ViewHolder>()
 {
     override fun getItemCount() : Int {
         enumAreas?.let {enumAreas ->
@@ -61,32 +62,11 @@ class ConfigurationAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapte
 
         holder.nameTextView.setText( enumArea.name )
 
-        var sampledCount = 0
-        var enumerationCount = 0
-        var surveyedCount = 0
-
-        for (location in enumArea.locations)
-        {
-            for (enumItem in location.enumerationItems)
-            {
-                if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
-                {
-                    enumerationCount += 1
-                }
-                if (enumItem.samplingState == SamplingState.Sampled || enumItem.subsetSamplingState == SamplingState.Sampled)
-                {
-                    sampledCount += 1
-                }
-                if (enumItem.collectionState == CollectionState.Complete)
-                {
-                    surveyedCount += 1
-                }
-            }
+        enumAreaSummaries.find { it.enumAreaUuid == enumArea.uuid } ?.let {
+            holder.enumeratedTextView.text = "${it.enumeratedCount}"
+            holder.sampledTextView.text = "${it.sampledCount}"
+            holder.surveyedTextView.text = "${it.surveyedCount}"
         }
-
-        holder.enumeratedTextView.text = "$enumerationCount"
-        holder.sampledTextView.text = "$sampledCount"
-        holder.surveyedTextView.text = "$surveyedCount"
 
         holder.itemView.setOnClickListener {
             didSelectEnumArea(enumArea)

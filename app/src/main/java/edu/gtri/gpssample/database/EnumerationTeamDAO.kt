@@ -17,14 +17,14 @@ class EnumerationTeamDAO(private var dao: DAO)
 {
     fun createOrUpdateEnumerationTeam(enumerationTeam: EnumerationTeam) : EnumerationTeam?
     {
-        val existingEnumerationTeam = getEnumerationTeam( enumerationTeam.uuid )
-
-        if (existingEnumerationTeam != null)
+        if (dao.exists( DAO.TABLE_ENUMERATION_TEAM, DAO.COLUMN_UUID, enumerationTeam.uuid ))
         {
-            if (enumerationTeam.doesNotEqual( existingEnumerationTeam ))
-            {
-                updateTeam( enumerationTeam )
-                Log.d( "xxx", "Updated EnumerationTeam with ID ${enumerationTeam.uuid}")
+            getEnumerationTeam( enumerationTeam.uuid )?.let { existingEnumerationTeam ->
+                if (enumerationTeam.doesNotEqual( existingEnumerationTeam ))
+                {
+                    updateTeam( enumerationTeam )
+                    Log.d( "xxx", "Updated EnumerationTeam with ID ${enumerationTeam.uuid}")
+                }
             }
         }
         else
@@ -85,13 +85,6 @@ class EnumerationTeamDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, enumerationTeam.creationDate )
         values.put( DAO.COLUMN_ENUM_AREA_UUID, enumerationTeam.enumAreaUuid )
         values.put( DAO.COLUMN_ENUMERATION_TEAM_NAME, enumerationTeam.name )
-    }
-
-    fun exists( enumerationTeam: EnumerationTeam ): Boolean
-    {
-        getEnumerationTeam( enumerationTeam.uuid )?.let {
-            return true
-        } ?: return false
     }
 
     @SuppressLint("Range")

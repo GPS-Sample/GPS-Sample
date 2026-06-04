@@ -30,6 +30,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -59,6 +60,9 @@ import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.File
 import java.time.LocalDateTime
@@ -194,493 +198,526 @@ class PerformCollectionFragment : Fragment(),
             collectionTeam = it
         }
 
-        if (sharedViewModel.currentCenterPoint?.value == null)
-        {
-            val latLngBounds = GeoUtils.findGeobounds(collectionTeam.polygon)
-            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-            sharedViewModel.setCurrentCenterPoint( point )
-        }
-
-        val _user = (activity!!.application as? MainApplication)?.user
-
-        _user?.let { user ->
-            this.user = user
-        }
-
-        enumerationItems.clear()
-        collectionTeamLocations.clear()
-
-        for (teamLocationUuid in collectionTeam.locationUuids)
-        {
-            enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
-                collectionTeamLocations.add( location )
-                for (enumurationItem in location.enumerationItems)
-                {
-                    if (enumurationItem.samplingState == SamplingState.Sampled || enumurationItem.subsetSamplingState == SamplingState.Sampled)
-                    {
-                        enumerationItems.add( enumurationItem )
-                    }
-                }
-            }
-        }
-
-        landmarkLocations.clear()
-
-        for (location in enumArea.locations)
-        {
-            if (location.isLandmark)
+        sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+            if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
             {
-                landmarkLocations.add( location )
-            }
-        }
-
-        performCollectionAdapter = PerformCollectionAdapter( ArrayList<EnumerationItem>(), ArrayList<Location>(), enumArea.name )
-        performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
-
-        performCollectionAdapter.didSelectItem = this::didSelectItem
-
-        binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = performCollectionAdapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(activity )
-        binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
-
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-            binding.titleTextView.text =  enumArea.name + " (" + collectionTeam.name + " " + resources.getString(R.string.team) + ")"
-        }
-
-        binding.mapTileCacheButton.backgroundTintList?.let {
-            defaultColorList = it
-        }
-
-        if (isShowingBreadcrumbs)
-        {
-            binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-        }
-        else
-        {
-            binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
-        }
-
-        val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
-        if (centerOnCurrentLocation == null)
-        {
-            sharedViewModel.setCenterOnCurrentLocation( false )
-        }
-
-        if (enumArea.mbTilesPath.isNotEmpty())
-        {
-            TileServer.startServer( enumArea.mbTilesPath )
-        }
-
-        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
-            this.mapView = mapView
-
-            MapManager.instance().enableLocationUpdates(activity!!, mapView)
-
-            binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
-
-            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                MapManager.instance().centerMap( collectionTeam.polygon, currentZoomLevel, mapView )
-            }
-
-            sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
-                if (centerOnCurrentLocation)
-                {
-                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                    binding.centerOnLocationButton.setBackgroundTintList( ColorStateList.valueOf( resources.getColor(android.R.color.holo_red_light)));
-                }
-                else
-                {
-                    MapManager.instance().stopCenteringOnLocation( mapView )
-                    binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
-                }
-            }
-
-            refreshMap()
-        }
-
-        if (ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-        {
-            val locationRequest = LocationRequest.create().apply {
-                interval = 5000
-                fastestInterval = 2000
-                priority = Priority.PRIORITY_HIGH_ACCURACY
-            }
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
-            fusedLocationClient.requestLocationUpdates( locationRequest, locationCallback, Looper.getMainLooper())
-        }
-
-        val views = ArrayList<String>()
-        val showViews = resources.getTextArray( R.array.show_views )
-
-        for (showView in showViews)
-        {
-            views.add( showView.toString())
-        }
-
-        binding.showSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, views )
-
-        binding.showSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
-        {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
-            {
-                // Note! OnItemSelected fires automatically when the fragment is created
-                when( position )
-                {
-                    0-> { // nothing
-                        binding.mapLayout.visibility = View.VISIBLE
-                        binding.recyclerView.visibility = View.VISIBLE
-                    }
-                    1-> { // Map Only
-                        binding.mapLayout.visibility = View.VISIBLE
-                        binding.recyclerView.visibility = View.GONE
-                    }
-                    2-> { // List Only
-                        binding.mapLayout.visibility = View.GONE
-                        binding.recyclerView.visibility = View.VISIBLE
-                    }
-                }
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
-
-        val items = ArrayList<String>()
-        val sortFilters = resources.getTextArray( R.array.sort_filters )
-
-        for (sortFilter in sortFilters)
-        {
-            items.add( sortFilter.toString())
-        }
-
-        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-            if (study.subsetRules.isNotEmpty() && study.subsetFilters.isNotEmpty())
-            {
-                items.add( resources.getString( R.string.primary_sample ))
-                items.add( resources.getString( R.string.subset_sample ))
-            }
-        }
-
-        binding.filterSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, items )
-
-        binding.filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
-        {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
-            {
-                // Note! OnItemSelected fires automatically when the fragment is created
-                when( position )
-                {
-                    0-> { // nothing
-                        for (enumerationItem in enumerationItems)
-                        {
-                            enumerationItem.isVisible = true
-                        }
-                        for (location in collectionTeamLocations) // includes landmarks!
-                        {
-                            location.isVisible = true
-                        }
-                    }
-                    1-> { // undefined
-                        for (location in collectionTeamLocations)
-                        {
-                            location.isVisible = false
-                        }
-
-                        for (enumerationItem in enumerationItems)
-                        {
-                            enumerationItem.isVisible = false
-
-                            if (enumerationItem.collectionState == CollectionState.Undefined)
-                            {
-                                enumerationItem.isVisible = true
-                                for (location in collectionTeamLocations)
-                                {
-                                    for (enumItem in location.enumerationItems)
-                                    {
-                                        if (enumItem.uuid == enumerationItem.uuid)
-                                        {
-                                            location.isVisible = true
-                                            break
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    2-> { // incomplete
-                        for (location in collectionTeamLocations)
-                        {
-                            location.isVisible = false
-                        }
-
-                        for (enumerationItem in enumerationItems)
-                        {
-                            enumerationItem.isVisible = false
-
-                            if (enumerationItem.collectionState == CollectionState.Incomplete)
-                            {
-                                enumerationItem.isVisible = true
-                                for (location in collectionTeamLocations)
-                                {
-                                    for (enumItem in location.enumerationItems)
-                                    {
-                                        if (enumItem.uuid == enumerationItem.uuid)
-                                        {
-                                            location.isVisible = true
-                                            break
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    3-> { // complete
-                        for (location in collectionTeamLocations)
-                        {
-                            location.isVisible = false
-                        }
-
-                        for (enumerationItem in enumerationItems)
-                        {
-                            enumerationItem.isVisible = false
-
-                            if (enumerationItem.collectionState == CollectionState.Complete)
-                            {
-                                enumerationItem.isVisible = true
-                                for (location in collectionTeamLocations)
-                                {
-                                    for (enumItem in location.enumerationItems)
-                                    {
-                                        if (enumItem.uuid == enumerationItem.uuid)
-                                        {
-                                            location.isVisible = true
-                                            break
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    4-> { // points of interest
-                        for (location in collectionTeamLocations)
-                        {
-                            location.isVisible = if (location.isLandmark) true else false
-                        }
-                        for (enumerationItem in enumerationItems)
-                        {
-                            enumerationItem.isVisible = false
-                        }
-                    }
-                    5 -> { // Primary Sample
-                        for (location in collectionTeamLocations)
-                        {
-                            location.isVisible = false
-                        }
-
-                        for (enumerationItem in enumerationItems)
-                        {
-                            enumerationItem.isVisible = false
-
-                            if (enumerationItem.samplingState == SamplingState.Sampled)
-                            {
-                                enumerationItem.isVisible = true
-                                for (location in collectionTeamLocations)
-                                {
-                                    for (enumItem in location.enumerationItems)
-                                    {
-                                        if (enumItem.uuid == enumerationItem.uuid)
-                                        {
-                                            location.isVisible = true
-                                            break
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    6 -> { // Subset Sample
-                        for (location in collectionTeamLocations)
-                        {
-                            location.isVisible = false
-                        }
-
-                        for (enumerationItem in enumerationItems)
-                        {
-                            enumerationItem.isVisible = false
-
-                            if (enumerationItem.subsetSamplingState == SamplingState.Sampled)
-                            {
-                                enumerationItem.isVisible = true
-                                for (location in collectionTeamLocations)
-                                {
-                                    for (enumItem in location.enumerationItems)
-                                    {
-                                        if (enumItem.uuid == enumerationItem.uuid)
-                                        {
-                                            location.isVisible = true
-                                            break
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
-                refreshMap()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
-
-        binding.mapTileCacheButton.setOnClickListener {
-            enumArea.mapTileRegion?.let {
-                val mapTileRegions = ArrayList<MapTileRegion>()
-                mapTileRegions.add( it )
-                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-                MapManager.instance().cacheMapTiles(activity!!, mapView, mapTileRegions, this )
-            }
-        }
-
-        binding.legendTextView.setOnClickListener {
-            MapLegendDialog( activity!! )
-        }
-
-        binding.legendImageView.setOnClickListener {
-            MapLegendDialog( activity!! )
-        }
-
-        binding.helpButton.setOnClickListener {
-            PerformCollectionHelpDialog( activity!! )
-        }
-
-        binding.centerOnLocationButton.setOnClickListener {
-            sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
-                if (centerOnCurrentLocation)
-                {
-                    sharedViewModel.setCenterOnCurrentLocation( false )
-                    MapManager.instance().stopCenteringOnLocation( mapView )
-                    binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
-                }
-                else
-                {
-                    sharedViewModel.setCenterOnCurrentLocation( true )
-                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                    binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                }
-                refreshMap()
-            }
-        }
-
-        binding.exportButton.setOnClickListener {
-            var title = ""
-
-            if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
-            {
-                title = resources.getString(R.string.export_configuration)
+                binding.osmMapView.visibility = View.VISIBLE
+                binding.mapboxMapView.visibility = View.GONE
+                MapManager.instance().centerMap( collectionTeam.polygon, currentZoomLevel, binding.osmMapView )
             }
             else
             {
-                title = resources.getString(R.string.export_collection_data)
+                binding.osmMapView.visibility = View.GONE
+                binding.mapboxMapView.visibility = View.VISIBLE
+                MapManager.instance().centerMap( collectionTeam.polygon, currentZoomLevel, binding.mapboxMapView )
+            }
+        }
+
+        binding.progressOverlayView.visibility = View.VISIBLE
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                for (location in enumArea.locations)
+                {
+                    if (location.enumerationItems.isEmpty())
+                    {
+                        location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems(location)
+                    }
+                }
             }
 
-            ConfirmationDialog( activity, title, resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    when( buttonPressed )
+            // back on the main thread...
+
+            binding.progressOverlayView.visibility = View.GONE
+
+            if (sharedViewModel.currentCenterPoint?.value == null)
+            {
+                val latLngBounds = GeoUtils.findGeobounds(collectionTeam.polygon)
+                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                sharedViewModel.setCurrentCenterPoint( point )
+            }
+
+            val _user = (activity!!.application as? MainApplication)?.user
+
+            _user?.let { user ->
+                this@PerformCollectionFragment.user = user
+            }
+
+            enumerationItems.clear()
+            collectionTeamLocations.clear()
+
+            for (teamLocationUuid in collectionTeam.locationUuids)
+            {
+                enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
+                    collectionTeamLocations.add( location )
+                    for (enumurationItem in location.enumerationItems)
                     {
-                        ConfirmationDialog.ButtonPress.Left -> {
-                            sharedNetworkViewModel.setCurrentConfig(config)
-
-                            when(user.role)
-                            {
-                                Role.Admin.toString(),
-                                Role.Supervisor.toString() ->
-                                {
-                                    sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
-                                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
-                                    sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-                                    startHotspot(view)
-                                }
-
-                                Role.Enumerator.toString(),
-                                Role.DataCollector.toString() ->
-                                {
-                                    sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                                        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-                                        sharedNetworkViewModel.networkClientModel.currentConfig = config
-                                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                                        getResult.launch(intent)
-                                    }
-                                }
-                                else -> {}
-                            }
-                        }
-                        ConfirmationDialog.ButtonPress.Right -> {
-                            val items = ArrayList<String>()
-                            items.add( "Configuration Files" )
-                            items.add( "Image Files" )
-                            CheckboxDialog( activity!!, "Select the file types to export", items ) { selections ->
-                                includeConfig = false
-                                includeImages = false
-
-                                for (selection in selections) {
-                                    if (selection == items[0]) includeConfig = true
-                                    if (selection == items[1]) includeImages = true
-                                }
-
-                                if (includeConfig || includeImages)
-                                {
-                                    ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null,true ) { buttonPressed, tag ->
-                                        when( buttonPressed )
-                                        {
-                                            ConfirmationDialog.ButtonPress.Left -> {
-                                                ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Surveyed", includeConfig, includeImages, shouldPackMinimal()) { success ->
-                                                    if (success)
-                                                    {
-                                                        Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
-                                                    }
-                                                    else
-                                                    {
-                                                        NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
-                                                    }
-                                                }
-                                            }
-                                            ConfirmationDialog.ButtonPress.Right -> {
-                                                exportToDevice()
-                                            }
-                                            ConfirmationDialog.ButtonPress.None -> {
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        ConfirmationDialog.ButtonPress.None -> {
+                        if (enumurationItem.samplingState == SamplingState.Sampled || enumurationItem.subsetSamplingState == SamplingState.Sampled)
+                        {
+                            enumerationItems.add( enumurationItem )
                         }
                     }
                 }
             }
-        }
 
-        binding.showBreadcrumbsButton.setOnClickListener {
-            if (!isShowingBreadcrumbs)
+            landmarkLocations.clear()
+
+            for (location in enumArea.locations)
             {
-                isShowingBreadcrumbs = true
+                if (location.isLandmark)
+                {
+                    landmarkLocations.add( location )
+                }
+            }
+
+            performCollectionAdapter = PerformCollectionAdapter( ArrayList<EnumerationItem>(), ArrayList<Location>(), enumArea.name )
+            performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+
+            performCollectionAdapter.didSelectItem = this@PerformCollectionFragment::didSelectItem
+
+            binding.recyclerView.itemAnimator = DefaultItemAnimator()
+            binding.recyclerView.adapter = performCollectionAdapter
+            binding.recyclerView.layoutManager = LinearLayoutManager(activity )
+            binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
+
+            sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
+                binding.titleTextView.text =  enumArea.name + " (" + collectionTeam.name + " " + resources.getString(R.string.team) + ")"
+            }
+
+            binding.mapTileCacheButton.backgroundTintList?.let {
+                defaultColorList = it
+            }
+
+            if (isShowingBreadcrumbs)
+            {
                 binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
             {
-                isShowingBreadcrumbs = false
                 binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
             }
 
-            refreshMap()
-        }
+            val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
+            if (centerOnCurrentLocation == null)
+            {
+                sharedViewModel.setCenterOnCurrentLocation( false )
+            }
 
-        updateSummaryInfo()
+            if (enumArea.mbTilesPath.isNotEmpty())
+            {
+                TileServer.startServer( enumArea.mbTilesPath )
+            }
+
+            val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+            MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this@PerformCollectionFragment ) { mapView ->
+                this@PerformCollectionFragment.mapView = mapView
+
+                MapManager.instance().enableLocationUpdates(activity!!, mapView)
+
+                binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
+
+                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                    MapManager.instance().centerMap( collectionTeam.polygon, currentZoomLevel, mapView )
+                }
+
+                sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
+                    if (centerOnCurrentLocation)
+                    {
+                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                        binding.centerOnLocationButton.setBackgroundTintList( ColorStateList.valueOf( resources.getColor(android.R.color.holo_red_light)));
+                    }
+                    else
+                    {
+                        MapManager.instance().stopCenteringOnLocation( mapView )
+                        binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                    }
+                }
+
+                refreshMap()
+            }
+
+            if (ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            {
+                val locationRequest = LocationRequest.create().apply {
+                    interval = 5000
+                    fastestInterval = 2000
+                    priority = Priority.PRIORITY_HIGH_ACCURACY
+                }
+                fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
+                fusedLocationClient.requestLocationUpdates( locationRequest, locationCallback, Looper.getMainLooper())
+            }
+
+            val views = ArrayList<String>()
+            val showViews = resources.getTextArray( R.array.show_views )
+
+            for (showView in showViews)
+            {
+                views.add( showView.toString())
+            }
+
+            binding.showSpinner.adapter = ArrayAdapter<String>(this@PerformCollectionFragment.requireContext(), android.R.layout.simple_spinner_dropdown_item, views )
+
+            binding.showSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+            {
+                override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
+                {
+                    // Note! OnItemSelected fires automatically when the fragment is created
+                    when( position )
+                    {
+                        0-> { // nothing
+                            binding.mapLayout.visibility = View.VISIBLE
+                            binding.recyclerView.visibility = View.VISIBLE
+                        }
+                        1-> { // Map Only
+                            binding.mapLayout.visibility = View.VISIBLE
+                            binding.recyclerView.visibility = View.GONE
+                        }
+                        2-> { // List Only
+                            binding.mapLayout.visibility = View.GONE
+                            binding.recyclerView.visibility = View.VISIBLE
+                        }
+                    }
+                }
+                override fun onNothingSelected(parent: AdapterView<*>) {}
+            }
+
+            val items = ArrayList<String>()
+            val sortFilters = resources.getTextArray( R.array.sort_filters )
+
+            for (sortFilter in sortFilters)
+            {
+                items.add( sortFilter.toString())
+            }
+
+            sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                if (study.subsetRules.isNotEmpty() && study.subsetFilters.isNotEmpty())
+                {
+                    items.add( resources.getString( R.string.primary_sample ))
+                    items.add( resources.getString( R.string.subset_sample ))
+                }
+            }
+
+            binding.filterSpinner.adapter = ArrayAdapter<String>(this@PerformCollectionFragment.requireContext(), android.R.layout.simple_spinner_dropdown_item, items )
+
+            binding.filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+            {
+                override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
+                {
+                    // Note! OnItemSelected fires automatically when the fragment is created
+                    when( position )
+                    {
+                        0-> { // nothing
+                            for (enumerationItem in enumerationItems)
+                            {
+                                enumerationItem.isVisible = true
+                            }
+                            for (location in collectionTeamLocations) // includes landmarks!
+                            {
+                                location.isVisible = true
+                            }
+                        }
+                        1-> { // undefined
+                            for (location in collectionTeamLocations)
+                            {
+                                location.isVisible = false
+                            }
+
+                            for (enumerationItem in enumerationItems)
+                            {
+                                enumerationItem.isVisible = false
+
+                                if (enumerationItem.collectionState == CollectionState.Undefined)
+                                {
+                                    enumerationItem.isVisible = true
+                                    for (location in collectionTeamLocations)
+                                    {
+                                        for (enumItem in location.enumerationItems)
+                                        {
+                                            if (enumItem.uuid == enumerationItem.uuid)
+                                            {
+                                                location.isVisible = true
+                                                break
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        2-> { // incomplete
+                            for (location in collectionTeamLocations)
+                            {
+                                location.isVisible = false
+                            }
+
+                            for (enumerationItem in enumerationItems)
+                            {
+                                enumerationItem.isVisible = false
+
+                                if (enumerationItem.collectionState == CollectionState.Incomplete)
+                                {
+                                    enumerationItem.isVisible = true
+                                    for (location in collectionTeamLocations)
+                                    {
+                                        for (enumItem in location.enumerationItems)
+                                        {
+                                            if (enumItem.uuid == enumerationItem.uuid)
+                                            {
+                                                location.isVisible = true
+                                                break
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        3-> { // complete
+                            for (location in collectionTeamLocations)
+                            {
+                                location.isVisible = false
+                            }
+
+                            for (enumerationItem in enumerationItems)
+                            {
+                                enumerationItem.isVisible = false
+
+                                if (enumerationItem.collectionState == CollectionState.Complete)
+                                {
+                                    enumerationItem.isVisible = true
+                                    for (location in collectionTeamLocations)
+                                    {
+                                        for (enumItem in location.enumerationItems)
+                                        {
+                                            if (enumItem.uuid == enumerationItem.uuid)
+                                            {
+                                                location.isVisible = true
+                                                break
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        4-> { // points of interest
+                            for (location in collectionTeamLocations)
+                            {
+                                location.isVisible = if (location.isLandmark) true else false
+                            }
+                            for (enumerationItem in enumerationItems)
+                            {
+                                enumerationItem.isVisible = false
+                            }
+                        }
+                        5 -> { // Primary Sample
+                            for (location in collectionTeamLocations)
+                            {
+                                location.isVisible = false
+                            }
+
+                            for (enumerationItem in enumerationItems)
+                            {
+                                enumerationItem.isVisible = false
+
+                                if (enumerationItem.samplingState == SamplingState.Sampled)
+                                {
+                                    enumerationItem.isVisible = true
+                                    for (location in collectionTeamLocations)
+                                    {
+                                        for (enumItem in location.enumerationItems)
+                                        {
+                                            if (enumItem.uuid == enumerationItem.uuid)
+                                            {
+                                                location.isVisible = true
+                                                break
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        6 -> { // Subset Sample
+                            for (location in collectionTeamLocations)
+                            {
+                                location.isVisible = false
+                            }
+
+                            for (enumerationItem in enumerationItems)
+                            {
+                                enumerationItem.isVisible = false
+
+                                if (enumerationItem.subsetSamplingState == SamplingState.Sampled)
+                                {
+                                    enumerationItem.isVisible = true
+                                    for (location in collectionTeamLocations)
+                                    {
+                                        for (enumItem in location.enumerationItems)
+                                        {
+                                            if (enumItem.uuid == enumerationItem.uuid)
+                                            {
+                                                location.isVisible = true
+                                                break
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+                    refreshMap()
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>) {}
+            }
+
+            binding.mapTileCacheButton.setOnClickListener {
+                enumArea.mapTileRegion?.let {
+                    val mapTileRegions = ArrayList<MapTileRegion>()
+                    mapTileRegions.add( it )
+                    busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this@PerformCollectionFragment )
+                    MapManager.instance().cacheMapTiles(activity!!, mapView, mapTileRegions, this@PerformCollectionFragment )
+                }
+            }
+
+            binding.legendTextView.setOnClickListener {
+                MapLegendDialog( activity!! )
+            }
+
+            binding.legendImageView.setOnClickListener {
+                MapLegendDialog( activity!! )
+            }
+
+            binding.helpButton.setOnClickListener {
+                PerformCollectionHelpDialog( activity!! )
+            }
+
+            binding.centerOnLocationButton.setOnClickListener {
+                sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
+                    if (centerOnCurrentLocation)
+                    {
+                        sharedViewModel.setCenterOnCurrentLocation( false )
+                        MapManager.instance().stopCenteringOnLocation( mapView )
+                        binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                    }
+                    else
+                    {
+                        sharedViewModel.setCenterOnCurrentLocation( true )
+                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                    }
+                    refreshMap()
+                }
+            }
+
+            binding.exportButton.setOnClickListener {
+                var title = ""
+
+                if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
+                {
+                    title = resources.getString(R.string.export_configuration)
+                }
+                else
+                {
+                    title = resources.getString(R.string.export_collection_data)
+                }
+
+                ConfirmationDialog( activity, title, resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                        when( buttonPressed )
+                        {
+                            ConfirmationDialog.ButtonPress.Left -> {
+                                sharedNetworkViewModel.setCurrentConfig(config)
+
+                                when(user.role)
+                                {
+                                    Role.Admin.toString(),
+                                    Role.Supervisor.toString() ->
+                                    {
+                                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
+                                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
+                                        sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+                                        startHotspot(view)
+                                    }
+
+                                    Role.Enumerator.toString(),
+                                    Role.DataCollector.toString() ->
+                                    {
+                                        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
+                                            sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
+                                            sharedNetworkViewModel.networkClientModel.currentConfig = config
+                                            val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                            getResult.launch(intent)
+                                        }
+                                    }
+                                    else -> {}
+                                }
+                            }
+                            ConfirmationDialog.ButtonPress.Right -> {
+                                val items = ArrayList<String>()
+                                items.add( "Configuration Files" )
+                                items.add( "Image Files" )
+                                CheckboxDialog( activity!!, "Select the file types to export", items ) { selections ->
+                                    includeConfig = false
+                                    includeImages = false
+
+                                    for (selection in selections) {
+                                        if (selection == items[0]) includeConfig = true
+                                        if (selection == items[1]) includeImages = true
+                                    }
+
+                                    if (includeConfig || includeImages)
+                                    {
+                                        ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null,true ) { buttonPressed, tag ->
+                                            when( buttonPressed )
+                                            {
+                                                ConfirmationDialog.ButtonPress.Left -> {
+                                                    ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Surveyed", includeConfig, includeImages, shouldPackMinimal()) { success ->
+                                                        if (success)
+                                                        {
+                                                            Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                                        }
+                                                        else
+                                                        {
+                                                            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                                        }
+                                                    }
+                                                }
+                                                ConfirmationDialog.ButtonPress.Right -> {
+                                                    exportToDevice()
+                                                }
+                                                ConfirmationDialog.ButtonPress.None -> {
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            ConfirmationDialog.ButtonPress.None -> {
+                            }
+                        }
+                    }
+                }
+            }
+
+            binding.showBreadcrumbsButton.setOnClickListener {
+                if (!isShowingBreadcrumbs)
+                {
+                    isShowingBreadcrumbs = true
+                    binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                }
+                else
+                {
+                    isShowingBreadcrumbs = false
+                    binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+                }
+
+                refreshMap()
+            }
+
+            updateSummaryInfo()
+        }
     }
 
     fun shouldPackMinimal() : Boolean

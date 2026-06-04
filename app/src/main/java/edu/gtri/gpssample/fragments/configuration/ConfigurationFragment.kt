@@ -331,7 +331,9 @@ class ConfigurationFragment : Fragment(),
                 sharedViewModel.createStudyModel.setStudy(config.studies[0])
             }
 
-            enumerationAreasAdapter = ConfigurationAdapter( config.enumAreas )
+            val enumAreaSummary = DAO.configDAO.getEnumAreaSummary(config.uuid )
+
+            enumerationAreasAdapter = ConfigurationAdapter( config.enumAreas, enumAreaSummary )
             enumerationAreasAdapter.didSelectEnumArea = this::didSelectEnumArea
         }
 
@@ -374,47 +376,15 @@ class ConfigurationFragment : Fragment(),
     fun updateOverview()
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
-
-            var sampledCount = 0
-            var enumerationCount = 0
-            var surveyedCount = 0
-            var eligibleCount = 0
+            val summaryInfo = DAO.configDAO.getConfigSummary(config.uuid )
+            val numRemaining = summaryInfo.sampledCount - summaryInfo.surveyedCount
 
             binding.numberOfEnumerationAreasTextView.text = "${config.enumAreas.size}"
-
-            for (enumerationArea in config.enumAreas)
-            {
-                for (location in enumerationArea.locations)
-                {
-                    for (enumItem in location.enumerationItems)
-                    {
-                        if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
-                        {
-                            enumerationCount += 1
-                        }
-                        if (enumItem.enumerationEligibleForSampling || enumItem.enumerationEligibleForSubsetSampling)
-                        {
-                            eligibleCount += 1
-                        }
-                        if (enumItem.samplingState == SamplingState.Sampled || enumItem.subsetSamplingState == SamplingState.Sampled)
-                        {
-                            sampledCount += 1
-                        }
-                        if (enumItem.collectionState == CollectionState.Complete)
-                        {
-                            surveyedCount += 1
-                        }
-                    }
-                }
-            }
-
-            val numRemaining = sampledCount - surveyedCount
-
-            binding.numberEnumeratedTextView.text = "$enumerationCount"
-            binding.numberEligibleTextView.text = "$eligibleCount"
-            binding.numberSampledTextView.text = "$sampledCount"
-            binding.numberSurveyedTextView.text = "$surveyedCount"
-            binding.numberRemainingTextView.text = "$numRemaining"
+            binding.numberEnumeratedTextView.text = "${summaryInfo.enumerationCount}"
+            binding.numberEligibleTextView.text = "${summaryInfo.eligibleCount}"
+            binding.numberSampledTextView.text = "${summaryInfo.sampledCount}"
+            binding.numberSurveyedTextView.text = "${summaryInfo.surveyedCount}"
+            binding.numberRemainingTextView.text = "${numRemaining}"
         }
     }
 

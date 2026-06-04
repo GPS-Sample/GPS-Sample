@@ -18,7 +18,7 @@ class FieldOptionDAO(private var dao: DAO)
 {
     fun createOrUpdateFieldOption( fieldOption: FieldOption, field: Field ) : FieldOption?
     {
-        if (exists( fieldOption ))
+        if (dao.exists(DAO.TABLE_FIELD_OPTION, DAO.COLUMN_UUID, fieldOption.uuid ))
         {
             updateFieldOption( fieldOption )
             Log.d( "xxx", "Updated FieldOption with ID ${fieldOption.uuid}")
@@ -50,6 +50,7 @@ class FieldOptionDAO(private var dao: DAO)
             values.put( DAO.COLUMN_FIELD_OPTION_UUID, fieldOption.uuid )
             dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_FIELD__FIELD_OPTION, null, values).toInt()
         }
+        cursor.close()
     }
 
     fun putFieldOption( fieldOption: FieldOption, values: ContentValues )
@@ -67,13 +68,6 @@ class FieldOptionDAO(private var dao: DAO)
         putFieldOption( fieldOption, values )
 
         dao.writableDatabase.update(DAO.TABLE_FIELD_OPTION, values, whereClause, args )
-    }
-
-    fun exists( fieldOption: FieldOption): Boolean
-    {
-        getFieldOption( fieldOption.uuid )?.let {
-            return true
-        } ?: return false
     }
 
     @SuppressLint("Range")

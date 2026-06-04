@@ -29,7 +29,7 @@ class FilterDAO(private var dao: DAO)
 
     fun createOrUpdateFilter( filter: Filter, study : Study ) : Filter?
     {
-        if (exists( filter, study ))
+        if (dao.exists(DAO.TABLE_FILTER, DAO.COLUMN_UUID, filter.uuid ))
         {
             updateFilter( filter, study )
             deleteAllFilterOperators(filter)

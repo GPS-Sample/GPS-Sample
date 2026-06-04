@@ -372,28 +372,41 @@ class AddHouseholdFragment : Fragment(),
 
                         if (location.enumerationItems.size == 0)
                         {
-                            enumArea.locations.remove( location )
-                            DAO.locationDAO.delete( location )
-                            enumerationTeam.locationUuids.remove( location.uuid )
+                            ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_location_message),
+                                resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                                when (buttonPressed) {
+                                    ConfirmationDialog.ButtonPress.Left -> {}
+                                    ConfirmationDialog.ButtonPress.Right -> {
+                                        enumArea.locations.remove( location )
+                                        DAO.locationDAO.delete( location )
+                                        enumerationTeam.locationUuids.remove( location.uuid )
+                                    }
+                                    ConfirmationDialog.ButtonPress.None -> {}
+                                }
+
+                                findNavController().popBackStack()
+                            }
+                        }
+                        else
+                        {
+                            findNavController().popBackStack()
                         }
 
-                        DAO.configDAO.getConfig( config.uuid )?.let {
-                            sharedViewModel.setCurrentConfig( it )
-                        }
-
-                        DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
-                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
-                        }
-
-                        DAO.studyDAO.getStudy( study.uuid )?.let {
-                            sharedViewModel.createStudyModel.setStudy( it )
-                        }
+//                        DAO.configDAO.getConfig( config.uuid )?.let {
+//                            sharedViewModel.setCurrentConfig( it )
+//                        }
+//
+//                        DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
+//                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
+//                        }
+//
+//                        DAO.studyDAO.getStudy( study.uuid )?.let {
+//                            sharedViewModel.createStudyModel.setStudy( it )
+//                        }
 
 //                        DAO.enumerationTeamDAO.getEnumerationTeam( enumTeam.uuid )?.let {
 //                            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
 //                        }
-
-                        findNavController().popBackStack()
                     }
                     ConfirmationDialog.ButtonPress.None -> {}
                 }

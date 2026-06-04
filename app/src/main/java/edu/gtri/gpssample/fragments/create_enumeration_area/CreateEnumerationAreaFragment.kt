@@ -136,6 +136,10 @@ class CreateEnumerationAreaFragment : Fragment(),
         return binding.root
     }
 
+    private var debugPressCount = 0
+    private var shouldAutoEnumerateLocations = false
+    private var timeOfLastPress : Long = 0
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
@@ -459,6 +463,29 @@ class CreateEnumerationAreaFragment : Fragment(),
         binding.saveButton.setOnClickListener {
             config.enumAreas.addAll( unsavedEnumAreas )
             findNavController().popBackStack()
+        }
+
+        binding.toolbarTitle.setOnClickListener {
+            if (!shouldAutoEnumerateLocations)
+            {
+                val timeSpan = Date().time - timeOfLastPress
+
+                if (timeSpan > 2000)
+                {
+                    debugPressCount = 0
+                }
+                else
+                {
+                    debugPressCount += 1
+                    if (debugPressCount == 6)
+                    {
+                        shouldAutoEnumerateLocations = true
+                        Toast.makeText(activity!!.applicationContext,  "Imported locations will be Auto Enumerated!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                timeOfLastPress = Date().time
+            }
         }
     }
 
@@ -1272,6 +1299,11 @@ class CreateEnumerationAreaFragment : Fragment(),
                 val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
                 val location = Location( timeZone, LocationType.Enumeration, -1, point.point.coordinates.latitude, point.point.coordinates.longitude, altitude, false, "", point.property )
 
+                if (shouldAutoEnumerateLocations)
+                {
+                    location.enumerationItems.add( autoEnumerate( location ))
+                }
+
                 val enumArea = findEnumAreaOfLocation( allEnumAreas, LatLng( point.point.coordinates.latitude, point.point.coordinates.longitude ))?.let { enumArea ->
                     enumArea.locations.add( location )
                 }
@@ -1286,6 +1318,99 @@ class CreateEnumerationAreaFragment : Fragment(),
         lifecycleScope.launch {
             refreshMap()
         }
+    }
+
+    var subAddress = 0
+
+    fun autoEnumerate( location: Location ) : EnumerationItem
+    {
+        subAddress+= 1
+
+        val enumerationItem = EnumerationItem()
+
+        enumerationItem.enumerationIncompleteReason = ""
+        enumerationItem.enumerationState = EnumerationState.Enumerated
+        enumerationItem.enumerationNotes = ""
+        enumerationItem.enumerationDate = Date().time
+        enumerationItem.syncCode = enumerationItem.syncCode + 1
+        enumerationItem.subAddress = subAddress.toString()
+        enumerationItem.locationUuid = location.uuid
+
+        if (config.studies.isEmpty())
+        {
+            config.studies.add( Study( "Study", SamplingMethod.Cluster, 10000, SampleType.NumberHouseholds ))
+        }
+
+        if (config.studies[0].fields.isEmpty())
+        {
+            val noteField = Field( null, 1, "Note", FieldType.Note, false, false, false, false, false, false, null, null)
+            val textField = Field( null, 2, "Text", FieldType.Text, false, false, false, false, false, false, null, null)
+            val numberField = Field( null, 3, "Number", FieldType.Number, false, false, true, false, false, false, null, null)
+            val dateField = Field( null, 4, "Date", FieldType.Date, false, false, false, false, true, false, null, null)
+            val checkBoxField = Field( null, 5, "Checkbox", FieldType.Checkbox, false, false, false, false, false, false, null, null)
+            val dropDownField = Field( null, 6, "Dropdown", FieldType.Dropdown, false, false, false, false, false, false, null, null)
+
+            checkBoxField.fieldOptions.add( FieldOption("CB 1" ))
+            checkBoxField.fieldOptions.add( FieldOption("CB 2" ))
+            checkBoxField.fieldOptions.add( FieldOption("CB 3" ))
+
+            dropDownField.fieldOptions.add( FieldOption("DD 1" ))
+            dropDownField.fieldOptions.add( FieldOption("DD 2" ))
+            dropDownField.fieldOptions.add( FieldOption("DD 3" ))
+
+            config.studies[0].fields.add( noteField )
+            config.studies[0].fields.add( textField )
+            config.studies[0].fields.add( numberField )
+            config.studies[0].fields.add( dateField )
+            config.studies[0].fields.add( checkBoxField )
+            config.studies[0].fields.add( dropDownField )
+        }
+
+        var creationDate = Date().time
+
+        for (field in config.studies[0].fields)
+        {
+            val fieldData = FieldData(creationDate++, field.uuid )
+
+            if (field.type == FieldType.Note)
+            {
+                fieldData.textValue = "Some Note"
+            }
+
+            if (field.type == FieldType.Text)
+            {
+                fieldData.textValue = "Some Text"
+            }
+
+            if (field.type == FieldType.Number)
+            {
+                fieldData.numberValue= 999.0
+            }
+
+            if (field.type == FieldType.Date)
+            {
+                fieldData.dateValue = Date().time
+            }
+
+            if (field.type == FieldType.Checkbox)
+            {
+                fieldData.fieldDataOptions.add( FieldDataOption( "CB 1", true ))
+                fieldData.fieldDataOptions.add( FieldDataOption( "CB 2", false ))
+                fieldData.fieldDataOptions.add( FieldDataOption( "CB 3", true ))
+            }
+
+            if (field.type == FieldType.Dropdown)
+            {
+                fieldData.dropdownIndex = 1
+                fieldData.fieldDataOptions.add( FieldDataOption( "DD 1", false ))
+                fieldData.fieldDataOptions.add( FieldDataOption( "DD 2", false ))
+                fieldData.fieldDataOptions.add( FieldDataOption( "DD 3", false ))
+            }
+
+            enumerationItem.fieldDataList.add( fieldData )
+        }
+
+        return enumerationItem
     }
 
     private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {

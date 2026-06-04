@@ -408,11 +408,29 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_GROUP_ID + " TEXT" +
                     ") WITHOUT ROWID")
             db.execSQL(createTableBreadcrumb)
+
+            createIndexes( db )
         }
         catch(ex: Exception)
         {
             Log.d("xxx", ex.stackTraceToString())
         }
+    }
+
+    fun createIndexes( db: SQLiteDatabase )
+    {
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_enumeration_item_location ON $TABLE_ENUMERATION_ITEM($COLUMN_LOCATION_UUID)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_field_data_enum_item ON $TABLE_FIELD_DATA($COLUMN_ENUMERATION_ITEM_UUID)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_field_data_option_link_field_data ON $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION($COLUMN_FIELD_DATA_UUID)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_field_data_option_link_option ON $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION($COLUMN_FIELD_DATA_OPTION_UUID)"
+        )
+    }
+
+    override fun onOpen(db: SQLiteDatabase)
+    {
+        super.onOpen(db)
+
+        createIndexes(db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int)
@@ -770,6 +788,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         {
             Log.d( "xxx", "Drop All tables FAILED" )
         }
+    }
+
+    fun exists(table: String, column: String, value: String): Boolean
+    {
+        return readableDatabase.rawQuery("""SELECT 1 FROM $table WHERE $column = ? LIMIT 1""".trimIndent(),arrayOf(value)).use { it.moveToFirst() }
     }
 
     companion object

@@ -23,7 +23,7 @@ class RuleDAO(private var dao: DAO)
 {
     fun createOrUpdateRule( rule: Rule ) : Rule?
     {
-        if (exists( rule ))
+        if (dao.exists( DAO.TABLE_RULE, DAO.COLUMN_UUID, rule.uuid ))
         {
             updateRule( rule )
             Log.d( "xxx", "Updated Rule with ID ${rule.uuid}")
@@ -45,13 +45,6 @@ class RuleDAO(private var dao: DAO)
         }
 
         return rule
-    }
-
-    fun exists( rule: Rule ): Boolean
-    {
-        getRule( rule.uuid )?.let {
-            return true
-        } ?:return false
     }
 
     private fun putRule( rule: Rule, values: ContentValues )

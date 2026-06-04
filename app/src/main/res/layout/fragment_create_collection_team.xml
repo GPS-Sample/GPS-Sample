@@ -140,8 +140,7 @@
     <FrameLayout
         android:id="@+id/busy_view"
         android:visibility="gone"
-        android:background="@color/light_gray"
-        android:alpha=".5"
+        android:background="@color/clear"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

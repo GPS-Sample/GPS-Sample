@@ -60,11 +60,32 @@ class SamplingViewModel : ViewModel()
             _currentEnumArea = MutableLiveData(value?.value)
         }
 
+    val fieldCache = HashMap<String, Field>()
+
+    fun loadFieldCache()
+    {
+        if (fieldCache.isEmpty())
+        {
+            currentStudy?.value?.let { study ->
+                val fields = DAO.fieldDAO.getFields( study )
+                for (field in fields)
+                {
+                    fieldCache[field.uuid] = field
+                }
+            }
+        }
+    }
+
+    fun getField( uuid: String ) : Field?
+    {
+        return fieldCache[uuid]
+    }
+
     fun validateRule(rule : Rule, fieldData : FieldData) : Boolean
     {
         var validRule = false
 
-        DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
+        getField( fieldData.fieldUuid )?.let { field ->
             when (field.type) {
                 FieldType.Checkbox ->
                 {
@@ -286,8 +307,25 @@ class SamplingViewModel : ViewModel()
 
         return validRule
     }
+
     fun beginSampling(view : View)
     {
+        val fragment = currentFragment as? CreateSampleFragment
+        fragment?.binding?.progressOverlayView?.visibility = View.VISIBLE
+
+        Thread {
+            handleBeginSampling( view )
+            currentFragment?.requireActivity()?.runOnUiThread {
+                _refreshMap.value = Unit
+                fragment?.binding?.progressOverlayView?.visibility = View.GONE
+            }
+        }.start()
+    }
+
+    fun handleBeginSampling(view : View)
+    {
+        loadFieldCache()
+
         currentStudy?.value?.let { study ->
             when( study.samplingMethod )
             {
@@ -328,8 +366,6 @@ class SamplingViewModel : ViewModel()
                 }
                 else -> {}
             }
-
-            _refreshMap.value = Unit
         }
     }
 
@@ -361,9 +397,9 @@ class SamplingViewModel : ViewModel()
                         var validRule = false
 
                         filter.rule?.let { rule ->
-                            DAO.fieldDAO.getField( rule.fieldUuid )?.let { field ->
+                            getField( rule.fieldUuid )?.let { field ->
                                 for (fieldData in sampleItem.fieldDataList) {
-                                    DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { f ->
+                                    getField( fieldData.fieldUuid )?.let { f ->
                                         if (field.name.equals( f.name )) {
                                             validRule = validateRule( rule, fieldData )
                                         }
@@ -380,10 +416,10 @@ class SamplingViewModel : ViewModel()
                             while (filterOperator != null)
                             {
                                 filterOperator.rule?.let { nextRule ->
-                                    DAO.fieldDAO.getField( nextRule.fieldUuid )?.let { nextField ->
+                                    getField( nextRule.fieldUuid )?.let { nextField ->
                                         for (fieldData in sampleItem.fieldDataList)
                                         {
-                                            DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { f ->
+                                            getField( fieldData.fieldUuid )?.let { f ->
                                                 if (nextField.name.equals( f.name ))
                                                 {
                                                     val nextRuleValid = validateRule( nextRule, fieldData )
@@ -445,9 +481,11 @@ class SamplingViewModel : ViewModel()
 
             if (sampleSize == 0)
             {
-                val fragment = currentFragment as? CreateSampleFragment
-                fragment?.let { fragment ->
-                    Toast.makeText( fragment.activity!!.applicationContext, "${fragment.activity!!.getString(R.string.no_eligible_households)}", Toast.LENGTH_SHORT).show()
+                currentFragment?.requireActivity()?.runOnUiThread {
+                    val fragment = currentFragment as? CreateSampleFragment
+                    fragment?.let { fragment ->
+                        Toast.makeText( fragment.activity!!.applicationContext, "${fragment.activity!!.getString(R.string.no_eligible_households)}", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
             else
@@ -468,8 +506,10 @@ class SamplingViewModel : ViewModel()
                     validSamples[rnds].samplingState = SamplingState.Sampled
                 }
 
-                val fragment = currentFragment as? CreateSampleFragment
-                fragment?.sampleGenerated()
+                currentFragment?.requireActivity()?.runOnUiThread {
+                    val fragment = currentFragment as? CreateSampleFragment
+                    fragment?.sampleGenerated()
+                }
             }
         }
     }
@@ -507,9 +547,9 @@ class SamplingViewModel : ViewModel()
                         var validRule = false
 
                         filter.rule?.let { rule ->
-                            DAO.fieldDAO.getField( rule.fieldUuid )?.let { field ->
+                            getField( rule.fieldUuid )?.let { field ->
                                 for (fieldData in sampleItem.fieldDataList) {
-                                    DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { f ->
+                                    getField( fieldData.fieldUuid )?.let { f ->
                                         if (field.name.equals( f.name )) {
                                             validRule = validateRule( rule, fieldData )
                                         }
@@ -526,10 +566,10 @@ class SamplingViewModel : ViewModel()
                             while (filterOperator != null)
                             {
                                 filterOperator.rule?.let { nextRule ->
-                                    DAO.fieldDAO.getField( nextRule.fieldUuid )?.let { nextField ->
+                                    getField( nextRule.fieldUuid )?.let { nextField ->
                                         for (fieldData in sampleItem.fieldDataList)
                                         {
-                                            DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { f ->
+                                            getField( fieldData.fieldUuid )?.let { f ->
                                                 if (nextField.name.equals( f.name ))
                                                 {
                                                     val nextRuleValid = validateRule( nextRule, fieldData )
@@ -607,8 +647,10 @@ class SamplingViewModel : ViewModel()
                     validSamples[rnds].subsetSamplingState = SamplingState.Sampled
                 }
 
-                val fragment = currentFragment as? CreateSampleFragment
-                fragment?.sampleGenerated()
+                currentFragment?.requireActivity()?.runOnUiThread {
+                    val fragment = currentFragment as? CreateSampleFragment
+                    fragment?.sampleGenerated()
+                }
             }
         }
     }

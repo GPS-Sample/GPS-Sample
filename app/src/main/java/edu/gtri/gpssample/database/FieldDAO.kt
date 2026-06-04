@@ -26,7 +26,7 @@ class FieldDAO(private var dao: DAO)
 {
     fun createOrUpdateField( field: Field, study : Study ) : Field?
     {
-        if (exists( field ))
+        if (dao.exists( DAO.TABLE_FIELD, DAO.COLUMN_UUID, field.uuid ))
         {
             updateField( field, study )
             Log.d( "xxx", "Updated Field with ID ${field.uuid}")
@@ -89,13 +89,6 @@ class FieldDAO(private var dao: DAO)
         putField( field, study, values )
 
         dao.writableDatabase.update(DAO.TABLE_FIELD, values, whereClause, args )
-    }
-
-    fun exists( field: Field ): Boolean
-    {
-        getField( field.uuid )?.let {
-            return true
-        } ?: return false
     }
 
     @SuppressLint("Range")

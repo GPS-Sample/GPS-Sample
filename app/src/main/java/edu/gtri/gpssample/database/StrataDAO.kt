@@ -18,14 +18,14 @@ class StrataDAO(private var dao: DAO)
 {
     fun createOrUpdateStrata( strata: Strata ) : Strata?
     {
-        val existingStrata = getStrata( strata.uuid )
-
-        if (existingStrata != null)
+        if (dao.exists(DAO.TABLE_STRATA, DAO.COLUMN_UUID, strata.uuid ))
         {
-            if (strata.doesNotEqual( existingStrata ))
-            {
-                updateStrata( strata )
-                Log.d( "xxx", "Updated LatLon with ID ${strata.uuid}" )
+            getStrata( strata.uuid )?.let { existingStrata ->
+                if (strata.doesNotEqual( existingStrata ))
+                {
+                    updateStrata( strata )
+                    Log.d( "xxx", "Updated LatLon with ID ${strata.uuid}" )
+                }
             }
         }
         else

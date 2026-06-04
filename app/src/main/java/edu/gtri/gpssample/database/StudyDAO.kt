@@ -22,14 +22,14 @@ class StudyDAO(private var dao: DAO)
 {
     fun createOrUpdateStudy( study: Study ) : Study?
     {
-        val existingStudy = getStudy( study.uuid )
-
-        if (existingStudy != null)
+        if (dao.exists(DAO.TABLE_STUDY, DAO.COLUMN_UUID, study.uuid ))
         {
-            if (study.doesNotEqual( existingStudy ))
-            {
-                updateStudy( study )
-                Log.d( "xxx", "Updated Study with ID ${study.uuid}")
+            getStudy( study.uuid )?.let { existingStudy ->
+                if (study.doesNotEqual( existingStudy ))
+                {
+                    updateStudy( study )
+                    Log.d( "xxx", "Updated Study with ID ${study.uuid}")
+                }
             }
         }
         else

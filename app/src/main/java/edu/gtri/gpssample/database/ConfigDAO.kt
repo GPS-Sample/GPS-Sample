@@ -37,16 +37,16 @@ class ConfigDAO(private var dao: DAO)
             }
         }
 
-        val existingConfig = getConfig( config.uuid )
-
-        if (existingConfig != null)
+        if (dao.exists( DAO.TABLE_CONFIG, DAO.COLUMN_UUID, config.uuid ))
         {
-            mergeValidUsers( config, existingConfig )
+            getConfig( config.uuid )?.let { existingConfig ->
+                mergeValidUsers( config, existingConfig )
 
-            if (config.doesNotEqual( existingConfig ))
-            {
-                updateConfig( config )
-                Log.d( "xxx", "Updated Config with ID ${config.uuid}" )
+                if (config.doesNotEqual( existingConfig ))
+                {
+                    updateConfig( config )
+                    Log.d( "xxx", "Updated Config with ID ${config.uuid}" )
+                }
             }
         }
         else
@@ -131,13 +131,6 @@ class ConfigDAO(private var dao: DAO)
         values.put(DAO.COLUMN_STUDY_UUID, study.uuid)
     }
 
-    fun exists( config: Config ): Boolean
-    {
-        getConfig( config.uuid )?.let {
-            return true
-        } ?: return false
-    }
-
     @SuppressLint("Range")
     private fun buildConfig(cursor: Cursor ) : Config
     {
@@ -178,6 +171,8 @@ class ConfigDAO(private var dao: DAO)
 
     fun getConfig( uuid: String ): Config?
     {
+        DAO.fieldDataOptionDAO.loadCache()
+
         var config: Config? = null
 
         val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
@@ -195,32 +190,6 @@ class ConfigDAO(private var dao: DAO)
         cursor.close()
 
         return config
-    }
-
-    fun getConfigs(): ArrayList<Config>
-    {
-        val configs = ArrayList<Config>()
-
-        MainApplication.instance.user?.let { user ->
-            val query = "SELECT * FROM ${DAO.TABLE_CONFIG} ORDER BY ${DAO.COLUMN_CREATION_DATE}"
-            val cursor = dao.writableDatabase.rawQuery(query, null)
-
-            while (cursor.moveToNext()) {
-                val config = buildConfig(cursor)
-
-                if (config.validUsers.contains(user.uuid))
-                {
-                    config.studies = DAO.studyDAO.getStudies( config )
-                    config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
-
-                    configs.add( config)
-                }
-            }
-
-            cursor.close()
-        }
-
-        return configs
     }
 
     fun getMinimalConfigs(): ArrayList<Config>
@@ -274,8 +243,153 @@ class ConfigDAO(private var dao: DAO)
         }
     }
 
+    data class ConfigSummary(
+        val enumerationCount: Int,
+        val eligibleCount: Int,
+        val sampledCount: Int,
+        val surveyedCount: Int
+    )
+
+    fun getConfigSummary(configUuid: String): ConfigSummary {
+
+        val db = dao.readableDatabase
+
+        val query = """
+            SELECT
+                SUM(CASE
+                    WHEN ei.enumeration_item_enumeration_state IN ('Enumerated', 'Incomplete')
+                    THEN 1 ELSE 0 END) AS enumeration_count,
+
+                SUM(CASE
+                    WHEN ei.enumeration_item_enumeration_eligible_for_sampling = 1
+                    OR ei.enumeration_item_enumeration_eligible_for_subset_sampling = 1
+                    THEN 1 ELSE 0 END) AS eligible_count,
+
+                SUM(CASE
+                    WHEN ei.enumeration_item_sampling_state = 'Sampled'
+                    OR ei.enumeration_item_subset_sampling_state = 'Sampled'
+                THEN 1 ELSE 0 END) AS sampled_count,
+
+                SUM(CASE
+                    WHEN ei.enumeration_item_collection_state = 'Complete'
+                THEN 1 ELSE 0 END) AS surveyed_count
+
+            FROM enumeration_item ei
+            JOIN location l
+                ON ei.location_uuid = l.uuid
+            JOIN location__enum_area lea
+                ON lea.location_uuid = l.uuid
+            JOIN enum_area ea
+                ON ea.uuid = lea.enum_area_uuid
+            WHERE ea.config_uuid = ?
+        """.trimIndent()
+
+        val cursor = db.rawQuery(query, arrayOf(configUuid))
+
+        var result = ConfigSummary(
+            enumerationCount = 0,
+            eligibleCount = 0,
+            sampledCount = 0,
+            surveyedCount = 0
+        )
+
+        cursor.use { c ->
+            if (c.moveToFirst()) {
+
+                val enumIndex = c.getColumnIndexOrThrow("enumeration_count")
+                val eligibleIndex = c.getColumnIndexOrThrow("eligible_count")
+                val sampledIndex = c.getColumnIndexOrThrow("sampled_count")
+                val surveyedIndex = c.getColumnIndexOrThrow("surveyed_count")
+
+                result = ConfigSummary(
+                    enumerationCount = c.getInt(enumIndex),
+                    eligibleCount = c.getInt(eligibleIndex),
+                    sampledCount = c.getInt(sampledIndex),
+                    surveyedCount = c.getInt(surveyedIndex)
+                )
+            }
+        }
+
+        return result
+    }
+
+    data class EnumAreaSummary(
+        val enumAreaUuid: String,
+        val enumeratedCount: Int,
+        val eligibleCount: Int,
+        val sampledCount: Int,
+        val surveyedCount: Int
+    )
+
+    fun getEnumAreaSummary(configUuid: String): List<EnumAreaSummary> {
+
+        val db = dao.readableDatabase
+
+        val query = """
+        SELECT
+            lea.enum_area_uuid AS enum_area_uuid,
+
+            SUM(CASE
+                WHEN ei.enumeration_item_enumeration_state IN ('Enumerated', 'Incomplete')
+                THEN 1 ELSE 0 END) AS enumerated_count,
+
+            SUM(CASE
+                WHEN ei.enumeration_item_enumeration_eligible_for_sampling = 1
+                  OR ei.enumeration_item_enumeration_eligible_for_subset_sampling = 1
+                THEN 1 ELSE 0 END) AS eligible_count,
+
+            SUM(CASE
+                WHEN ei.enumeration_item_sampling_state = 'Sampled'
+                  OR ei.enumeration_item_subset_sampling_state = 'Sampled'
+                THEN 1 ELSE 0 END) AS sampled_count,
+
+            SUM(CASE
+                WHEN ei.enumeration_item_collection_state = 'Complete'
+                THEN 1 ELSE 0 END) AS surveyed_count
+
+        FROM enumeration_item ei
+        JOIN location l
+            ON ei.location_uuid = l.uuid
+        JOIN location__enum_area lea
+            ON lea.location_uuid = l.uuid
+        JOIN enum_area ea
+            ON ea.uuid = lea.enum_area_uuid
+        WHERE ea.config_uuid = ?
+        GROUP BY lea.enum_area_uuid
+    """.trimIndent()
+
+        val cursor = db.rawQuery(query, arrayOf(configUuid))
+
+        val result = ArrayList<EnumAreaSummary>()
+
+        cursor.use { c ->
+
+            val uuidIdx = c.getColumnIndexOrThrow("enum_area_uuid")
+            val enumIdx = c.getColumnIndexOrThrow("enumerated_count")
+            val eligIdx = c.getColumnIndexOrThrow("eligible_count")
+            val sampIdx = c.getColumnIndexOrThrow("sampled_count")
+            val survIdx = c.getColumnIndexOrThrow("surveyed_count")
+
+            while (c.moveToNext()) {
+                result.add(
+                    EnumAreaSummary(
+                        enumAreaUuid = c.getString(uuidIdx),
+                        enumeratedCount = c.getInt(enumIdx),
+                        eligibleCount = c.getInt(eligIdx),
+                        sampledCount = c.getInt(sampIdx),
+                        surveyedCount = c.getInt(survIdx)
+                    )
+                )
+            }
+        }
+
+        return result
+    }
+
     fun deleteConfig( config: Config )
     {
+        dao.writableDatabase.beginTransaction()
+
         val studies = DAO.studyDAO.getStudies( config )
         for (study in studies)
         {
@@ -294,5 +408,8 @@ class ConfigDAO(private var dao: DAO)
         dao.writableDatabase.delete(DAO.TABLE_CONFIG, whereClause, args)
 
         PreferencesManager.removeAllHashes(config.uuid )
+
+        dao.writableDatabase.setTransactionSuccessful()
+        dao.writableDatabase.endTransaction()
     }
 }

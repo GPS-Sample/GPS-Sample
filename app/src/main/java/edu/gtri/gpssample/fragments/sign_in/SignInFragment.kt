@@ -178,35 +178,35 @@ class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
 
             user?.let { user ->
 
-                if (user.name == "@test-admin" && DAO.configDAO.getConfigs().isNotEmpty())
-                {
-                    ConfirmationDialog( activity, resources.getString(R.string.oops), "The test-admin is not allowed to view/edit a previously saved configuration.  Would you like to delete the saved configuration(s)?", resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                        when( buttonPressed )
-                        {
-                            ConfirmationDialog.ButtonPress.Left -> {
-                            }
-                            ConfirmationDialog.ButtonPress.Right -> {
-                                DAO.deleteAll( false )
-                                ImageDAO.deleteAll()
-
-                                val pin = binding.pinEditText.text.toString()
-                                val userName = binding.nameEditText.text.toString()
-
-                                DAO.userDAO.getUser(userName)?.let { user ->
-                                    setTitle( user )
-
-                                    val bundle = Bundle()
-                                    bundle.putString(Keys.kRole.value, user.role)
-                                    findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
-                                }
-                            }
-                            ConfirmationDialog.ButtonPress.None -> {
-                            }
-                        }
-                    }
-
-                    return
-                }
+//                if (user.name == "@test-admin" && DAO.configDAO.getConfigs().isNotEmpty())
+//                {
+//                    ConfirmationDialog( activity, resources.getString(R.string.oops), "The test-admin is not allowed to view/edit a previously saved configuration.  Would you like to delete the saved configuration(s)?", resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+//                        when( buttonPressed )
+//                        {
+//                            ConfirmationDialog.ButtonPress.Left -> {
+//                            }
+//                            ConfirmationDialog.ButtonPress.Right -> {
+//                                DAO.deleteAll( false )
+//                                ImageDAO.deleteAll()
+//
+//                                val pin = binding.pinEditText.text.toString()
+//                                val userName = binding.nameEditText.text.toString()
+//
+//                                DAO.userDAO.getUser(userName)?.let { user ->
+//                                    setTitle( user )
+//
+//                                    val bundle = Bundle()
+//                                    bundle.putString(Keys.kRole.value, user.role)
+//                                    findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
+//                                }
+//                            }
+//                            ConfirmationDialog.ButtonPress.None -> {
+//                            }
+//                        }
+//                    }
+//
+//                    return
+//                }
 
                 if (user.role != expectedRole)
                 {

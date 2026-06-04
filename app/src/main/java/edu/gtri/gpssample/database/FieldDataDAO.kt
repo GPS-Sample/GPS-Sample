@@ -23,14 +23,14 @@ class FieldDataDAO(private var dao: DAO)
 {
     fun createOrUpdateFieldData( fieldData: FieldData, enumerationItem: EnumerationItem ) : FieldData?
     {
-        val existingFieldData = getFieldData( fieldData.uuid )
-
-        if (existingFieldData != null)
+        if (dao.exists( DAO.TABLE_FIELD_DATA, DAO.COLUMN_UUID, fieldData.uuid ))
         {
-            if (fieldData.doesNotEqual( existingFieldData ))
-            {
-                updateFieldData( fieldData )
-                Log.d( "xxx", "Updated FieldData with ID ${fieldData.uuid}" )
+            getFieldData( fieldData.uuid )?.let { existingFieldData ->
+                if (fieldData.doesNotEqual( existingFieldData ))
+                {
+                    updateFieldData( fieldData )
+                    Log.d( "xxx", "Updated FieldData with ID ${fieldData.uuid}" )
+                }
             }
         }
         else
@@ -68,13 +68,6 @@ class FieldDataDAO(private var dao: DAO)
         values.put( DAO.COLUMN_FIELD_DATA_DATE_VALUE, fieldData.dateValue )
         values.put( DAO.COLUMN_FIELD_DATA_DROPDOWN_INDEX, fieldData.dropdownIndex )
         values.put( DAO.COLUMN_FIELD_DATA_BLOCK_NUMBER, fieldData.blockNumber )
-    }
-
-    fun exists( fieldData: FieldData ): Boolean
-    {
-        getFieldData( fieldData.uuid )?.let {
-            return true
-        } ?: return false
     }
 
     @SuppressLint("Range")

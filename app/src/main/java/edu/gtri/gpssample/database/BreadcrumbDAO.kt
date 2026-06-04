@@ -10,9 +10,7 @@ class BreadcrumbDAO(private var dao: DAO)
 {
     fun createOrUpdateBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb?
     {
-        val existingBreadcrumb = getBreadcrumb( breadcrumb.uuid )
-
-        if (existingBreadcrumb != null)
+        if (dao.exists( DAO.TABLE_BREADCRUMB, DAO.COLUMN_UUID, breadcrumb.uuid ))
         {
             updateBreadcrumb( breadcrumb )
             Log.d( "xxx", "Updated Breadcrumb with ID ${breadcrumb.uuid}" )

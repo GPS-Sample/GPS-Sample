@@ -29,14 +29,14 @@ class LocationDAO(private var dao: DAO)
 {
     fun createOrUpdateLocation( location: Location, enumArea : EnumArea ) : Location?
     {
-        val existingLocation = getLocation( location.uuid )
-
-        if (existingLocation != null)
+        if (dao.exists(DAO.TABLE_LOCATION, DAO.COLUMN_UUID, location.uuid ))
         {
-            if (location.doesNotEqual( existingLocation ))
-            {
-                updateLocation( location )
-                Log.d( "xxx", "Updated Location with ID ${location.uuid}" )
+            getLocation( location.uuid )?.let { existingLocation ->
+                if (location.doesNotEqual( existingLocation ))
+                {
+                    updateLocation( location )
+                    Log.d( "xxx", "Updated Location with ID ${location.uuid}" )
+                }
             }
         }
         else
@@ -246,7 +246,7 @@ class LocationDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val location = buildLocation( cursor )
-            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+//            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
             locations.add( location )
         }
 

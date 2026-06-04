@@ -17,14 +17,14 @@ class LatLonDAO(private var dao: DAO)
 {
     fun createOrUpdateLatLon( latLon: LatLon, enumArea : EnumArea?, config: Config? ) : LatLon?
     {
-        val existingLatLon = getLatLon( latLon.uuid )
-
-        if (existingLatLon != null)
+        if (dao.exists(DAO.TABLE_LAT_LON, DAO.COLUMN_UUID, latLon.uuid ))
         {
-            if (latLon.doesNotEqual( existingLatLon ))
-            {
-                updateLatLon( latLon )
-                Log.d( "xxx", "Updated LatLon with ID ${latLon.uuid}" )
+            getLatLon( latLon.uuid )?.let { existingLatLon ->
+                if (latLon.doesNotEqual( existingLatLon ))
+                {
+                    updateLatLon( latLon )
+                    Log.d( "xxx", "Updated LatLon with ID ${latLon.uuid}" )
+                }
             }
         }
         else
@@ -71,13 +71,6 @@ class LatLonDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, latLon.creationDate )
         values.put( DAO.COLUMN_LAT, latLon.latitude )
         values.put( DAO.COLUMN_LON, latLon.longitude )
-    }
-
-    fun exists( latLon: LatLon ): Boolean
-    {
-        getLatLon( latLon.uuid )?.let {
-            return true
-        } ?: return false
     }
 
     @SuppressLint("Range")

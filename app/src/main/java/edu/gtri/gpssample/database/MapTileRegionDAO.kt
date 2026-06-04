@@ -17,14 +17,14 @@ class MapTileRegionDAO(private var dao: DAO)
 {
     fun createOrUpdateMapTileRegion( mapTileRegion: MapTileRegion, enumArea: EnumArea ) : MapTileRegion?
     {
-        val existingMapTileRegion = getMapTileRegion( mapTileRegion.uuid )
-
-        if (existingMapTileRegion != null)
+        if (dao.exists(DAO.TABLE_MAP_TILE_REGION, DAO.COLUMN_UUID, mapTileRegion.uuid ))
         {
-            if (mapTileRegion.doesNotEqual( existingMapTileRegion ))
-            {
-                updateMapTileRegion( mapTileRegion, enumArea )
-                Log.d( "xxx", "Updated MapTileRegion with ID ${mapTileRegion.uuid}" )
+            getMapTileRegion( mapTileRegion.uuid )?.let { existingMapTileRegion ->
+                if (mapTileRegion.doesNotEqual( existingMapTileRegion ))
+                {
+                    updateMapTileRegion( mapTileRegion, enumArea )
+                    Log.d( "xxx", "Updated MapTileRegion with ID ${mapTileRegion.uuid}" )
+                }
             }
         }
         else

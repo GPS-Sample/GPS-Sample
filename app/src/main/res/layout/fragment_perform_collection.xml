@@ -1,309 +1,328 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:foregroundTintMode="src_over"
-    android:orientation="vertical"
-    tools:context=".fragments.perform_collection.PerformCollectionFragment">
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="10dp" />
-
-    <include
-        android:id="@+id/list_item_enum_area"
-        layout="@layout/list_item_enum_area" />
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_margin="5dp"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:foregroundTintMode="src_over"
+        android:orientation="vertical"
+        tools:context=".fragments.perform_collection.PerformCollectionFragment">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:gravity="center_vertical"
-            android:text="@string/view"
-            android:textColor="@color/primary_textcolor"
-            android:textSize="17sp"
-            android:textStyle="normal" />
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <include
+            android:id="@+id/list_item_enum_area"
+            layout="@layout/list_item_enum_area" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:gravity="center_vertical"
+                android:text="@string/view"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="17sp"
+                android:textStyle="normal" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/spinner_frame">
+
+                <Spinner
+                    android:id="@+id/showSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
+        </LinearLayout>
 
         <FrameLayout
+            android:id="@+id/map_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="5dp"
-            android:background="@drawable/spinner_frame">
+            android:layout_height="0dp"
+            android:layout_weight="2">
 
-            <Spinner
-                android:id="@+id/showSpinner"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent">
+
+                <com.mapbox.maps.MapView
+                    android:id="@+id/mapbox_map_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible">
+                </com.mapbox.maps.MapView>
+
+                <org.osmdroid.views.MapView
+                    android:id="@+id/osm_map_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone">
+                </org.osmdroid.views.MapView>
+
+                <ImageView
+                    android:id="@+id/north_up_image_view"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/compass_icon" />
+
+                <include layout="@layout/hh_popup"/>
+
+                <View
+                    android:id="@+id/map_overlay_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                </View>
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="top|start"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="30dp"
+                android:background="#40FFFFFF"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/legend_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="0dp"
+                    android:text="@string/legend"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+
+                <ImageView
+                    android:id="@+id/legend_image_view"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="10dp"
+                    app:srcCompat="@drawable/info2" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="top|end"
+                android:layout_marginEnd="10dp"
+                android:background="#40FFFFFF"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="0dp"
+                    android:text="@string/accuracy"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:id="@+id/accuracy_label_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:textColor="@color/blue"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/accuracy_value_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="10dp"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/osm_label"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="bottom|start"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="OSM"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="normal" />
+
+            <TextView
+                android:id="@+id/location_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="10dp"
+                android:background="#40FFFFFF"
+                android:gravity="center_vertical|center_horizontal"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="normal" />
         </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_gray"></View>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:gravity="center_vertical"
+                android:text="@string/filter_by"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="17sp"
+                android:textStyle="normal" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/spinner_frame">
+
+                <Spinner
+                    android:id="@+id/filterSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_gray"></View>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/title_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/primary"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/map_tile_cache_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/cache2"
+                android:insetTop="0dp"
+                android:insetBottom="0dp" />
+
+            <Button
+                android:id="@+id/center_on_location_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/location_bubble_primary"
+                android:insetTop="0dp"
+                android:insetBottom="0dp" />
+
+            <Button
+                android:id="@+id/show_breadcrumbs_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/navigate2"
+                android:insetTop="0dp"
+                android:insetBottom="0dp" />
+
+            <Button
+                android:id="@+id/export_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/export_blue"
+                android:insetTop="0dp"
+                android:insetBottom="0dp" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/help_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/help"
+                android:insetTop="0dp"
+                android:insetBottom="0dp" />
+        </LinearLayout>
     </LinearLayout>
 
     <FrameLayout
-        android:id="@+id/map_layout"
+        android:id="@+id/progress_overlay_view"
+        android:visibility="gone"
+        android:background="@color/clear"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2">
+        android:layout_height="match_parent">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <com.mapbox.maps.MapView
-                android:id="@+id/mapbox_map_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="visible">
-            </com.mapbox.maps.MapView>
-
-            <org.osmdroid.views.MapView
-                android:id="@+id/osm_map_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone">
-            </org.osmdroid.views.MapView>
-
-            <ImageView
-                android:id="@+id/north_up_image_view"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="top|end"
-                android:layout_marginTop="40dp"
-                android:layout_marginEnd="20dp"
-                android:visibility="gone"
-                app:srcCompat="@drawable/compass_icon" />
-
-            <include layout="@layout/hh_popup"/>
-
-            <View
-                android:id="@+id/map_overlay_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            </View>
-        </FrameLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <ProgressBar
+            android:id="@+id/device_progress_bar"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+            android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="30dp"
-            android:background="#40FFFFFF"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/legend_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:gravity="center_vertical|center_horizontal"
-                android:paddingStart="10dp"
-                android:paddingEnd="0dp"
-                android:text="@string/legend"
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                android:textStyle="normal" />
-
-            <ImageView
-                android:id="@+id/legend_image_view"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
-                android:paddingStart="0dp"
-                android:paddingEnd="10dp"
-                app:srcCompat="@drawable/info2" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_gravity="top|end"
-            android:layout_marginEnd="10dp"
-            android:background="#40FFFFFF"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:gravity="center_vertical|center_horizontal"
-                android:paddingStart="10dp"
-                android:paddingEnd="0dp"
-                android:text="@string/accuracy"
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                android:textStyle="normal" />
-
-            <TextView
-                android:id="@+id/accuracy_label_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:gravity="center_vertical|center_horizontal"
-                android:textColor="@color/blue"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/accuracy_value_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:gravity="center_vertical|center_horizontal"
-                android:paddingStart="0dp"
-                android:paddingEnd="10dp"
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                android:textStyle="normal" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/osm_label"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_gravity="bottom|start"
-            android:layout_marginStart="10dp"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="OSM"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:textStyle="normal" />
-
-        <TextView
-            android:id="@+id/location_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="10dp"
-            android:background="#40FFFFFF"
-            android:gravity="center_vertical|center_horizontal"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:textStyle="normal" />
+            android:layout_gravity="center" />
     </FrameLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/light_gray"></View>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_margin="5dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:gravity="center_vertical"
-            android:text="@string/filter_by"
-            android:textColor="@color/primary_textcolor"
-            android:textSize="17sp"
-            android:textStyle="normal" />
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="5dp"
-            android:background="@drawable/spinner_frame">
-
-            <Spinner
-                android:id="@+id/filterSpinner"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </FrameLayout>
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/light_gray"></View>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="20dp"
-        android:layout_weight="1" />
-
-    <TextView
-        android:id="@+id/title_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@color/primary"
-        android:gravity="center_vertical|center_horizontal"
-        android:textColor="@color/white"
-        android:textSize="17sp"
-        android:textStyle="bold" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="5dp"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/map_tile_cache_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="5dp"
-            android:background="@drawable/cache2"
-            android:insetTop="0dp"
-            android:insetBottom="0dp" />
-
-        <Button
-            android:id="@+id/center_on_location_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="5dp"
-            android:background="@drawable/location_bubble_primary"
-            android:insetTop="0dp"
-            android:insetBottom="0dp" />
-
-        <Button
-            android:id="@+id/show_breadcrumbs_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="5dp"
-            android:background="@drawable/navigate2"
-            android:insetTop="0dp"
-            android:insetBottom="0dp" />
-
-        <Button
-            android:id="@+id/export_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="5dp"
-            android:background="@drawable/export_blue"
-            android:insetTop="0dp"
-            android:insetBottom="0dp" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/help_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="5dp"
-            android:background="@drawable/help"
-            android:insetTop="0dp"
-            android:insetBottom="0dp" />
-    </LinearLayout>
-
-</LinearLayout>
+</FrameLayout>
