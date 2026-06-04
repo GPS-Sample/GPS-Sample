@@ -171,7 +171,7 @@ class ConfigDAO(private var dao: DAO)
 
     fun getConfig( uuid: String ): Config?
     {
-        DAO.fieldDataOptionDAO.loadCache()
+//        DAO.fieldDataOptionDAO.loadCache()
 
         var config: Config? = null
 

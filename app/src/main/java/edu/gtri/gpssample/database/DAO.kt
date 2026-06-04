@@ -422,8 +422,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_enumeration_item_location ON $TABLE_ENUMERATION_ITEM($COLUMN_LOCATION_UUID)")
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_field_data_enum_item ON $TABLE_FIELD_DATA($COLUMN_ENUMERATION_ITEM_UUID)")
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_field_data_option_link_field_data ON $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION($COLUMN_FIELD_DATA_UUID)")
-        db.execSQL("CREATE INDEX IF NOT EXISTS idx_field_data_option_link_option ON $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION($COLUMN_FIELD_DATA_OPTION_UUID)"
-        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_field_data_option_link_option ON $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION($COLUMN_FIELD_DATA_OPTION_UUID)")
     }
 
     override fun onOpen(db: SQLiteDatabase)

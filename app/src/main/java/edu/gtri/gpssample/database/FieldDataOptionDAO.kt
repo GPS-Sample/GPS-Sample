@@ -18,7 +18,7 @@ import edu.gtri.gpssample.extensions.toBoolean
 
 class FieldDataOptionDAO(private var dao: DAO)
 {
-    val fieldDataOptionCache = HashMap<String, FieldDataOption>()
+//    val fieldDataOptionCache = HashMap<String, FieldDataOption>()
 
     fun createOrUpdateFieldDataOption(fieldDataOption: FieldDataOption, obj: Any) : FieldDataOption?
     {
@@ -126,31 +126,70 @@ class FieldDataOptionDAO(private var dao: DAO)
         return FieldDataOption(uuid, name, value)
     }
 
-    fun loadCache()
-    {
-        fieldDataOptionCache.clear()
+//    fun loadCache()
+//    {
+//        fieldDataOptionCache.clear()
+//
+//        val cursor = dao.writableDatabase.rawQuery("SELECT * FROM ${DAO.TABLE_FIELD_DATA_OPTION}", null)
+//
+//        while (cursor.moveToNext()) {
+//            val option = buildFieldDataOption(cursor)
+//            fieldDataOptionCache[option.uuid] = option
+//        }
+//
+//        cursor.close()
+//    }
 
-        val cursor = dao.writableDatabase.rawQuery("SELECT * FROM ${DAO.TABLE_FIELD_DATA_OPTION}", null)
+//    fun getFieldDataOption( uuid: String ): FieldDataOption?
+//    {
+//        fieldDataOptionCache[uuid]?.let {
+//            return it
+//        }
+//
+//        return null
+//    }
 
-        while (cursor.moveToNext()) {
-            val option = buildFieldDataOption(cursor)
-            fieldDataOptionCache[option.uuid] = option
-        }
-
-        cursor.close()
-    }
+//    @SuppressLint("Range")
+//    fun getFieldDataOptions( fieldData: FieldData ) : ArrayList<FieldDataOption>
+//    {
+//        val fieldDataOptions = ArrayList<FieldDataOption>()
+//
+//        val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION} where ${DAO.COLUMN_FIELD_DATA_UUID} = '${fieldData.uuid}'"
+//        val cursor = dao.writableDatabase.rawQuery(query, null)
+//
+//        while (cursor.moveToNext())
+//        {
+//            val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_UUID))
+//
+//            fieldDataOptionCache[uuid]?.let {
+//                fieldDataOptions.add(it)
+//            }
+//        }
+//
+//        cursor.close()
+//
+//        return fieldDataOptions
+//    }
 
     fun getFieldDataOption( uuid: String ): FieldDataOption?
     {
-        fieldDataOptionCache[uuid]?.let {
-            return it
+        var fieldDataOption: FieldDataOption? = null
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA_OPTION} where ${DAO.COLUMN_UUID} = '${uuid}'"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+            fieldDataOption = buildFieldDataOption( cursor )
         }
 
-        return null
+        cursor.close()
+
+        return fieldDataOption
     }
 
     @SuppressLint("Range")
-    fun getFieldDataOptions( fieldData: FieldData ) : ArrayList<FieldDataOption>
+    fun getFieldDataOptions( fieldData: FieldData) : ArrayList<FieldDataOption>
     {
         val fieldDataOptions = ArrayList<FieldDataOption>()
 
@@ -159,10 +198,10 @@ class FieldDataOptionDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_UUID))
-
-            fieldDataOptionCache[uuid]?.let {
-                fieldDataOptions.add(it)
+            val fieldDataOptionId = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_UUID))
+            val fieldDataOption = getFieldDataOption( fieldDataOptionId )
+            fieldDataOption?.let {
+                fieldDataOptions.add( it )
             }
         }
 
