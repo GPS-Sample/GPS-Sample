@@ -192,7 +192,7 @@ class ConfigDAO(private var dao: DAO)
         return config
     }
 
-    fun getMinimalConfigs(): ArrayList<Config>
+    fun getConfigs(): ArrayList<Config>
     {
         val configs = ArrayList<Config>()
 
@@ -205,6 +205,8 @@ class ConfigDAO(private var dao: DAO)
 
                 if (config.validUsers.contains(user.uuid))
                 {
+                    config.studies = DAO.studyDAO.getStudies( config )
+                    config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
                     configs.add( config)
                 }
             }

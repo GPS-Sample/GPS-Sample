@@ -50,6 +50,7 @@ import edu.gtri.gpssample.viewmodels.models.NetworkClientModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.Date
 import java.util.UUID
 import kotlin.collections.ArrayList
@@ -146,88 +147,95 @@ class ManageConfigurationsFragment : Fragment(),
             binding.addButton.visibility = View.GONE
         }
 
-        configurations = DAO.configDAO.getMinimalConfigs()
+        binding.progressOverlayView.visibility = View.VISIBLE
 
-        manageConfigurationsAdapter = ManageConfigurationsAdapter( configurations )
-        manageConfigurationsAdapter.didSelectConfig = this::didSelectConfig
-        manageConfigurationsAdapter.shouldCloneConfig = this::shouldCloneConfig
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                configurations = DAO.configDAO.getConfigs()
+            }
 
-        if (user.role == Role.Enumerator.value && configurations.isNotEmpty()) // && configurations[0].selectedEnumAreaUuid.isEmpty())
-        {
-            binding.createButton.visibility = View.VISIBLE
-        }
+            // back on the main thread...
+            binding.progressOverlayView.visibility = View.GONE
 
-        binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = manageConfigurationsAdapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(activity )
+            manageConfigurationsAdapter = ManageConfigurationsAdapter( configurations )
+            manageConfigurationsAdapter.didSelectConfig = this@ManageConfigurationsFragment::didSelectConfig
+            manageConfigurationsAdapter.shouldCloneConfig = this@ManageConfigurationsFragment::shouldCloneConfig
 
-        if (BuildConfig.DEBUG && (user.role == Role.Admin.toString() || user.role == Role.Supervisor.toString()))
-        {
-            binding.createButton.visibility = View.VISIBLE
-        }
-
-        binding.addButton.setOnClickListener {
-            sharedViewModel.createNewConfiguration()
-            findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
-        }
-
-        binding.createButton.setOnClickListener {
-
-            if (configurations.isNotEmpty())
+            if (user.role == Role.Enumerator.value && configurations.isNotEmpty()) // && configurations[0].selectedEnumAreaUuid.isEmpty())
             {
-                getFullConfig( configurations[0] ) { config ->
-                    sharedViewModel.setCurrentConfig( config )
+                binding.createButton.visibility = View.VISIBLE
+            }
+
+            binding.recyclerView.itemAnimator = DefaultItemAnimator()
+            binding.recyclerView.adapter = manageConfigurationsAdapter
+            binding.recyclerView.layoutManager = LinearLayoutManager(activity )
+
+            if (BuildConfig.DEBUG && (user.role == Role.Admin.toString() || user.role == Role.Supervisor.toString()))
+            {
+                binding.createButton.visibility = View.VISIBLE
+            }
+
+            binding.addButton.setOnClickListener {
+                sharedViewModel.createNewConfiguration()
+                findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
+            }
+
+            binding.createButton.setOnClickListener {
+
+                if (configurations.isNotEmpty())
+                {
+                    sharedViewModel.setCurrentConfig( configurations[0] )
                     val bundle = Bundle()
                     bundle.putBoolean( Keys.kEditMode.value, true )
                     findNavController().navigate(R.id.action_navigate_to_WalkEnumerationAreaFragment, bundle)
                 }
             }
-        }
 
-        binding.importButton.setOnClickListener {
-            var password = ""
+            binding.importButton.setOnClickListener {
+                var password = ""
 
-            if (configurations.size == 1)
-            {
-                encryptionPassword = configurations[0].encryptionPassword
-                for (i in 1..encryptionPassword.length)
+                if (configurations.size == 1)
                 {
-                    password += "*"
-                }
-            }
-
-            if ((configurations.size == 1) && ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())))
-            {
-                ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                    when( buttonPressed )
+                    encryptionPassword = configurations[0].encryptionPassword
+                    for (i in 1..encryptionPassword.length)
                     {
-                        ConfirmationDialog.ButtonPress.Left -> {
-                        }
-                        ConfirmationDialog.ButtonPress.Right -> {
-                            DAO.deleteAll()
-                            ImageDAO.deleteAll()
-                            configurations.clear()
-                            manageConfigurationsAdapter.updateConfigurations(configurations)
-                            InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false )  { action, password, tag ->
-                                when (action) {
-                                    InputDialog.Action.DidCancel -> {}
-                                    InputDialog.Action.DidEnterText -> {importConfiguration( password )}
-                                    InputDialog.Action.DidPressQRButton -> {}
+                        password += "*"
+                    }
+                }
+
+                if ((configurations.size == 1) && ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())))
+                {
+                    ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                        when( buttonPressed )
+                        {
+                            ConfirmationDialog.ButtonPress.Left -> {
+                            }
+                            ConfirmationDialog.ButtonPress.Right -> {
+                                DAO.deleteAll()
+                                ImageDAO.deleteAll()
+                                configurations.clear()
+                                manageConfigurationsAdapter.updateConfigurations(configurations)
+                                InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false )  { action, password, tag ->
+                                    when (action) {
+                                        InputDialog.Action.DidCancel -> {}
+                                        InputDialog.Action.DidEnterText -> {importConfiguration( password )}
+                                        InputDialog.Action.DidPressQRButton -> {}
+                                    }
                                 }
                             }
-                        }
-                        ConfirmationDialog.ButtonPress.None -> {
+                            ConfirmationDialog.ButtonPress.None -> {
+                            }
                         }
                     }
                 }
-            }
-            else
-            {
-                InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false)  { action, password, tag ->
-                    when (action) {
-                        InputDialog.Action.DidCancel -> {}
-                        InputDialog.Action.DidEnterText -> {importConfiguration( password )}
-                        InputDialog.Action.DidPressQRButton -> {}
+                else
+                {
+                    InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false)  { action, password, tag ->
+                        when (action) {
+                            InputDialog.Action.DidCancel -> {}
+                            InputDialog.Action.DidEnterText -> {importConfiguration( password )}
+                            InputDialog.Action.DidPressQRButton -> {}
+                        }
                     }
                 }
             }
@@ -410,10 +418,8 @@ class ManageConfigurationsFragment : Fragment(),
     {
         if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
         {
-            getFullConfig( config ) { fullConfig ->
-                sharedViewModel.setCurrentConfig( fullConfig )
-                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
-            }
+            sharedViewModel.setCurrentConfig( config )
+            findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
         }
         else
         {
@@ -463,7 +469,7 @@ class ManageConfigurationsFragment : Fragment(),
     {
         runBlocking(Dispatchers.Main) {
             sharedViewModel.setCurrentConfig( config )
-            configurations = DAO.configDAO.getMinimalConfigs()
+            configurations.add( config )
             manageConfigurationsAdapter.updateConfigurations( configurations )
         }
     }
@@ -492,93 +498,91 @@ class ManageConfigurationsFragment : Fragment(),
     {
         if (user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())
         {
-            sharedViewModel.currentConfiguration?.value?.let { currentConfig ->
-                getFullConfig( currentConfig ) { config ->
-                    sharedViewModel.setCurrentConfig( config )
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                sharedViewModel.setCurrentConfig( config )
 
-                    // find the selected Enum Area
-                    val enumAreas = config.enumAreas.filter { it.uuid == config.selectedEnumAreaUuid }
+                // find the selected Enum Area
+                val enumAreas = config.enumAreas.filter { it.uuid == config.selectedEnumAreaUuid }
 
-                    // find the selected study
-                    val studies = config.studies.filter { it.uuid == config.selectedStudyUuid }
+                // find the selected study
+                val studies = config.studies.filter { it.uuid == config.selectedStudyUuid }
 
-                    if (user.role == Role.Enumerator.toString())
+                if (user.role == Role.Enumerator.toString())
+                {
+                    if (enumAreas.isEmpty())
                     {
-                        if (enumAreas.isEmpty())
+                        NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_enumeration_area))
+                    }
+                    else if (studies.isEmpty())
+                    {
+                        NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_study))
+                    }
+                    else
+                    {
+                        val study = studies[0]
+                        val enumArea = enumAreas[0]
+
+                        // find the selected enumeration Team
+                        val enumTeams = enumArea.enumerationTeams.filter { enumTeam -> enumTeam.uuid == enumArea.selectedEnumerationTeamUuid }
+
+                        // find the selected collection Team
+                        val collectionTeams = enumArea.collectionTeams.filter { collectionTeam -> collectionTeam.uuid == enumArea.selectedCollectionTeamUuid }
+
+                        if (collectionTeams.isNotEmpty())
                         {
-                            NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_enumeration_area))
+                            val collectionTeam = collectionTeams[0]
+
+                            sharedViewModel.createStudyModel.setStudy( study )
+                            sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
+                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+                            samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+
+                            findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
                         }
-                        else if (studies.isEmpty())
+                        else if (enumTeams.isNotEmpty())
                         {
-                            NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_study))
-                        }
-                        else
-                        {
-                            val study = studies[0]
-                            val enumArea = enumAreas[0]
+                            val enumTeam = enumTeams[0]
 
-                            // find the selected enumeration Team
-                            val enumTeams = enumArea.enumerationTeams.filter { enumTeam -> enumTeam.uuid == enumArea.selectedEnumerationTeamUuid }
+                            sharedViewModel.createStudyModel.setStudy( study )
+                            sharedViewModel.currentEnumerationTeamUuid = enumTeam.uuid
+                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
 
-                            // find the selected collection Team
-                            val collectionTeams = enumArea.collectionTeams.filter { collectionTeam -> collectionTeam.uuid == enumArea.selectedCollectionTeamUuid }
-
-                            if (collectionTeams.isNotEmpty())
-                            {
-                                val collectionTeam = collectionTeams[0]
-
-                                sharedViewModel.createStudyModel.setStudy( study )
-                                sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
-                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
-                                samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
-
-                                findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
-                            }
-                            else if (enumTeams.isNotEmpty())
-                            {
-                                val enumTeam = enumTeams[0]
-
-                                sharedViewModel.createStudyModel.setStudy( study )
-                                sharedViewModel.currentEnumerationTeamUuid = enumTeam.uuid
-                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
-
-                                findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
-                            }
+                            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
                         }
                     }
-                    else if (user.role == Role.DataCollector.toString())
+                }
+                else if (user.role == Role.DataCollector.toString())
+                {
+                    if (enumAreas.isEmpty())
                     {
-                        if (enumAreas.isEmpty())
+                        NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_enumeration_area))
+                    }
+                    else if (studies.isEmpty())
+                    {
+                        NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_study))
+                    }
+                    else
+                    {
+                        val study = studies[0]
+                        val enumArea = enumAreas[0]
+
+                        // find the selected collection Team
+                        val collectionTeams = enumArea.collectionTeams.filter { collectionTeam -> collectionTeam.uuid == enumArea.selectedCollectionTeamUuid }
+
+                        if (collectionTeams.isEmpty())
                         {
-                            NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_enumeration_area))
-                        }
-                        else if (studies.isEmpty())
-                        {
-                            NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_study))
+                            NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_collection_team))
                         }
                         else
                         {
-                            val study = studies[0]
-                            val enumArea = enumAreas[0]
+                            val collectionTeam = collectionTeams[0]
 
-                            // find the selected collection Team
-                            val collectionTeams = enumArea.collectionTeams.filter { collectionTeam -> collectionTeam.uuid == enumArea.selectedCollectionTeamUuid }
+                            sharedViewModel.createStudyModel.setStudy( study )
+                            sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
+                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+                            samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
 
-                            if (collectionTeams.isEmpty())
-                            {
-                                NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_collection_team))
-                            }
-                            else
-                            {
-                                val collectionTeam = collectionTeams[0]
-
-                                sharedViewModel.createStudyModel.setStudy( study )
-                                sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
-                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
-                                samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
-
-                                findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
-                            }
+                            findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
                         }
                     }
                 }
@@ -628,7 +632,7 @@ class ManageConfigurationsFragment : Fragment(),
             uri?.let { uri ->
                 try
                 {
-                    binding.overlayView.visibility = View.VISIBLE
+                    binding.progressOverlayView.visibility = View.VISIBLE
 
                     ZipUtils.unzip( activity!!, uri, encryptionPassword ) { result ->
                         val config = result.first
@@ -636,7 +640,7 @@ class ManageConfigurationsFragment : Fragment(),
 
                         if (config == null)
                         {
-                            binding.overlayView.visibility = View.GONE
+                            binding.progressOverlayView.visibility = View.GONE
                             val message = if (errorCode == Config.ErrorCode.PasswordError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
                             InfoDialog( activity!!, resources.getString(R.string.error), message, resources.getString(R.string.ok), null, null)
                         }
@@ -653,7 +657,7 @@ class ManageConfigurationsFragment : Fragment(),
                             configurations.add( config )
                             manageConfigurationsAdapter.updateConfigurations( configurations )
 
-                            binding.overlayView.visibility = View.GONE
+                            binding.progressOverlayView.visibility = View.GONE
 
                             didReceiveConfiguration(Config.ErrorCode.None )
                         }
@@ -661,39 +665,15 @@ class ManageConfigurationsFragment : Fragment(),
                 }
                 catch( ex: java.lang.Exception )
                 {
-                    binding.overlayView.visibility = View.GONE
+                    binding.progressOverlayView.visibility = View.GONE
                     InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
                 }
             }
         }
         else
         {
-            binding.overlayView.visibility = View.GONE
+            binding.progressOverlayView.visibility = View.GONE
             InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
-        }
-    }
-
-    fun getFullConfig( config: Config, completion: ((config: Config)->Unit) )
-    {
-        if (config.studies.isNotEmpty() && config.enumAreas.isNotEmpty())
-        {
-            completion( config ) // we already have a full config
-        }
-        else
-        {
-            binding.overlayView.visibility = View.VISIBLE
-
-            Thread {
-                val fullConfig = DAO.configDAO.getConfig( config.uuid )
-
-                requireActivity().runOnUiThread {
-                    binding.overlayView.visibility = View.GONE
-
-                    fullConfig?.let { fullConfig ->
-                        completion( fullConfig )
-                    } ?: completion( config )
-                }
-            }.start()
         }
     }
 
