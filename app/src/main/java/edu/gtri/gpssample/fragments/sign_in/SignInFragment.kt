@@ -8,21 +8,14 @@
 package edu.gtri.gpssample.fragments.sign_in
 
 import android.content.SharedPreferences
-import android.content.res.ColorStateList
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -30,18 +23,11 @@ import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.ImageDAO
-import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentSignInBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.dialogs.ResetPinDialog
-import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import edu.gtri.gpssample.viewmodels.NetworkViewModel
-import edu.gtri.gpssample.viewmodels.SamplingViewModel
 
 class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
 {

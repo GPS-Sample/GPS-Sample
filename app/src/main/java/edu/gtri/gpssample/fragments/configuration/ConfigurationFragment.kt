@@ -32,14 +32,10 @@ import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
-import edu.gtri.gpssample.constants.CollectionState
-import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.HotspotMode
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.constants.ResultCode
-import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
@@ -53,22 +49,18 @@ import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionManager
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import org.osmdroid.views.MapView
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class ConfigurationFragment : Fragment(),
-    View.OnTouchListener,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate
+class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
-    private lateinit var sharedNetworkViewModel : NetworkViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
     private lateinit var nearbySessionManager: NearbySessionManager
 
@@ -81,12 +73,9 @@ class ConfigurationFragment : Fragment(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val vm: ConfigurationViewModel by activityViewModels()
-        val networkVm: NetworkViewModel by activityViewModels()
 
         sharedViewModel = vm
-        sharedNetworkViewModel = networkVm
 
-        sharedNetworkViewModel.currentFragment = this
         sharedViewModel.currentFragment = this
     }
 

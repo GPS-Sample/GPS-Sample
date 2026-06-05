@@ -16,7 +16,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
@@ -25,7 +24,6 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.appcompat.widget.PopupMenu
@@ -46,7 +44,6 @@ import com.mapbox.maps.Style
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
@@ -58,13 +55,9 @@ import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import java.io.File
-import java.lang.Thread.sleep
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -82,7 +75,6 @@ class PerformEnumerationFragment : Fragment(),
     private lateinit var enumerationTeam: EnumerationTeam
     private lateinit var defaultColorList : ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
-    private lateinit var sharedNetworkViewModel : NetworkViewModel
     private lateinit var nearbySessionManager: NearbySessionManager
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
 
@@ -106,10 +98,7 @@ class PerformEnumerationFragment : Fragment(),
         super.onCreate(savedInstanceState)
 
         val vm : ConfigurationViewModel by activityViewModels()
-        val networkVm : NetworkViewModel by activityViewModels()
         sharedViewModel = vm
-        sharedNetworkViewModel = networkVm
-        sharedNetworkViewModel.currentFragment = this
 
         sharedViewModel.setCurrentCenterPoint( null )
 
@@ -142,8 +131,6 @@ class PerformEnumerationFragment : Fragment(),
 
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
-            sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-            sharedNetworkViewModel.networkClientModel.encryptionPassword = config.encryptionPassword
         }
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
@@ -1327,33 +1314,6 @@ class PerformEnumerationFragment : Fragment(),
         binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private val getResult =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == ResultCode.BarcodeScanned.value) {
-                val payload = it.data!!.getStringExtra(Keys.kPayload.value)
-
-                val jsonObject = JSONObject(payload);
-
-                Log.d("xxx", jsonObject.toString(2))
-
-                val ssid = jsonObject.getString(Keys.kSSID.value)
-                val pass = jsonObject.getString(Keys.kPass.value)
-                val serverIp = jsonObject.getString(Keys.kIpAddress.value)
-
-                Log.d("xxxx", "the ssid, pass, serverIP ${ssid}, ${pass}, ${serverIp}")
-
-                sharedNetworkViewModel.connectHotspot(ssid, pass, serverIp)
-            }
-        }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    fun startHotspot(view : View)
-    {
-        sharedNetworkViewModel.createHotspot(view)
-    }
-
     override fun didPressCancelButton()
     {
         MapManager.instance().cancelTilePackDownload()
@@ -1380,9 +1340,7 @@ class PerformEnumerationFragment : Fragment(),
             }
             else
             {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                }
+                busyIndicatorDialog?.alertDialog?.cancel()
             }
         }
     }

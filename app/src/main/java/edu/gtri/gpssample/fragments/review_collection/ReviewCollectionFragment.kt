@@ -41,7 +41,6 @@ import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import java.util.*
 
@@ -54,7 +53,6 @@ class ReviewCollectionFragment : Fragment(),
     private lateinit var enumArea: EnumArea
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel: ConfigurationViewModel
-    private lateinit var sharedNetworkViewModel: NetworkViewModel
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
 
@@ -69,10 +67,7 @@ class ReviewCollectionFragment : Fragment(),
         super.onCreate(savedInstanceState)
 
         val vm: ConfigurationViewModel by activityViewModels()
-        val networkVm: NetworkViewModel by activityViewModels()
         sharedViewModel = vm
-        sharedNetworkViewModel = networkVm
-        sharedNetworkViewModel.currentFragment = this
 
         val samplingVm: SamplingViewModel by activityViewModels()
         samplingViewModel = samplingVm

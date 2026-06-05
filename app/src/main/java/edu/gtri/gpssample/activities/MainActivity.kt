@@ -10,9 +10,7 @@ package edu.gtri.gpssample.activities
 import android.annotation.SuppressLint
 import android.content.*
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -28,50 +26,12 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.databinding.ActivityMainBinding
 import edu.gtri.gpssample.dialogs.InfoDialog
-import edu.gtri.gpssample.receivers.NetworkStatusBroadcastReceiver
-import edu.gtri.gpssample.services.NetworkMonitorService
-import edu.gtri.gpssample.services.UDPBroadcastReceiverService
-import edu.gtri.gpssample.utils.NetworkConnectionStatus
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import edu.gtri.gpssample.viewmodels.NetworkViewModel
 
 class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, ProviderInstaller.ProviderInstallListener
 {
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var udpBroadcastReceiverService: UDPBroadcastReceiverService
-    private lateinit var networkViewModel : NetworkViewModel
-    lateinit var networkMonitorService: NetworkMonitorService
-
-    var isBound = false
-
-    private lateinit var networkStatusBroadcastReceiver: NetworkStatusBroadcastReceiver
-    private lateinit var intentFilter : IntentFilter
-    private var  networkConnectionStatus: NetworkConnectionStatus = NetworkConnectionStatus.UNKNOWN_STATUS
-
-    private val serviceConnection = object : ServiceConnection {
-        override fun onServiceConnected(className: ComponentName, service: IBinder)
-        {
-            val binder = service as UDPBroadcastReceiverService.LocalBinder
-            udpBroadcastReceiverService = binder.getService()
-        }
-
-        override fun onServiceDisconnected(name: ComponentName)
-        {
-        }
-    }
-
-    private val networkMonitorConnection = object : ServiceConnection {
-        override fun onServiceConnected(className: ComponentName, service: IBinder)
-        {
-            val binder = service as NetworkMonitorService.LocalBinder
-            networkMonitorService = binder.getService()
-        }
-
-        override fun onServiceDisconnected(name: ComponentName)
-        {
-        }
-    }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?)
@@ -82,8 +42,6 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, Provide
 
         // build view models
         val viewModel: ConfigurationViewModel by viewModels()
-        val networkVm : NetworkViewModel by viewModels()
-        networkViewModel = networkVm
 
         DAO.createSharedInstance( applicationContext )
         ImageDAO.createSharedInstance( applicationContext )
@@ -109,23 +67,6 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, Provide
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
             }
         }
-
-        val networkMonitorIntent = Intent(this, NetworkMonitorService::class.java)
-        this.bindService( networkMonitorIntent, networkMonitorConnection, Context.BIND_AUTO_CREATE)
-
-        networkStatusBroadcastReceiver = NetworkStatusBroadcastReceiver( ::updateConnectionStatus)
-
-        intentFilter = IntentFilter()
-        intentFilter.addAction(NetworkMonitorService.NETWORK_SERVICE_STATUS_KEY)
-
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU)
-        {
-            registerReceiver(networkStatusBroadcastReceiver, intentFilter, RECEIVER_EXPORTED)
-        }
-        else
-        {
-            registerReceiver(networkStatusBroadcastReceiver, intentFilter)
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle)
@@ -133,29 +74,6 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, Provide
         super.onSaveInstanceState(outState)
 
         // TODO: Figure out how to save the ViewModel state.
-    }
-
-    private fun updateConnectionStatus(status : NetworkConnectionStatus)
-    {
-        if(networkConnectionStatus != status)
-        {
-            networkConnectionStatus = status
-
-//            val sharedPreferences: SharedPreferences = getSharedPreferences("default", 0)
-//            val isFirstRun = sharedPreferences.getBoolean("IsFirstRun", true )
-//
-//            if (!isFirstRun)
-//            {
-//                runOnUiThread {
-//                    // pop up a dialog if the wifi is off
-//                    if(status == NetworkConnectionStatus.WIFI_NOT_AVAILABLE)
-//                    {
-//                        InfoDialog( this, resources.getString(R.string.wifi_disabled),
-//                            resources.getString(R.string.wifi_disabled_message), resources.getString(R.string.ok), null, this)
-//                    }
-//                }
-//            }
-        }
     }
 
     override fun onResume() {
@@ -180,13 +98,6 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, Provide
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
-        this.unbindService( networkMonitorConnection)
-        networkViewModel.shutdown()
-    }
-
     override fun didSelectOkButton(tag: Any?)
     {
     }
@@ -199,5 +110,10 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, Provide
     override fun onProviderInstalled()
     {
         Log.d( "xxx", "onProviderInstalledPassed" )
+    }
+
+    override fun onDestroy()
+    {
+        super.onDestroy()
     }
 }

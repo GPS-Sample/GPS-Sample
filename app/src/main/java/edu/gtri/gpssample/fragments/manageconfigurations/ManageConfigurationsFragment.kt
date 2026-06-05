@@ -9,19 +9,14 @@ package edu.gtri.gpssample.fragments.manageconfigurations
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidmads.library.qrgenearator.QRGContents
-import androidmads.library.qrgenearator.QRGEncoder
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.*
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -41,23 +36,17 @@ import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
 import edu.gtri.gpssample.managers.NearbySessionManager
-import edu.gtri.gpssample.managers.NearbySessionState
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
-import edu.gtri.gpssample.viewmodels.models.NetworkClientModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.Date
 import java.util.UUID
 import kotlin.collections.ArrayList
 
-class ManageConfigurationsFragment : Fragment(),
-    NetworkClientModel.ConfigurationDelegate,
-    NetworkViewModel.ManageConfigurationNetworkDelegate
+class ManageConfigurationsFragment : Fragment()
 {
     private var _binding: FragmentManageConfigurationsBinding? = null
     private val binding get() = _binding!!
@@ -68,7 +57,6 @@ class ManageConfigurationsFragment : Fragment(),
     private lateinit var user: User
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
     private lateinit var sharedViewModel: ConfigurationViewModel
-    private lateinit var sharedNetworkViewModel: NetworkViewModel
     private lateinit var samplingViewModel: SamplingViewModel
 
     private val REQUEST_CONFIGURATION   = 1001
@@ -78,31 +66,17 @@ class ManageConfigurationsFragment : Fragment(),
         super.onCreate(savedInstanceState)
 
         val vm : ConfigurationViewModel by activityViewModels()
-        val networkVm : NetworkViewModel by activityViewModels()
         val samplingVm : SamplingViewModel by activityViewModels()
 
         sharedViewModel = vm
         samplingViewModel = samplingVm
 
-        sharedNetworkViewModel = networkVm
-
         setHasOptionsMenu(true)
-
-        clearFragmentResultListener( this.javaClass.simpleName )
-
-        setFragmentResultListener( this.javaClass.simpleName ) { key, bundle ->
-            val errorCode = Config.ErrorCode.values()[bundle.getInt(Keys.kError.value)]
-            didReceiveConfiguration( errorCode )
-            clearFragmentResult( this.javaClass.simpleName )
-        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         _binding = FragmentManageConfigurationsBinding.inflate(inflater, container, false)
-
-        sharedNetworkViewModel.currentFragment = this
-        sharedNetworkViewModel.networkClientModel.configurationDelegate = this
 
         return binding.root
     }
@@ -465,16 +439,7 @@ class ManageConfigurationsFragment : Fragment(),
         }
     }
 
-    override fun configurationReceived(config: Config)
-    {
-        runBlocking(Dispatchers.Main) {
-            sharedViewModel.setCurrentConfig( config )
-            configurations.add( config )
-            manageConfigurationsAdapter.updateConfigurations( configurations )
-        }
-    }
-
-    override fun didReceiveConfiguration(errorCode: Config.ErrorCode)
+    fun didReceiveConfiguration(errorCode: Config.ErrorCode)
     {
         if (errorCode != Config.ErrorCode.None)
         {

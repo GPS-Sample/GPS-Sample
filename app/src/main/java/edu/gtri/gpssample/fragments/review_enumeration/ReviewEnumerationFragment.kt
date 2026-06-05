@@ -40,7 +40,6 @@ import edu.gtri.gpssample.databinding.FragmentReviewEnumerationBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.fragments.perform_enumeration.PerformEnumerationAdapter
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
@@ -54,7 +53,6 @@ class ReviewEnumerationFragment : Fragment(),
     private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private lateinit var sharedViewModel : ConfigurationViewModel
-    private lateinit var sharedNetworkViewModel : NetworkViewModel
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
 
@@ -70,11 +68,8 @@ class ReviewEnumerationFragment : Fragment(),
         super.onCreate(savedInstanceState)
 
         val vm : ConfigurationViewModel by activityViewModels()
-        val networkVm : NetworkViewModel by activityViewModels()
 
         sharedViewModel = vm
-        sharedNetworkViewModel = networkVm
-        sharedNetworkViewModel.currentFragment = this
 
         setHasOptionsMenu(true)
     }

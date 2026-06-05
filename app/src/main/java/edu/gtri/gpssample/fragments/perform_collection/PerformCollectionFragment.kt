@@ -17,7 +17,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.Looper
 import android.util.Log
 import android.view.*
@@ -47,7 +46,6 @@ import com.mapbox.maps.Style
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
@@ -59,13 +57,10 @@ import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -84,7 +79,6 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var defaultColorList: ColorStateList
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel: ConfigurationViewModel
-    private lateinit var sharedNetworkViewModel: NetworkViewModel
     private lateinit var nearbySessionManager: NearbySessionManager
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
@@ -109,10 +103,7 @@ class PerformCollectionFragment : Fragment(),
         super.onCreate(savedInstanceState)
 
         val vm: ConfigurationViewModel by activityViewModels()
-        val networkVm: NetworkViewModel by activityViewModels()
         sharedViewModel = vm
-        sharedNetworkViewModel = networkVm
-        sharedNetworkViewModel.currentFragment = this
 
         sharedViewModel.setCurrentCenterPoint( null )
 
@@ -192,8 +183,6 @@ class PerformCollectionFragment : Fragment(),
 
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
-            sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-            sharedNetworkViewModel.networkClientModel.encryptionPassword = config.encryptionPassword
         }
 
         DAO.collectionTeamDAO.getCollectionTeam( enumArea.selectedCollectionTeamUuid )?.let {
@@ -1065,33 +1054,6 @@ class PerformCollectionFragment : Fragment(),
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private val getResult =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == ResultCode.BarcodeScanned.value) {
-                val payload = it.data!!.getStringExtra(Keys.kPayload.value)
-
-                val jsonObject = JSONObject(payload);
-
-                Log.d("xxx", jsonObject.toString(2))
-
-                val ssid = jsonObject.getString(Keys.kSSID.value)
-                val pass = jsonObject.getString(Keys.kPass.value)
-                val serverIp = jsonObject.getString(Keys.kIpAddress.value)
-
-                Log.d("xxxx", "the ssid, pass, serverIP ${ssid}, ${pass}, ${serverIp}")
-
-                sharedNetworkViewModel.connectHotspot(ssid, pass, serverIp)
-            }
-        }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    fun startHotspot(view : View)
-    {
-        sharedNetworkViewModel.createHotspot(view)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
     override fun shouldLaunchODK()
     {
         val intent = Intent(Intent.ACTION_VIEW)
@@ -1151,8 +1113,6 @@ class PerformCollectionFragment : Fragment(),
 
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
 
-//        enumArea.locations = DAO.locationDAO.getLocations( collectionTeam )
-
                 collectionTeamLocations.clear()
                 val enumerationItems = ArrayList<EnumerationItem>()
 
@@ -1171,24 +1131,6 @@ class PerformCollectionFragment : Fragment(),
                 }
 
                 performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
-
-//        sharedViewModel.currentConfiguration?.value?.let { config ->
-//            DAO.configDAO.getConfig( config.uuid )?.let {
-//                sharedViewModel.setCurrentConfig( it )
-//            }
-//        }
-//
-//        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-//            DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
-//                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
-//            }
-//        }
-//
-//        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-//            DAO.studyDAO.getStudy( study.uuid )?.let {
-//                sharedViewModel.createStudyModel.setStudy( it )
-//            }
-//        }
 
                 performCollectionAdapter.notifyDataSetChanged()
 
