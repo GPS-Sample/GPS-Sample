@@ -156,6 +156,17 @@ class EnumAreaDAO(private var dao: DAO)
         return enumAreas
     }
 
+    fun getFullLocations( enumArea: EnumArea )
+    {
+        for (location in enumArea.locations)
+        {
+            if (location.enumerationItems.isEmpty())
+            {
+                location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+            }
+        }
+    }
+
     fun delete( enumArea: EnumArea )
     {
         enumArea.mapTileRegion?.let {

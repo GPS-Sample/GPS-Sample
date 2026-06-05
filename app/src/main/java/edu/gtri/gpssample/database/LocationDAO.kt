@@ -192,48 +192,6 @@ class LocationDAO(private var dao: DAO)
         return uuids
     }
 
-    fun getLocations( enumerationTeam: EnumerationTeam ) : ArrayList<Location>
-    {
-        val locations = ArrayList<Location>()
-
-        val query = "SELECT location.*, conn.${DAO.COLUMN_LOCATION_UUID}, conn.${DAO.COLUMN_ENUMERATION_TEAM_UUID} FROM ${DAO.TABLE_LOCATION} AS location, " +
-                "${DAO.CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM} AS conn WHERE location.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LOCATION_UUID} AND conn.${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${enumerationTeam.uuid}'"
-
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            val location = buildLocation( cursor )
-            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
-            locations.add( location )
-        }
-
-        cursor.close()
-
-        return locations
-    }
-
-    fun getLocations( collectionTeam: CollectionTeam ) : ArrayList<Location>
-    {
-        val locations = ArrayList<Location>()
-
-        val query = "SELECT location.*, conn.${DAO.COLUMN_LOCATION_UUID}, conn.${DAO.COLUMN_COLLECTION_TEAM_UUID} FROM ${DAO.TABLE_LOCATION} AS location, " +
-                "${DAO.CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM} AS conn WHERE location.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LOCATION_UUID} AND conn.${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${collectionTeam.uuid}'"
-
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            val location = buildLocation( cursor )
-            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
-            locations.add( location )
-        }
-
-        cursor.close()
-
-        return locations
-    }
-
     fun getLocations( enumArea: EnumArea ): ArrayList<Location>
     {
         val locations = ArrayList<Location>()
@@ -246,26 +204,8 @@ class LocationDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val location = buildLocation( cursor )
-//            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
-            locations.add( location )
-        }
-
-        cursor.close()
-
-        return locations
-    }
-
-    fun getLocations() : ArrayList<Location>
-    {
-        val locations = ArrayList<Location>()
-
-        val query = "SELECT * FROM ${DAO.TABLE_LOCATION}"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            val location = buildLocation( cursor )
-            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+            // enumerationItems will be lazy loaded as needed
+            // location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
             locations.add( location )
         }
 

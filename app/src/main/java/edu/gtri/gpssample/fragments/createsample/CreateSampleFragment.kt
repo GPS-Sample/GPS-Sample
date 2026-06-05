@@ -128,24 +128,12 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
                 {
                     for (enumArea in config.enumAreas)
                     {
-                        for (location in enumArea.locations)
-                        {
-                            if (location.enumerationItems.isEmpty())
-                            {
-                                location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
-                            }
-                        }
+                        DAO.enumAreaDAO.getFullLocations( enumArea )
                     }
                 }
                 else
                 {
-                    for (location in enumArea.locations)
-                    {
-                        if (location.enumerationItems.isEmpty())
-                        {
-                            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
-                        }
-                    }
+                    DAO.enumAreaDAO.getFullLocations( enumArea )
                 }
             }
 

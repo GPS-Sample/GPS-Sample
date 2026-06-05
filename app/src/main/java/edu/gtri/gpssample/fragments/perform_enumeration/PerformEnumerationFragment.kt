@@ -174,13 +174,7 @@ class PerformEnumerationFragment : Fragment(),
 
         viewLifecycleOwner.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                for (location in enumArea.locations)
-                {
-                    if (location.enumerationItems.isEmpty())
-                    {
-                        location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
-                    }
-                }
+                DAO.enumAreaDAO.getFullLocations( enumArea )
             }
 
             // back on the main thread...
