@@ -50,7 +50,7 @@ class ManageConfigurationsFragment : Fragment()
 {
     private var _binding: FragmentManageConfigurationsBinding? = null
     private val binding get() = _binding!!
-    private var configurations = ArrayList<Config>()
+    private var minimalConfigurations = ArrayList<Config>()
     private var encryptionPassword = ""
 
     private lateinit var nearbySessionManager: NearbySessionManager
@@ -125,19 +125,19 @@ class ManageConfigurationsFragment : Fragment()
 
         viewLifecycleOwner.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                configurations = DAO.configDAO.getConfigs()
+                minimalConfigurations = DAO.configDAO.getMinimalConfigs()
             }
 
             // back on the main thread...
             binding.progressOverlayView.visibility = View.GONE
 
-            manageConfigurationsAdapter = ManageConfigurationsAdapter( configurations )
+            manageConfigurationsAdapter = ManageConfigurationsAdapter( minimalConfigurations )
             manageConfigurationsAdapter.didSelectConfig = this@ManageConfigurationsFragment::didSelectConfig
             manageConfigurationsAdapter.shouldCloneConfig = this@ManageConfigurationsFragment::shouldCloneConfig
 
-            if (user.role == Role.Enumerator.value && configurations.isNotEmpty()) // && configurations[0].selectedEnumAreaUuid.isEmpty())
+            if (user.role == Role.Enumerator.value && minimalConfigurations.isNotEmpty()) // && configurations[0].selectedEnumAreaUuid.isEmpty())
             {
-                binding.createButton.visibility = View.VISIBLE
+                binding.walkButton.visibility = View.VISIBLE
             }
 
             binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -146,7 +146,7 @@ class ManageConfigurationsFragment : Fragment()
 
             if (BuildConfig.DEBUG && (user.role == Role.Admin.toString() || user.role == Role.Supervisor.toString()))
             {
-                binding.createButton.visibility = View.VISIBLE
+                binding.walkButton.visibility = View.VISIBLE
             }
 
             binding.addButton.setOnClickListener {
@@ -154,30 +154,32 @@ class ManageConfigurationsFragment : Fragment()
                 findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
             }
 
-            binding.createButton.setOnClickListener {
+            binding.walkButton.setOnClickListener {
 
-                if (configurations.isNotEmpty())
+                if (minimalConfigurations.isNotEmpty())
                 {
-                    sharedViewModel.setCurrentConfig( configurations[0] )
-                    val bundle = Bundle()
-                    bundle.putBoolean( Keys.kEditMode.value, true )
-                    findNavController().navigate(R.id.action_navigate_to_WalkEnumerationAreaFragment, bundle)
+                    DAO.configDAO.getConfig( minimalConfigurations[0].uuid )?.let { config ->
+                        sharedViewModel.setCurrentConfig( config )
+                        val bundle = Bundle()
+                        bundle.putBoolean( Keys.kEditMode.value, true )
+                        findNavController().navigate(R.id.action_navigate_to_WalkEnumerationAreaFragment, bundle)
+                    }
                 }
             }
 
             binding.importButton.setOnClickListener {
                 var password = ""
 
-                if (configurations.size == 1)
+                if (minimalConfigurations.size == 1)
                 {
-                    encryptionPassword = configurations[0].encryptionPassword
+                    encryptionPassword = minimalConfigurations[0].encryptionPassword
                     for (i in 1..encryptionPassword.length)
                     {
                         password += "*"
                     }
                 }
 
-                if ((configurations.size == 1) && ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())))
+                if ((minimalConfigurations.size == 1) && ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())))
                 {
                     ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
                         when( buttonPressed )
@@ -187,8 +189,8 @@ class ManageConfigurationsFragment : Fragment()
                             ConfirmationDialog.ButtonPress.Right -> {
                                 DAO.deleteAll()
                                 ImageDAO.deleteAll()
-                                configurations.clear()
-                                manageConfigurationsAdapter.updateConfigurations(configurations)
+                                minimalConfigurations.clear()
+                                manageConfigurationsAdapter.updateConfigurations(minimalConfigurations)
                                 InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false )  { action, password, tag ->
                                     when (action) {
                                         InputDialog.Action.DidCancel -> {}
@@ -384,22 +386,14 @@ class ManageConfigurationsFragment : Fragment()
 
         // save the new config to the database
         DAO.configDAO.createOrUpdateConfig( newConfig )
-        configurations.add( newConfig )
-        manageConfigurationsAdapter.updateConfigurations( configurations )
+
+        minimalConfigurations.add( newConfig )
+        manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
     }
 
     private fun didSelectConfig( config: Config )
     {
-        if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
-        {
-            sharedViewModel.setCurrentConfig( config )
-            findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
-        }
-        else
-        {
-            sharedViewModel.setCurrentConfig( config )
-            navigateBasedOnRole()
-        }
+        navigateBasedOnRole(config )
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -417,55 +411,72 @@ class ManageConfigurationsFragment : Fragment()
 
             nearbySessionManager.handleNearbySessionStatusForClient( nearbySessionStatusDialog ) { config ->
 
-                nearbySessionStatusDialog.dismiss()
-
                 nearbySessionManager.clientClose()
 
                 DAO.configDAO.createOrUpdateConfig( config )
 
-                sharedViewModel.setCurrentConfig( config )
+                nearbySessionStatusDialog.dismiss()
 
-                configurations.find { it.uuid == config.uuid } ?.let {
-                    configurations.remove(it )
+                minimalConfigurations.find { it.uuid == config.uuid } ?.let {
+                    minimalConfigurations.remove(it )
                 }
 
-                configurations.add( config )
-                manageConfigurationsAdapter.updateConfigurations( configurations )
+                minimalConfigurations.add( config )
+                manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
 
-                didReceiveConfiguration(Config.ErrorCode.None )
+                // make this a minimal config!
+                config.studies.clear()
+                config.enumAreas.clear()
+
+                didReceiveConfiguration( config )
             }
 
             nearbySessionManager.clientConnect(sessionId!! )
         }
     }
 
-    fun didReceiveConfiguration(errorCode: Config.ErrorCode)
+    fun didReceiveConfiguration( config: Config )
     {
-        if (errorCode != Config.ErrorCode.None)
-        {
-            val message = if (errorCode == Config.ErrorCode.PasswordError) resources.getString(R.string.password_error) else resources.getString(R.string.import_failed)
-            InfoDialog( activity!!, resources.getString(R.string.error), message, resources.getString(R.string.ok), null, null)
-        }
-        else
-        {
-            InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
+        InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
 
-            if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaUuid.isEmpty())
-            {
-                binding.createButton.visibility = View.VISIBLE
-            }
-
-            navigateBasedOnRole()
+        if (user.role == Role.Enumerator.toString() && config.selectedEnumAreaUuid.isEmpty())
+        {
+            binding.walkButton.visibility = View.VISIBLE
         }
+
+        navigateBasedOnRole( config )
     }
 
-    fun navigateBasedOnRole()
+    fun navigateBasedOnRole( minimalConfig: Config )
     {
-        if (user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())
-        {
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-                sharedViewModel.setCurrentConfig( config )
+        var config = minimalConfig
 
+        binding.progressOverlayView.visibility = View.VISIBLE
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                // make sure this is really a minimal config
+                if (minimalConfig.studies.isEmpty() && minimalConfig.enumAreas.isEmpty())
+                {
+                    // get the full config...
+                    DAO.configDAO.getConfig(minimalConfig.uuid )?.let {
+                        config = it
+                    }
+                }
+            }
+
+            // back on the main thread...
+
+            binding.progressOverlayView.visibility = View.GONE
+
+            sharedViewModel.setCurrentConfig( config )
+
+            if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
+            {
+                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
+            }
+            else
+            {
                 // find the selected Enum Area
                 val enumAreas = config.enumAreas.filter { it.uuid == config.selectedEnumAreaUuid }
 
@@ -612,18 +623,16 @@ class ManageConfigurationsFragment : Fragment()
                         {
                             DAO.configDAO.createOrUpdateConfig( config )
 
-                            sharedViewModel.setCurrentConfig( config )
-
-                            configurations.find { it.uuid == config.uuid } ?.let {
-                                configurations.remove(it )
+                            minimalConfigurations.find { it.uuid == config.uuid } ?.let {
+                                minimalConfigurations.remove(it )
                             }
 
-                            configurations.add( config )
-                            manageConfigurationsAdapter.updateConfigurations( configurations )
+                            minimalConfigurations.add( config )
+                            manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
 
                             binding.progressOverlayView.visibility = View.GONE
 
-                            didReceiveConfiguration(Config.ErrorCode.None )
+                            didReceiveConfiguration( config )
                         }
                     }
                 }

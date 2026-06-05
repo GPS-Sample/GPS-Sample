@@ -179,9 +179,8 @@ class ConfigDAO(private var dao: DAO)
 
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
-        if (cursor.count > 0)
+        while (cursor.moveToNext())
         {
-            cursor.moveToNext()
             config = buildConfig( cursor )
             config.studies = DAO.studyDAO.getStudies( config )
             config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
@@ -192,7 +191,7 @@ class ConfigDAO(private var dao: DAO)
         return config
     }
 
-    fun getConfigs(): ArrayList<Config>
+    fun getMinimalConfigs(): ArrayList<Config>
     {
         val configs = ArrayList<Config>()
 
@@ -200,13 +199,12 @@ class ConfigDAO(private var dao: DAO)
             val query = "SELECT * FROM ${DAO.TABLE_CONFIG} ORDER BY ${DAO.COLUMN_CREATION_DATE}"
             val cursor = dao.writableDatabase.rawQuery(query, null)
 
-            while (cursor.moveToNext()) {
+            while (cursor.moveToNext())
+            {
                 val config = buildConfig(cursor)
 
-                if (config.validUsers.contains(user.uuid))
+                if (config.validUsers.contains(user.uuid ))
                 {
-                    config.studies = DAO.studyDAO.getStudies( config )
-                    config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
                     configs.add( config)
                 }
             }

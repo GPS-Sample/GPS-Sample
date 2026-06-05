@@ -43,7 +43,7 @@
             android:layout_height="0dp"/>
 
         <Button
-            android:id="@+id/create_button"
+            android:id="@+id/walk_button"
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="50dp"

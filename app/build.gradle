@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace 'edu.gtri.gpssample'
+    namespace = 'edu.gtri.gpssample'
     compileSdk 35
 
     defaultConfig {
@@ -36,8 +36,8 @@ android {
     }
 
     buildFeatures {
-        viewBinding true
-        dataBinding true
+        viewBinding = true
+        dataBinding = true
     }
 }
 
