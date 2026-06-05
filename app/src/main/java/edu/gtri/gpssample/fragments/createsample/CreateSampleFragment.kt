@@ -128,12 +128,12 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
                 {
                     for (enumArea in config.enumAreas)
                     {
-                        DAO.enumAreaDAO.getFullLocations( enumArea )
+                        DAO.enumAreaDAO.loadLazyLocations( enumArea )
                     }
                 }
                 else
                 {
-                    DAO.enumAreaDAO.getFullLocations( enumArea )
+                    DAO.enumAreaDAO.loadLazyLocations( enumArea )
                 }
             }
 

@@ -53,6 +53,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
+import edu.gtri.gpssample.managers.NearbySessionManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
@@ -82,13 +83,12 @@ class PerformEnumerationFragment : Fragment(),
     private lateinit var defaultColorList : ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var sharedNetworkViewModel : NetworkViewModel
+    private lateinit var nearbySessionManager: NearbySessionManager
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
 
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
-
     private var lastBreadcrumbGroupId = ""
-
     private var dropMode = false
     private var isShowingBreadcrumbs = false
     private var isRecordingBreadcrumbs = false
@@ -98,7 +98,6 @@ class PerformEnumerationFragment : Fragment(),
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var includeConfig = false
     private var includeImages = false
-
     private var maxSubaddress = 0
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
 
@@ -174,7 +173,7 @@ class PerformEnumerationFragment : Fragment(),
 
         viewLifecycleOwner.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                DAO.enumAreaDAO.getFullLocations( enumArea )
+                DAO.enumAreaDAO.loadLazyLocations( enumArea )
             }
 
             // back on the main thread...
@@ -469,28 +468,26 @@ class PerformEnumerationFragment : Fragment(),
 
                 if (gpsAccuracyIsGood())
                 {
-                    sharedViewModel.currentConfiguration?.value?.let { config ->
-                        if (config.allowManualLocationEntry)
-                        {
-                            ConfirmationDialog( activity, resources.getString(R.string.select_location), "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), null, true ) { buttonPressed, tag ->
-                                when( buttonPressed )
-                                {
-                                    ConfirmationDialog.ButtonPress.Left -> {
-                                        addHouseholdButtonPress()
-                                    }
-                                    ConfirmationDialog.ButtonPress.Right -> {
-                                        dropMode = true
-                                        binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                                    }
-                                    ConfirmationDialog.ButtonPress.None -> {
-                                    }
+                    if (config.allowManualLocationEntry)
+                    {
+                        ConfirmationDialog( activity, resources.getString(R.string.select_location), "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), null, true ) { buttonPressed, tag ->
+                            when( buttonPressed )
+                            {
+                                ConfirmationDialog.ButtonPress.Left -> {
+                                    addHouseholdButtonPress()
+                                }
+                                ConfirmationDialog.ButtonPress.Right -> {
+                                    dropMode = true
+                                    binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                                }
+                                ConfirmationDialog.ButtonPress.None -> {
                                 }
                             }
                         }
-                        else
-                        {
-                            addHouseholdButtonPress()
-                        }
+                    }
+                    else
+                    {
+                        addHouseholdButtonPress()
                     }
                 }
                 else
@@ -539,29 +536,15 @@ class PerformEnumerationFragment : Fragment(),
                     when( buttonPressed )
                     {
                         ConfirmationDialog.ButtonPress.Left -> {
-                            sharedViewModel.currentConfiguration?.value?.let { config ->
-                                sharedNetworkViewModel.setCurrentConfig(config)
+                            nearbySessionManager = NearbySessionManager(requireContext(), viewLifecycleOwner, config )
 
-                                when(user.role)
-                                {
-                                    Role.Admin.toString(),
-                                    Role.Supervisor.toString() ->
-                                    {
-                                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
-                                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
-                                        sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-                                        startHotspot(view)
-                                    }
-
-                                    Role.Enumerator.toString() ->
-                                    {
-                                        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
-                                        sharedNetworkViewModel.networkClientModel.currentConfig = config
-                                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                                        getResult.launch(intent)
-                                    }
-                                }
+                            val nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
+                                nearbySessionManager.stopHosting()
                             }
+
+                            nearbySessionManager.handleNearbySessionStatusForHost( nearbySessionStatusDialog )
+
+                            nearbySessionManager.startHosting()
                         }
                         ConfirmationDialog.ButtonPress.Right -> {
                             val items = ArrayList<String>()
@@ -1679,6 +1662,11 @@ class PerformEnumerationFragment : Fragment(),
         {
             val intent = Intent(activity!!, LocationService::class.java)
             activity!!.stopService( intent )
+        }
+
+        if (this::nearbySessionManager.isInitialized)
+        {
+            nearbySessionManager.stopHosting()
         }
 
         _binding = null

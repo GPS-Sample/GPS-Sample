@@ -443,6 +443,10 @@ class ManageConfigurationsFragment : Fragment(),
 
             nearbySessionManager.handleNearbySessionStatusForClient( nearbySessionStatusDialog ) { config ->
 
+                nearbySessionStatusDialog.dismiss()
+
+                nearbySessionManager.clientClose()
+
                 DAO.configDAO.createOrUpdateConfig( config )
 
                 sharedViewModel.setCurrentConfig( config )
@@ -453,10 +457,6 @@ class ManageConfigurationsFragment : Fragment(),
 
                 configurations.add( config )
                 manageConfigurationsAdapter.updateConfigurations( configurations )
-
-                nearbySessionStatusDialog.dismiss()
-
-                nearbySessionManager.clientClose()
 
                 didReceiveConfiguration(Config.ErrorCode.None )
             }
@@ -603,7 +603,6 @@ class ManageConfigurationsFragment : Fragment(),
             {
                 ConfirmationDialog.ButtonPress.Left -> {
                     val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-
                     getQrCode.launch(intent)
                 }
                 ConfirmationDialog.ButtonPress.Right -> {

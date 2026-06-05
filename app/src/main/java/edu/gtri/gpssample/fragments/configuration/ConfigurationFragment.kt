@@ -17,6 +17,7 @@ import android.text.InputType
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -30,12 +31,14 @@ import com.mapbox.geojson.Point
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.HotspotMode
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.MapEngine
+import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
@@ -168,23 +171,8 @@ class ConfigurationFragment : Fragment(),
                 when( buttonPressed )
                 {
                     ConfirmationDialog.ButtonPress.Left -> {
-                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.import_field_data))
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Import )
-
-                        sharedViewModel.currentConfiguration?.value?.let{ config ->
-
-                            config.selectedEnumAreaUuid = ""
-
-                            for (enumArea in config.enumAreas)
-                            {
-                                enumArea.selectedEnumerationTeamUuid = ""
-                                enumArea.selectedCollectionTeamUuid = ""
-                            }
-
-                            sharedNetworkViewModel.setCurrentConfig(config)
-                            sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-                            sharedNetworkViewModel.createHotspot(view)
-                        }
+                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                        getQrCode.launch(intent)
                     }
                     ConfirmationDialog.ButtonPress.Right -> {
                         Toast.makeText(activity!!.applicationContext, resources.getString(R.string.select_configuration_file), Toast.LENGTH_LONG).show()
@@ -212,6 +200,7 @@ class ConfigurationFragment : Fragment(),
                     {
                         enumArea.selectedEnumerationTeamUuid = ""
                         enumArea.selectedCollectionTeamUuid = ""
+                        DAO.enumAreaDAO.loadLazyLocations( enumArea )
                     }
                 }
 
@@ -348,6 +337,64 @@ class ConfigurationFragment : Fragment(),
         updateOverview()
     }
 
+    override fun onResume()
+    {
+        super.onResume()
+
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    fun updateOverview()
+    {
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            val summaryInfo = DAO.configDAO.getConfigSummary(config.uuid )
+            val numRemaining = summaryInfo.sampledCount - summaryInfo.surveyedCount
+
+            binding.numberOfEnumerationAreasTextView.text = "${config.enumAreas.size}"
+            binding.numberEnumeratedTextView.text = "${summaryInfo.enumerationCount}"
+            binding.numberEligibleTextView.text = "${summaryInfo.eligibleCount}"
+            binding.numberSampledTextView.text = "${summaryInfo.sampledCount}"
+            binding.numberSurveyedTextView.text = "${summaryInfo.surveyedCount}"
+            binding.numberRemainingTextView.text = "${numRemaining}"
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private val getQrCode = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+    {
+        if (it.resultCode == ResultCode.BarcodeScanned.value)
+        {
+            val sessionId = it.data!!.getStringExtra(Keys.kPayload.value )
+
+            nearbySessionManager = NearbySessionManager(requireContext(), viewLifecycleOwner, null )
+
+            val nearbySessionStatusDialog = NearbySessionStatusDialog( requireContext(), resources.getString( R.string.import_configuration )) {
+                nearbySessionManager.clientClose()
+            }
+
+            nearbySessionManager.handleNearbySessionStatusForClient( nearbySessionStatusDialog ) { config ->
+
+                nearbySessionStatusDialog.dismiss()
+
+                nearbySessionManager.clientClose()
+
+                DAO.configDAO.createOrUpdateConfig( config )
+
+                sharedViewModel.setCurrentConfig( config )
+                enumerationAreasAdapter.updateEnumAreas( config.enumAreas )
+
+                updateOverview()
+            }
+
+            nearbySessionManager.clientConnect(sessionId!! )
+        }
+    }
+
+    private fun didSelectStudy(study: Study)
+    {
+        sharedViewModel.createStudyModel.setStudy(study)
+    }
+
     fun getFileName() : String
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -371,33 +418,6 @@ class ConfigurationFragment : Fragment(),
         }
 
         return ""
-    }
-
-    fun updateOverview()
-    {
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            val summaryInfo = DAO.configDAO.getConfigSummary(config.uuid )
-            val numRemaining = summaryInfo.sampledCount - summaryInfo.surveyedCount
-
-            binding.numberOfEnumerationAreasTextView.text = "${config.enumAreas.size}"
-            binding.numberEnumeratedTextView.text = "${summaryInfo.enumerationCount}"
-            binding.numberEligibleTextView.text = "${summaryInfo.eligibleCount}"
-            binding.numberSampledTextView.text = "${summaryInfo.sampledCount}"
-            binding.numberSurveyedTextView.text = "${summaryInfo.surveyedCount}"
-            binding.numberRemainingTextView.text = "${numRemaining}"
-        }
-    }
-
-    override fun onResume()
-    {
-        super.onResume()
-
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
-    }
-
-    private fun didSelectStudy(study: Study)
-    {
-        sharedViewModel.createStudyModel.setStudy(study)
     }
 
     fun exportToDevice( )

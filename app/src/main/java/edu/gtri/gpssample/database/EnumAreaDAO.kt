@@ -156,7 +156,7 @@ class EnumAreaDAO(private var dao: DAO)
         return enumAreas
     }
 
-    fun getFullLocations( enumArea: EnumArea )
+    fun loadLazyLocations( enumArea: EnumArea )
     {
         for (location in enumArea.locations)
         {

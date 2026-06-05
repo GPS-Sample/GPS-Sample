@@ -54,6 +54,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
+import edu.gtri.gpssample.managers.NearbySessionManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
@@ -84,6 +85,7 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var sharedNetworkViewModel: NetworkViewModel
+    private lateinit var nearbySessionManager: NearbySessionManager
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
 
@@ -217,7 +219,7 @@ class PerformCollectionFragment : Fragment(),
 
         viewLifecycleOwner.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                DAO.enumAreaDAO.getFullLocations( enumArea )
+                DAO.enumAreaDAO.loadLazyLocations( enumArea )
             }
 
             // back on the main thread...
@@ -622,30 +624,16 @@ class PerformCollectionFragment : Fragment(),
                         when( buttonPressed )
                         {
                             ConfirmationDialog.ButtonPress.Left -> {
-                                sharedNetworkViewModel.setCurrentConfig(config)
+                                sharedViewModel.currentConfiguration?.value?.let { config ->
+                                    nearbySessionManager = NearbySessionManager(requireContext(), viewLifecycleOwner, config )
 
-                                when(user.role)
-                                {
-                                    Role.Admin.toString(),
-                                    Role.Supervisor.toString() ->
-                                    {
-                                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
-                                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
-                                        sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-                                        startHotspot(view)
+                                    val nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
+                                        nearbySessionManager.stopHosting()
                                     }
 
-                                    Role.Enumerator.toString(),
-                                    Role.DataCollector.toString() ->
-                                    {
-                                        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                                            sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-                                            sharedNetworkViewModel.networkClientModel.currentConfig = config
-                                            val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                                            getResult.launch(intent)
-                                        }
-                                    }
-                                    else -> {}
+                                    nearbySessionManager.handleNearbySessionStatusForHost( nearbySessionStatusDialog )
+
+                                    nearbySessionManager.startHosting()
                                 }
                             }
                             ConfirmationDialog.ButtonPress.Right -> {
@@ -1493,6 +1481,11 @@ class PerformCollectionFragment : Fragment(),
         if (this::fusedLocationClient.isInitialized)
         {
             fusedLocationClient.removeLocationUpdates( locationCallback )
+        }
+
+        if (this::nearbySessionManager.isInitialized)
+        {
+            nearbySessionManager.stopHosting()
         }
 
         _binding = null
