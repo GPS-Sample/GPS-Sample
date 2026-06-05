@@ -38,8 +38,6 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, Provide
     {
         super.onCreate(savedInstanceState)
 
-        ProviderInstaller.installIfNeededAsync(this, this)
-
         // build view models
         val viewModel: ConfigurationViewModel by viewModels()
 

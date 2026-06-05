@@ -68,13 +68,10 @@ dependencies {
     // Barcode generation
     implementation 'com.github.androidmads:QRGenerator:1.0.1'
 
-    implementation 'com.google.android.gms:play-services-base:18.10.0'
+    // Google PlayServices
     implementation("com.google.android.gms:play-services-nearby:19.3.0")
-
-    // Google Maps
-    implementation 'com.google.android.gms:play-services-maps:18.1.0'
-    implementation 'com.google.android.libraries.places:places:3.2.0'
-    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.android.gms:play-services-maps:20.0.0")
 
     // MapBox
     implementation 'com.mapbox.maps:android-ndk27:11.18.0'
