@@ -184,9 +184,12 @@ class CreateFilterRuleModel {
 
             _secondRule?.value?.let{secondRule ->
                 // build operator
-                val operator = FilterOperator("", 0, currentConnector, secondRule)
-                // add add operator to first rule
-                currentRule.filterOperator = operator
+                if (currentConnector != Connector.NONE)
+                {
+                    val operator = FilterOperator("", 0, currentConnector, secondRule)
+                    // add add operator to first rule
+                    currentRule.filterOperator = operator
+                }
             }
             filter.rule?.let{rule ->
                 _createFilterAdapter?.updateRules(rule)
