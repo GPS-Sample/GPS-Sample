@@ -1466,7 +1466,7 @@ class PerformEnumerationFragment : Fragment(),
                             MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.breadcrumb, "")
 
                             val breadcrumb = Breadcrumb( enumArea.uuid, enumerationTeam.name, point.latitude(), point.longitude(), lastBreadcrumbGroupId )
-                            DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breadcrumb )
+                            DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breadcrumb, breadcrumb.version )
                             enumArea.breadcrumbs.add( breadcrumb )
 
                             refreshMap()

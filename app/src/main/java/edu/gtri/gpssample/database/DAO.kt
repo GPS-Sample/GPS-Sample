@@ -220,6 +220,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_COLLECTION_TEAM + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
                     COLUMN_COLLECTION_TEAM_NAME + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" +
@@ -328,6 +329,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableFieldDataOption = ("CREATE TABLE " +
                     TABLE_FIELD_DATA_OPTION + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_FIELD_DATA_OPTION_NAME + " TEXT" + "," +
                     COLUMN_FIELD_DATA_OPTION_VALUE + " INTEGER" +
                     ") WITHOUT ROWID")
@@ -411,6 +413,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_BREADCRUMB + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
                     COLUMN_ENUMERATION_TEAM_NAME + " TEXT" + "," +
                     COLUMN_LATITUDE + " REAL" + "," +

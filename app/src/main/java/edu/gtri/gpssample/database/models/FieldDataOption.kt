@@ -18,9 +18,10 @@ import java.util.*
 data class FieldDataOption(
     var uuid : String,
     var name : String,
-    var value: Boolean )
+    var value: Boolean,
+    var version: String)
 {
-    constructor(name: String, value: Boolean) : this(UUID.randomUUID().toString(), name, value )
+    constructor(name: String, value: Boolean) : this(UUID.randomUUID().toString(), name, value, UUID.randomUUID().toString())
 
     fun equals( other: FieldDataOption ) : Boolean
     {

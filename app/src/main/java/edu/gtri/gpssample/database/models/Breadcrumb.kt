@@ -20,9 +20,10 @@ data class Breadcrumb(
     var enumTeamName: String,
     var latitude: Double,
     var longitude: Double,
-    var groupId: String
+    var groupId: String,
+    var version: String
 )
 {
     constructor( enumAreaUuid: String, enumTeamName: String, latitude: Double, longitude: Double, groupId: String )
-            : this( UUID.randomUUID().toString(), Date().time, enumAreaUuid, enumTeamName, latitude, longitude, groupId )
+            : this( UUID.randomUUID().toString(), Date().time, enumAreaUuid, enumTeamName, latitude, longitude, groupId, UUID.randomUUID().toString())
 }

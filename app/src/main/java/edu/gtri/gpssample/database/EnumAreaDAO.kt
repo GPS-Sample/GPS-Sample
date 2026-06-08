@@ -59,12 +59,12 @@ class EnumAreaDAO(private var dao: DAO)
         }
 
         for (collectionTeam in enumArea.collectionTeams) {
-            DAO.collectionTeamDAO.createOrUpdateCollectionTeam( collectionTeam )
+            DAO.collectionTeamDAO.createOrUpdateCollectionTeam( collectionTeam, collectionTeam.version )
         }
 
         for (breacrumb in enumArea.breadcrumbs)
         {
-            DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breacrumb )
+            DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breacrumb, breacrumb.version )
         }
 
         return enumArea

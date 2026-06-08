@@ -184,10 +184,9 @@ class CreateCollectionTeamFragment : Fragment(),
                     }
                 }
 
-                val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam(
-                    CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygonPoints, locationUuids ))
+                val collectionTeam = CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygonPoints, locationUuids )
 
-                collectionTeam?.let { team ->
+                DAO.collectionTeamDAO.createOrUpdateCollectionTeam( collectionTeam, collectionTeam.version )?.let { team ->
                     enumArea.collectionTeams.add(team)
                     activity!!.runOnUiThread {
                         findNavController().popBackStack()

@@ -41,7 +41,7 @@ class RuleDAO(private var dao: DAO)
 
         for (fieldDataOption in rule.fieldDataOptions)
         {
-            DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, rule )
+            DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, rule, fieldDataOption.version )
         }
 
         return rule

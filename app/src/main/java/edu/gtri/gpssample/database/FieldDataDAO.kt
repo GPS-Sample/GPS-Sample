@@ -48,7 +48,7 @@ class FieldDataDAO(private var dao: DAO)
 
         for (fieldDataOption in fieldData.fieldDataOptions)
         {
-            DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData )
+            DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData, fieldDataOption.version )
         }
 
         return fieldData

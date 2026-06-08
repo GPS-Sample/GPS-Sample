@@ -8,12 +8,19 @@ import edu.gtri.gpssample.database.models.Breadcrumb
 
 class BreadcrumbDAO(private var dao: DAO)
 {
-    fun createOrUpdateBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb?
+    fun createOrUpdateBreadcrumb(breadcrumb: Breadcrumb, version: String): Breadcrumb?
     {
-        if (dao.exists( DAO.TABLE_BREADCRUMB, DAO.COLUMN_UUID, breadcrumb.uuid ))
+        breadcrumb.version = version
+
+        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_BREADCRUMB, breadcrumb.uuid, version )
+
+        if (exists)
         {
-            updateBreadcrumb( breadcrumb )
-            Log.d( "xxx", "Updated Breadcrumb with ID ${breadcrumb.uuid}" )
+            if (shouldUpdate)
+            {
+                updateBreadcrumb( breadcrumb )
+                Log.d( "xxx", "Updated Breadcrumb to version ${breadcrumb.version}")
+            }
         }
         else
         {
@@ -23,7 +30,7 @@ class BreadcrumbDAO(private var dao: DAO)
                 return null
             }
 
-            Log.d("xxx", "Created Breadcrumb with ID ${breadcrumb.uuid}")
+            Log.d("xxx", "Created Breadcrumb with version ${breadcrumb.version}")
         }
 
         return breadcrumb
@@ -44,6 +51,7 @@ class BreadcrumbDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_UUID, breadcrumb.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, breadcrumb.creationDate )
+        values.put( DAO.COLUMN_VERSION, breadcrumb.version )
         values.put( DAO.COLUMN_ENUM_AREA_UUID, breadcrumb.enumAreaUuid )
         values.put( DAO.COLUMN_ENUMERATION_TEAM_NAME, breadcrumb.enumTeamName )
         values.put( DAO.COLUMN_LATITUDE, breadcrumb.latitude )
@@ -56,13 +64,14 @@ class BreadcrumbDAO(private var dao: DAO)
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val enumAreaUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
         val enumTeamName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_NAME))
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LATITUDE))
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LONGITUDE))
         val groupId = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_GROUP_ID))
 
-        return Breadcrumb( uuid, creationDate, enumAreaUuid, enumTeamName, latitude, longitude, groupId )
+        return Breadcrumb( uuid, creationDate, enumAreaUuid, enumTeamName, latitude, longitude, groupId, version )
     }
 
     fun getBreadcrumb( uuid: String ): Breadcrumb?

@@ -20,16 +20,18 @@ class FieldDataOptionDAO(private var dao: DAO)
 {
 //    val fieldDataOptionCache = HashMap<String, FieldDataOption>()
 
-    fun createOrUpdateFieldDataOption(fieldDataOption: FieldDataOption, obj: Any) : FieldDataOption?
+    fun createOrUpdateFieldDataOption(fieldDataOption: FieldDataOption, obj: Any, version: String) : FieldDataOption?
     {
-        if (dao.exists( DAO.TABLE_FIELD_DATA_OPTION, DAO.COLUMN_UUID, fieldDataOption.uuid ))
+        fieldDataOption.version = version
+
+        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD_DATA_OPTION, fieldDataOption.uuid, version )
+
+        if (exists)
         {
-            getFieldDataOption( fieldDataOption.uuid )?.let { existingFieldDataOption ->
-                if (fieldDataOption.doesNotEqual( existingFieldDataOption ))
-                {
-                    updateFieldDataOption( fieldDataOption )
-                    Log.d( "xxx", "Updated FieldDataOption with ID ${fieldDataOption.uuid}")
-                }
+            if (shouldUpdate)
+            {
+                updateFieldDataOption( fieldDataOption )
+                Log.d( "xxx", "Updated FieldDataOption to version ${fieldDataOption.version}")
             }
         }
         else
@@ -40,7 +42,7 @@ class FieldDataOptionDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created FieldDataOption with ID ${fieldDataOption.uuid}")
+            Log.d( "xxx", "Created FieldDataOption with version ${fieldDataOption.version}")
         }
 
         val fieldData = obj as? FieldData
@@ -89,6 +91,7 @@ class FieldDataOptionDAO(private var dao: DAO)
     fun putFieldDataOption(fieldDataOption: FieldDataOption, values: ContentValues)
     {
         values.put( DAO.COLUMN_UUID, fieldDataOption.uuid )
+        values.put( DAO.COLUMN_VERSION, fieldDataOption.version )
         values.put( DAO.COLUMN_FIELD_DATA_OPTION_NAME, fieldDataOption.name )
         values.put( DAO.COLUMN_FIELD_DATA_OPTION_VALUE, fieldDataOption.value )
     }
@@ -104,26 +107,15 @@ class FieldDataOptionDAO(private var dao: DAO)
         dao.writableDatabase.update(DAO.TABLE_FIELD_DATA_OPTION, values, whereClause, args )
     }
 
-    fun modified( fieldDataOption : FieldDataOption ) : Boolean
-    {
-        getFieldDataOption( fieldDataOption.uuid )?.let {
-            if (!fieldDataOption.equals(it))
-            {
-                return true
-            }
-        }
-
-        return false
-    }
-
     @SuppressLint("Range")
     private fun  buildFieldDataOption(cursor: Cursor): FieldDataOption
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_NAME))
         val value = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_VALUE)).toBoolean()
 
-        return FieldDataOption(uuid, name, value)
+        return FieldDataOption(uuid, name, value, version)
     }
 
 //    fun loadCache()

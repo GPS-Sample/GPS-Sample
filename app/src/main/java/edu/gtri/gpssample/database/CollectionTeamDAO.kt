@@ -15,16 +15,18 @@ import edu.gtri.gpssample.database.models.*
 
 class CollectionTeamDAO(private var dao: DAO)
 {
-    fun createOrUpdateCollectionTeam(collectionTeam: CollectionTeam) : CollectionTeam?
+    fun createOrUpdateCollectionTeam(collectionTeam: CollectionTeam, version: String) : CollectionTeam?
     {
-        if (dao.exists( DAO.TABLE_COLLECTION_TEAM, DAO.COLUMN_UUID, collectionTeam.uuid ))
-        {
-            val existingCollectionTeam = getCollectionTeam( collectionTeam.uuid )
+        collectionTeam.version = version
 
-            if (existingCollectionTeam != null && collectionTeam.doesNotEqual( existingCollectionTeam ))
+        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_COLLECTION_TEAM, collectionTeam.uuid, version )
+
+        if (exists)
+        {
+            if (shouldUpdate)
             {
                 updateTeam( collectionTeam )
-                Log.d( "xxx", "Updated CollectionTeam with ID ${collectionTeam.uuid}" )
+                Log.d( "xxx", "Updated CollectionTeam to version ${collectionTeam.version}")
             }
         }
         else
@@ -35,7 +37,7 @@ class CollectionTeamDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created CollectionTeam with ID = ${collectionTeam.uuid}")
+            Log.d( "xxx", "Created CollectionTeam with version = ${collectionTeam.uuid}")
         }
 
         for (latLon in collectionTeam.polygon)
@@ -92,10 +94,11 @@ class CollectionTeamDAO(private var dao: DAO)
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val enum_area_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_NAME))
 
-        val collectionTeam = CollectionTeam(uuid, creationDate, enum_area_uuid, name, ArrayList<LatLon>(), ArrayList<String>())
+        val collectionTeam = CollectionTeam(uuid, creationDate, enum_area_uuid, name, ArrayList<LatLon>(), ArrayList<String>(), version)
 
         collectionTeam.polygon = DAO.latLonDAO.getLatLonsWithCollectionTeamId( collectionTeam.uuid )
         collectionTeam.locationUuids = DAO.locationDAO.getCollectionTeamLocationUuids( collectionTeam )
