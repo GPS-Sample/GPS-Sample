@@ -16,12 +16,19 @@ import edu.gtri.gpssample.database.models.FieldOption
 
 class FieldOptionDAO(private var dao: DAO)
 {
-    fun createOrUpdateFieldOption( fieldOption: FieldOption, field: Field ) : FieldOption?
+    fun createOrUpdateFieldOption( fieldOption: FieldOption, field: Field, version: String ) : FieldOption?
     {
-        if (dao.exists(DAO.TABLE_FIELD_OPTION, DAO.COLUMN_UUID, fieldOption.uuid ))
+        fieldOption.version = version
+
+        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD_OPTION, field.uuid, version )
+
+        if (exists)
         {
-            updateFieldOption( fieldOption )
-            Log.d( "xxx", "Updated FieldOption with ID ${fieldOption.uuid}")
+            if (shouldUpdate)
+            {
+                updateFieldOption( fieldOption )
+                Log.d( "xxx", "Updated FieldOption to version ${fieldOption.version}")
+            }
         }
         else
         {
@@ -31,7 +38,7 @@ class FieldOptionDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created FieldOption with ID ${fieldOption.uuid}")
+            Log.d( "xxx", "Created FieldOption with version ${fieldOption.version}")
         }
 
         createConnection( fieldOption, field )
@@ -56,6 +63,7 @@ class FieldOptionDAO(private var dao: DAO)
     fun putFieldOption( fieldOption: FieldOption, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, fieldOption.uuid )
+        values.put( DAO.COLUMN_VERSION, fieldOption.version )
         values.put( DAO.COLUMN_FIELD_OPTION_NAME, fieldOption.name )
     }
 
@@ -74,9 +82,10 @@ class FieldOptionDAO(private var dao: DAO)
     private fun  buildFieldOption(cursor: Cursor ): FieldOption
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_NAME))
 
-        return FieldOption(uuid, name)
+        return FieldOption(uuid, name, version)
     }
 
     fun getFieldOption( uuid : String ): FieldOption?

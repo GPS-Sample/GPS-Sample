@@ -185,7 +185,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
                     }
                     else
                     {
-                        DAO.configDAO.createOrUpdateConfig(config)
+                        DAO.configDAO.createOrUpdateConfig(config,config.version)
 
                         fetchImages( config )
                         fetchMbTiles( config )

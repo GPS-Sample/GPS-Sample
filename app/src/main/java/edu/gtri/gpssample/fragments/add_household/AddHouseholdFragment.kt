@@ -615,10 +615,10 @@ class AddHouseholdFragment : Fragment(),
             enumerationItem.enumeratorName = user.name
         }
 
-        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location,UUID.randomUUID().toString())
 
         location.creationDate = Date().time
-        DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+        DAO.locationDAO.createOrUpdateLocation( location, enumArea, UUID.randomUUID().toString())
 
         findNavController().popBackStack()
     }

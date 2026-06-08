@@ -21,16 +21,18 @@ import edu.gtri.gpssample.extensions.toBoolean
 
 class FieldDataDAO(private var dao: DAO)
 {
-    fun createOrUpdateFieldData( fieldData: FieldData, enumerationItem: EnumerationItem ) : FieldData?
+    fun createOrUpdateFieldData( fieldData: FieldData, enumerationItem: EnumerationItem, version: String ) : FieldData?
     {
-        if (dao.exists( DAO.TABLE_FIELD_DATA, DAO.COLUMN_UUID, fieldData.uuid ))
+        fieldData.version = version
+
+        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD_DATA, fieldData.uuid, version )
+
+        if (exists)
         {
-            getFieldData( fieldData.uuid )?.let { existingFieldData ->
-                if (fieldData.doesNotEqual( existingFieldData ))
-                {
-                    updateFieldData( fieldData )
-                    Log.d( "xxx", "Updated FieldData with ID ${fieldData.uuid}" )
-                }
+            if (shouldUpdate)
+            {
+                updateFieldData( fieldData )
+                Log.d( "xxx", "Updated FieldData to version ${fieldData.version}")
             }
         }
         else
@@ -41,7 +43,7 @@ class FieldDataDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created FieldData with ID ${fieldData.uuid}" )
+            Log.d( "xxx", "Created FieldData with version ${fieldData.version}" )
         }
 
         for (fieldDataOption in fieldData.fieldDataOptions)
@@ -60,6 +62,7 @@ class FieldDataDAO(private var dao: DAO)
 
         values.put( DAO.COLUMN_UUID, fieldData.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, fieldData.creationDate )
+        values.put( DAO.COLUMN_VERSION, fieldData.version )
         values.put( DAO.COLUMN_FIELD_UUID, fieldData.fieldUuid )
         values.put( DAO.COLUMN_FIELD_NAME, fieldData.name )
         values.put( DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(fieldData.type))
@@ -75,6 +78,7 @@ class FieldDataDAO(private var dao: DAO)
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val fieldUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
         val type = FieldTypeConverter.fromIndex(cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX)))
@@ -84,7 +88,7 @@ class FieldDataDAO(private var dao: DAO)
         val dropdownIndex = cursor.getIntOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_DROPDOWN_INDEX))
         val blockNumber = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_BLOCK_NUMBER))
 
-        return FieldData( uuid, creationDate, fieldUuid, name, type, textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>())
+        return FieldData( uuid, creationDate, fieldUuid, name, type, textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>(), version )
     }
 
     fun updateFieldData( fieldData: FieldData )

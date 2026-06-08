@@ -38,16 +38,17 @@ data class EnumArea (
     var collectionTeams: ArrayList<CollectionTeam>,
     var selectedCollectionTeamUuid: String,
     var mapTileRegion: MapTileRegion?,
-    var breadcrumbs: ArrayList<Breadcrumb>)
+    var breadcrumbs: ArrayList<Breadcrumb>,
+    var version: String )
 {
-    constructor( uuid: String, creationDate: Long, configUuid: String, strataUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, selectedEnumerationTeamUuid: String, selectedCollectionTeamUuid: String )
-            : this(uuid, creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>(), selectedEnumerationTeamUuid, ArrayList<CollectionTeam>(), selectedCollectionTeamUuid,null, ArrayList<Breadcrumb>())
+    constructor( uuid: String, creationDate: Long, configUuid: String, strataUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, selectedEnumerationTeamUuid: String, selectedCollectionTeamUuid: String, version: String )
+            : this(uuid, creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>(), selectedEnumerationTeamUuid, ArrayList<CollectionTeam>(), selectedCollectionTeamUuid,null, ArrayList<Breadcrumb>(), version )
 
     constructor( configUuid: String, strataUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, vertices: ArrayList<LatLon>, mapTileRegion: MapTileRegion?)
-            : this(UUID.randomUUID().toString(), Date().time, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion, ArrayList<Breadcrumb>())
+            : this(UUID.randomUUID().toString(), Date().time, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion, ArrayList<Breadcrumb>(), UUID.randomUUID().toString())
 
     constructor( creationDate: Long, configUuid: String, strataUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, vertices: ArrayList<LatLon>, mapTileRegion: MapTileRegion?)
-            : this(UUID.randomUUID().toString(), creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion, ArrayList<Breadcrumb>())
+            : this(UUID.randomUUID().toString(), creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion, ArrayList<Breadcrumb>(), UUID.randomUUID().toString())
 
     fun equals( other: EnumArea ): Boolean
     {

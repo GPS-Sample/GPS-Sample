@@ -466,6 +466,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
                 }
                 else
                 {
+                    field.version = UUID.randomUUID().toString()
                     sharedViewModel.createFieldModel.setParentField( field )
 
                     field.fields?.let { fields ->

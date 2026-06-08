@@ -21,10 +21,11 @@ data class EnumerationTeam(
     var enumAreaUuid: String,
     var name: String,
     var polygon: ArrayList<LatLon>,
-    var locationUuids: ArrayList<String>) // the EnumArea is the single point keeper of locations, we don't want a copy of it here!
+    var locationUuids: ArrayList<String>,
+    var version: String)
 {
     constructor( enumAreaUuid: String,  name: String, polygon: ArrayList<LatLon>, locationUuids: ArrayList<String> )
-            : this(UUID.randomUUID().toString(), Date().time, enumAreaUuid, name, polygon, locationUuids )
+            : this(UUID.randomUUID().toString(), Date().time, enumAreaUuid, name, polygon, locationUuids, UUID.randomUUID().toString())
 
     fun equals( other: EnumerationTeam ): Boolean
     {

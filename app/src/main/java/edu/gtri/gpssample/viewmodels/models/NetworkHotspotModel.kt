@@ -328,7 +328,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 {
                     delegate?.didStartImport()
 
-                    DAO.configDAO.createOrUpdateConfig( config )
+                    DAO.configDAO.createOrUpdateConfig( config, config.version )
 
                     sharedViewModel?.setCurrentConfig( config )
 

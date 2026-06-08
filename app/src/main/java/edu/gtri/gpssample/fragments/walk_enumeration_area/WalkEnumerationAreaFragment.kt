@@ -388,7 +388,7 @@ class WalkEnumerationAreaFragment : Fragment(),
                     config.enumAreas.clear()
                     config.selectedEnumAreaUuid = ""
 
-                    DAO.configDAO.createOrUpdateConfig( config )
+                    DAO.configDAO.createOrUpdateConfig( config, UUID.randomUUID().toString())
                 }
                 ConfirmationDialog.ButtonPress.None -> {
                 }
@@ -489,7 +489,7 @@ class WalkEnumerationAreaFragment : Fragment(),
             enumArea.enumerationTeams.add( enumerationTeam )
             enumArea.selectedEnumerationTeamUuid = enumerationTeam.uuid
 
-            DAO.configDAO.createOrUpdateConfig( config )
+            DAO.configDAO.createOrUpdateConfig( config, UUID.randomUUID().toString())
 
             binding.saveButton.isEnabled = false
             binding.walkButton.isEnabled = false
@@ -522,7 +522,7 @@ class WalkEnumerationAreaFragment : Fragment(),
                     enumArea.name = enumArea.name + "-[" + strata.name + "]"
                 }
 
-                DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+                DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, UUID.randomUUID().toString())
 
                 refreshMap()
             }

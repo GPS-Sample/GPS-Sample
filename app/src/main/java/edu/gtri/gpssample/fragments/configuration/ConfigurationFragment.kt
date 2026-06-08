@@ -22,6 +22,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -49,6 +50,9 @@ import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionManager
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.osmdroid.views.MapView
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -56,19 +60,17 @@ import java.util.*
 
 class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
-    private var _binding: FragmentConfigurationBinding? = null
-    private val binding get() = _binding!!
-
     private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
     private lateinit var nearbySessionManager: NearbySessionManager
 
+    private var _binding: FragmentConfigurationBinding? = null
+    private val binding get() = _binding!!
     private var includeConfig = false
     private var includeImages = false
-
-    val REQUEST_CODE_PICK_CONFIG_DIR    = 1001
-    val REQUEST_CONFIGURATION           = 1003
+    private val REQUEST_CODE_PICK_CONFIG_DIR    = 1001
+    private val REQUEST_CONFIGURATION           = 1003
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -185,79 +187,88 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                         config.selectedStudyUuid = study.uuid
                     }
 
-                    for (enumArea in config.enumAreas)
-                    {
-                        enumArea.selectedEnumerationTeamUuid = ""
-                        enumArea.selectedCollectionTeamUuid = ""
-                        DAO.enumAreaDAO.loadLazyLocations( enumArea )
-                    }
-                }
+                    binding.overlayView.visibility = View.VISIBLE
 
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {
-                        sharedViewModel.currentConfiguration?.value?.let { config ->
-
-                            nearbySessionManager = NearbySessionManager(requireContext(), viewLifecycleOwner, config )
-
-                            val nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
-                                nearbySessionManager.stopHosting()
-                            }
-
-                            nearbySessionManager.handleNearbySessionStatusForHost( nearbySessionStatusDialog )
-
-                            nearbySessionManager.startHosting()
-                        }
-                    }
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        val items = ArrayList<String>()
-                        items.add( "Configuration Files" )
-                        items.add( "Image Files" )
-                        CheckboxDialog( activity!!, "Select the file types to export", items ) { selections ->
-                            includeConfig = false
-                            includeImages = false
-
-                            for (selection in selections) {
-                                if (selection == items[0]) includeConfig = true
-                                if (selection == items[1]) includeImages = true
-                            }
-
-                            if (includeConfig || includeImages)
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        withContext(Dispatchers.IO) {
+                            // this may take a while...
+                            for (enumArea in config.enumAreas)
                             {
-                                ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null, true) { buttonPressed, tag ->
-                                    when( buttonPressed )
+                                enumArea.selectedEnumerationTeamUuid = ""
+                                enumArea.selectedCollectionTeamUuid = ""
+                                DAO.enumAreaDAO.loadLazyLocations( enumArea )
+                            }
+                        }
+
+                        // back on the main thread...
+
+                        binding.overlayView.visibility = View.GONE
+
+                        when( buttonPressed )
+                        {
+                            ConfirmationDialog.ButtonPress.Left -> {
+                                nearbySessionManager = NearbySessionManager(requireContext(), viewLifecycleOwner, config )
+
+                                val nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
+                                    nearbySessionManager.stopHosting()
+                                }
+
+                                nearbySessionManager.handleNearbySessionStatusForHost( nearbySessionStatusDialog )
+
+                                nearbySessionManager.startHosting()
+                            }
+                            ConfirmationDialog.ButtonPress.Right -> {
+                                val items = ArrayList<String>()
+                                items.add( "Configuration Files" )
+                                items.add( "Image Files" )
+                                CheckboxDialog( activity!!, "Select the file types to export", items ) { selections ->
+                                    includeConfig = false
+                                    includeImages = false
+
+                                    for (selection in selections) {
+                                        if (selection == items[0]) includeConfig = true
+                                        if (selection == items[1]) includeImages = true
+                                    }
+
+                                    if (includeConfig || includeImages)
                                     {
-                                        ConfirmationDialog.ButtonPress.Left -> {
-                                            sharedViewModel.currentConfiguration?.value?.let { config ->
-                                                ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages, false ) { success ->
-                                                    if (success)
-                                                    {
-                                                        Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
-                                                    }
-                                                    else
-                                                    {
-                                                        NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                        ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null, true) { buttonPressed, tag ->
+                                            when( buttonPressed )
+                                            {
+                                                ConfirmationDialog.ButtonPress.Left -> {
+                                                    ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages, false ) { success ->
+                                                        if (success)
+                                                        {
+                                                            Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                                        }
+                                                        else
+                                                        {
+                                                            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                                        }
                                                     }
                                                 }
+                                                ConfirmationDialog.ButtonPress.Right -> {
+                                                    exportToDevice()
+                                                }
+                                                ConfirmationDialog.ButtonPress.None -> {
+                                                }
                                             }
-                                        }
-                                        ConfirmationDialog.ButtonPress.Right -> {
-                                            exportToDevice()
-                                        }
-                                        ConfirmationDialog.ButtonPress.None -> {
                                         }
                                     }
                                 }
                             }
+                            ConfirmationDialog.ButtonPress.None -> {
+                            }
                         }
-                    }
-                    ConfirmationDialog.ButtonPress.None -> {
                     }
                 }
             }
         }
 
         binding.mapOverlayView.setOnTouchListener(this)
+
+        binding.overlayView.isClickable = true
+        binding.overlayView.isFocusable = true
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
 
@@ -306,7 +317,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
 
             if(config.studies.count() > 0)
             {
-                sharedViewModel.createStudyModel.setStudy(config.studies[0])
+                sharedViewModel.createStudyModel.setCurrentStudy(config.studies[0])
             }
 
             val enumAreaSummary = DAO.configDAO.getEnumAreaSummary(config.uuid )
@@ -322,6 +333,42 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
         binding.enumAreasRecycler.itemAnimator = DefaultItemAnimator()
         binding.enumAreasRecycler.adapter = enumerationAreasAdapter
         binding.enumAreasRecycler.layoutManager = LinearLayoutManager(activity )
+
+        updateOverview()
+    }
+
+    fun refreshView( config: Config )
+    {
+        studiesAdapter.updateStudies( config.studies )
+        enumerationAreasAdapter.updateEnumAreas( config.enumAreas )
+
+        binding.configNameTextView.text = config.name
+
+        val items = ArrayList<String>()
+        val mapEngines = resources.getTextArray( R.array.map_engines )
+
+        for (mapEngine in mapEngines)
+        {
+            items.add( mapEngine.toString() )
+        }
+
+        binding.mapEngineText.text = items[config.mapEngineIndex]
+
+        binding.configPreferredUnitsText.text = sharedViewModel.currentConfigurationDistanceFormat
+        binding.configDateFormatText.text = sharedViewModel.currentConfigurationDateFormat
+        binding.configTimeFormatText.text = sharedViewModel.currentConfigurationTimeFormat
+        binding.minGpsPrecisionEditText.text = sharedViewModel.currentConfigurationMinimumGpsPrecision
+        binding.encryptionPasswordTextView.text = config.encryptionPassword
+        binding.locationSwitch.isChecked = config.allowManualLocationEntry
+        binding.subaddressRequiredSwitch.isChecked = config.subaddressIsrequired
+        binding.autoIncrementSubaddressSwitch.isChecked = config.autoIncrementSubaddress
+        binding.proximityWarningSwitch.isChecked = config.proximityWarningIsEnabled
+        binding.proximityWarningTextView.text = sharedViewModel.currentConfigurationProximityWarning
+
+        if (!config.proximityWarningIsEnabled)
+        {
+            binding.proximityWarningTextView.visibility = View.GONE
+        }
 
         updateOverview()
     }
@@ -363,16 +410,20 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
 
             nearbySessionManager.handleNearbySessionStatusForClient( nearbySessionStatusDialog ) { config ->
 
-                nearbySessionStatusDialog.dismiss()
-
                 nearbySessionManager.clientClose()
 
-                DAO.configDAO.createOrUpdateConfig( config )
+                viewLifecycleOwner.lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        DAO.configDAO.createOrUpdateConfig( config,config.version )
+                    }
 
-                sharedViewModel.setCurrentConfig( config )
-                enumerationAreasAdapter.updateEnumAreas( config.enumAreas )
+                    // back on the main thread...
+                    nearbySessionStatusDialog.dismiss()
 
-                updateOverview()
+                    sharedViewModel.setCurrentConfig( config )
+
+                    refreshView( config )
+                }
             }
 
             nearbySessionManager.clientConnect(sessionId!! )
@@ -381,7 +432,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
 
     private fun didSelectStudy(study: Study)
     {
-        sharedViewModel.createStudyModel.setStudy(study)
+        sharedViewModel.createStudyModel.setCurrentStudy(study)
     }
 
     fun getFileName() : String
@@ -501,11 +552,11 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                                 }
                                 else
                                 {
-                                    DAO.configDAO.createOrUpdateConfig( config )
+                                    DAO.configDAO.createOrUpdateConfig( config,config.version )
 
                                     sharedViewModel.setCurrentConfig( config )
-                                    updateOverview()
-                                    enumerationAreasAdapter.updateEnumAreas( config.enumAreas )
+
+                                    refreshView( config )
 
                                     binding.overlayView.visibility = View.GONE
                                     InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)

@@ -45,7 +45,8 @@ data class EnumerationItem(
     var collectionNotes : String,
     var fieldDataList : ArrayList<FieldData>,
     var locationUuid : String,
-    var odkRecordUri : String )
+    var odkRecordUri : String,
+    var version : String)
 {
     constructor() : this(
         "",
@@ -71,7 +72,8 @@ data class EnumerationItem(
         "",
         ArrayList<FieldData>(),
         "",
-        "")
+        "",
+        UUID.randomUUID().toString())
 
     fun pack() : String
     {

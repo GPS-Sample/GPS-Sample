@@ -25,6 +25,7 @@ import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.util.UUID
 
 enum class DeleteMode(val value : Int)
 {
@@ -147,6 +148,8 @@ class CreateStudyFragment : Fragment()
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.sample_size_error), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
+            study.version = UUID.randomUUID().toString()
 
             sharedViewModel.addStudy()
 

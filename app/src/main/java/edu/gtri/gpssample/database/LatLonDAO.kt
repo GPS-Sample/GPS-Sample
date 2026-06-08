@@ -10,6 +10,7 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import edu.gtri.gpssample.database.models.*
 
@@ -17,17 +18,7 @@ class LatLonDAO(private var dao: DAO)
 {
     fun createOrUpdateLatLon( latLon: LatLon, enumArea : EnumArea?, config: Config? ) : LatLon?
     {
-        if (dao.exists(DAO.TABLE_LAT_LON, DAO.COLUMN_UUID, latLon.uuid ))
-        {
-            getLatLon( latLon.uuid )?.let { existingLatLon ->
-                if (latLon.doesNotEqual( existingLatLon ))
-                {
-                    updateLatLon( latLon )
-                    Log.d( "xxx", "Updated LatLon with ID ${latLon.uuid}" )
-                }
-            }
-        }
-        else
+        if (!dao.exists(DAO.TABLE_LAT_LON, DAO.COLUMN_UUID, latLon.uuid )) // LatLon's are never updated
         {
             val values = ContentValues()
             putLatLon( latLon, values )
@@ -40,23 +31,11 @@ class LatLonDAO(private var dao: DAO)
 
         enumArea?.let { enumArea ->
             val values = ContentValues()
-            val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_ENUM_AREA__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_UUID} = '${latLon.uuid}' AND ${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}'"
-            val cursor = dao.writableDatabase.rawQuery(query, null)
-            if (cursor.count == 0)
-            {
-                putLatLonEnumArea( latLon.uuid, enumArea.uuid, values)
-                dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_ENUM_AREA__LAT_LON, null, values)
-            }
-            cursor.close()
+            putLatLonEnumArea( latLon.uuid, enumArea.uuid, values )
+            dao.writableDatabase.insertWithOnConflict(DAO.CONNECTOR_TABLE_ENUM_AREA__LAT_LON, null, values, SQLiteDatabase.CONFLICT_IGNORE )
         }
 
         return latLon
-    }
-
-    private fun putLatLonConfig(llID : String, configUUID: String, values : ContentValues)
-    {
-        values.put( DAO.COLUMN_LAT_LON_UUID, llID )
-        values.put( DAO.COLUMN_CONFIG_UUID, configUUID )
     }
 
     private fun putLatLonEnumArea(llID : String, enumAreaUuid: String, values : ContentValues)
@@ -82,34 +61,6 @@ class LatLonDAO(private var dao: DAO)
         val lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LON))
 
         return LatLon( uuid, creationDate, lat, lon )
-    }
-
-    fun updateLatLon( latLon: LatLon )
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(latLon.uuid)
-        val values = ContentValues()
-
-        putLatLon( latLon, values )
-
-        dao.writableDatabase.update(DAO.TABLE_LAT_LON, values, whereClause, args )
-    }
-
-    fun getLatLon( uuid: String ): LatLon?
-    {
-        var latLon: LatLon? = null
-        val query = "SELECT * FROM ${DAO.TABLE_LAT_LON} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            latLon = buildLatLon( cursor )
-        }
-
-        cursor.close()
-
-        return latLon
     }
 
     fun getLatLonsWithEnumAreaUuid( enumAreaUuid: String ): ArrayList<LatLon>
@@ -171,22 +122,6 @@ class LatLonDAO(private var dao: DAO)
             val latlon = buildLatLon(cursor)
 
             latLons.add( latlon )
-        }
-
-        cursor.close()
-
-        return latLons
-    }
-
-    fun getLatLons(): ArrayList<LatLon>
-    {
-        val latLons = ArrayList<LatLon>()
-        val query = "SELECT * FROM ${DAO.TABLE_LAT_LON}"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            latLons.add( buildLatLon( cursor ))
         }
 
         cursor.close()

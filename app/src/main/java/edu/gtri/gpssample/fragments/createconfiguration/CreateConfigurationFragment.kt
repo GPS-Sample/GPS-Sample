@@ -234,7 +234,7 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
 
     private fun didSelectStudy(study: Study)
     {
-        sharedViewModel.createStudyModel.setStudy(study)
+        sharedViewModel.createStudyModel.setCurrentStudy(study)
         findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
     }
     private fun shouldDeleteStudy(study: Study)

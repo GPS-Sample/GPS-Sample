@@ -27,8 +27,21 @@ import kotlin.collections.ArrayList
 
 class LocationDAO(private var dao: DAO)
 {
-    fun createOrUpdateLocation( location: Location, enumArea : EnumArea ) : Location?
+    fun createOrUpdateLocation( location: Location, enumArea : EnumArea, version: String ) : Location?
     {
+        location.version = version
+
+        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_LOCATION, location.uuid, version )
+
+        if (exists)
+        {
+            if (shouldUpdate)
+            {
+                updateLocation( location )
+                Log.d( "xxx", "Updated Location to version ${location.version}" )
+            }
+        }
+
         if (dao.exists(DAO.TABLE_LOCATION, DAO.COLUMN_UUID, location.uuid ))
         {
             getLocation( location.uuid )?.let { existingLocation ->
@@ -52,7 +65,7 @@ class LocationDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created Location with ID ${location.uuid}" )
+            Log.d( "xxx", "Created Location with version ${location.version}" )
         }
 
         updateConnectorTable( location, enumArea )
@@ -60,7 +73,7 @@ class LocationDAO(private var dao: DAO)
         for (enumerationItem in location.enumerationItems)
         {
             enumerationItem.locationUuid = location.uuid
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, enumerationItem.version )
         }
 
         return location
@@ -80,13 +93,6 @@ class LocationDAO(private var dao: DAO)
         cursor.close()
     }
 
-    fun exists( location: Location ): Boolean
-    {
-        getLocation( location.uuid )?.let {
-            return true
-        } ?: return false
-    }
-
     fun updateLocation( location: Location )
     {
         val whereClause = "${DAO.COLUMN_UUID} = ?"
@@ -102,6 +108,7 @@ class LocationDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_UUID, location.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, location.creationDate )
+        values.put( DAO.COLUMN_VERSION, location.version )
         values.put( DAO.COLUMN_TIME_ZONE, location.timeZone )
         values.put( DAO.COLUMN_LOCATION_TYPE_ID, LocationTypeConverter.toIndex(location.type) )
         values.put( DAO.COLUMN_LOCATION_GPS_ACCURACY, location.gpsAccuracy )
@@ -120,6 +127,7 @@ class LocationDAO(private var dao: DAO)
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val timeZone = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TIME_ZONE))
         val locationTypeId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_TYPE_ID))
         val gpsAccuracy = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_GPS_ACCURACY))
@@ -132,7 +140,7 @@ class LocationDAO(private var dao: DAO)
         val isMultiFamily = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_MULTI_FAMILY)).toBoolean()
         val properties = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_PROPERTIES))
 
-        return Location( uuid, creationDate, timeZone, 0.0, "", true, LocationTypeConverter.fromIndex(locationTypeId), gpsAccuracy, latitude, longitude, altitude, isLandmark, description, imageUuid, isMultiFamily, properties, ArrayList<EnumerationItem>())
+        return Location( uuid, creationDate, timeZone, 0.0, "", true, LocationTypeConverter.fromIndex(locationTypeId), gpsAccuracy, latitude, longitude, altitude, isLandmark, description, imageUuid, isMultiFamily, properties, ArrayList<EnumerationItem>(), version)
     }
 
     fun getLocation( uuid: String ) : Location?

@@ -20,6 +20,7 @@ import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.Image
 import java.util.*
 import androidx.core.database.sqlite.transaction
+import edu.gtri.gpssample.database.models.Study
 
 class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
     : SQLiteOpenHelper( context, DATABASE_NAME, factory, DATABASE_VERSION )
@@ -42,6 +43,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_CONFIG + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_TIME_ZONE + " INTEGER" + "," +
                     COLUMN_CONFIG_NAME + " TEXT UNIQUE NOT NULL" + "," +
                     COLUMN_CONFIG_DB_VERSION + " INTEGER" + "," +
@@ -67,6 +69,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableEnumArea = ("CREATE TABLE " +
                     TABLE_ENUM_AREA + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_CONFIG_UUID + " TEXT" + "," +
                     COLUMN_STRATA_UUID + " TEXT" + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
@@ -85,6 +88,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_STUDY + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_STUDY_NAME + " TEXT" + "," +
                     COLUMN_STUDY_SAMPLING_METHOD_INDEX + " INTEGER" + "," +
                     COLUMN_STUDY_SAMPLE_SIZE + " INTEGER" + "," +
@@ -120,6 +124,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_FIELD + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_STUDY_UUID + " TEXT" + "," +
                     COLUMN_FIELD_PARENT_UUID + " TEXT" + "," +
                     COLUMN_FIELD_INDEX + " INTEGER" + "," +
@@ -146,6 +151,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableFieldOption = ("CREATE TABLE " +
                     TABLE_FIELD_OPTION + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_FIELD_OPTION_NAME + " TEXT" +
                     ") WITHOUT ROWID")
             db.execSQL(createTableFieldOption)
@@ -203,6 +209,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_ENUMERATION_TEAM + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
                     COLUMN_ENUMERATION_TEAM_NAME + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" +
@@ -223,6 +230,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_LOCATION + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_TIME_ZONE + " INTEGER" + "," +
                     COLUMN_LOCATION_TYPE_ID + " INTEGER" + "," +
                     COLUMN_LOCATION_GPS_ACCURACY + " INTEGER" + "," +
@@ -233,7 +241,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_LOCATION_DESCRIPTION + " TEXT" + "," +
                     COLUMN_LOCATION_IMAGE_UUID + " TEXT" + "," +
                     COLUMN_LOCATION_IS_MULTI_FAMILY + " INTEGER" + "," +
-                    COLUMN_LOCATION_PROPERTIES + " STRING" +
+                    COLUMN_LOCATION_PROPERTIES + " TEXT" +
                     ") WITHOUT ROWID")
             db.execSQL(createTableLocation)
 
@@ -274,6 +282,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_ENUMERATION_ITEM + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_SYNC_CODE + " INTEGER" + "," +
                     COLUMN_LOCATION_UUID + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
@@ -300,6 +309,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_FIELD_DATA + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_STUDY_UUID + " TEXT" + "," +
                     COLUMN_FIELD_UUID + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_UUID + " TEXT" + "," +
@@ -423,6 +433,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_field_data_enum_item ON $TABLE_FIELD_DATA($COLUMN_ENUMERATION_ITEM_UUID)")
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_field_data_option_link_field_data ON $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION($COLUMN_FIELD_DATA_UUID)")
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_field_data_option_link_option ON $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION($COLUMN_FIELD_DATA_OPTION_UUID)")
+        db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS idx_enum_area_lat_lon ON $CONNECTOR_TABLE_ENUM_AREA__LAT_LON($COLUMN_LAT_LON_UUID, $COLUMN_ENUM_AREA_UUID)")
     }
 
     override fun onOpen(db: SQLiteDatabase)
@@ -430,6 +441,34 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         super.onOpen(db)
 
         createIndexes(db)
+    }
+
+    fun exists(table: String, column: String, value: String): Boolean
+    {
+        return readableDatabase.rawQuery("""SELECT 1 FROM $table WHERE $column = ? LIMIT 1""".trimIndent(),arrayOf(value)).use { it.moveToFirst() }
+    }
+
+    fun getExistingInfo( table: String, uuid: String, newVersion: String ): Pair<Boolean, Boolean>
+    {
+        val query = """
+            SELECT ${DAO.COLUMN_VERSION}
+            FROM ${table}
+            WHERE ${DAO.COLUMN_UUID} = ?
+            """.trimIndent()
+
+        return readableDatabase.rawQuery(query, arrayOf(uuid)).use { cursor ->
+            if (cursor.moveToFirst()) {
+                val oldVersion = cursor.getString(0 )
+                if (oldVersion != newVersion)
+                {
+                    Log.d( "xxx", "$table: old version: $oldVersion")
+                    Log.d( "xxx", "$table: new version: $newVersion")
+                }
+                Pair(true, oldVersion != newVersion )
+            } else {
+                Pair(false, false)
+            }
+        }
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int)
@@ -789,11 +828,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         }
     }
 
-    fun exists(table: String, column: String, value: String): Boolean
-    {
-        return readableDatabase.rawQuery("""SELECT 1 FROM $table WHERE $column = ? LIMIT 1""".trimIndent(),arrayOf(value)).use { it.moveToFirst() }
-    }
-
     companion object
     {
         private const val DATABASE_NAME = "GPSSampleDB.db"
@@ -802,6 +836,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_CID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
 
         const val COLUMN_UUID = "uuid"
+        const val COLUMN_VERSION = "version"
         const val COLUMN_UUID_TYPE = " TEXT PRIMARY KEY NOT NULL"
 
         const val COLUMN_TIME_ZONE = "time_zone"

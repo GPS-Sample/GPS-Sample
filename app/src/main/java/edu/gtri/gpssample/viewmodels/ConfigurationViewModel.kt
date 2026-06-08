@@ -242,7 +242,7 @@ class ConfigurationViewModel : ViewModel()
     fun updateConfiguration()
     {
         _currentConfiguration?.value?.let{ configuration ->
-            DAO.configDAO.createOrUpdateConfig(configuration)
+            DAO.configDAO.createOrUpdateConfig(configuration, UUID.randomUUID().toString())
         }
     }
 

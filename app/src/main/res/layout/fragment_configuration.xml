@@ -243,7 +243,7 @@
                             android:textColor="@color/primary_textcolor" />
 
                         <TextView
-                            android:id="@+id/encryption_password_edit_text"
+                            android:id="@+id/encryption_password_text_view"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_marginStart="20dp"
@@ -354,6 +354,7 @@
                                 android:textColor="@color/primary_textcolor" />
 
                             <androidx.appcompat.widget.SwitchCompat
+                                android:id="@+id/proximity_warning_switch"
                                 android:clickable="false"
                                 android:checked="@={viewModel.currentConfiguration.proximityWarningIsEnabled}"
                                 android:layout_width="50dp"
@@ -716,14 +717,13 @@
                 android:layout_margin="20dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="@string/import_field_data" />
+                android:text="@string/import_configuration" />
         </LinearLayout>
 
         <FrameLayout
             android:id="@+id/overlay_view"
             android:visibility="gone"
-            android:background="@color/light_gray"
-            android:alpha=".5"
+            android:background="@color/clear"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

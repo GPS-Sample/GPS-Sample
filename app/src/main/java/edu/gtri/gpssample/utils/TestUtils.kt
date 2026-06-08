@@ -46,7 +46,7 @@ object TestUtils
                 enumerationItem.enumerationEligibleForSampling = true
                 enumerationItem.syncCode = enumerationItem.syncCode + 1
                 enumerationItem.enumerationState = EnumerationState.Enumerated
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, enumerationItem.toString())
                 count += 1
             }
         }
@@ -75,7 +75,7 @@ object TestUtils
                 enumerationItem.syncCode = enumerationItem.syncCode + 1
                 enumerationItem.collectionState = CollectionState.Complete
                 enumerationItem.samplingState = SamplingState.Sampled
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, enumerationItem.toString())
             }
         }
 

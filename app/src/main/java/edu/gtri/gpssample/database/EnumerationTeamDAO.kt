@@ -15,16 +15,18 @@ import edu.gtri.gpssample.database.models.*
 
 class EnumerationTeamDAO(private var dao: DAO)
 {
-    fun createOrUpdateEnumerationTeam(enumerationTeam: EnumerationTeam) : EnumerationTeam?
+    fun createOrUpdateEnumerationTeam(enumerationTeam: EnumerationTeam, version: String) : EnumerationTeam?
     {
-        if (dao.exists( DAO.TABLE_ENUMERATION_TEAM, DAO.COLUMN_UUID, enumerationTeam.uuid ))
+        enumerationTeam.version = version
+
+        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_ENUMERATION_TEAM, enumerationTeam.uuid, version )
+
+        if (exists)
         {
-            getEnumerationTeam( enumerationTeam.uuid )?.let { existingEnumerationTeam ->
-                if (enumerationTeam.doesNotEqual( existingEnumerationTeam ))
-                {
-                    updateTeam( enumerationTeam )
-                    Log.d( "xxx", "Updated EnumerationTeam with ID ${enumerationTeam.uuid}")
-                }
+            if (shouldUpdate)
+            {
+                updateTeam( enumerationTeam )
+                Log.d( "xxx", "Updated EnumerationTeam to version ${enumerationTeam.version}")
             }
         }
         else
@@ -35,7 +37,7 @@ class EnumerationTeamDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created EnumerationTeam with ID ${enumerationTeam.uuid}")
+            Log.d( "xxx", "Created EnumerationTeam with version ${enumerationTeam.version}")
         }
 
         for (latLon in enumerationTeam.polygon)
@@ -83,6 +85,7 @@ class EnumerationTeamDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_UUID, enumerationTeam.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, enumerationTeam.creationDate )
+        values.put( DAO.COLUMN_VERSION, enumerationTeam.version )
         values.put( DAO.COLUMN_ENUM_AREA_UUID, enumerationTeam.enumAreaUuid )
         values.put( DAO.COLUMN_ENUMERATION_TEAM_NAME, enumerationTeam.name )
     }
@@ -92,10 +95,11 @@ class EnumerationTeamDAO(private var dao: DAO)
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val enumAreaUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_NAME))
 
-        val enumerationTeam = EnumerationTeam(uuid, creationDate, enumAreaUuid, name, ArrayList<LatLon>(), ArrayList<String>())
+        val enumerationTeam = EnumerationTeam( uuid, creationDate, enumAreaUuid, name, ArrayList<LatLon>(), ArrayList<String>(), version )
 
         enumerationTeam.polygon = DAO.latLonDAO.getLatLonsWithEnumerationTeamId( enumerationTeam.uuid )
         enumerationTeam.locationUuids = DAO.locationDAO.getEnumerationTeamLocationUuids( enumerationTeam )

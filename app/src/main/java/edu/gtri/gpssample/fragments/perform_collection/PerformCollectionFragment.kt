@@ -1111,7 +1111,7 @@ class PerformCollectionFragment : Fragment(),
                     enumerationItem.collectionIncompleteReason = incompleteReason
                 }
 
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, UUID.randomUUID().toString() )
 
                 collectionTeamLocations.clear()
                 val enumerationItems = ArrayList<EnumerationItem>()

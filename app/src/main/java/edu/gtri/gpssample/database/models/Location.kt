@@ -36,13 +36,14 @@ data class Location(
     var imageUuid: String,
     var isMultiFamily : Boolean, // not used since build #106
     var properties : String,
-    var enumerationItems: ArrayList<EnumerationItem>)
+    var enumerationItems: ArrayList<EnumerationItem>,
+    var version: String)
 {
     constructor( latitude: Double, longitude: Double, altitude: Double ) :
-            this( UUID.randomUUID().toString(), Date().time, 0, 0.0, "", true, LocationType.None, 0, latitude, longitude, altitude, false, "","", false, "", ArrayList<EnumerationItem>())
+            this( UUID.randomUUID().toString(), Date().time, 0, 0.0, "", true, LocationType.None, 0, latitude, longitude, altitude, false, "","", false, "", ArrayList<EnumerationItem>(), UUID.randomUUID().toString())
 
     constructor( timeZone: Int, type: LocationType, gpsAccuracy: Int, latitude: Double, longitude: Double, altitude: Double, isLandmark: Boolean, description: String, properties: String ) :
-            this( UUID.randomUUID().toString(), Date().time, timeZone, 0.0, "", true, type, gpsAccuracy, latitude, longitude, altitude, isLandmark, description,"", false, properties, ArrayList<EnumerationItem>())
+            this( UUID.randomUUID().toString(), Date().time, timeZone, 0.0, "", true, type, gpsAccuracy, latitude, longitude, altitude, isLandmark, description,"", false, properties, ArrayList<EnumerationItem>(),UUID.randomUUID().toString())
 
     fun equals( other: Location ) : Boolean
     {

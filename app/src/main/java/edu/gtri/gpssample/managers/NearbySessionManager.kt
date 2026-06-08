@@ -246,10 +246,12 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
 
                     when (state) {
                         is NearbySessionState.Advertising -> {
+                            Log.d( "xxx", "creating barcode" )
                             val qrgEncoder = QRGEncoder(state.sessionId, null, QRGContents.Type.TEXT, 400 )
                             qrgEncoder.colorBlack = Color.WHITE;
                             qrgEncoder.colorWhite = Color.BLACK;
                             nearbySessionStatusDialog.showQrCode( qrgEncoder.bitmap )
+                            Log.d( "xxx", "done" )
                         }
 
                         NearbySessionState.Connecting -> {

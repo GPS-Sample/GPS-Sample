@@ -496,8 +496,7 @@ class PerformEnumerationFragment : Fragment(),
                         currentGPSLocation?.let { point ->
                             val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
                             val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), true, "", "")
-
-                            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                            DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
                             enumArea.locations.add(location)
                             sharedViewModel.currentLocationUuid = location.uuid
                             findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
@@ -729,7 +728,7 @@ class PerformEnumerationFragment : Fragment(),
             val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
             val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), false, "", "")
 
-            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+            DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
             enumArea.locations.add(location)
 
             sharedViewModel.currentLocationUuid = location.uuid
@@ -759,7 +758,7 @@ class PerformEnumerationFragment : Fragment(),
                     val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
                     val location = Location( timeZone, LocationType.Enumeration, accuracy, pt.latitude(), pt.longitude(), pt.altitude(), false, "", "")
 
-                    DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                    DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
                     enumArea.locations.add(location)
 
                     sharedViewModel.currentLocationUuid = location.uuid
@@ -1136,7 +1135,9 @@ class PerformEnumerationFragment : Fragment(),
                         {
                             ConfirmationDialog.ButtonPress.Left,
                             ConfirmationDialog.ButtonPress.Right -> {
-                                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( EnumerationItem(), location )?.let { enumerationItem ->
+                                val enumerationItem = EnumerationItem()
+
+                                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, enumerationItem.version )?.let { enumerationItem ->
                                     location.enumerationItems.add(enumerationItem)
                                     sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
 
@@ -1568,7 +1569,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     if (gpsLocationIsGood( location ))
                     {
-                        DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                        DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
                         enumArea.locations.add(location)
 
                         sharedViewModel.currentLocationUuid = location.uuid

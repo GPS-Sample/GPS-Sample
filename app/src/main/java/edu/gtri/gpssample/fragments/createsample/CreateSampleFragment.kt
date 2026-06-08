@@ -241,13 +241,13 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
                                 {
                                     for (enumArea in config.enumAreas)
                                     {
-                                        DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea)
+                                        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea,enumArea.version )
                                     }
                                 }
                                 else
                                 {
                                     sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-                                        DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea)
+                                        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, enumArea.version )
                                     }
                                 }
 
@@ -450,7 +450,7 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
             enumArea.vertices.add( southWest )
             enumArea.vertices.add( northWest2 )
 
-            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, UUID.randomUUID().toString())
 
             refreshMap()
         }

@@ -24,6 +24,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddMultiHouseholdBinding
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.util.UUID
 
 class AddMultiHouseholdFragment : Fragment()
 {
@@ -90,7 +91,8 @@ class AddMultiHouseholdFragment : Fragment()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
 
         binding.addButton.setOnClickListener {
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( EnumerationItem(), location )?.let { enumerationItem ->
+            val enumerationItem = EnumerationItem()
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location,enumerationItem.version )?.let { enumerationItem ->
                 location.enumerationItems.add(enumerationItem)
 
                 enumerationItem.subAddress = getNextSubaddress().toString()

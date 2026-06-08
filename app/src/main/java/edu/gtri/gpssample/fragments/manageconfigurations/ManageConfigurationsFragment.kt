@@ -385,7 +385,7 @@ class ManageConfigurationsFragment : Fragment()
         }
 
         // save the new config to the database
-        DAO.configDAO.createOrUpdateConfig( newConfig )
+        DAO.configDAO.createOrUpdateConfig( newConfig, config.version )
 
         minimalConfigurations.add( newConfig )
         manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
@@ -413,7 +413,7 @@ class ManageConfigurationsFragment : Fragment()
 
                 nearbySessionManager.clientClose()
 
-                DAO.configDAO.createOrUpdateConfig( config )
+                DAO.configDAO.createOrUpdateConfig( config, config.version )
 
                 nearbySessionStatusDialog.dismiss()
 
@@ -508,7 +508,7 @@ class ManageConfigurationsFragment : Fragment()
                         {
                             val collectionTeam = collectionTeams[0]
 
-                            sharedViewModel.createStudyModel.setStudy( study )
+                            sharedViewModel.createStudyModel.setCurrentStudy( study )
                             sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
                             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                             samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
@@ -519,7 +519,7 @@ class ManageConfigurationsFragment : Fragment()
                         {
                             val enumTeam = enumTeams[0]
 
-                            sharedViewModel.createStudyModel.setStudy( study )
+                            sharedViewModel.createStudyModel.setCurrentStudy( study )
                             sharedViewModel.currentEnumerationTeamUuid = enumTeam.uuid
                             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
 
@@ -553,7 +553,7 @@ class ManageConfigurationsFragment : Fragment()
                         {
                             val collectionTeam = collectionTeams[0]
 
-                            sharedViewModel.createStudyModel.setStudy( study )
+                            sharedViewModel.createStudyModel.setCurrentStudy( study )
                             sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
                             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                             samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
@@ -621,7 +621,7 @@ class ManageConfigurationsFragment : Fragment()
                         }
                         else
                         {
-                            DAO.configDAO.createOrUpdateConfig( config )
+                            DAO.configDAO.createOrUpdateConfig( config, config.version )
 
                             minimalConfigurations.find { it.uuid == config.uuid } ?.let {
                                 minimalConfigurations.remove(it )

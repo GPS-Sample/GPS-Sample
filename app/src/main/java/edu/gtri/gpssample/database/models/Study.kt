@@ -37,13 +37,15 @@ data class Study(
     var primaryFilters : ArrayList<Filter>,
     var subsetRules : ArrayList<Rule>,
     var subsetFilters : ArrayList<Filter>,
-)
+    var version : String )
 {
     constructor(name: String, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType)
-            : this(UUID.randomUUID().toString(), Date().time, name, samplingMethod, sampleSize, sampleType, "", 0, SampleType.None,ArrayList<Strata>(), ArrayList<Field>(), ArrayList<Rule>(),ArrayList<Filter>(),ArrayList<Rule>(), ArrayList<Filter>())
+            : this(UUID.randomUUID().toString(), Date().time, name, samplingMethod, sampleSize, sampleType, "", 0, SampleType.None,ArrayList<Strata>(), ArrayList<Field>(), ArrayList<Rule>(),ArrayList<Filter>(),ArrayList<Rule>(), ArrayList<Filter>(),
+        UUID.randomUUID().toString()
+    )
 
     constructor(uuid: String, creationDate: Long, name: String, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType, subsetSampleName: String, subsetSampleSize: Int, subsetSampleType: SampleType )
-            : this(uuid, creationDate, name, samplingMethod, sampleSize, sampleType, subsetSampleName, subsetSampleSize, subsetSampleType,ArrayList<Strata>(), ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<Rule>(), ArrayList<Filter>())
+            : this(uuid, creationDate, name, samplingMethod, sampleSize, sampleType, subsetSampleName, subsetSampleSize, subsetSampleType,ArrayList<Strata>(), ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<Rule>(), ArrayList<Filter>(), UUID.randomUUID().toString())
 
     fun pack(password: String) : String
     {

@@ -17,16 +17,18 @@ import edu.gtri.gpssample.database.models.Location
 
 class EnumAreaDAO(private var dao: DAO)
 {
-    fun createOrUpdateEnumArea( enumArea: EnumArea ) : EnumArea?
+    fun createOrUpdateEnumArea( enumArea: EnumArea, version: String ) : EnumArea?
     {
-        if (dao.exists( DAO.TABLE_ENUM_AREA, DAO.COLUMN_UUID, enumArea.uuid ))
+        enumArea.version = version
+
+        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_ENUM_AREA, enumArea.uuid, version )
+
+        if (exists)
         {
-            getEnumArea( enumArea.uuid )?.let { existingEnumArea ->
-                if (enumArea.doesNotEqual( existingEnumArea ))
-                {
-                    updateEnumArea( enumArea )
-                    Log.d( "xxx", "Updated EnumerationArea with ID ${enumArea.uuid}" )
-                }
+            if (shouldUpdate)
+            {
+                updateEnumArea( enumArea )
+                Log.d( "xxx", "Updated EnumerationArea to version ${enumArea.version}" )
             }
         }
         else
@@ -37,7 +39,7 @@ class EnumAreaDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created EnumerationArea with ID ${enumArea.uuid}" )
+            Log.d( "xxx", "Created EnumerationArea with version ${enumArea.version}" )
         }
 
         enumArea.mapTileRegion?.let {
@@ -49,11 +51,11 @@ class EnumAreaDAO(private var dao: DAO)
         }
 
         for (location in enumArea.locations) {
-            DAO.locationDAO.createOrUpdateLocation(location, enumArea)
+            DAO.locationDAO.createOrUpdateLocation(location, enumArea, location.version)
         }
 
         for (enumerationTeam in enumArea.enumerationTeams) {
-            DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( enumerationTeam )
+            DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( enumerationTeam, enumerationTeam.version )
         }
 
         for (collectionTeam in enumArea.collectionTeams) {
@@ -72,6 +74,7 @@ class EnumAreaDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_UUID, enumArea.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, enumArea.creationDate )
+        values.put( DAO.COLUMN_VERSION, enumArea.version )
         values.put( DAO.COLUMN_CONFIG_UUID, enumArea.configUuid )
         values.put( DAO.COLUMN_STRATA_UUID, enumArea.strataUuid )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
@@ -86,6 +89,7 @@ class EnumAreaDAO(private var dao: DAO)
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val configUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_UUID))
         val strataUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STRATA_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
@@ -94,7 +98,7 @@ class EnumAreaDAO(private var dao: DAO)
         val selectedEnumerationTeamUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_UUID))
         val selectedCollectionTeamUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_UUID))
 
-        return EnumArea( uuid, creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, selectedEnumerationTeamUuid, selectedCollectionTeamUuid )
+        return EnumArea( uuid, creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, selectedEnumerationTeamUuid, selectedCollectionTeamUuid, version )
     }
 
     fun updateEnumArea( enumArea: EnumArea )

@@ -462,6 +462,12 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         binding.saveButton.setOnClickListener {
             config.enumAreas.addAll( unsavedEnumAreas )
+
+            for (enumArea in config.enumAreas)
+            {
+                enumArea.version = UUID.randomUUID().toString()
+            }
+
             findNavController().popBackStack()
         }
 

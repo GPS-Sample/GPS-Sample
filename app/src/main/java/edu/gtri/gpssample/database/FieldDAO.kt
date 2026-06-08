@@ -24,12 +24,19 @@ import edu.gtri.gpssample.database.models.Study
 
 class FieldDAO(private var dao: DAO)
 {
-    fun createOrUpdateField( field: Field, study : Study ) : Field?
+    fun createOrUpdateField( field: Field, study : Study, version: String ) : Field?
     {
-        if (dao.exists( DAO.TABLE_FIELD, DAO.COLUMN_UUID, field.uuid ))
+        field.version = version
+
+        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD, field.uuid, version )
+
+        if (exists)
         {
-            updateField( field, study )
-            Log.d( "xxx", "Updated Field with ID ${field.uuid}")
+            if (shouldUpdate)
+            {
+                updateField( field, study )
+                Log.d( "xxx", "Updated Field to version ${field.version}")
+            }
         }
         else
         {
@@ -39,19 +46,19 @@ class FieldDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created Field with ID ${field.uuid}")
+            Log.d( "xxx", "Created Field with version ${field.version}")
         }
 
         field.fields?.let { fields ->
             for (field in fields)
             {
-                createOrUpdateField( field, study )
+                createOrUpdateField( field, study,field.version )
             }
         }
 
         for (fieldOption in field.fieldOptions)
         {
-            DAO.fieldOptionDAO.createOrUpdateFieldOption( fieldOption, field )
+            DAO.fieldOptionDAO.createOrUpdateFieldOption( fieldOption, field, fieldOption.version )
         }
 
         return field
@@ -62,6 +69,7 @@ class FieldDAO(private var dao: DAO)
         values.put( DAO.COLUMN_UUID, field.uuid )
         values.put( DAO.COLUMN_FIELD_PARENT_UUID, field.parentUUID )
         values.put( DAO.COLUMN_CREATION_DATE, field.creationDate )
+        values.put( DAO.COLUMN_VERSION, field.version )
         values.put( DAO.COLUMN_STUDY_UUID, study.uuid )
         values.put( DAO.COLUMN_FIELD_INDEX, field.index )
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
@@ -96,6 +104,7 @@ class FieldDAO(private var dao: DAO)
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val parentUUID = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_PARENT_UUID))
         val index = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_INDEX))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
@@ -111,7 +120,7 @@ class FieldDAO(private var dao: DAO)
 
         val type = FieldTypeConverter.fromIndex(typeIndex)
 
-        return Field( uuid, creationDate, parentUUID, index, name, type, pii, required, integerOnly, numberOfResidents, date, time, minimum, maximum, ArrayList<FieldOption>(), ArrayList<Field>())
+        return Field( uuid, creationDate, parentUUID, index, name, type, pii, required, integerOnly, numberOfResidents, date, time, minimum, maximum, ArrayList<FieldOption>(), ArrayList<Field>(), version )
     }
 
     fun getField( uuid : String ): Field?

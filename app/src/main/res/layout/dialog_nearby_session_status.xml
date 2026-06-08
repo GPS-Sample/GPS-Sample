@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/medium_gray"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -57,14 +58,13 @@
     </LinearLayout>
 
     <ImageView
-        android:visibility="gone"
+        android:visibility="visible"
         android:id="@+id/image_view"
         app:layout_constraintWidth_default="wrap"
         app:layout_constraintWidth_max="500dp"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="20dp"
-        android:background="@color/highlight_red"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_text_view"

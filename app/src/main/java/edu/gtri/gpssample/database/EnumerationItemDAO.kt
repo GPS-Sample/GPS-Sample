@@ -21,12 +21,19 @@ import kotlin.collections.ArrayList
 
 class EnumerationItemDAO(private var dao: DAO)
 {
-    fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location ) : EnumerationItem?
+    fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location, version: String ) : EnumerationItem?
     {
-        if (dao.exists( DAO.TABLE_ENUMERATION_ITEM, DAO.COLUMN_UUID, enumerationItem.uuid ))
+        enumerationItem.version = version
+
+        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_STUDY, enumerationItem.uuid, version )
+
+        if (exists)
         {
-            updateEnumerationItem( enumerationItem, location )
-            Log.d( "xxx", "Updated EnumerationItem with ID ${enumerationItem.uuid}" )
+            if (shouldUpdate)
+            {
+                updateEnumerationItem( enumerationItem, location )
+                Log.d( "xxx", "Updated EnumerationItem to version ${enumerationItem.version}")
+            }
         }
         else
         {
@@ -40,24 +47,17 @@ class EnumerationItemDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created EnumerationItem with ID ${enumerationItem.uuid}" )
+            Log.d( "xxx", "Created EnumerationItem with version ${enumerationItem.version}" )
         }
 
         enumerationItem.fieldDataList?.let { fieldDataList ->
             for (fieldData in fieldDataList)
             {
-                DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
+                DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem, fieldData.version )
             }
         }
 
         return enumerationItem
-    }
-
-    fun exists( enumerationItem: EnumerationItem ): Boolean
-    {
-        getEnumerationItem( enumerationItem.uuid )?.let {
-            return true
-        } ?: return false
     }
 
     fun updateEnumerationItem( enumerationItem: EnumerationItem, location : Location )
@@ -79,6 +79,7 @@ class EnumerationItemDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_UUID, enumerationItem.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, enumerationItem.creationDate )
+        values.put( DAO.COLUMN_VERSION, enumerationItem.version )
         values.put( DAO.COLUMN_SYNC_CODE, enumerationItem.syncCode)
         values.put( DAO.COLUMN_LOCATION_UUID, location.uuid)
         values.put( DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS, enumerationItem.subAddress )
@@ -103,6 +104,7 @@ class EnumerationItemDAO(private var dao: DAO)
     private fun buildEnumerationItem(cursor: Cursor): EnumerationItem {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val syncCode = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_SYNC_CODE))
         val locationUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_UUID))
         val subAddress = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS))
@@ -148,7 +150,8 @@ class EnumerationItemDAO(private var dao: DAO)
             collectionNotes,
             fieldDataList,
             locationUuid,
-            odkInstanceUri
+            odkInstanceUri,
+            version
         )
     }
 

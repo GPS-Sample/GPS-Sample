@@ -260,7 +260,7 @@ class CreateStudyModel {
         currentStudy = _currentStudy
     }
 
-    fun setStudy(study : Study)
+    fun setCurrentStudy(study : Study)
     {
         _currentStudy = MutableLiveData(study)
         currentStudy = _currentStudy

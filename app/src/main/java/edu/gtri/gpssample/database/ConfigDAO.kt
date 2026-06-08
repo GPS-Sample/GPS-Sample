@@ -20,33 +20,34 @@ import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.managers.PreferencesManager
+import java.util.UUID
 import kotlin.math.min
 
 class ConfigDAO(private var dao: DAO)
 {
-    fun createOrUpdateConfig( config: Config ) : Boolean
+    fun createOrUpdateConfig( config: Config, version: String ) : Boolean
     {
-        dao.writableDatabase.beginTransaction()
-
         var success = true
+
+        config.version = version
 
         MainApplication.instance.user?.let { user ->
             if (!config.validUsers.contains(user.uuid))
             {
-                config.validUsers += " ${user.uuid} "
+                config.validUsers += " ${user.uuid}"
             }
         }
 
-        if (dao.exists( DAO.TABLE_CONFIG, DAO.COLUMN_UUID, config.uuid ))
-        {
-            getConfig( config.uuid )?.let { existingConfig ->
-                mergeValidUsers( config, existingConfig )
+        dao.writableDatabase.beginTransaction()
 
-                if (config.doesNotEqual( existingConfig ))
-                {
-                    updateConfig( config )
-                    Log.d( "xxx", "Updated Config with ID ${config.uuid}" )
-                }
+        val (exists, shouldUpdate) = existingConfig(config )
+
+        if (exists)
+        {
+            if (shouldUpdate)
+            {
+                updateConfig( config )
+                Log.d( "xxx", "Updated Config to version ${config.version}" )
             }
         }
         else
@@ -56,8 +57,12 @@ class ConfigDAO(private var dao: DAO)
             if (dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values) < 0)
             {
                 success = false
+                Log.d( "xxx", "Failed to Create Config with ID = ${config.uuid}")
             }
-            Log.d( "xxx", "Created Config with ID = ${config.uuid}")
+            else
+            {
+                Log.d( "xxx", "Created Config with version = ${config.version}")
+            }
         }
 
         if (success)
@@ -72,19 +77,133 @@ class ConfigDAO(private var dao: DAO)
         return success
     }
 
-    fun mergeValidUsers( newConfig: Config, oldConfig: Config )
+    @SuppressLint("Range")
+    fun existingConfig( newConfig: Config ): Pair<Boolean, Boolean>
     {
-        val oldUsers = oldConfig.validUsers.split( " " )
+        val query = """
+            SELECT ${DAO.COLUMN_VERSION}, ${DAO.COLUMN_CONFIG_VALID_USERS}
+            FROM ${DAO.TABLE_CONFIG}
+            WHERE ${DAO.COLUMN_UUID} = ?
+            """.trimIndent()
 
-        for (oldUser in oldUsers)
-        {
-            val trimmedOldUser = oldUser.trim()
+        var shouldUpdate = false
 
-            if (trimmedOldUser.isNotEmpty() && !newConfig.validUsers.contains( trimmedOldUser ))
+        dao.readableDatabase.rawQuery(query, arrayOf(newConfig.uuid)).use { cursor ->
+
+            if (!cursor.moveToFirst())
             {
-                newConfig.validUsers += " ${trimmedOldUser}"
+                return Pair(false, false)
+            }
+
+            val oldVersion = cursor.getString(0)
+            val oldValidUsers = cursor.getString(1)
+
+            if (newConfig.version != oldVersion)
+            {
+                shouldUpdate = true
+            }
+
+            if (newConfig.validUsers.trim().length != oldValidUsers.trim().length)
+            {
+                shouldUpdate = true
+
+                // combine old & new users
+                val oldUsers = oldValidUsers.split(" ")
+                val newUsers = newConfig.validUsers.split(" ")
+
+                newConfig.validUsers = ""
+
+                for (user in oldUsers)
+                {
+                    val trimmedUser = user.trim()
+                    if (trimmedUser.isNotEmpty() &&
+                        !newConfig.validUsers.contains(trimmedUser))
+                    {
+                        newConfig.validUsers += "$trimmedUser "
+                    }
+                }
+
+                for (user in newUsers)
+                {
+                    val trimmedUser = user.trim()
+                    if (trimmedUser.isNotEmpty() &&
+                        !newConfig.validUsers.contains(trimmedUser))
+                    {
+                        newConfig.validUsers += "$trimmedUser "
+                    }
+                }
+
+                newConfig.validUsers = newConfig.validUsers.trim()
             }
         }
+
+        return Pair(true, shouldUpdate )
+    }
+
+    @SuppressLint("Range")
+    fun shouldUpdateXXX( newConfig: Config ) : Boolean
+    {
+        var should_update = false
+
+        // get minimal old config info
+        val query = """
+        SELECT ${DAO.COLUMN_VERSION}, ${DAO.COLUMN_CONFIG_VALID_USERS}
+        FROM ${DAO.TABLE_CONFIG}
+        WHERE ${DAO.COLUMN_UUID} = ?
+        """.trimIndent()
+
+        dao.readableDatabase.rawQuery(query, arrayOf(newConfig.uuid)).use { cursor ->
+            cursor.moveToFirst()
+
+            val oldVersion = cursor.getString(0 )
+            val oldValidUsers = cursor.getString(1 )
+
+            if (newConfig.version != oldVersion)
+            {
+                should_update = true
+                Log.d( "xxx", "version changed" )
+            }
+
+            if (newConfig.validUsers.trim().length != oldValidUsers.trim().length)
+            {
+                should_update = true
+                Log.d( "xxx", "validUsers changed" )
+
+                Log.d( "xxx", "[${newConfig.validUsers.trim()}]")
+                Log.d( "xxx", "[${oldValidUsers.trim()}]")
+
+                // combine old & new users
+
+                val oldUsers = oldValidUsers.split(" " )
+                val newUsers = newConfig.validUsers.split(" " )
+
+                newConfig.validUsers = ""
+
+                for (user in oldUsers)
+                {
+                    val trimmedUser = user.trim()
+                    if (!newConfig.validUsers.contains(trimmedUser ))
+                    {
+                        newConfig.validUsers += "$trimmedUser "
+                    }
+                }
+
+                for (user in newUsers)
+                {
+                    val trimmedUser = user.trim()
+                    if (!newConfig.validUsers.contains(trimmedUser ))
+                    {
+                        newConfig.validUsers += "$trimmedUser "
+                    }
+                }
+
+                newConfig.validUsers = newConfig.validUsers.trim()
+
+                Log.d( "xxx", "[${newConfig.validUsers}]")
+            }
+        }
+
+        return should_update
     }
 
     fun updateConfig( config: Config )
@@ -100,6 +219,7 @@ class ConfigDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_UUID, config.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, config.creationDate )
+        values.put( DAO.COLUMN_VERSION, config.version )
         values.put( DAO.COLUMN_TIME_ZONE, config.timeZone )
         values.put( DAO.COLUMN_ENUM_AREA_UUID, config.selectedEnumAreaUuid )
         values.put( DAO.COLUMN_STUDY_UUID, config.selectedStudyUuid )
@@ -135,6 +255,7 @@ class ConfigDAO(private var dao: DAO)
     private fun buildConfig(cursor: Cursor ) : Config
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val selectedEnumAreaUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
         val selectedStudyUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
@@ -154,6 +275,7 @@ class ConfigDAO(private var dao: DAO)
         val proximityWarningValue = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_PROXIMITY_WARNING_VALUE))
         var validUsers = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_VALID_USERS))
 
+        // HACK!!! is this really necessary?
         if (validUsers.isEmpty())
         {
             MainApplication.instance.user?.let { user->
@@ -161,12 +283,11 @@ class ConfigDAO(private var dao: DAO)
             }
         }
 
-        // TODO: these should be lookup tables
         val distanceFormat = DistanceFormatConverter.fromIndex(distanceFormatIndex)
         val dateFormat = DateFormatConverter.fromIndex(dateFormatIndex)
         val timeFormat = TimeFormatConverter.fromIndex(timeFormatIndex)
 
-        return Config( uuid, creationDate, timeZone, name, dbVersion, mapEngineIndex, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsRequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, selectedStudyUuid, selectedEnumAreaUuid, validUsers )
+        return Config( uuid, creationDate, timeZone, name, dbVersion, mapEngineIndex, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsRequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, selectedStudyUuid, selectedEnumAreaUuid, validUsers, version )
     }
 
     fun getConfig( uuid: String ): Config?
@@ -227,7 +348,7 @@ class ConfigDAO(private var dao: DAO)
         for(study in config.studies)
         {
             // study will either be created or updated
-            DAO.studyDAO.createOrUpdateStudy(study)?.let { study
+            DAO.studyDAO.createOrUpdateStudy(study, study.version)?.let { study
                 val configStudyValues = ContentValues()
                 putConfigStudy(config, study, configStudyValues)
                 dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_CONFIG__STUDY, null, configStudyValues).toInt()
@@ -239,7 +360,7 @@ class ConfigDAO(private var dao: DAO)
     {
         for (enumArea in config.enumAreas)
         {
-            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, enumArea.version )
         }
     }
 

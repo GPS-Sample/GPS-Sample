@@ -16,20 +16,24 @@ import edu.gtri.gpssample.constants.SampleTypeConverter
 import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.constants.SamplingMethodConverter
 import edu.gtri.gpssample.database.models.*
+import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.extensions.toBoolean
+import java.util.UUID
 
 class StudyDAO(private var dao: DAO)
 {
-    fun createOrUpdateStudy( study: Study ) : Study?
+    fun createOrUpdateStudy( study: Study, version: String ) : Study?
     {
-        if (dao.exists(DAO.TABLE_STUDY, DAO.COLUMN_UUID, study.uuid ))
+        study.version = version
+
+        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_STUDY, study.uuid, version )
+
+        if (exists)
         {
-            getStudy( study.uuid )?.let { existingStudy ->
-                if (study.doesNotEqual( existingStudy ))
-                {
-                    updateStudy( study )
-                    Log.d( "xxx", "Updated Study with ID ${study.uuid}")
-                }
+            if (shouldUpdate)
+            {
+                updateStudy( study )
+                Log.d( "xxx", "Updated Study to version ${study.version}")
             }
         }
         else
@@ -40,13 +44,13 @@ class StudyDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created Study with ID ${study.uuid}")
+            Log.d( "xxx", "Created Study with version ${study.version}")
         }
 
         // add fields
         for (field in study.fields)
         {
-            DAO.fieldDAO.createOrUpdateField( field, study )
+            DAO.fieldDAO.createOrUpdateField( field, study,field.version )
         }
 
         // add primary rules
@@ -86,6 +90,7 @@ class StudyDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_UUID, study.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, study.creationDate )
+        values.put( DAO.COLUMN_VERSION, study.version )
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
         values.put( DAO.COLUMN_STUDY_SUBSET_SAMPLE_SIZE, study.subsetSampleSize )
@@ -106,18 +111,12 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX, index )
     }
 
-    fun exists( study: Study ): Boolean
-    {
-        getStudy( study.uuid )?.let {
-            return true
-        } ?: return false
-    }
-
     @SuppressLint("Range")
     private fun buildStudy(cursor: Cursor ): Study
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_NAME))
         var subsetSampleName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_SUBSET_SAMPLE_NAME))
         val samplingMethodIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX))
@@ -136,7 +135,7 @@ class StudyDAO(private var dao: DAO)
             subsetSampleName = ""
         }
 
-        val study = Study( uuid, creationDate, name, samplingMethod, sampleSize, sampleType, subsetSampleName, subsetSampleSize, subsetSampleType )
+        val study = Study( uuid, creationDate, name, samplingMethod, sampleSize, sampleType, subsetSampleName, subsetSampleSize, subsetSampleType, ArrayList<Strata>(), ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<Rule>(), ArrayList<Filter>(), version )
 
         return study
     }

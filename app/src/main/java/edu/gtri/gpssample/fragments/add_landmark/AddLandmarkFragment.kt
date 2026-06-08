@@ -26,6 +26,7 @@ import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.utils.CameraUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.Date
+import java.util.UUID
 
 class AddLandmarkFragment : Fragment()
 {
@@ -131,7 +132,7 @@ class AddLandmarkFragment : Fragment()
             location.description = binding.descriptionEditText.text.toString()
 
             location.creationDate = Date().time
-            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+            DAO.locationDAO.createOrUpdateLocation( location, enumArea, UUID.randomUUID().toString())
 
 //            DAO.configDAO.getConfig( config.uuid )?.let {
 //                it.selectedStudyUuid = config.selectedStudyUuid
