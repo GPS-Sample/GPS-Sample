@@ -133,7 +133,7 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
         sessionId = id
 
         val options = AdvertisingOptions.Builder()
-            .setStrategy(Strategy.P2P_POINT_TO_POINT)
+            .setStrategy(Strategy.P2P_STAR)
             .build()
 
         Log.d( "xxx", "Advertising Started" )
@@ -210,7 +210,7 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
         _nearbySessionState.value = NearbySessionState.Connecting
 
         val options = DiscoveryOptions.Builder()
-            .setStrategy(Strategy.P2P_POINT_TO_POINT)
+            .setStrategy(Strategy.P2P_STAR)
             .build()
 
         Log.d("xxx", "Discovery Started" )
