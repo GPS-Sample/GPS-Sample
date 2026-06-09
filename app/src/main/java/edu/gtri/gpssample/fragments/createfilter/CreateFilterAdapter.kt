@@ -24,18 +24,14 @@ class CreateFilterAdapter(var filterRules: List<Rule>) : RecyclerView.Adapter<Cr
     override fun getItemCount() = filterRules.size
 
     private var context: Context? = null
-    private var allHolders = ArrayList<ViewHolder>()
     lateinit var shouldEditFilterRule: ((rule: Rule) -> Unit)
     lateinit var shouldDeleteFilterRule: ((rule: Rule, previousRule : Rule?) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
-        this.context = parent.context
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_filter, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_filter, parent, false))
 
         viewHolder.itemView.isSelected = false
-
-        allHolders.add(viewHolder)
 
         return viewHolder
     }

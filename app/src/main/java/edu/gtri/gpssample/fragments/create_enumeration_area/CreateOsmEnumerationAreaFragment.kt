@@ -58,6 +58,7 @@ import org.json.JSONObject
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
+import org.osmdroid.events.MapListener
 import java.io.File
 import java.util.*
 import kotlin.io.path.Path
@@ -76,6 +77,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     private lateinit var defaultColorList : ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
 
+    private var osmMapListener: MapListener? = null
     private var editMode = false
     private var radius: Double = 0.0
     private val binding get() = _binding!!
@@ -125,6 +127,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
 
         if (sharedViewModel.currentZoomLevel?.value == null)
         {
@@ -1505,8 +1509,13 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
+        osmMapListener?.let {
+            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
+            osmMapListener = null
+        }
 
         _binding = null
+
+        super.onDestroyView()
     }
 }

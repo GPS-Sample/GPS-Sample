@@ -168,8 +168,9 @@ class ManageCollectionTeamsFragment : Fragment()
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
-
+        binding.teamRecyclerView.adapter = null
         _binding = null
+
+        super.onDestroyView()
     }
 }

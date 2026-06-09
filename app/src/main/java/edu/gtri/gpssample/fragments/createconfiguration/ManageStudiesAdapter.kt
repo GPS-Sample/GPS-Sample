@@ -24,19 +24,14 @@ class ManageStudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<Man
 {
     override fun getItemCount() = studies!!.size
 
-    private var mContext: Context? = null
-    private var allHolders = ArrayList<ViewHolder>()
     lateinit var didSelectStudy: ((study: Study) -> Unit)
     lateinit var shouldDeleteStudy: ((study: Study) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
-        this.mContext = parent.context
-
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
 
         viewHolder.itemView.isSelected = false
-        allHolders.add(viewHolder)
 
         return viewHolder
     }

@@ -33,7 +33,6 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var 
 
     var items = ArrayList<Any>()
     private lateinit var mContext: Context
-    private var allHolders = ArrayList<ViewHolder>()
     lateinit var didSelectItem: ((item: Any) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
@@ -43,7 +42,6 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var 
         val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_collection, parent, false))
 
         viewHolder.itemView.isSelected = false
-        allHolders.add(viewHolder)
 
         return viewHolder
     }

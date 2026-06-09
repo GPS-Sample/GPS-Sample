@@ -69,6 +69,7 @@ import org.json.JSONObject
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
+import org.osmdroid.events.MapListener
 import java.io.File
 import java.util.*
 
@@ -87,6 +88,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private lateinit var defaultColorList : ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
 
+    private var osmMapListener: MapListener? = null
     private var editMode = false
     private val binding get() = _binding!!
     private var showCurrentLocation = false
@@ -144,12 +146,14 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
+        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
+
         if (sharedViewModel.currentZoomLevel?.value == null)
         {
             sharedViewModel.setCurrentZoomLevel( 16.0 )
         }
 
-        binding?.apply {
+        binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
 
@@ -1546,12 +1550,17 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
+        osmMapListener?.let {
+            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
+            osmMapListener = null
+        }
 
         binding.mapboxMapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapboxMapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
         binding.mapboxMapView.gestures.removeOnMoveListener(onMoveListener)
 
         _binding = null
+
+        super.onDestroyView()
     }
 }

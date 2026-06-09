@@ -127,6 +127,9 @@ import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import java.util.concurrent.atomic.AtomicInteger
@@ -266,22 +269,31 @@ class MapManager
         rotationGestureOverlay.isEnabled = true
         mapView.overlays.add(rotationGestureOverlay)
 
+        completion()
+    }
+
+    fun createOsmMapListener( mapView: org.osmdroid.views.MapView, northUpImageView: ImageView ) : MapListener
+    {
         northUpImageView.setOnClickListener {
-            mapView.mapOrientation = 0f   // reset to North-up
+            mapView.mapOrientation = 0f
             northUpImageView.visibility = View.GONE
         }
 
-        mapView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
-                if (mapView.mapOrientation != 0f)
-                {
-                    northUpImageView.visibility = View.VISIBLE
-                }
-                return true
+        val mapListener = object : MapListener {
+            override fun onScroll(event: ScrollEvent?): Boolean {
+                northUpImageView.visibility = if (mapView.mapOrientation != 0f) View.VISIBLE else View.GONE
+                return false
             }
-        })
 
-        completion()
+            override fun onZoom(event: ZoomEvent?): Boolean {
+                northUpImageView.visibility = if (mapView.mapOrientation != 0f) View.VISIBLE else View.GONE
+                return false
+            }
+        }
+
+        mapView.addMapListener(mapListener)
+
+        return mapListener
     }
 
     private fun initializeMapboxMap( mapView: com.mapbox.maps.MapView, style: String, enumArea: EnumArea?, zoom: Double, completion: (()->Unit))
@@ -1623,6 +1635,23 @@ class MapManager
     {
         fun tilePacksLoaded( error: String )
         fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
+    }
+
+    fun onFragmentDestroyed( mapView: org.osmdroid.views.MapView, mapListener: MapListener )
+    {
+        mapView.removeMapListener( mapListener )
+
+        delegate = null
+
+        mapboxPolygonAnnotationManager?.deleteAll()
+        mapboxPolylineAnnotationManager?.deleteAll()
+        mapboxPointAnnotationManager?.deleteAll()
+        mapboxBreadcrumbAnnotationManager?.deleteAll()
+
+        mapboxPolygonAnnotationManager = null
+        mapboxPolylineAnnotationManager = null
+        mapboxPointAnnotationManager = null
+        mapboxBreadcrumbAnnotationManager = null
     }
 
     companion object

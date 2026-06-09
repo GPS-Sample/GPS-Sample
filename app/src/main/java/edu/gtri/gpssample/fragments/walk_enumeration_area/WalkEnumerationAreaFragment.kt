@@ -50,6 +50,7 @@ import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import org.osmdroid.events.MapListener
 import java.util.*
 
 class WalkEnumerationAreaFragment : Fragment(),
@@ -62,8 +63,8 @@ class WalkEnumerationAreaFragment : Fragment(),
     private lateinit var defaultColorList : ColorStateList
     private lateinit var fusedLocationClient : FusedLocationProviderClient
 
+    private var osmMapListener: MapListener? = null
     private var inputDialog: InputDialog? = null
-
     private var isRecording = false
     private val binding get() = _binding!!
     private var showCurrentLocation = false
@@ -72,7 +73,6 @@ class WalkEnumerationAreaFragment : Fragment(),
     private var currentGPSLocation: com.mapbox.geojson.Point? = null
     private var _binding: FragmentWalkEnumerationAreaBinding? = null
     private val polyLinePoints = ArrayList<com.mapbox.geojson.Point>()
-
     private val kEnumAreaName = 3
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -93,6 +93,8 @@ class WalkEnumerationAreaFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
 
         binding.apply {
             // Specify the fragment as the lifecycle owner
@@ -670,10 +672,15 @@ class WalkEnumerationAreaFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
+        osmMapListener?.let {
+            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
+            osmMapListener = null
+        }
 
         fusedLocationClient.removeLocationUpdates( locationCallback )
 
         _binding = null
+
+        super.onDestroyView()
     }
 }

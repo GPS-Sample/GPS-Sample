@@ -223,9 +223,9 @@ class CameraFragment : Fragment()
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
-
         _binding = null
         cameraExecutor.shutdown()
+
+        super.onDestroyView()
     }
 }

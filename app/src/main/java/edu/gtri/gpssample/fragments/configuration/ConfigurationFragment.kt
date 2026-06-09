@@ -53,6 +53,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.osmdroid.events.*
 import org.osmdroid.views.MapView
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -65,6 +66,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
     private lateinit var nearbySessionManager: NearbySessionManager
 
+    private var osmMapListener: MapListener? = null
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
     private var includeConfig = false
@@ -101,6 +103,8 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                     .build())
             return
         }
+
+        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
 
         binding.apply {
             // Specify the fragment as the lifecycle owner
@@ -275,6 +279,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
             val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
 
             MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom ) { mapView ->
+
                 binding.osmLabel.visibility = if (mapView is MapView) View.VISIBLE else View.GONE
 
                 if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
@@ -613,13 +618,26 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
+        binding.mapOverlayView.setOnTouchListener(null)
+
+        osmMapListener?.let {
+            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
+            osmMapListener = null
+        }
+
+        sharedViewModel.currentFragment = null
 
         if (this::nearbySessionManager.isInitialized)
         {
             nearbySessionManager.stopHosting()
         }
 
+        binding.enumAreasRecycler.adapter = null
+        binding.studiesRecycler.adapter = null
+
+
         _binding = null
+
+        super.onDestroyView()
     }
 }

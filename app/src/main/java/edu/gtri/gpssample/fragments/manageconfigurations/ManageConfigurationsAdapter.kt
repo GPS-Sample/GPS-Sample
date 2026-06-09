@@ -25,19 +25,14 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
 {
     override fun getItemCount() = configurations!!.size
 
-    private var mContext: Context? = null
-    private var allHolders = ArrayList<ViewHolder>()
     lateinit var didSelectConfig: ((config: Config) -> Unit)
     lateinit var shouldCloneConfig: ((config: Config) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
-        this.mContext = parent.context
-
         val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_configurations, parent, false))
 
         viewHolder.itemView.isSelected = false
-        allHolders.add(viewHolder)
 
         return viewHolder
     }

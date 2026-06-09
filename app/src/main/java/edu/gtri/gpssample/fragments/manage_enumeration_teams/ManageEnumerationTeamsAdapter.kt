@@ -24,20 +24,14 @@ import kotlin.collections.ArrayList
 class ManageEnumerationTeamsAdapter(var enumerationTeams: List<EnumerationTeam>?) : RecyclerView.Adapter<ManageEnumerationTeamsAdapter.ViewHolder>()
 {
     override fun getItemCount() = enumerationTeams!!.size
-
-    private lateinit var context: Context
-    private var allHolders = ArrayList<ViewHolder>()
     lateinit var didSelectTeam: ((enumerationTeam: EnumerationTeam) -> Unit)
     lateinit var shouldDeleteTeam: ((enumerationTeam: EnumerationTeam) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
-        this.context = parent.context
-
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_team, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_team, parent, false))
 
         viewHolder.itemView.isSelected = false
-        allHolders.add(viewHolder)
 
         return viewHolder
     }

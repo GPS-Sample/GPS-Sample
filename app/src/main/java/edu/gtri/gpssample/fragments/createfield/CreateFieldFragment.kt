@@ -606,8 +606,10 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
-
+        checkboxRecyclerView.adapter = null
+        dropdownRecyclerView.adapter = null
         _binding = null
+
+        super.onDestroyView()
     }
 }

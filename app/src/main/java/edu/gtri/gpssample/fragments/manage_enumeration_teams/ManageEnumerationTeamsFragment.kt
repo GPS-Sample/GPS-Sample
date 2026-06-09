@@ -28,6 +28,7 @@ import edu.gtri.gpssample.database.models.EnumerationTeam
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.fragments.manage_collection_teams.ManageCollectionTeamsAdapter
+import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class ManageEnumerationTeamsFragment : Fragment()
@@ -130,8 +131,9 @@ class ManageEnumerationTeamsFragment : Fragment()
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
-
+        binding.teamRecyclerView.adapter = null
         _binding = null
+
+        super.onDestroyView()
     }
 }

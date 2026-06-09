@@ -52,7 +52,6 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
     implementation 'com.android.databinding:viewbinding:4.0.1'
     implementation("androidx.cardview:cardview:1.0.0")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.20"
     implementation 'com.google.android.material:material:1.5.0'
 
     implementation 'com.google.guava:guava:27.1-android'
@@ -97,6 +96,8 @@ dependencies {
     implementation 'com.github.MKergall:osmbonuspack:6.9.0'
 
     implementation("com.google.code.gson:gson:2.10.1")
+
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

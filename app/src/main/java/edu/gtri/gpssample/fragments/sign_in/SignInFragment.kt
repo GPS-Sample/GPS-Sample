@@ -270,8 +270,8 @@ class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
-
         _binding = null
+
+        super.onDestroyView()
     }
 }

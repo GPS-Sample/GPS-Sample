@@ -631,8 +631,11 @@ class AddHouseholdFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
+        binding.recyclerView.adapter = null
+        binding.propertyRecyclerView.adapter = null
 
         _binding = null
+
+        super.onDestroyView()
     }
 }

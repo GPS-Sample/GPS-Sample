@@ -45,7 +45,6 @@ class CreateRuleFragment : Fragment(),
 {
     private var _binding: FragmentCreateRuleBinding? = null
     private val binding get() = _binding!!
-
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     private var fieldList = ArrayList<Field>()
@@ -492,8 +491,9 @@ class CreateRuleFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
-
+        sharedViewModel.createRuleModel.fragment = null
         _binding = null
+
+        super.onDestroyView()
     }
 }

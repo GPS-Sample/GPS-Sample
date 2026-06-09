@@ -23,26 +23,12 @@ import kotlin.collections.ArrayList
 class HotspotAdapter : RecyclerView.Adapter<HotspotAdapter.BindableViewHolder>()
 {
     override fun getItemCount() = connections!!.size
-
-    private var mContext: Context? = null
-    private var allHolders = ArrayList<BindableViewHolder>()
-
     private var connections: List<NetworkConnectionViewModel> = emptyList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindableViewHolder
     {
-        this.mContext = parent.context
+        val binding: ViewDataBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.list_item_network, parent, false)
 
-
-        val binding: ViewDataBinding = DataBindingUtil.inflate(
-            LayoutInflater.from(parent.context),
-            R.layout.list_item_network,
-            parent,
-            false)
-
-
-//        val viewHolder = BindableViewHolder(binding)
-//        allHolders.add(viewHolder)
         return BindableViewHolder(binding)
 
     }

@@ -43,6 +43,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.fragments.perform_enumeration.PerformEnumerationAdapter
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
+import org.osmdroid.events.MapListener
 import java.util.*
 
 class ReviewEnumerationFragment : Fragment(),
@@ -56,9 +57,9 @@ class ReviewEnumerationFragment : Fragment(),
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
 
+    private var osmMapListener: MapListener? = null
     private var _binding: FragmentReviewEnumerationBinding? = null
     private val binding get() = _binding!!
-
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
     private var isShowingBreadcrumbs = true
@@ -84,6 +85,8 @@ class ReviewEnumerationFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
 
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
@@ -546,10 +549,15 @@ class ReviewEnumerationFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
+        osmMapListener?.let {
+            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
+            osmMapListener = null
+        }
 
         fusedLocationClient.removeLocationUpdates( locationCallback )
 
         _binding = null
+
+        super.onDestroyView()
     }
 }

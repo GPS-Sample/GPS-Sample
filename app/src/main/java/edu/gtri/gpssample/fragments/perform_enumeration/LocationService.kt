@@ -15,6 +15,7 @@ import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import edu.gtri.gpssample.R
@@ -87,12 +88,14 @@ class LocationService : Service()
             .build()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        started = false
+    override fun onDestroy()
+    {
         locationCallback?.let {
             fusedLocationClient.removeLocationUpdates(it)
         }
+        locationCallback = null
+        started = false
+        super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null

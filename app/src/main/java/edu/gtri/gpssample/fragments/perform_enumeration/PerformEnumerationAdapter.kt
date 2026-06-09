@@ -29,7 +29,6 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
     override fun getItemCount() = locations.size
 
     private lateinit var mContext: Context
-    private var allHolders = ArrayList<ViewHolder>()
     lateinit var didSelectLocation: ((location: Location) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
@@ -39,7 +38,6 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
         val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_collection, parent, false))
 
         viewHolder.itemView.isSelected = false
-        allHolders.add(viewHolder)
 
         return viewHolder
     }

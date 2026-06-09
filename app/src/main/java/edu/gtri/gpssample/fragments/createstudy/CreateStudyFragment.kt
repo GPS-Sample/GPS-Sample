@@ -166,11 +166,11 @@ class CreateStudyFragment : Fragment()
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
-
         expandableListState = SparseArray()
-//        binding.expandableListView.saveHierarchyState(expandableListState)
+        sharedViewModel.createStudyModel.fragment = null
 
         _binding = null
+
+        super.onDestroyView()
     }
 }

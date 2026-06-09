@@ -23,20 +23,13 @@ class CreateFieldDropdownAdapter(var fieldOptions: List<FieldOption>) : Recycler
 {
     override fun getItemCount() = fieldOptions.size
 
-    private var context: Context? = null
-    private var allHolders = ArrayList<ViewHolder>()
-
     lateinit var shouldDeleteDropdownFieldOption: ((fieldOption: FieldOption) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
-        this.context = parent.context
-
         val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_field_option, parent, false))
 
         viewHolder.itemView.isSelected = false
-
-        allHolders.add(viewHolder)
 
         return viewHolder
     }

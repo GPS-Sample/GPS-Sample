@@ -40,15 +40,18 @@ import kotlinx.coroutines.withContext
 import java.util.*
 import androidx.core.view.isVisible
 import edu.gtri.gpssample.constants.MapEngine
+import org.osmdroid.events.MapListener
 
 class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
 {
     private lateinit var study: Study
-    private lateinit var mapView: View
     private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
+
+    private var mapView: View? = null
+    private var osmMapListener: MapListener? = null
 
     var _binding: FragmentCreateSampleBinding? = null
     val binding get() = _binding!!
@@ -92,6 +95,8 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
             this.config = config
@@ -297,7 +302,7 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
 
     fun refreshMap()
     {
-        MapManager.instance().clearMap( mapView )
+        MapManager.instance().clearMap( mapView!! )
 
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
@@ -310,7 +315,7 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
 
         if (pointList.isNotEmpty())
         {
-            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
+            MapManager.instance().createPolygon( mapView!!, pointList, Color.BLACK, 0x40 )
         }
 
         val markerProperties = ArrayList<MapManager.MarkerProperty>()
@@ -373,7 +378,7 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
 
         if (markerProperties.isNotEmpty())
         {
-            MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, false )
+            MapManager.instance().loadMarkers( activity!!, mapView!!, markerProperties, false )
         }
     }
 
@@ -467,7 +472,19 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
+        osmMapListener?.let {
+            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
+            osmMapListener = null
+        }
+
+        samplingViewModel.currentFragment = null
+        samplingViewModel.currentConfig = null
+        samplingViewModel.currentStudy = null
+        samplingViewModel.currentEnumArea = null
+
+        mapView = null
         _binding = null
+
+        super.onDestroyView()
     }
 }

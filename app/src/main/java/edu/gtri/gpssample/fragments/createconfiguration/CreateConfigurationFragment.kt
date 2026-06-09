@@ -53,9 +53,6 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
         super.onCreate(savedInstanceState)
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
-        manageStudiesAdapter = ManageStudiesAdapter(listOf<Study>())
-        manageStudiesAdapter.didSelectStudy = this::didSelectStudy
-        manageStudiesAdapter.shouldDeleteStudy = this::shouldDeleteStudy
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -218,6 +215,10 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
             findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
         }
 
+        manageStudiesAdapter = ManageStudiesAdapter(listOf<Study>())
+        manageStudiesAdapter.didSelectStudy = this::didSelectStudy
+        manageStudiesAdapter.shouldDeleteStudy = this::shouldDeleteStudy
+
         binding.studiesRecycler.itemAnimator = DefaultItemAnimator()
         binding.studiesRecycler.adapter = manageStudiesAdapter
         binding.studiesRecycler.layoutManager = LinearLayoutManager(activity )
@@ -279,8 +280,10 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
+        binding.studiesRecycler.adapter = null
 
         _binding = null
+
+        super.onDestroyView()
     }
 }

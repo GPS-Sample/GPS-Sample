@@ -61,6 +61,7 @@ import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.osmdroid.events.MapListener
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -83,6 +84,7 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
 
+    private var osmMapListener: MapListener? = null
     private val binding get() = _binding!!
     private var isShowingBreadcrumbs = true
     private var currentGPSAccuracy: Int? = null
@@ -99,7 +101,8 @@ class PerformCollectionFragment : Fragment(),
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
         super.onCreate(savedInstanceState)
 
         val vm: ConfigurationViewModel by activityViewModels()
@@ -178,6 +181,8 @@ class PerformCollectionFragment : Fragment(),
                     .build())
             return
         }
+
+        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
 
         lateinit var config: Config
 
@@ -1418,7 +1423,12 @@ class PerformCollectionFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
+        osmMapListener?.let {
+            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
+            osmMapListener = null
+        }
+
+        binding.recyclerView.adapter = null
 
         if (this::fusedLocationClient.isInitialized)
         {
@@ -1431,5 +1441,7 @@ class PerformCollectionFragment : Fragment(),
         }
 
         _binding = null
+
+        super.onDestroyView()
     }
 }

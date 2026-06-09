@@ -40,6 +40,7 @@ import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
+import org.osmdroid.events.MapListener
 import java.util.*
 
 class CreateCollectionTeamFragment : Fragment(),
@@ -54,6 +55,7 @@ class CreateCollectionTeamFragment : Fragment(),
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
 
+    private var osmMapListener: MapListener? = null
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
     private val binding get() = _binding!!
 
@@ -85,6 +87,8 @@ class CreateCollectionTeamFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
 
         sharedViewModel.currentConfiguration?.value?.let {_config ->
             config = _config
@@ -495,8 +499,13 @@ class CreateCollectionTeamFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
+        osmMapListener?.let {
+            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
+            osmMapListener = null
+        }
 
         _binding = null
+
+        super.onDestroyView()
     }
 }

@@ -46,6 +46,7 @@ import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.coroutines.selects.select
+import org.osmdroid.events.MapListener
 import java.util.ArrayList
 import java.util.Date
 
@@ -58,12 +59,12 @@ class MapFragment : Fragment(),
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
 
+    private var osmMapListener: MapListener? = null
     private lateinit var mapView: View
     private var centerOnLocation = true
     private var defineMapRegion = false
     private var mapTileRegion: MapTileRegion? = null
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
-
     private lateinit var defaultColorList : ColorStateList
     private lateinit var sharedViewModel: ConfigurationViewModel
 
@@ -86,6 +87,8 @@ class MapFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
 
         binding.apply {
             // Specify the fragment as the lifecycle owner
@@ -510,8 +513,13 @@ class MapFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
+        osmMapListener?.let {
+            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
+            osmMapListener = null
+        }
 
         _binding = null
+
+        super.onDestroyView()
     }
 }

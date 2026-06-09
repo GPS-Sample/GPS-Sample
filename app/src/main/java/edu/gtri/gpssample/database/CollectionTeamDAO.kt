@@ -85,6 +85,7 @@ class CollectionTeamDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_UUID, collectionTeam.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, collectionTeam.creationDate )
+        values.put( DAO.COLUMN_VERSION, collectionTeam.version )
         values.put( DAO.COLUMN_ENUM_AREA_UUID, collectionTeam.enumAreaUuid )
         values.put( DAO.COLUMN_COLLECTION_TEAM_NAME, collectionTeam.name )
     }

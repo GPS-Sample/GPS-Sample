@@ -26,18 +26,14 @@ class ManageCollectionTeamsAdapter(var collectionTeams: List<CollectionTeam>?) :
     override fun getItemCount() = collectionTeams!!.size
 
     private lateinit var context: Context
-    private var allHolders = ArrayList<ViewHolder>()
     lateinit var didSelectTeam: ((collectionTeam: CollectionTeam) -> Unit)
     lateinit var shouldDeleteTeam: ((collectionTeam: CollectionTeam) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
-        this.context = parent.context
-
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_team, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_team, parent, false))
 
         viewHolder.itemView.isSelected = false
-        allHolders.add(viewHolder)
 
         return viewHolder
     }

@@ -33,7 +33,6 @@ class ConfigurationAdapter(var enumAreas: List<EnumArea>?, var enumAreaSummaries
     }
 
     private lateinit var context: Context
-    private var allHolders = ArrayList<ViewHolder>()
     lateinit var didSelectEnumArea: ((enumArea: EnumArea) -> Unit)
 
     fun updateEnumAreas( areas: List<EnumArea>? )
@@ -49,7 +48,6 @@ class ConfigurationAdapter(var enumAreas: List<EnumArea>?, var enumAreaSummaries
         val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_enum_area, parent, false))
 
         viewHolder.itemView.isSelected = false
-        allHolders.add(viewHolder)
 
         return viewHolder
     }

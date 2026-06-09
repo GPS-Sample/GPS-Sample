@@ -36,6 +36,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.model.*
@@ -58,6 +59,9 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -78,6 +82,7 @@ class PerformEnumerationFragment : Fragment(),
     private lateinit var nearbySessionManager: NearbySessionManager
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
 
+    private var osmMapListener: MapListener? = null
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
     private var lastBreadcrumbGroupId = ""
@@ -126,6 +131,8 @@ class PerformEnumerationFragment : Fragment(),
                     .build())
             return
         }
+
+        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
 
         lateinit var config: Config
 
@@ -1615,7 +1622,12 @@ class PerformEnumerationFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
+        osmMapListener?.let {
+            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
+            osmMapListener = null
+        }
+
+        binding.recyclerView.adapter = null
 
         if (LocationService.started)
         {
@@ -1629,5 +1641,7 @@ class PerformEnumerationFragment : Fragment(),
         }
 
         _binding = null
+
+        super.onDestroyView()
     }
 }

@@ -39,6 +39,7 @@ import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
+import org.osmdroid.events.MapListener
 import java.util.*
 
 class CreateEnumerationTeamFragment : Fragment(),
@@ -51,9 +52,9 @@ class CreateEnumerationTeamFragment : Fragment(),
     private lateinit var enumArea: EnumArea
     private lateinit var sharedViewModel : ConfigurationViewModel
 
+    private var osmMapListener: MapListener? = null
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
     private val binding get() = _binding!!
-
     private var createMode = false
     private var fingerPolyline: Any? = null
     private val locationUuids = ArrayList<String>()
@@ -79,6 +80,8 @@ class CreateEnumerationTeamFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
 
         sharedViewModel.currentConfiguration?.value?.let { _config ->
             config = _config
@@ -445,8 +448,13 @@ class CreateEnumerationTeamFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        super.onDestroyView()
+        osmMapListener?.let {
+            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
+            osmMapListener = null
+        }
 
         _binding = null
+
+        super.onDestroyView()
     }
 }
