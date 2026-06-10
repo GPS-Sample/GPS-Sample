@@ -413,22 +413,29 @@ class ManageConfigurationsFragment : Fragment()
 
                 nearbySessionManager.clientClose()
 
-                DAO.configDAO.createOrUpdateConfig( config, config.version )
+                nearbySessionStatusDialog.setStatus( "Saving Configuration..." )
 
-                nearbySessionStatusDialog.dismiss()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        DAO.configDAO.createOrUpdateConfig( config, config.version )
+                    }
 
-                minimalConfigurations.find { it.uuid == config.uuid } ?.let {
-                    minimalConfigurations.remove(it )
+                    // back on the main thread...
+                    nearbySessionStatusDialog.dismiss()
+
+                    minimalConfigurations.find { it.uuid == config.uuid } ?.let {
+                        minimalConfigurations.remove(it )
+                    }
+
+                    minimalConfigurations.add( config )
+                    manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
+
+                    // make this a minimal config!
+                    config.studies.clear()
+                    config.enumAreas.clear()
+
+                    didReceiveConfiguration( config )
                 }
-
-                minimalConfigurations.add( config )
-                manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
-
-                // make this a minimal config!
-                config.studies.clear()
-                config.enumAreas.clear()
-
-                didReceiveConfiguration( config )
             }
 
             nearbySessionManager.clientConnect(sessionId!! )

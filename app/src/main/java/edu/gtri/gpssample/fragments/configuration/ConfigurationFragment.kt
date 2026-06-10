@@ -417,6 +417,8 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
 
                 nearbySessionManager.clientClose()
 
+                nearbySessionStatusDialog.setStatus( "Saving Configuration..." )
+
                 viewLifecycleOwner.lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         DAO.configDAO.createOrUpdateConfig( config,config.version )
