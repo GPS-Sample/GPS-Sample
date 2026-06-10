@@ -38,7 +38,7 @@ class LocationDAO(private var dao: DAO)
             if (shouldUpdate)
             {
                 updateLocation( location )
-                Log.d( "xxx", "Updated Location to version ${location.version}" )
+                DAO.log("Updated Location to version ${location.version}" )
             }
         }
         else
@@ -54,7 +54,7 @@ class LocationDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created Location with version ${location.version}" )
+            DAO.log("Created Location with version ${location.version}" )
         }
 
         updateConnectorTable( location, enumArea )

@@ -47,7 +47,7 @@ class ConfigDAO(private var dao: DAO)
             if (shouldUpdate)
             {
                 updateConfig( config )
-                Log.d( "xxx", "Updated Config to version ${config.version}" )
+                DAO.log("Updated Config to version ${config.version}" )
             }
         }
         else
@@ -61,7 +61,7 @@ class ConfigDAO(private var dao: DAO)
             }
             else
             {
-                Log.d( "xxx", "Created Config with version = ${config.version}")
+                DAO.log("Created Config with version = ${config.version}")
             }
         }
 

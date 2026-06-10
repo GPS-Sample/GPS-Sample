@@ -27,7 +27,7 @@ class FieldOptionDAO(private var dao: DAO)
             if (shouldUpdate)
             {
                 updateFieldOption( fieldOption )
-                Log.d( "xxx", "Updated FieldOption to version ${fieldOption.version}")
+                DAO.log("Updated FieldOption to version ${fieldOption.version}")
             }
         }
         else
@@ -38,7 +38,7 @@ class FieldOptionDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created FieldOption with version ${fieldOption.version}")
+            DAO.log("Created FieldOption with version ${fieldOption.version}")
         }
 
         createConnection( fieldOption, field )

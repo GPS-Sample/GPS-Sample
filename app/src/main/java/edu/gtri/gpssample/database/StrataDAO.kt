@@ -24,7 +24,7 @@ class StrataDAO(private var dao: DAO)
                 if (strata.doesNotEqual( existingStrata ))
                 {
                     updateStrata( strata )
-                    Log.d( "xxx", "Updated LatLon with ID ${strata.uuid}" )
+                    DAO.log("Updated LatLon with ID ${strata.uuid}" )
                 }
             }
         }
@@ -36,7 +36,7 @@ class StrataDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created LatLon with ID ${strata.uuid}" )
+            DAO.log("Created LatLon with ID ${strata.uuid}" )
         }
 
         return strata

@@ -28,7 +28,7 @@ class EnumAreaDAO(private var dao: DAO)
             if (shouldUpdate)
             {
                 updateEnumArea( enumArea )
-                Log.d( "xxx", "Updated EnumerationArea to version ${enumArea.version}" )
+                DAO.log("Updated EnumerationArea to version ${enumArea.version}" )
             }
         }
         else
@@ -39,7 +39,7 @@ class EnumAreaDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created EnumerationArea with version ${enumArea.version}" )
+            DAO.log("Created EnumerationArea with version ${enumArea.version}" )
         }
 
         enumArea.mapTileRegion?.let {

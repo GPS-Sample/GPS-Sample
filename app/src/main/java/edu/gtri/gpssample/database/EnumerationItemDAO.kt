@@ -32,7 +32,7 @@ class EnumerationItemDAO(private var dao: DAO)
             if (shouldUpdate)
             {
                 updateEnumerationItem( enumerationItem, location )
-                Log.d( "xxx", "Updated EnumerationItem to version ${enumerationItem.version}")
+                DAO.log("Updated EnumerationItem to version ${enumerationItem.version}")
             }
         }
         else
@@ -47,7 +47,7 @@ class EnumerationItemDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created EnumerationItem with version ${enumerationItem.version}" )
+            DAO.log("Created EnumerationItem with version ${enumerationItem.version}" )
         }
 
         enumerationItem.fieldDataList?.let { fieldDataList ->

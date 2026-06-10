@@ -26,7 +26,7 @@ class EnumerationTeamDAO(private var dao: DAO)
             if (shouldUpdate)
             {
                 updateTeam( enumerationTeam )
-                Log.d( "xxx", "Updated EnumerationTeam to version ${enumerationTeam.version}")
+                DAO.log("Updated EnumerationTeam to version ${enumerationTeam.version}")
             }
         }
         else
@@ -37,7 +37,7 @@ class EnumerationTeamDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created EnumerationTeam with version ${enumerationTeam.version}")
+            DAO.log("Created EnumerationTeam with version ${enumerationTeam.version}")
         }
 
         for (latLon in enumerationTeam.polygon)

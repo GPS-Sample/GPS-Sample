@@ -31,7 +31,7 @@ class FieldDataOptionDAO(private var dao: DAO)
             if (shouldUpdate)
             {
                 updateFieldDataOption( fieldDataOption )
-                Log.d( "xxx", "Updated FieldDataOption to version ${fieldDataOption.version}")
+                DAO.log("Updated FieldDataOption to version ${fieldDataOption.version}")
             }
         }
         else
@@ -42,7 +42,7 @@ class FieldDataOptionDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created FieldDataOption with version ${fieldDataOption.version}")
+            DAO.log("Created FieldDataOption with version ${fieldDataOption.version}")
         }
 
         val fieldData = obj as? FieldData

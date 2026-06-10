@@ -33,7 +33,7 @@ class FilterDAO(private var dao: DAO)
         {
             updateFilter( filter, study )
             deleteAllFilterOperators(filter)
-            Log.d( "xxx", "Updated Filter with ID ${filter.uuid}")
+            DAO.log("Updated Filter with ID ${filter.uuid}")
         }
         else
         {
@@ -44,7 +44,7 @@ class FilterDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created Filter with ID ${filter.uuid}")
+            DAO.log("Created Filter with ID ${filter.uuid}")
         }
 
         filter.rule?.let{ rule ->

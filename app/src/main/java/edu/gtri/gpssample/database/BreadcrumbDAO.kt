@@ -19,7 +19,7 @@ class BreadcrumbDAO(private var dao: DAO)
             if (shouldUpdate)
             {
                 updateBreadcrumb( breadcrumb )
-                Log.d( "xxx", "Updated Breadcrumb to version ${breadcrumb.version}")
+                DAO.log("Updated Breadcrumb to version ${breadcrumb.version}")
             }
         }
         else
@@ -30,7 +30,7 @@ class BreadcrumbDAO(private var dao: DAO)
                 return null
             }
 
-            Log.d("xxx", "Created Breadcrumb with version ${breadcrumb.version}")
+            DAO.log("Created Breadcrumb with version ${breadcrumb.version}")
         }
 
         return breadcrumb

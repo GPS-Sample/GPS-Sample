@@ -23,7 +23,7 @@ class MapTileRegionDAO(private var dao: DAO)
                 if (mapTileRegion.doesNotEqual( existingMapTileRegion ))
                 {
                     updateMapTileRegion( mapTileRegion, enumArea )
-                    Log.d( "xxx", "Updated MapTileRegion with ID ${mapTileRegion.uuid}" )
+                    DAO.log("Updated MapTileRegion with ID ${mapTileRegion.uuid}" )
                 }
             }
         }
@@ -35,7 +35,7 @@ class MapTileRegionDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created MapTileRegion with ID ${mapTileRegion.uuid}" )
+            DAO.log("Created MapTileRegion with ID ${mapTileRegion.uuid}" )
         }
 
         return mapTileRegion

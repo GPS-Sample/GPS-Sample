@@ -35,7 +35,7 @@ class FieldDAO(private var dao: DAO)
             if (shouldUpdate)
             {
                 updateField( field, study )
-                Log.d( "xxx", "Updated Field to version ${field.version}")
+                DAO.log("Updated Field to version ${field.version}")
             }
         }
         else
@@ -46,7 +46,7 @@ class FieldDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created Field with version ${field.version}")
+            DAO.log("Created Field with version ${field.version}")
         }
 
         field.fields?.let { fields ->

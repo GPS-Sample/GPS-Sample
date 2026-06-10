@@ -32,7 +32,7 @@ class FieldDataDAO(private var dao: DAO)
             if (shouldUpdate)
             {
                 updateFieldData( fieldData )
-                Log.d( "xxx", "Updated FieldData to version ${fieldData.version}")
+                DAO.log("Updated FieldData to version ${fieldData.version}")
             }
         }
         else

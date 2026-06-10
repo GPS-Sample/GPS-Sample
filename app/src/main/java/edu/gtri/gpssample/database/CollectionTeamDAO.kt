@@ -26,7 +26,7 @@ class CollectionTeamDAO(private var dao: DAO)
             if (shouldUpdate)
             {
                 updateTeam( collectionTeam )
-                Log.d( "xxx", "Updated CollectionTeam to version ${collectionTeam.version}")
+                DAO.log("Updated CollectionTeam to version ${collectionTeam.version}")
             }
         }
         else
@@ -37,7 +37,7 @@ class CollectionTeamDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created CollectionTeam with version = ${collectionTeam.uuid}")
+            DAO.log("Created CollectionTeam with version = ${collectionTeam.version}")
         }
 
         for (latLon in collectionTeam.polygon)

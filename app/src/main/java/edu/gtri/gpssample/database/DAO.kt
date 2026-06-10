@@ -1179,6 +1179,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
+        fun log( msg: String )
+        {
+            Log.d( "xxx", msg )
+        }
+
         const val DATABASE_VERSION = 324
     }
 }

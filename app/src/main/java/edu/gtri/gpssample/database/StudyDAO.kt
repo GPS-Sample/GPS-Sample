@@ -33,7 +33,7 @@ class StudyDAO(private var dao: DAO)
             if (shouldUpdate)
             {
                 updateStudy( study )
-                Log.d( "xxx", "Updated Study to version ${study.version}")
+                DAO.log("Updated Study to version ${study.version}")
             }
         }
         else
@@ -44,7 +44,7 @@ class StudyDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created Study with version ${study.version}")
+            DAO.log("Created Study with version ${study.version}")
         }
 
         // add fields
