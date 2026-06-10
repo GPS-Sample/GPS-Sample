@@ -14,9 +14,6 @@ import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.PowerManager
-import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,9 +33,7 @@ import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.databinding.FragmentMainBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
@@ -92,18 +87,6 @@ class MainFragment : Fragment()
             findNavController().navigate(R.id.action_navigate_to_AboutFragment,bundle)
             return
         }
-
-//        if (DAO.userDAO.getUser("@test-admin") == null)
-//        {
-//            val x = id.toString()
-//            var p = "" + x.get(9)
-//            p += x.get(5)
-//            p += x.get(0)
-//            p += x.get(6)
-//
-//            val user = User( "@test-admin", p.toInt(), Role.Admin.value, "", "", false )
-//            DAO.userDAO.createUser( user )
-//        }
 
         var highestRole = Role.Undefined
 
@@ -336,31 +319,6 @@ class MainFragment : Fragment()
                     if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)
                     {
                         NotificationDialog(requireActivity(), resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement))
-//                        ConfirmationDialog( activity, resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement),
-//                            resources.getString(R.string.accept_privacy_policy), resources.getString(R.string.decline_privacy_policy), null, true, false ) { buttonPressed, tag ->
-//                            when( buttonPressed )
-//                            {
-//                                ConfirmationDialog.ButtonPress.Left -> {
-//                                    ConfirmationDialog( activity, resources.getString(R.string.enable_background_activity_title), resources.getString(R.string.enable_background_activity_body),
-//                                        resources.getString(R.string.open_settings), resources.getString(R.string.cancel), null, true, false ) { buttonPressed, tag ->
-//                                        when( buttonPressed )
-//                                        {
-//                                            ConfirmationDialog.ButtonPress.Left -> {
-//                                                requestIgnoreBatteryOptimizationsIfNeeded()
-//                                            }
-//                                            ConfirmationDialog.ButtonPress.Right -> {
-//                                            }
-//                                            ConfirmationDialog.ButtonPress.None -> {
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                                ConfirmationDialog.ButtonPress.Right -> {
-//                                }
-//                                ConfirmationDialog.ButtonPress.None -> {
-//                                }
-//                            }
-//                        }
                     }
                 }
             }
@@ -377,26 +335,6 @@ class MainFragment : Fragment()
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.MainFragment.value.toString() + ": " + this.javaClass.simpleName
-    }
-
-    private fun requestIgnoreBatteryOptimizationsIfNeeded()
-    {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
-
-        val context = requireContext()
-        val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-
-        if (pm.isIgnoringBatteryOptimizations(context.packageName)) return
-
-        val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-
-        try {
-            requireActivity().startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            startActivity(
-                Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-            )
-        }
     }
 
     private fun allRuntimePermissionsGranted(): Boolean {
@@ -416,13 +354,9 @@ class MainFragment : Fragment()
             }
         }
 
-        if (permissionsToRequest.isNotEmpty()) {
+        if (permissionsToRequest.isNotEmpty())
+        {
             requestPermissions( permissionsToRequest.toTypedArray(), REQUEST_CODE)
-//            requestPermissions(
-//                activity as AppCompatActivity,
-//                permissionsToRequest.toTypedArray(),
-//                REQUEST_CODE
-//            )
         }
 
         if (isPermissionGranted( activity as AppCompatActivity, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -433,17 +367,6 @@ class MainFragment : Fragment()
                 requestPermissions( arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION), 1001 )
             }
         }
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            val intent = Intent()
-//            val packageName = requireContext().packageName
-//            val pm = requireContext().getSystemService(PowerManager::class.java)
-//            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-//                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-//                intent.data = Uri.parse("package:$packageName")
-//                startActivity(intent)
-//            }
-//        }
     }
 
     private fun isPermissionGranted(context: Context, permission: String): Boolean
@@ -454,22 +377,6 @@ class MainFragment : Fragment()
         }
 
         return false
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == 1001) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d("xxx", "✅ Background permission granted")
-            } else {
-                Log.d("xxx", "❌ Background permission denied")
-            }
-        }
     }
 
     override fun onDestroyView()
