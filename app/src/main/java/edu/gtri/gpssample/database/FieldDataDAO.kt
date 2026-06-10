@@ -43,7 +43,7 @@ class FieldDataDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created FieldData with version ${fieldData.version}" )
+            DAO.log("Created FieldData with version ${fieldData.version}" )
         }
 
         for (fieldDataOption in fieldData.fieldDataOptions)
