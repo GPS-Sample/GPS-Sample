@@ -41,17 +41,6 @@ class LocationDAO(private var dao: DAO)
                 Log.d( "xxx", "Updated Location to version ${location.version}" )
             }
         }
-
-        if (dao.exists(DAO.TABLE_LOCATION, DAO.COLUMN_UUID, location.uuid ))
-        {
-            getLocation( location.uuid )?.let { existingLocation ->
-                if (location.doesNotEqual( existingLocation ))
-                {
-                    updateLocation( location )
-                    Log.d( "xxx", "Updated Location with ID ${location.uuid}" )
-                }
-            }
-        }
         else
         {
             if (location.altitude.isNaN())
