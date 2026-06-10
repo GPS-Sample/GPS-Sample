@@ -40,7 +40,7 @@ class ConfigDAO(private var dao: DAO)
 
         dao.writableDatabase.beginTransaction()
 
-        val (exists, shouldUpdate) = existingConfig(config )
+        val (exists, shouldUpdate) = getExistingInfo(config )
 
         if (exists)
         {
@@ -78,7 +78,7 @@ class ConfigDAO(private var dao: DAO)
     }
 
     @SuppressLint("Range")
-    fun existingConfig( newConfig: Config ): Pair<Boolean, Boolean>
+    fun getExistingInfo( newConfig: Config ): Pair<Boolean, Boolean>
     {
         val query = """
             SELECT ${DAO.COLUMN_VERSION}, ${DAO.COLUMN_CONFIG_VALID_USERS}
@@ -138,72 +138,6 @@ class ConfigDAO(private var dao: DAO)
         }
 
         return Pair(true, shouldUpdate )
-    }
-
-    @SuppressLint("Range")
-    fun shouldUpdateXXX( newConfig: Config ) : Boolean
-    {
-        var should_update = false
-
-        // get minimal old config info
-        val query = """
-        SELECT ${DAO.COLUMN_VERSION}, ${DAO.COLUMN_CONFIG_VALID_USERS}
-        FROM ${DAO.TABLE_CONFIG}
-        WHERE ${DAO.COLUMN_UUID} = ?
-        """.trimIndent()
-
-        dao.readableDatabase.rawQuery(query, arrayOf(newConfig.uuid)).use { cursor ->
-            cursor.moveToFirst()
-
-            val oldVersion = cursor.getString(0 )
-            val oldValidUsers = cursor.getString(1 )
-
-            if (newConfig.version != oldVersion)
-            {
-                should_update = true
-                Log.d( "xxx", "version changed" )
-            }
-
-            if (newConfig.validUsers.trim().length != oldValidUsers.trim().length)
-            {
-                should_update = true
-                Log.d( "xxx", "validUsers changed" )
-
-                Log.d( "xxx", "[${newConfig.validUsers.trim()}]")
-                Log.d( "xxx", "[${oldValidUsers.trim()}]")
-
-                // combine old & new users
-
-                val oldUsers = oldValidUsers.split(" " )
-                val newUsers = newConfig.validUsers.split(" " )
-
-                newConfig.validUsers = ""
-
-                for (user in oldUsers)
-                {
-                    val trimmedUser = user.trim()
-                    if (!newConfig.validUsers.contains(trimmedUser ))
-                    {
-                        newConfig.validUsers += "$trimmedUser "
-                    }
-                }
-
-                for (user in newUsers)
-                {
-                    val trimmedUser = user.trim()
-                    if (!newConfig.validUsers.contains(trimmedUser ))
-                    {
-                        newConfig.validUsers += "$trimmedUser "
-                    }
-                }
-
-                newConfig.validUsers = newConfig.validUsers.trim()
-
-                Log.d( "xxx", "[${newConfig.validUsers}]")
-            }
-        }
-
-        return should_update
     }
 
     fun updateConfig( config: Config )
