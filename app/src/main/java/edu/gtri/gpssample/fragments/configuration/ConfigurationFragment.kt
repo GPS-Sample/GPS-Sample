@@ -94,7 +94,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
     {
         super.onViewCreated(view, savedInstanceState)
 
-        if ((requireActivity().application as MainApplication).user == null)
+        if (sharedViewModel.currentConfiguration == null || (requireActivity().application as MainApplication).user == null)
         {
             findNavController().navigate(R.id.action_navigate_to_MainFragment, null,
                 NavOptions.Builder()
