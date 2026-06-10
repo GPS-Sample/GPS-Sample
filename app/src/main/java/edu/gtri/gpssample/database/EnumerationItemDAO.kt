@@ -25,7 +25,7 @@ class EnumerationItemDAO(private var dao: DAO)
     {
         enumerationItem.version = version
 
-        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_STUDY, enumerationItem.uuid, version )
+        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_ENUMERATION_ITEM, enumerationItem.uuid, version )
 
         if (exists)
         {

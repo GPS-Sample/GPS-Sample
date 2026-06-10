@@ -20,7 +20,7 @@ class FieldOptionDAO(private var dao: DAO)
     {
         fieldOption.version = version
 
-        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD_OPTION, field.uuid, version )
+        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD_OPTION, fieldOption.uuid, version )
 
         if (exists)
         {
