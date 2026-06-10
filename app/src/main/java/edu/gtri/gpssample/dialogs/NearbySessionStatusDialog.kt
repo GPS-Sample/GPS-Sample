@@ -3,6 +3,7 @@ package edu.gtri.gpssample.dialogs
 import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -18,10 +19,15 @@ class NearbySessionStatusDialog
     }
 
     private lateinit var view: View
+    private lateinit var doneButtonText: String
+    private lateinit var cancelButtonText: String
     private lateinit var alertDialog: AlertDialog
 
-    constructor( context: Context?, title: String, completion: (()->Unit) )
+    constructor( context: Context, title: String, completion: (()->Unit) )
     {
+        this.doneButtonText = context.resources.getString(R.string.done )
+        this.cancelButtonText = context.resources.getString( R.string.cancel )
+
         val inflater = LayoutInflater.from(context)
 
         view = inflater.inflate(R.layout.dialog_nearby_session_status, null)
@@ -48,6 +54,16 @@ class NearbySessionStatusDialog
     fun dismiss()
     {
         alertDialog.dismiss()
+    }
+
+    fun showDoneButton()
+    {
+        view.findViewById<Button>(R.id.done_button ).text = doneButtonText
+    }
+
+    fun showCancelButton()
+    {
+        view.findViewById<Button>(R.id.done_button ).text = cancelButtonText
     }
 
     fun setStatus( status: String )

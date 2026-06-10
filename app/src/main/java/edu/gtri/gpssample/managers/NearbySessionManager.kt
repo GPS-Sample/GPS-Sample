@@ -175,14 +175,15 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
                             qrgEncoder.colorBlack = Color.WHITE;
                             qrgEncoder.colorWhite = Color.BLACK;
                             nearbySessionStatusDialog.showQrCode( qrgEncoder.bitmap )
+                            nearbySessionStatusDialog.showDoneButton()
                         }
 
                         NearbySessionState.Connecting -> {
-                            nearbySessionStatusDialog.setStatus( "Connecting..." )
                         }
 
                         NearbySessionState.Connected -> {
                             nearbySessionStatusDialog.setStatus( "Connected." )
+                            nearbySessionStatusDialog.showCancelButton()
                         }
 
                         NearbySessionState.Idle -> {
@@ -193,7 +194,6 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
                         }
 
                         NearbySessionState.Closed -> {
-                            nearbySessionStatusDialog.setStatus( "Closed." )
                         }
                     }
                 }
@@ -246,12 +246,6 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
 
                     when (state) {
                         is NearbySessionState.Advertising -> {
-                            Log.d( "xxx", "creating barcode" )
-                            val qrgEncoder = QRGEncoder(state.sessionId, null, QRGContents.Type.TEXT, 400 )
-                            qrgEncoder.colorBlack = Color.WHITE;
-                            qrgEncoder.colorWhite = Color.BLACK;
-                            nearbySessionStatusDialog.showQrCode( qrgEncoder.bitmap )
-                            Log.d( "xxx", "done" )
                         }
 
                         NearbySessionState.Connecting -> {
@@ -259,6 +253,7 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
                         }
 
                         NearbySessionState.Connected -> {
+                            nearbySessionStatusDialog.showCancelButton()
                             nearbySessionStatusDialog.setStatus( "Connected." )
                             sleep(1000 )
                             nearbySessionStatusDialog.setStatus( "Requesting Configuration..." )
@@ -395,7 +390,7 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
 
         override fun onDisconnected(endpointId: String)
         {
-            Log.d( "xxx", "Connection Disconnected" )
+            Log.d( "xxx", "hostConnectionCallback: Connection Disconnected" )
 
             stopHosting()
             startHosting()
@@ -426,7 +421,7 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
 
         override fun onDisconnected(endpointId: String)
         {
-            Log.d( "xxx", "Connection Disconnected" )
+            Log.d( "xxx", "clientConnectionCallback: Connection Disconnected" )
             connectedEndpointId = null
             _nearbySessionState.value = NearbySessionState.Idle
         }
@@ -457,7 +452,6 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
                     }
                 }
                 Command.DONE -> {
-                    nearbySessionStatusDialog?.setStatus( "Done." )
                     client.disconnectFromEndpoint(endpointId)
                 }
             }
