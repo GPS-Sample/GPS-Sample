@@ -349,6 +349,8 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
     {
         sendRequest(Request(Command.DONE))
 
+        client.stopDiscovery()
+
         connectedEndpointId?.let {
             client.disconnectFromEndpoint(it)
         }
@@ -405,13 +407,13 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
     {
         override fun onConnectionInitiated( endpointId: String, connectionInfo: ConnectionInfo )
         {
-            Log.d( "xxx", "Connection Accepted" )
+            Log.d( "xxx", "clientConnectionCallback: Connection Accepted" )
             client.acceptConnection(endpointId, clientPayloadCallback )
         }
 
         override fun onConnectionResult( endpointId: String, result: ConnectionResolution )
         {
-            Log.d( "xxx", "Connection Result Received" )
+            Log.d( "xxx", "clientConnectionCallback: Connection Result Received" )
             if (result.status.isSuccess)
             {
                 connectedEndpointId = endpointId
@@ -503,7 +505,9 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
 
         lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
-                json.encodeToStream(Config.serializer(), config!!, output )
+                json.encodeToStream(Config.serializer(), config!!, output)
+            } catch( ex: Exception ) {
+                Log.d( "xxx", ex.stackTraceToString())
             } finally {
                 output.close()
             }
@@ -538,12 +542,14 @@ class NearbySessionManager( private val context: Context, private val lifecycleO
     private fun receiveConfig(input: InputStream)
     {
         lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val config = json.decodeFromStream(
-                Config.serializer(),
-                input
-            )
-
-            configDeferred?.complete(config)
+            try {
+                val config = json.decodeFromStream(Config.serializer(),input )
+                configDeferred?.complete(config )
+            }
+            catch( ex: Exception )
+            {
+                Log.d( "xxx", ex.stackTraceToString())
+            }
         }
     }
 
