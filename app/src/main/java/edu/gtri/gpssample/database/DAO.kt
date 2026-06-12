@@ -462,11 +462,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         return readableDatabase.rawQuery(query, arrayOf(uuid)).use { cursor ->
             if (cursor.moveToFirst()) {
                 val oldVersion = cursor.getString(0 )
-                if (oldVersion != newVersion)
-                {
-                    Log.d( "xxx", "$table: old version: $oldVersion")
-                    Log.d( "xxx", "$table: new version: $newVersion")
-                }
                 Pair(true, oldVersion != newVersion )
             } else {
                 Pair(false, false)

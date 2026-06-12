@@ -87,6 +87,7 @@ class BlockFieldAdapter( val parentFieldIndex: Int, val editMode: Boolean, val c
 
                 editText.doAfterTextChanged {
                     fieldData.textValue = it.toString()
+                    fieldData.version = UUID.randomUUID().toString()
                 }
 
                 if (!editMode)
@@ -121,6 +122,7 @@ class BlockFieldAdapter( val parentFieldIndex: Int, val editMode: Boolean, val c
                     if (it.toString().isNotEmpty())
                     {
                         fieldData.numberValue = it.toString().toDouble()
+                        fieldData.version = UUID.randomUUID().toString()
                     }
                 }
 
@@ -203,7 +205,10 @@ class BlockFieldAdapter( val parentFieldIndex: Int, val editMode: Boolean, val c
                             {
                                 fieldData.dropdownIndex = position-1
                                 fieldData.textValue = field.fieldOptions[position-1].name
-                            }                        }
+                            }
+
+                            fieldData.version = UUID.randomUUID().toString()
+                        }
 
                         override fun onNothingSelected(parent: AdapterView<*>)
                         {
@@ -323,6 +328,7 @@ class BlockFieldAdapter( val parentFieldIndex: Int, val editMode: Boolean, val c
 
             fieldData?.let{ fieldData ->
                 fieldData.dateValue = date.time
+                fieldData.version = UUID.randomUUID().toString()
                 editText?.let { editText ->
                     displayDate( date, field, fieldData, editText )
                 }
@@ -338,6 +344,7 @@ class BlockFieldAdapter( val parentFieldIndex: Int, val editMode: Boolean, val c
     {
         fieldData?.let { fieldData ->
             fieldData.dateValue = date.time
+            fieldData.version = UUID.randomUUID().toString()
             editText?.let { editText ->
                 displayDate( date, field, fieldData, editText )
             }

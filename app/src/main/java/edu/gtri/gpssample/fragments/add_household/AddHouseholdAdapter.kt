@@ -234,6 +234,7 @@ class AddHouseholdAdapter( val recyclerView: RecyclerView, val editMode: Boolean
 
                 editText.doAfterTextChanged {
                     fieldData.textValue = it.toString()
+                    fieldData.version = UUID.randomUUID().toString()
                 }
 
                 if (!editMode)
@@ -292,6 +293,7 @@ class AddHouseholdAdapter( val recyclerView: RecyclerView, val editMode: Boolean
                         else
                         {
                             fieldData.numberValue = editable.toString().toDouble()
+                            fieldData.version = UUID.randomUUID().toString()
                         }
                     }
                 }
@@ -385,6 +387,8 @@ class AddHouseholdAdapter( val recyclerView: RecyclerView, val editMode: Boolean
                                 fieldData.dropdownIndex = position-1
                                 fieldData.textValue = field.fieldOptions[position-1].name
                             }
+
+                            fieldData.version = UUID.randomUUID().toString()
                         }
 
                         override fun onNothingSelected(parent: AdapterView<*>)
@@ -422,6 +426,7 @@ class AddHouseholdAdapter( val recyclerView: RecyclerView, val editMode: Boolean
                 }
             }
         }
+
         frameLayout?.let { layout ->
             layout.visibility = View.VISIBLE
             val titleView = layout.findViewById<TextView>(R.id.title_text_view)
@@ -469,6 +474,7 @@ class AddHouseholdAdapter( val recyclerView: RecyclerView, val editMode: Boolean
 
             fieldData?.let { fieldData ->
                 fieldData.dateValue = date.time
+                fieldData.version = UUID.randomUUID().toString()
                 editText?.let { editText ->
                     displayDate( date, field, fieldData, editText )
                 }
@@ -484,6 +490,7 @@ class AddHouseholdAdapter( val recyclerView: RecyclerView, val editMode: Boolean
     {
         fieldData?.let { fieldData ->
             fieldData.dateValue = date.time
+            fieldData.version = UUID.randomUUID().toString()
             editText?.let { editText ->
                 displayDate( date, field, fieldData, editText )
             }

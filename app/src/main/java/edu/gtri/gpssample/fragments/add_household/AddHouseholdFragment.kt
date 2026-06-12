@@ -582,7 +582,7 @@ class AddHouseholdFragment : Fragment(),
 
         enumerationItem.enumerationNotes = notes
         enumerationItem.enumerationDate = Date().time
-        enumerationItem.syncCode = enumerationItem.syncCode + 1
+        enumerationItem.version = UUID.randomUUID().toString()
         enumerationItem.subAddress = binding.subaddressEditText.text.toString()
 
         if (location.properties.isNotEmpty())

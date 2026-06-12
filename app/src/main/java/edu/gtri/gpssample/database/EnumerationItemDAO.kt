@@ -71,7 +71,6 @@ class EnumerationItemDAO(private var dao: DAO)
             val values = ContentValues()
             putEnumerationItem( enumerationItem, location, values )
             dao.writableDatabase.update(DAO.TABLE_ENUMERATION_ITEM, values, whereClause, args )
-            Log.d( "xxx", "Updated EnumerationItem with ID ${enumerationItem.uuid}" )
         }
     }
 

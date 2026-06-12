@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.FieldDataOption
 import edu.gtri.gpssample.database.models.FieldOption
+import java.util.UUID
 
 class CheckboxOptionAdapter( val editMode: Boolean, var fieldDataOptions: List<FieldDataOption>) : RecyclerView.Adapter<CheckboxOptionAdapter.ViewHolder>()
 {
@@ -69,6 +70,7 @@ class CheckboxOptionAdapter( val editMode: Boolean, var fieldDataOptions: List<F
                 override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
                 {
                     fieldDataOption.value = isChecked
+                    fieldDataOption.version = UUID.randomUUID().toString()
                 }
             })
         }
