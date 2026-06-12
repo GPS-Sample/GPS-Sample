@@ -29,7 +29,9 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -52,7 +54,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
-import edu.gtri.gpssample.managers.NearbySessionManager
+import edu.gtri.gpssample.managers.NearbySessionHostManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
@@ -80,7 +82,6 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var defaultColorList: ColorStateList
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel: ConfigurationViewModel
-    private lateinit var nearbySessionManager: NearbySessionManager
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
 
@@ -97,7 +98,8 @@ class PerformCollectionFragment : Fragment(),
     private val enumerationItems = ArrayList<EnumerationItem>()
     private var includeConfig = false
     private var includeImages = false
-
+    private var nearbySessionHostManager: NearbySessionHostManager? = null
+    private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -618,18 +620,25 @@ class PerformCollectionFragment : Fragment(),
                         when( buttonPressed )
                         {
                             ConfirmationDialog.ButtonPress.Left -> {
-                                sharedViewModel.currentConfiguration?.value?.let { config ->
-                                    nearbySessionManager = NearbySessionManager(requireContext(), viewLifecycleOwner, config )
-
-                                    val nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
-                                        nearbySessionManager.stopHosting()
-                                    }
-
-                                    nearbySessionManager.handleNearbySessionStatusForHost( nearbySessionStatusDialog )
-
-                                    nearbySessionManager.startHosting()
+                                nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
+                                    nearbySessionHostManager?.stopHosting()
+                                    nearbySessionStatusDialog = null
                                 }
+
+                                nearbySessionHostManager = NearbySessionHostManager( requireContext().applicationContext, config )
+
+                                viewLifecycleOwner.lifecycleScope.launch {
+                                    repeatOnLifecycle(Lifecycle.State.STARTED )
+                                    {
+                                        nearbySessionHostManager?.state?.collect { state ->
+                                            nearbySessionStatusDialog?.updateState(state)
+                                        }
+                                    }
+                                }
+
+                                nearbySessionHostManager?.startHosting()
                             }
+
                             ConfirmationDialog.ButtonPress.Right -> {
                                 val items = ArrayList<String>()
                                 items.add( "Configuration Files" )
@@ -1430,18 +1439,25 @@ class PerformCollectionFragment : Fragment(),
 
         binding.recyclerView.adapter = null
 
+        nearbySessionStatusDialog?.dismiss()
+        nearbySessionStatusDialog = null
+
+        nearbySessionHostManager?.stopHosting()
+
         if (this::fusedLocationClient.isInitialized)
         {
             fusedLocationClient.removeLocationUpdates( locationCallback )
         }
 
-        if (this::nearbySessionManager.isInitialized)
-        {
-            nearbySessionManager.stopHosting()
-        }
-
         _binding = null
 
         super.onDestroyView()
+    }
+
+    override fun onDestroy()
+    {
+        nearbySessionHostManager?.stopHosting()
+
+        super.onDestroy()
     }
 }

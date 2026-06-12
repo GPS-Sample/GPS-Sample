@@ -16,7 +16,9 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.*
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -33,9 +35,9 @@ import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.dialogs.InputDialog
-import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
-import edu.gtri.gpssample.managers.NearbySessionManager
+import edu.gtri.gpssample.dialogs.NotificationDialog
+import edu.gtri.gpssample.managers.NearbySessionClientManager
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
@@ -52,8 +54,9 @@ class ManageConfigurationsFragment : Fragment()
     private val binding get() = _binding!!
     private var minimalConfigurations = ArrayList<Config>()
     private var encryptionPassword = ""
+    private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
+    private var nearbySessionClientManager: NearbySessionClientManager? = null
 
-    private lateinit var nearbySessionManager: NearbySessionManager
     private lateinit var user: User
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
     private lateinit var sharedViewModel: ConfigurationViewModel
@@ -401,44 +404,46 @@ class ManageConfigurationsFragment : Fragment()
     {
         if (it.resultCode == ResultCode.BarcodeScanned.value)
         {
-            val sessionId = it.data!!.getStringExtra(Keys.kPayload.value )
+            // payload contains the sessionId
+            it.data!!.getStringExtra(Keys.kPayload.value )?.let { sessionId ->
+                nearbySessionClientManager = NearbySessionClientManager( requireContext().applicationContext )
 
-            nearbySessionManager = NearbySessionManager(requireContext(), viewLifecycleOwner, null )
-
-            val nearbySessionStatusDialog = NearbySessionStatusDialog( requireContext(), resources.getString( R.string.import_configuration )) {
-                nearbySessionManager.clientClose()
-            }
-
-            nearbySessionManager.handleNearbySessionStatusForClient( nearbySessionStatusDialog ) { config ->
-
-                nearbySessionManager.clientClose()
-
-                nearbySessionStatusDialog.setStatus( "Saving Configuration..." )
+                nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(),getString(R.string.import_configuration))
+                {
+                    nearbySessionClientManager?.cancel()
+                }
 
                 viewLifecycleOwner.lifecycleScope.launch {
-                    withContext(Dispatchers.IO) {
-                        DAO.configDAO.createOrUpdateConfig( config, config.version )
+                    repeatOnLifecycle(Lifecycle.State.STARTED )
+                    {
+                        nearbySessionClientManager?.state?.collect { state ->
+                            nearbySessionStatusDialog?.updateState(state)
+                        }
                     }
+                }
 
-                    // back on the main thread...
-                    nearbySessionStatusDialog.dismiss()
+                nearbySessionClientManager?.connect( sessionId ) { config ->
+                    nearbySessionStatusDialog?.setStatus( "Saving Configuration..." )
 
-                    minimalConfigurations.find { it.uuid == config.uuid } ?.let {
-                        minimalConfigurations.remove(it )
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        withContext(Dispatchers.IO) {
+                            DAO.configDAO.createOrUpdateConfig( config,config.version )
+                        }
+
+                        // back on the main thread...
+                        nearbySessionStatusDialog?.dismiss()
+
+                        minimalConfigurations.find { it.uuid == config.uuid } ?.let {
+                            minimalConfigurations.remove(it )
+                        }
+
+                        minimalConfigurations.add( config )
+                        manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
+
+                        didReceiveConfiguration( config )
                     }
-
-                    minimalConfigurations.add( config )
-                    manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
-
-                    // make this a minimal config!
-                    config.studies.clear()
-                    config.enumAreas.clear()
-
-                    didReceiveConfiguration( config )
                 }
             }
-
-            nearbySessionManager.clientConnect(sessionId!! )
         }
     }
 
@@ -462,7 +467,7 @@ class ManageConfigurationsFragment : Fragment()
 
         viewLifecycleOwner.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                // make sure this is really a minimal config
+                // get the full config, if necessary
                 if (minimalConfig.studies.isEmpty() && minimalConfig.enumAreas.isEmpty())
                 {
                     // get the full config...
@@ -659,9 +664,21 @@ class ManageConfigurationsFragment : Fragment()
 
     override fun onDestroyView()
     {
+        nearbySessionStatusDialog?.dismiss()
+        nearbySessionStatusDialog = null
+
+        nearbySessionClientManager?.cancel()
+
         binding.recyclerView.adapter = null
         _binding = null
 
         super.onDestroyView()
+    }
+
+    override fun onDestroy()
+    {
+        nearbySessionClientManager?.shutdown()
+
+        super.onDestroy()
     }
 }

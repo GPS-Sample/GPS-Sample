@@ -31,7 +31,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -51,7 +53,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
-import edu.gtri.gpssample.managers.NearbySessionManager
+import edu.gtri.gpssample.managers.NearbySessionHostManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
@@ -60,8 +62,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.osmdroid.events.MapListener
-import org.osmdroid.events.ScrollEvent
-import org.osmdroid.events.ZoomEvent
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -79,7 +79,6 @@ class PerformEnumerationFragment : Fragment(),
     private lateinit var enumerationTeam: EnumerationTeam
     private lateinit var defaultColorList : ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
-    private lateinit var nearbySessionManager: NearbySessionManager
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
 
     private var osmMapListener: MapListener? = null
@@ -96,6 +95,8 @@ class PerformEnumerationFragment : Fragment(),
     private var includeConfig = false
     private var includeImages = false
     private var maxSubaddress = 0
+    private var nearbySessionHostManager: NearbySessionHostManager? = null
+    private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -529,16 +530,25 @@ class PerformEnumerationFragment : Fragment(),
                     when( buttonPressed )
                     {
                         ConfirmationDialog.ButtonPress.Left -> {
-                            nearbySessionManager = NearbySessionManager(requireContext(), viewLifecycleOwner, config )
-
-                            val nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
-                                nearbySessionManager.stopHosting()
+                            nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
+                                nearbySessionHostManager?.stopHosting()
+                                nearbySessionStatusDialog = null
                             }
 
-                            nearbySessionManager.handleNearbySessionStatusForHost( nearbySessionStatusDialog )
+                            nearbySessionHostManager = NearbySessionHostManager( requireContext().applicationContext, config )
 
-                            nearbySessionManager.startHosting()
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                repeatOnLifecycle(Lifecycle.State.STARTED )
+                                {
+                                    nearbySessionHostManager?.state?.collect { state ->
+                                        nearbySessionStatusDialog?.updateState(state)
+                                    }
+                                }
+                            }
+
+                            nearbySessionHostManager?.startHosting()
                         }
+
                         ConfirmationDialog.ButtonPress.Right -> {
                             val items = ArrayList<String>()
                             items.add( "Configuration Files" )
@@ -1629,19 +1639,26 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.recyclerView.adapter = null
 
+        nearbySessionStatusDialog?.dismiss()
+        nearbySessionStatusDialog = null
+
+        nearbySessionHostManager?.stopHosting()
+
         if (LocationService.started)
         {
             val intent = Intent(activity!!, LocationService::class.java)
             activity!!.stopService( intent )
         }
 
-        if (this::nearbySessionManager.isInitialized)
-        {
-            nearbySessionManager.stopHosting()
-        }
-
         _binding = null
 
         super.onDestroyView()
+    }
+
+    override fun onDestroy()
+    {
+        nearbySessionHostManager?.stopHosting()
+
+        super.onDestroy()
     }
 }

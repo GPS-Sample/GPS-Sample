@@ -22,7 +22,9 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -47,7 +49,8 @@ import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
 import edu.gtri.gpssample.managers.MapManager
-import edu.gtri.gpssample.managers.NearbySessionManager
+import edu.gtri.gpssample.managers.NearbySessionClientManager
+import edu.gtri.gpssample.managers.NearbySessionHostManager
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.coroutines.Dispatchers
@@ -64,8 +67,10 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
     private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
-    private lateinit var nearbySessionManager: NearbySessionManager
 
+    private var nearbySessionHostManager: NearbySessionHostManager? = null
+    private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
+    private var nearbySessionClientManager: NearbySessionClientManager? = null
     private var osmMapListener: MapListener? = null
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
@@ -200,7 +205,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                             {
                                 enumArea.selectedEnumerationTeamUuid = ""
                                 enumArea.selectedCollectionTeamUuid = ""
-                                DAO.enumAreaDAO.loadLazyLocations( enumArea )
+                                DAO.enumAreaDAO.loadLazyLocations( enumArea ) // if needed
                             }
                         }
 
@@ -211,16 +216,25 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                         when( buttonPressed )
                         {
                             ConfirmationDialog.ButtonPress.Left -> {
-                                nearbySessionManager = NearbySessionManager(requireContext(), viewLifecycleOwner, config )
-
-                                val nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
-                                    nearbySessionManager.stopHosting()
+                                nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
+                                    nearbySessionHostManager?.stopHosting()
+                                    nearbySessionStatusDialog = null
                                 }
 
-                                nearbySessionManager.handleNearbySessionStatusForHost( nearbySessionStatusDialog )
+                                nearbySessionHostManager = NearbySessionHostManager( requireContext().applicationContext, config )
 
-                                nearbySessionManager.startHosting()
+                                viewLifecycleOwner.lifecycleScope.launch {
+                                    repeatOnLifecycle(Lifecycle.State.STARTED )
+                                    {
+                                        nearbySessionHostManager?.state?.collect { state ->
+                                            nearbySessionStatusDialog?.updateState(state)
+                                        }
+                                    }
+                                }
+
+                                nearbySessionHostManager?.startHosting()
                             }
+
                             ConfirmationDialog.ButtonPress.Right -> {
                                 val items = ArrayList<String>()
                                 items.add( "Configuration Files" )
@@ -405,35 +419,41 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
     {
         if (it.resultCode == ResultCode.BarcodeScanned.value)
         {
-            val sessionId = it.data!!.getStringExtra(Keys.kPayload.value )
+            // payload contains the sessionId
+            it.data!!.getStringExtra(Keys.kPayload.value )?.let { sessionId ->
+                nearbySessionClientManager = NearbySessionClientManager( requireContext().applicationContext )
 
-            nearbySessionManager = NearbySessionManager(requireContext(), viewLifecycleOwner, null )
-
-            val nearbySessionStatusDialog = NearbySessionStatusDialog( requireContext(), resources.getString( R.string.import_configuration )) {
-                nearbySessionManager.clientClose()
-            }
-
-            nearbySessionManager.handleNearbySessionStatusForClient( nearbySessionStatusDialog ) { config ->
-
-                nearbySessionManager.clientClose()
-
-                nearbySessionStatusDialog.setStatus( "Saving Configuration..." )
+                nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(),getString(R.string.import_configuration))
+                {
+                    nearbySessionClientManager?.cancel()
+                }
 
                 viewLifecycleOwner.lifecycleScope.launch {
-                    withContext(Dispatchers.IO) {
-                        DAO.configDAO.createOrUpdateConfig( config,config.version )
+                    repeatOnLifecycle(Lifecycle.State.STARTED )
+                    {
+                        nearbySessionClientManager?.state?.collect { state ->
+                            nearbySessionStatusDialog?.updateState(state)
+                        }
                     }
+                }
 
-                    // back on the main thread...
-                    nearbySessionStatusDialog.dismiss()
+                nearbySessionClientManager?.connect( sessionId ) { config ->
+                    nearbySessionStatusDialog?.setStatus( "Saving Configuration..." )
 
-                    sharedViewModel.setCurrentConfig( config )
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        withContext(Dispatchers.IO) {
+                            DAO.configDAO.createOrUpdateConfig( config,config.version )
+                        }
 
-                    refreshView( config )
+                        // back on the main thread...
+                        nearbySessionStatusDialog?.dismiss()
+
+                        sharedViewModel.setCurrentConfig( config )
+
+                        refreshView( config )
+                    }
                 }
             }
-
-            nearbySessionManager.clientConnect(sessionId!! )
         }
     }
 
@@ -627,19 +647,26 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
             osmMapListener = null
         }
 
+        nearbySessionStatusDialog?.dismiss()
+        nearbySessionStatusDialog = null
+
+        nearbySessionHostManager?.stopHosting()
+        nearbySessionClientManager?.cancel()
+
         sharedViewModel.currentFragment = null
-
-        if (this::nearbySessionManager.isInitialized)
-        {
-            nearbySessionManager.stopHosting()
-        }
-
         binding.enumAreasRecycler.adapter = null
         binding.studiesRecycler.adapter = null
-
 
         _binding = null
 
         super.onDestroyView()
+    }
+
+    override fun onDestroy()
+    {
+        nearbySessionHostManager?.stopHosting()
+        nearbySessionClientManager?.shutdown()
+
+        super.onDestroy()
     }
 }

@@ -2,15 +2,17 @@ package edu.gtri.gpssample.dialogs
 
 import android.app.AlertDialog
 import android.content.Context
-import android.graphics.Bitmap
-import android.util.Log
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidmads.library.qrgenearator.QRGContents
+import androidmads.library.qrgenearator.QRGEncoder
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.managers.NearbySessionState
 
 class NearbySessionStatusDialog
 {
@@ -81,8 +83,12 @@ class NearbySessionStatusDialog
         imageView.visibility = View.GONE
     }
 
-    fun showQrCode( bitmap: Bitmap )
+    fun showQrCode( sessionId: String )
     {
+        val qrgEncoder = QRGEncoder(sessionId, null, QRGContents.Type.TEXT, 500 )
+        qrgEncoder.colorBlack = Color.WHITE;
+        qrgEncoder.colorWhite = Color.BLACK;
+
         val doneButton = view.findViewById<Button>(R.id.done_button)
         doneButton.visibility = View.VISIBLE
 
@@ -91,6 +97,61 @@ class NearbySessionStatusDialog
 
         val imageView = view.findViewById<ImageView>( R.id.image_view)
         imageView.visibility = View.VISIBLE
-        imageView.setImageBitmap( bitmap )
+        imageView.setImageBitmap( qrgEncoder.bitmap )
+    }
+
+    fun updateState( state: NearbySessionState ) {
+
+        when (state) {
+
+            NearbySessionState.Connecting -> {
+                setStatus("Connecting...")
+            }
+
+            NearbySessionState.Connected -> {
+                setStatus("Connected.")
+                showCancelButton()
+            }
+
+            NearbySessionState.SendingConfig -> {
+                setStatus("Sending Config...")
+                showCancelButton()
+            }
+
+            NearbySessionState.ReceivingConfig -> {
+                setStatus("Receiving Config...")
+                showCancelButton()
+            }
+
+            NearbySessionState.ReceivingImages -> {
+                setStatus("Receiving Images...")
+                showCancelButton()
+            }
+
+            NearbySessionState.SendingImage -> {
+                setStatus("Sending Image...")
+                showCancelButton()
+            }
+
+            NearbySessionState.Done -> {
+                setStatus("Done.")
+                showCancelButton()
+            }
+
+            NearbySessionState.Idle -> {
+            }
+
+            is NearbySessionState.Error -> {
+                setStatus(state.message)
+            }
+
+            NearbySessionState.Closed -> {
+                setStatus("Closed")
+            }
+
+            is NearbySessionState.Advertising -> {
+                showQrCode( state.sessionId )
+            }
+        }
     }
 }
