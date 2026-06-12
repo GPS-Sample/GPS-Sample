@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.managers
 
 import android.content.Context
+import android.util.Log
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import edu.gtri.gpssample.database.ImageDAO
@@ -11,6 +12,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToStream
 import java.io.*
@@ -214,24 +216,28 @@ class NearbySessionHostManager( private val context: Context, private val config
         {
             if (payload.type != Payload.Type.BYTES) return
 
-            val request = json.decodeFromString(Request.serializer(), String(payload.asBytes()!!))
+            try {
+                val request = json.decodeFromString(Request.serializer(), String(payload.asBytes()!!))
 
-            when (request.command)
-            {
-                Command.GET_CONFIG -> {
-                    _state.value = NearbySessionState.SendingConfig
-                    sendConfig(endpointId)
-                }
+                when (request.command)
+                {
+                    Command.GET_CONFIG -> {
+                        _state.value = NearbySessionState.SendingConfig
+                        sendConfig(endpointId)
+                    }
 
-                Command.GET_IMAGE -> {
-                    _state.value = NearbySessionState.SendingImage
-                    request.imageUuid?.let { sendImage(endpointId, it) }
-                }
+                    Command.GET_IMAGE -> {
+                        _state.value = NearbySessionState.SendingImage
+                        request.imageUuid?.let { sendImage(endpointId, it) }
+                    }
 
-                Command.DONE -> {
-                    _state.value = NearbySessionState.Done
-                    client.disconnectFromEndpoint(endpointId)
+                    Command.DONE -> {
+                        _state.value = NearbySessionState.Done
+                        client.disconnectFromEndpoint(endpointId)
+                    }
                 }
+            } catch( ex: Exception ) {
+                Log.d( "xxx", ex.stackTraceToString())
             }
         }
 
@@ -242,6 +248,7 @@ class NearbySessionHostManager( private val context: Context, private val config
     // Send Config
     // -------------------------------------------------------------------------
 
+    @OptIn(ExperimentalSerializationApi::class)
     private fun sendConfig(endpointId: String)
     {
         val output = PipedOutputStream()
@@ -252,6 +259,8 @@ class NearbySessionHostManager( private val context: Context, private val config
         scope.launch(Dispatchers.IO) {
             try {
                 json.encodeToStream(Config.serializer(), config, output)
+            } catch (ex: Exception) {
+                Log.d( "xxx", ex.stackTraceToString().toString())
             } finally {
                 output.close()
             }
@@ -262,6 +271,7 @@ class NearbySessionHostManager( private val context: Context, private val config
     // Send Image
     // -------------------------------------------------------------------------
 
+    @OptIn(ExperimentalSerializationApi::class)
     private fun sendImage(endpointId: String, imageId: String)
     {
         val image = ImageDAO.instance().getImage(imageId) ?: return
@@ -274,6 +284,8 @@ class NearbySessionHostManager( private val context: Context, private val config
         scope.launch(Dispatchers.IO) {
             try {
                 json.encodeToStream(Image.serializer(), image, output)
+            } catch (ex: Exception) {
+                Log.d( "xxx", ex.stackTraceToString().toString())
             } finally {
                 output.close()
             }

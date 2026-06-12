@@ -12,6 +12,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.*
@@ -284,20 +285,29 @@ class NearbySessionClientManager(private val context: Context)
     // Receive handlers
     // -------------------------------------------------------------------------
 
+    @OptIn(ExperimentalSerializationApi::class)
     private fun receiveConfig(input: InputStream)
     {
         scope.launch(Dispatchers.IO) {
-            val config = json.decodeFromStream(Config.serializer(), input)
-            configDeferred?.complete(config)
+            try {
+                val config = json.decodeFromStream(Config.serializer(), input)
+                configDeferred?.complete(config)
+            } catch( ex: Exception ) {
+                Log.d( "xxx", ex.stackTraceToString())
+            }
         }
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     private fun receiveImage(input: InputStream)
     {
         scope.launch(Dispatchers.IO) {
-            val image = json.decodeFromStream(Image.serializer(), input)
-
-            imageDeferred?.complete(image)
+            try {
+                val image = json.decodeFromStream(Image.serializer(), input)
+                imageDeferred?.complete(image)
+            } catch( ex: Exception ) {
+                Log.d( "xxx", ex.stackTraceToString())
+            }
         }
     }
 
@@ -309,9 +319,12 @@ class NearbySessionClientManager(private val context: Context)
     {
         val endpoint = connectedEndpointId ?: return
 
-        val bytes = json.encodeToString(Request.serializer(), request).toByteArray()
-
-        client.sendPayload(endpoint, Payload.fromBytes(bytes))
+        try {
+            val bytes = json.encodeToString(Request.serializer(), request).toByteArray()
+            client.sendPayload(endpoint, Payload.fromBytes(bytes))
+        } catch( ex: Exception ) {
+            Log.d( "xxx", ex.stackTraceToString())
+        }
     }
 
     private fun sendDone()
