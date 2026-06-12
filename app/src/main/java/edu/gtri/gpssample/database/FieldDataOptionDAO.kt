@@ -15,16 +15,32 @@ import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.FieldDataOption
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.extensions.toBoolean
+import java.util.HashMap
 
 class FieldDataOptionDAO(private var dao: DAO)
 {
+    var versionCache: HashMap<String, String>? = null
 //    val fieldDataOptionCache = HashMap<String, FieldDataOption>()
 
     fun createOrUpdateFieldDataOption(fieldDataOption: FieldDataOption, obj: Any, version: String) : FieldDataOption?
     {
         fieldDataOption.version = version
 
-        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD_DATA_OPTION, fieldDataOption.uuid, version )
+        var exists: Boolean
+        var shouldUpdate: Boolean
+
+        if (versionCache == null)
+        {
+            val (_exists, _shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD_DATA_OPTION, fieldDataOption.uuid, version )
+            exists = _exists
+            shouldUpdate = _shouldUpdate
+        }
+        else
+        {
+            val existingVersion = versionCache!![fieldDataOption.uuid]
+            exists = true
+            shouldUpdate = version != existingVersion
+        }
 
         if (exists)
         {

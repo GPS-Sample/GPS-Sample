@@ -173,6 +173,8 @@ class CameraXLivePreviewActivity :
 
   public override fun onDestroy() {
     super.onDestroy()
+    analysisUseCase?.clearAnalyzer()
+    cameraProvider?.unbindAll()
     imageProcessor?.run { this.stop() }
   }
 
@@ -241,6 +243,8 @@ class CameraXLivePreviewActivity :
 //      builder.setTargetResolution(targetResolution)
 //    }
 
+    cameraProvider?.unbindAll()
+
     analysisUseCase = builder.build()
 
     needUpdateGraphicOverlayImageSourceInfo = true
@@ -269,6 +273,7 @@ class CameraXLivePreviewActivity :
       }
     )
 
+    cameraProvider!!.unbindAll()
     cameraProvider!!.bindToLifecycle(/* lifecycleOwner= */ this, cameraSelector!!, analysisUseCase)
   }
 

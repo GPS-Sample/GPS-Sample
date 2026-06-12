@@ -18,14 +18,31 @@ import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.extensions.toBoolean
+import java.util.HashMap
 
 class FieldDataDAO(private var dao: DAO)
 {
+    var versionCache: HashMap<String, String>? = null
+
     fun createOrUpdateFieldData( fieldData: FieldData, enumerationItem: EnumerationItem, version: String ) : FieldData?
     {
         fieldData.version = version
 
-        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD_DATA, fieldData.uuid, version )
+        var exists: Boolean
+        var shouldUpdate: Boolean
+
+        if (versionCache == null)
+        {
+            val (_exists, _shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD_DATA, fieldData.uuid, version )
+            exists = _exists
+            shouldUpdate = _shouldUpdate
+        }
+        else
+        {
+            val existingVersion = versionCache!![fieldData.uuid]
+            exists = true
+            shouldUpdate = version != existingVersion
+        }
 
         if (exists)
         {

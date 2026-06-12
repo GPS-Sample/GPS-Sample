@@ -402,15 +402,21 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
     fun updateOverview()
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
-            val summaryInfo = DAO.configDAO.getConfigSummary(config.uuid )
-            val numRemaining = summaryInfo.sampledCount - summaryInfo.surveyedCount
+            viewLifecycleOwner.lifecycleScope.launch {
+                val summaryInfo = withContext(Dispatchers.IO) {
+                    DAO.configDAO.getConfigSummary(config.uuid )
+                }
 
-            binding.numberOfEnumerationAreasTextView.text = "${config.enumAreas.size}"
-            binding.numberEnumeratedTextView.text = "${summaryInfo.enumerationCount}"
-            binding.numberEligibleTextView.text = "${summaryInfo.eligibleCount}"
-            binding.numberSampledTextView.text = "${summaryInfo.sampledCount}"
-            binding.numberSurveyedTextView.text = "${summaryInfo.surveyedCount}"
-            binding.numberRemainingTextView.text = "${numRemaining}"
+                // back on main thread
+                val numRemaining = summaryInfo.sampledCount - summaryInfo.surveyedCount
+
+                binding.numberOfEnumerationAreasTextView.text = "${config.enumAreas.size}"
+                binding.numberEnumeratedTextView.text = "${summaryInfo.enumerationCount}"
+                binding.numberEligibleTextView.text = "${summaryInfo.eligibleCount}"
+                binding.numberSampledTextView.text = "${summaryInfo.sampledCount}"
+                binding.numberSurveyedTextView.text = "${summaryInfo.surveyedCount}"
+                binding.numberRemainingTextView.text = "${numRemaining}"
+            }
         }
     }
 
@@ -443,6 +449,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                     viewLifecycleOwner.lifecycleScope.launch {
                         withContext(Dispatchers.IO) {
                             DAO.configDAO.createOrUpdateConfig( config,config.version )
+                            // TODO!!! re-fetch the config from the db
                         }
 
                         // back on the main thread...

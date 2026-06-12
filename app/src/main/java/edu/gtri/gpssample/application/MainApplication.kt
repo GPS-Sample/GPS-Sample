@@ -12,6 +12,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Study
@@ -36,28 +37,46 @@ class MainApplication : Application()
 
         instance = this
 
-//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+//        StrictMode.setVmPolicy(
+//            StrictMode.VmPolicy.Builder()
+//                .detectLeakedClosableObjects()
+//                .detectLeakedSqlLiteObjects()
+//                .detectActivityLeaks()
+//                .penaltyLog()
+//                .build()
+//        )
+//
+//        StrictMode.setThreadPolicy(
+//            StrictMode.ThreadPolicy.Builder()
+//                .detectDiskReads()
+//                .detectDiskWrites()
+//                .penaltyLog()
+//                .build()
+//        )
 
-        val serviceChannel = NotificationChannel(
-
-            UDPBroadcastReceiverService.SERVICE_CHANNEL_ID,
-            "UDP Broadcast Receiver Service",
-            NotificationManager.IMPORTANCE_LOW
-
-        )
-
-        serviceChannel.apply {
-            setShowBadge(false)
-        }
-
-        val manager: NotificationManager = getSystemService(NotificationManager::class.java)
-        manager.createNotificationChannel(serviceChannel)
+//        val serviceChannel = NotificationChannel(
+//
+//            UDPBroadcastReceiverService.SERVICE_CHANNEL_ID,
+//            "UDP Broadcast Receiver Service",
+//            NotificationManager.IMPORTANCE_LOW
+//
+//        )
+//
+//        serviceChannel.apply {
+//            setShowBadge(false)
+//        }
+//
+//        val manager: NotificationManager = getSystemService(NotificationManager::class.java)
+//        manager.createNotificationChannel(serviceChannel)
     }
 
-    companion object {
+    companion object
+    {
         lateinit var instance: MainApplication
 
-        fun getContext(): Context {
+        fun getContext(): Context
+        {
             return instance!!.applicationContext
         }
-    }}
+    }
+}

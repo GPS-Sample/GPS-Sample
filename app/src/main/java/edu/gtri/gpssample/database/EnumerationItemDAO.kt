@@ -21,11 +21,27 @@ import kotlin.collections.ArrayList
 
 class EnumerationItemDAO(private var dao: DAO)
 {
+    var versionCache: HashMap<String,String>? = null
+
     fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location, version: String ) : EnumerationItem?
     {
         enumerationItem.version = version
 
-        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_ENUMERATION_ITEM, enumerationItem.uuid, version )
+        var exists: Boolean
+        var shouldUpdate: Boolean
+
+        if (versionCache == null)
+        {
+            val (_exists, _shouldUpdate) = dao.getExistingInfo(DAO.TABLE_ENUMERATION_ITEM, enumerationItem.uuid, version )
+            exists = _exists
+            shouldUpdate = _shouldUpdate
+        }
+        else
+        {
+            val existingVersion = versionCache!![enumerationItem.uuid]
+            exists = true
+            shouldUpdate = version != existingVersion
+        }
 
         if (exists)
         {

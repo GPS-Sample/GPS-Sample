@@ -42,6 +42,15 @@ class ConfigDAO(private var dao: DAO)
 
         val start = Date().time / 1000L
 
+//        DAO.locationDAO.versionCache = dao.loadVersionCache( DAO.TABLE_LOCATION )
+//        DAO.enumerationItemDAO.versionCache = dao.loadVersionCache( DAO.TABLE_ENUMERATION_ITEM )
+//        DAO.fieldDataDAO.versionCache = dao.loadVersionCache( DAO.TABLE_FIELD_DATA )
+//        DAO.fieldDataOptionDAO.versionCache = dao.loadVersionCache( DAO.TABLE_FIELD_DATA_OPTION )
+
+        val vals = ContentValues()
+        putConfig( config, vals )
+        dao.upsert( DAO.TABLE_CONFIG, vals )
+
         dao.writableDatabase.beginTransaction()
 
         val (exists, shouldUpdate) = getExistingInfo(config )
@@ -82,6 +91,18 @@ class ConfigDAO(private var dao: DAO)
         val minutes = duration / 60
         val seconds = duration % 60
         Log.d("xxx", "Config update time: %d:%02d".format(minutes, seconds))
+
+//        DAO.locationDAO.versionCache?.clear()
+//        DAO.locationDAO.versionCache = null
+//
+//        DAO.enumerationItemDAO.versionCache?.clear()
+//        DAO.enumerationItemDAO.versionCache = null
+//
+//        DAO.fieldDataDAO.versionCache?.clear()
+//        DAO.fieldDataDAO.versionCache = null
+//
+//        DAO.fieldDataOptionDAO.versionCache?.clear()
+//        DAO.fieldDataOptionDAO.versionCache = null
 
         return success
     }

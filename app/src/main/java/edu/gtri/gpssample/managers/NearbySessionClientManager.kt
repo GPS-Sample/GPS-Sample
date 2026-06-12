@@ -119,7 +119,9 @@ class NearbySessionClientManager(private val context: Context)
 
         downloadImages(config)
 
-        completion( config )
+        withContext(Dispatchers.Main) {
+            completion( config )
+        }
 
         sendDone()
 
@@ -200,7 +202,8 @@ class NearbySessionClientManager(private val context: Context)
             {
                 if (payload.type != Payload.Type.STREAM) return
 
-                val input = payload.asStream()?.asInputStream() ?: return
+                val stream = payload.asStream() ?: return
+                val input = stream.asInputStream()
 
                 when (pendingRequest)
                 {
@@ -289,11 +292,13 @@ class NearbySessionClientManager(private val context: Context)
     private fun receiveConfig(input: InputStream)
     {
         scope.launch(Dispatchers.IO) {
-            try {
-                val config = json.decodeFromStream(Config.serializer(), input)
-                configDeferred?.complete(config)
-            } catch( ex: Exception ) {
-                Log.d( "xxx", ex.stackTraceToString())
+            input.use { stream ->
+                try {
+                    val config = json.decodeFromStream(Config.serializer(), stream)
+                    configDeferred?.complete(config)
+                } catch( ex: Exception ) {
+                    Log.d( "xxx", ex.stackTraceToString())
+                }
             }
         }
     }
@@ -302,11 +307,13 @@ class NearbySessionClientManager(private val context: Context)
     private fun receiveImage(input: InputStream)
     {
         scope.launch(Dispatchers.IO) {
-            try {
-                val image = json.decodeFromStream(Image.serializer(), input)
-                imageDeferred?.complete(image)
-            } catch( ex: Exception ) {
-                Log.d( "xxx", ex.stackTraceToString())
+            input.use { stream ->
+                try {
+                    val image = json.decodeFromStream(Image.serializer(), stream)
+                    imageDeferred?.complete(image)
+                } catch( ex: Exception ) {
+                    Log.d( "xxx", ex.stackTraceToString())
+                }
             }
         }
     }

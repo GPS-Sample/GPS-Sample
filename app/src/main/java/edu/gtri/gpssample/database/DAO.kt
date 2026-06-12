@@ -446,6 +446,47 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         createIndexes(db)
     }
 
+    fun upsert(table: String, values: ContentValues)
+    {
+        val keys = values.keySet().toList()
+
+        val columns = keys.joinToString(", ")
+        val placeholders = keys.joinToString(", ") { "?" }
+
+        val query = """
+        INSERT INTO $table (
+            $columns
+        )
+        VALUES (
+            $placeholders
+        )
+        ON CONFLICT(${COLUMN_UUID})
+        DO UPDATE SET
+            ${COLUMN_VERSION} = excluded.${COLUMN_VERSION}
+        WHERE excluded.${COLUMN_VERSION} <> ${COLUMN_VERSION}
+    """.trimIndent()
+
+        val stmt = writableDatabase.compileStatement(query)
+
+        keys.forEachIndexed { index, key ->
+            val value = values.get(key)
+
+            when (value) {
+                null -> stmt.bindNull(index + 1)
+                is String -> stmt.bindString(index + 1, value)
+                is Int -> stmt.bindLong(index + 1, value.toLong())
+                is Long -> stmt.bindLong(index + 1, value)
+                is Float -> stmt.bindDouble(index + 1, value.toDouble())
+                is Double -> stmt.bindDouble(index + 1, value)
+                is Boolean -> stmt.bindLong(index + 1, if (value) 1 else 0)
+                else -> stmt.bindString(index + 1, value.toString())
+            }
+        }
+
+        stmt.execute()
+        stmt.close()
+    }
+
     fun exists(table: String, column: String, value: String): Boolean
     {
         return readableDatabase.rawQuery("""SELECT 1 FROM $table WHERE $column = ? LIMIT 1""".trimIndent(),arrayOf(value)).use { it.moveToFirst() }
@@ -462,16 +503,32 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         return readableDatabase.rawQuery(query, arrayOf(uuid)).use { cursor ->
             if (cursor.moveToFirst()) {
                 val oldVersion = cursor.getString(0 )
-                if (oldVersion != newVersion)
-                {
-                    Log.d( "xxx", "oldVersion = ${oldVersion}")
-                    Log.d( "xxx", "newVersion = ${newVersion}")
-                }
+//                if (oldVersion != newVersion)
+//                {
+//                    Log.d( "xxx", "oldVersion = ${oldVersion}")
+//                    Log.d( "xxx", "newVersion = ${newVersion}")
+//                }
                 Pair(true, oldVersion != newVersion )
             } else {
                 Pair(false, false)
             }
         }
+    }
+
+    fun loadVersionCache( table: String ) :  HashMap<String,String>
+    {
+        val hashMap = HashMap<String,String>()
+
+        val query = "SELECT ${DAO.COLUMN_UUID}, ${DAO.COLUMN_VERSION} FROM $table"
+
+        readableDatabase.rawQuery(query, null).use { cursor ->
+            while (cursor.moveToNext())
+            {
+                hashMap[cursor.getString(0)] = cursor.getString(1)
+            }
+        }
+
+        return hashMap
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int)

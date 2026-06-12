@@ -27,11 +27,27 @@ import kotlin.collections.ArrayList
 
 class LocationDAO(private var dao: DAO)
 {
+    var versionCache: HashMap<String,String>? = null
+
     fun createOrUpdateLocation( location: Location, enumArea : EnumArea, version: String ) : Location?
     {
         location.version = version
 
-        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_LOCATION, location.uuid, version )
+        var exists: Boolean
+        var shouldUpdate: Boolean
+
+        if (versionCache == null)
+        {
+            val (_exists, _shouldUpdate) = dao.getExistingInfo(DAO.TABLE_LOCATION, location.uuid, version )
+            exists = _exists
+            shouldUpdate = _shouldUpdate
+        }
+        else
+        {
+            val existingVersion = versionCache!![location.uuid]
+            exists = true
+            shouldUpdate = version != existingVersion
+        }
 
         if (exists)
         {
