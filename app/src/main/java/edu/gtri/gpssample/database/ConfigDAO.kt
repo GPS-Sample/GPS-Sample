@@ -20,8 +20,10 @@ import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.managers.PreferencesManager
+import java.util.Date
 import java.util.UUID
 import kotlin.math.min
+import kotlin.time.Duration
 
 class ConfigDAO(private var dao: DAO)
 {
@@ -37,6 +39,8 @@ class ConfigDAO(private var dao: DAO)
                 config.validUsers += " ${user.uuid}"
             }
         }
+
+        val start = Date().time / 1000L
 
         dao.writableDatabase.beginTransaction()
 
@@ -73,6 +77,11 @@ class ConfigDAO(private var dao: DAO)
 
         dao.writableDatabase.setTransactionSuccessful()
         dao.writableDatabase.endTransaction()
+
+        val duration= Date().time / 1000L - start
+        val minutes = duration / 60
+        val seconds = duration % 60
+        Log.d("xxx", "Config update time: %d:%02d".format(minutes, seconds))
 
         return success
     }
