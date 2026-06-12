@@ -190,7 +190,7 @@ class PerformMultiCollectionFragment : Fragment(),
         this.location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
             enumerationItem.collectionNotes = notes
             enumerationItem.collectionDate = Date().time
-            enumerationItem.syncCode = enumerationItem.syncCode + 1
+            enumerationItem.version = UUID.randomUUID().toString()
             enumerationItem.collectionState = CollectionState.Complete
 
             (activity!!.application as MainApplication).user?.let { user ->

@@ -378,7 +378,6 @@ class SamplingViewModel : ViewModel()
             {
                 sampleItem.samplingState = SamplingState.NotSampled
                 sampleItem.enumerationEligibleForSampling = false
-                sampleItem.syncCode = sampleItem.syncCode + 1
 
                 // find and remove items that are not valid
                 if (sampleItem.enumerationState == EnumerationState.Enumerated)
@@ -502,8 +501,8 @@ class SamplingViewModel : ViewModel()
                     }
 
                     sampledIndices.add(rnds)
-                    validSamples[rnds].syncCode = validSamples[rnds].syncCode + 1
                     validSamples[rnds].samplingState = SamplingState.Sampled
+                    validSamples[rnds].version = UUID.randomUUID().toString()
                 }
 
                 currentFragment?.requireActivity()?.runOnUiThread {
@@ -528,7 +527,6 @@ class SamplingViewModel : ViewModel()
             {
                 sampleItem.subsetSamplingState = SamplingState.NotSampled
                 sampleItem.enumerationEligibleForSubsetSampling = false
-                sampleItem.syncCode = sampleItem.syncCode + 1
 
                 // find and remove items that are not valid
                 if (sampleItem.enumerationState == EnumerationState.Enumerated)
@@ -643,7 +641,7 @@ class SamplingViewModel : ViewModel()
                     }
 
                     sampledIndices.add(rnds)
-                    validSamples[rnds].syncCode = validSamples[rnds].syncCode + 1
+                    validSamples[rnds].version = UUID.randomUUID().toString()
                     validSamples[rnds].subsetSamplingState = SamplingState.Sampled
                 }
 

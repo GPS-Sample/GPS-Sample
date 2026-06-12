@@ -1319,7 +1319,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         enumerationItem.enumerationState = EnumerationState.Enumerated
         enumerationItem.enumerationNotes = ""
         enumerationItem.enumerationDate = Date().time
-        enumerationItem.syncCode = enumerationItem.syncCode + 1
         enumerationItem.subAddress = subAddress.toString()
         enumerationItem.locationUuid = location.uuid
 

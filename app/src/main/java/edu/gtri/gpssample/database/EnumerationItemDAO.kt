@@ -62,16 +62,11 @@ class EnumerationItemDAO(private var dao: DAO)
 
     fun updateEnumerationItem( enumerationItem: EnumerationItem, location : Location )
     {
-        val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
-
-        if (existingEnumerationItem != null && enumerationItem.syncCode > existingEnumerationItem.syncCode)
-        {
-            val whereClause = "${DAO.COLUMN_UUID} = ?"
-            val args: Array<String> = arrayOf(enumerationItem.uuid)
-            val values = ContentValues()
-            putEnumerationItem( enumerationItem, location, values )
-            dao.writableDatabase.update(DAO.TABLE_ENUMERATION_ITEM, values, whereClause, args )
-        }
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args: Array<String> = arrayOf(enumerationItem.uuid)
+        val values = ContentValues()
+        putEnumerationItem( enumerationItem, location, values )
+        dao.writableDatabase.update(DAO.TABLE_ENUMERATION_ITEM, values, whereClause, args )
     }
 
     fun putEnumerationItem( enumerationItem: EnumerationItem, location : Location, values: ContentValues )
