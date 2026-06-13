@@ -199,6 +199,8 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                     binding.overlayView.visibility = View.VISIBLE
 
                     viewLifecycleOwner.lifecycleScope.launch {
+                        Log.d("MEM", "minimal config = ${usedMB()} MB")
+
                         withContext(Dispatchers.IO) {
                             // this may take a while...
                             for (enumArea in config.enumAreas)
@@ -208,6 +210,8 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                                 DAO.enumAreaDAO.loadLazyLocations( enumArea ) // if needed
                             }
                         }
+
+                        Log.d("MEM", "full config = ${usedMB()} MB")
 
                         // back on the main thread...
 
@@ -443,6 +447,8 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                     }
                 }
 
+                Log.d("MEM", "before import = ${usedMB()} MB")
+
                 nearbySessionClientManager?.connect( sessionId ) { config ->
                     nearbySessionStatusDialog?.setStatus( "Saving Configuration..." )
 
@@ -452,16 +458,29 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                             // TODO!!! re-fetch the config from the db
                         }
 
+                        System.gc()
+
+                        Log.d("MEM", "after import = ${usedMB()} MB")
+
                         // back on the main thread...
                         nearbySessionStatusDialog?.dismiss()
 
                         sharedViewModel.setCurrentConfig( config )
+
+                        System.gc()
+
+                        Log.d("MEM", "after setCurrent = ${usedMB()} MB")
 
                         refreshView( config )
                     }
                 }
             }
         }
+    }
+
+    fun usedMB(): Long {
+        val runtime = Runtime.getRuntime()
+        return (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024
     }
 
     private fun didSelectStudy(study: Study)

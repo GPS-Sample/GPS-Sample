@@ -26,7 +26,7 @@ class LatLonDAO(private var dao: DAO)
             {
                 return null
             }
-            DAO.log("Created LatLon with ID ${latLon.uuid}" )
+//            DAO.log("Created LatLon with ID ${latLon.uuid}" )
         }
 
         enumArea?.let { enumArea ->

@@ -26,26 +26,10 @@ class StudyDAO(private var dao: DAO)
     {
         study.version = version
 
-        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_STUDY, study.uuid, version )
+        val values = ContentValues()
+        putStudy( study, values )
 
-        if (exists)
-        {
-            if (shouldUpdate)
-            {
-                updateStudy( study )
-                DAO.log("Updated Study to version ${study.version}")
-            }
-        }
-        else
-        {
-            val values = ContentValues()
-            putStudy(study, values)
-            if (dao.writableDatabase.insert(DAO.TABLE_STUDY, null, values) < 0)
-            {
-                return null
-            }
-            DAO.log("Created Study with version ${study.version}")
-        }
+        dao.upsert( DAO.TABLE_STUDY, values )
 
         // add fields
         for (field in study.fields)
@@ -140,29 +124,6 @@ class StudyDAO(private var dao: DAO)
         return study
     }
 
-    fun getStudy( uuid: String ): Study?
-    {
-        var study: Study? = null
-        val query = "SELECT study.* FROM ${DAO.TABLE_STUDY} as study WHERE ${DAO.COLUMN_UUID} = '${uuid}'"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-
-            study = buildStudy( cursor )
-            study.fields = DAO.fieldDAO.getFields(study)
-            // study.rules is loaded by getFields()
-            study.primaryFilters.addAll(DAO.filterDAO.getPrimaryFilters(study))
-            study.subsetFilters.addAll(DAO.filterDAO.getSubsetFilters(study))
-            study.stratas = DAO.strataDAO.getStratasWithStudyUuid(uuid )
-        }
-
-        cursor.close()
-
-        return study
-    }
-
     fun getStudies( config: Config ): ArrayList<Study>
     {
         val studies = ArrayList<Study>()
@@ -188,44 +149,8 @@ class StudyDAO(private var dao: DAO)
         return studies
     }
 
-    fun getStudies(): ArrayList<Study>
-    {
-        val studies = ArrayList<Study>()
-
-        val query = "SELECT * FROM ${DAO.TABLE_STUDY}"
-
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            val study = buildStudy( cursor )
-            study.fields = DAO.fieldDAO.getFields(study)
-            // study.rules is loaded by getFields()
-            study.primaryFilters.addAll(DAO.filterDAO.getPrimaryFilters(study))
-            study.subsetFilters.addAll(DAO.filterDAO.getSubsetFilters(study))
-            studies.add( study )
-        }
-
-        cursor.close()
-
-        return studies
-    }
-
-    fun updateStudy( study: Study )
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(study.uuid)
-        val values = ContentValues()
-
-        putStudy( study, values )
-
-        dao.writableDatabase.update(DAO.TABLE_STUDY, values, whereClause, args )
-    }
-
     fun deleteStudy( study: Study )
     {
-//        val filters = DAO.filterDAO.getPrimaryFilters( study )
-
         for (filter in study.primaryFilters)
         {
             DAO.filterDAO.deleteFilter( filter )
@@ -236,8 +161,6 @@ class StudyDAO(private var dao: DAO)
             DAO.filterDAO.deleteFilter( filter )
         }
 
-        // val rules = DAO.ruleDAO.getRules( study )
-
         for (rule in study.primaryRules)
         {
             DAO.ruleDAO.deleteRule( rule )
@@ -247,8 +170,6 @@ class StudyDAO(private var dao: DAO)
         {
             DAO.ruleDAO.deleteRule( rule )
         }
-
-//        val fields = DAO.fieldDAO.getFields( study )
 
         for (field in study.fields)
         {

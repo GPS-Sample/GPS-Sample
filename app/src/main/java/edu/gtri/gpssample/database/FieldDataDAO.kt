@@ -22,53 +22,19 @@ import java.util.HashMap
 
 class FieldDataDAO(private var dao: DAO)
 {
-    var versionCache: HashMap<String, String>? = null
-
-    fun createOrUpdateFieldData( fieldData: FieldData, enumerationItem: EnumerationItem, version: String ) : FieldData?
+    fun createOrUpdateFieldData( fieldData: FieldData, enumerationItem: EnumerationItem, version: String )
     {
         fieldData.version = version
 
-        var exists: Boolean
-        var shouldUpdate: Boolean
+        val values = ContentValues()
+        putFieldData( fieldData, values, enumerationItem )
 
-        if (versionCache == null)
-        {
-            val (_exists, _shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD_DATA, fieldData.uuid, version )
-            exists = _exists
-            shouldUpdate = _shouldUpdate
-        }
-        else
-        {
-            val existingVersion = versionCache!![fieldData.uuid]
-            exists = true
-            shouldUpdate = version != existingVersion
-        }
-
-        if (exists)
-        {
-            if (shouldUpdate)
-            {
-                updateFieldData( fieldData )
-                DAO.log("Updated FieldData to version ${fieldData.version}")
-            }
-        }
-        else
-        {
-            val values = ContentValues()
-            putFieldData( fieldData, values, enumerationItem )
-            if (dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values) < 0)
-            {
-                return null
-            }
-            DAO.log("Created FieldData with version ${fieldData.version}" )
-        }
+        dao.upsert( DAO.TABLE_FIELD_DATA, values )
 
         for (fieldDataOption in fieldData.fieldDataOptions)
         {
             DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData, fieldDataOption.version )
         }
-
-        return fieldData
     }
 
     fun putFieldData(fieldData: FieldData, values: ContentValues, enumerationItem: EnumerationItem?)
@@ -108,35 +74,6 @@ class FieldDataDAO(private var dao: DAO)
         return FieldData( uuid, creationDate, fieldUuid, name, type, textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>(), version )
     }
 
-    fun updateFieldData( fieldData: FieldData )
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(fieldData.uuid)
-        val values = ContentValues()
-
-        putFieldData( fieldData, values, null )
-
-        dao.writableDatabase.update(DAO.TABLE_FIELD_DATA, values, whereClause, args )
-    }
-
-    fun getFieldData( uuid: String ): FieldData?
-    {
-        var fieldData: FieldData? = null
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            fieldData = buildFieldData( cursor )
-            fieldData.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( fieldData )
-        }
-
-        cursor.close()
-
-        return fieldData
-    }
-
     fun getFieldDataList( enumerationItem: EnumerationItem ): ArrayList<FieldData>
     {
         val fieldDataList = ArrayList<FieldData>()
@@ -149,23 +86,6 @@ class FieldDataDAO(private var dao: DAO)
             val fieldData = buildFieldData( cursor )
             fieldData.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( fieldData )
             fieldDataList.add( fieldData )
-        }
-
-        cursor.close()
-
-        return fieldDataList
-    }
-
-    fun getFieldData(): ArrayList<FieldData>
-    {
-        val fieldDataList = ArrayList<FieldData>()
-
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA}"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            fieldDataList.add( buildFieldData( cursor ))
         }
 
         cursor.close()

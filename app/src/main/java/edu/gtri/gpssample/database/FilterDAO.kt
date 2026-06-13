@@ -29,26 +29,15 @@ class FilterDAO(private var dao: DAO)
 
     fun createOrUpdateFilter( filter: Filter, study : Study ) : Filter?
     {
-        if (dao.exists(DAO.TABLE_FILTER, DAO.COLUMN_UUID, filter.uuid ))
-        {
-            updateFilter( filter, study )
-            deleteAllFilterOperators(filter)
-            DAO.log("Updated Filter with ID ${filter.uuid}")
-        }
-        else
-        {
-            val values = ContentValues()
+        val values = ContentValues()
+        putFilter( filter, study, values )
 
-            putFilter( filter,study, values )
-            if (dao.writableDatabase.insert(DAO.TABLE_FILTER, null, values) < 0)
-            {
-                return null
-            }
-            DAO.log("Created Filter with ID ${filter.uuid}")
-        }
+        deleteAllFilterOperators(filter)
+
+        dao.upsert( DAO.TABLE_RULE, values )
 
         filter.rule?.let{ rule ->
-            rule.filterOperator?.let{filterOperator ->
+            rule.filterOperator?.let{ filterOperator ->
                 val filterOperatorOrder = kFilterOperatorOrderUndefined
                 traverseRuleChain(rule, filter, filterOperatorOrder)
             }?: run {
@@ -117,13 +106,6 @@ class FilterDAO(private var dao: DAO)
         dao.writableDatabase.insert(DAO.TABLE_FILTEROPERATOR, null, values).toInt()
     }
 
-    fun exists( filter: Filter, study : Study ): Boolean
-    {
-        getFilter( filter.uuid, study)?.let {
-            return true
-        } ?: return false
-    }
-
     private fun putFilter( filter: Filter, study: Study, values: ContentValues )
     {
         val index = SampleTypeConverter.toIndex(filter.samplingType)
@@ -133,17 +115,6 @@ class FilterDAO(private var dao: DAO)
         values.put( DAO.COLUMN_FILTER_NAME, filter.name )
         values.put( DAO.COLUMN_FILTER_SAMPLE_SIZE, filter.sampleSize )
         values.put( DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX, index )
-    }
-
-    fun updateFilter( filter: Filter, study : Study )
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(filter.uuid)
-        val values = ContentValues()
-
-        putFilter( filter, study, values )
-
-        dao.writableDatabase.update(DAO.TABLE_FILTER, values, whereClause, args )
     }
 
     @SuppressLint("Range")
@@ -237,22 +208,6 @@ class FilterDAO(private var dao: DAO)
         filter.rule = firstRule
     }
 
-    fun getFilter(uuid : String, study : Study) : Filter?
-    {
-        var filter: Filter? = null
-        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_UUID} = '${uuid}'"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            filter = buildFilter(cursor, study)
-        }
-
-        cursor.close()
-
-        return filter
-    }
-
     fun getPrimaryFilters( study : Study ) : ArrayList<Filter>
     {
         val filters = ArrayList<Filter>()
@@ -301,13 +256,6 @@ class FilterDAO(private var dao: DAO)
         return filters
     }
 
-    fun getFilters() : ArrayList<Filter>
-    {
-        val filters = ArrayList<Filter>()
-
-        return filters
-    }
-
     fun deleteFilter( filter: Filter )
     {
         deleteAllFilterOperators(filter)
@@ -323,6 +271,5 @@ class FilterDAO(private var dao: DAO)
         val whereClause = "${DAO.COLUMN_FILTER_UUID} = ?"
         val args = arrayOf(filter.uuid)
         dao.writableDatabase.delete(DAO.TABLE_FILTEROPERATOR, whereClause, args)
-
     }
 }

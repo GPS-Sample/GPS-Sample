@@ -10,44 +10,20 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
-import android.util.Log
 import edu.gtri.gpssample.database.models.*
 
 class CollectionTeamDAO(private var dao: DAO)
 {
-    fun createOrUpdateCollectionTeam(collectionTeam: CollectionTeam, version: String) : CollectionTeam?
+    fun createOrUpdateCollectionTeam( collectionTeam: CollectionTeam, version: String )
     {
         collectionTeam.version = version
 
-        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_COLLECTION_TEAM, collectionTeam.uuid, version )
+        val values = ContentValues()
+        putTeam( collectionTeam, values )
 
-        if (exists)
-        {
-            if (shouldUpdate)
-            {
-                updateTeam( collectionTeam )
-                DAO.log("Updated CollectionTeam to version ${collectionTeam.version}")
-            }
-        }
-        else
-        {
-            val values = ContentValues()
-            putTeam( collectionTeam, values )
-            if (dao.writableDatabase.insert(DAO.TABLE_COLLECTION_TEAM, null, values) < 0)
-            {
-                return null
-            }
-            DAO.log("Created CollectionTeam with version = ${collectionTeam.version}")
-        }
-
-        for (latLon in collectionTeam.polygon)
-        {
-            DAO.latLonDAO.createOrUpdateLatLon(latLon,null, null)
-        }
+        dao.upsert( DAO.TABLE_COLLECTION_TEAM, values )
 
         updateConnectorTable( collectionTeam )
-
-        return collectionTeam
     }
 
     private fun updateConnectorTable( collectionTeam: CollectionTeam )
@@ -107,17 +83,6 @@ class CollectionTeamDAO(private var dao: DAO)
         return collectionTeam
     }
 
-    fun updateTeam( collectionTeam: CollectionTeam)
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(collectionTeam.uuid)
-        val values = ContentValues()
-
-        putTeam( collectionTeam, values )
-
-        dao.writableDatabase.update(DAO.TABLE_COLLECTION_TEAM, values, whereClause, args )
-    }
-
     fun getCollectionTeam( uuid: String ): CollectionTeam?
     {
         var collectionTeam: CollectionTeam? = null
@@ -140,22 +105,6 @@ class CollectionTeamDAO(private var dao: DAO)
         val collectionTeam = ArrayList<CollectionTeam>()
 
         val query = "SELECT * FROM ${DAO.TABLE_COLLECTION_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}' ORDER BY ${DAO.COLUMN_CREATION_DATE}"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            collectionTeam.add( buildTeam( cursor ))
-        }
-
-        cursor.close()
-
-        return collectionTeam
-    }
-
-    fun getCollectionTeams(): ArrayList<CollectionTeam>
-    {
-        val collectionTeam = ArrayList<CollectionTeam>()
-        val query = "SELECT * FROM ${DAO.TABLE_COLLECTION_TEAM}"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())

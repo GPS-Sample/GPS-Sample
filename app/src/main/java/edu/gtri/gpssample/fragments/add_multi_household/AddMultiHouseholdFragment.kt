@@ -92,15 +92,14 @@ class AddMultiHouseholdFragment : Fragment()
 
         binding.addButton.setOnClickListener {
             val enumerationItem = EnumerationItem()
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location,enumerationItem.version )?.let { enumerationItem ->
-                location.enumerationItems.add(enumerationItem)
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location,enumerationItem.version )
+            location.enumerationItems.add(enumerationItem)
 
-                enumerationItem.subAddress = getNextSubaddress().toString()
+            enumerationItem.subAddress = getNextSubaddress().toString()
 
-                sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
+            sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
 
-                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
-            }
+            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
         }
 
         binding.backButton.setOnClickListener {

@@ -37,29 +37,27 @@ class MainApplication : Application()
 
         instance = this
 
-//        StrictMode.setVmPolicy(
-//            StrictMode.VmPolicy.Builder()
-//                .detectLeakedClosableObjects()
-//                .detectLeakedSqlLiteObjects()
-//                .detectActivityLeaks()
-//                .penaltyLog()
-//                .build()
-//        )
-//
-//        StrictMode.setThreadPolicy(
-//            StrictMode.ThreadPolicy.Builder()
-//                .detectDiskReads()
-//                .detectDiskWrites()
-//                .penaltyLog()
-//                .build()
-//        )
+        StrictMode.setVmPolicy(
+            StrictMode.VmPolicy.Builder()
+                .detectLeakedClosableObjects()
+                .detectLeakedSqlLiteObjects()
+                .detectActivityLeaks()
+                .penaltyLog()
+                .build()
+        )
+
+        StrictMode.setThreadPolicy(
+            StrictMode.ThreadPolicy.Builder()
+                .detectDiskReads()
+                .detectDiskWrites()
+                .penaltyLog()
+                .build()
+        )
 
 //        val serviceChannel = NotificationChannel(
-//
 //            UDPBroadcastReceiverService.SERVICE_CHANNEL_ID,
 //            "UDP Broadcast Receiver Service",
 //            NotificationManager.IMPORTANCE_LOW
-//
 //        )
 //
 //        serviceChannel.apply {

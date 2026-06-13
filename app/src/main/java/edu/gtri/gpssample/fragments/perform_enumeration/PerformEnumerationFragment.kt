@@ -1154,14 +1154,13 @@ class PerformEnumerationFragment : Fragment(),
                             ConfirmationDialog.ButtonPress.Right -> {
                                 val enumerationItem = EnumerationItem()
 
-                                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, enumerationItem.version )?.let { enumerationItem ->
-                                    location.enumerationItems.add(enumerationItem)
-                                    sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
+                                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, enumerationItem.version )
+                                location.enumerationItems.add(enumerationItem)
+                                sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
 
-                                    sharedViewModel.currentConfiguration?.value?.let { config ->
-                                        if (config.autoIncrementSubaddress) {
-                                            enumerationItem.subAddress = "${maxSubaddress + 1}"
-                                        }
+                                sharedViewModel.currentConfiguration?.value?.let { config ->
+                                    if (config.autoIncrementSubaddress) {
+                                        enumerationItem.subAddress = "${maxSubaddress + 1}"
                                     }
                                 }
 

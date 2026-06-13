@@ -24,30 +24,14 @@ import edu.gtri.gpssample.database.models.Study
 
 class FieldDAO(private var dao: DAO)
 {
-    fun createOrUpdateField( field: Field, study : Study, version: String ) : Field?
+    fun createOrUpdateField( field: Field, study : Study, version: String )
     {
         field.version = version
 
-        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD, field.uuid, version )
+        val values = ContentValues()
+        putField( field, study, values )
 
-        if (exists)
-        {
-            if (shouldUpdate)
-            {
-                updateField( field, study )
-                DAO.log("Updated Field to version ${field.version}")
-            }
-        }
-        else
-        {
-            val values = ContentValues()
-            putField( field, study, values )
-            if (dao.writableDatabase.insert(DAO.TABLE_FIELD, null, values) < 0)
-            {
-                return null
-            }
-            DAO.log("Created Field with version ${field.version}")
-        }
+        dao.upsert( DAO.TABLE_FIELD, values )
 
         field.fields?.let { fields ->
             for (field in fields)
@@ -60,8 +44,6 @@ class FieldDAO(private var dao: DAO)
         {
             DAO.fieldOptionDAO.createOrUpdateFieldOption( fieldOption, field, fieldOption.version )
         }
-
-        return field
     }
 
     fun putField( field: Field, study : Study, values: ContentValues )
@@ -86,17 +68,6 @@ class FieldDAO(private var dao: DAO)
         // TODO: use look up tables
         val type = FieldTypeConverter.toIndex(field.type)
         values.put( DAO.COLUMN_FIELD_TYPE_INDEX, type )
-    }
-
-    fun updateField( field: Field, study : Study )
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(field.uuid)
-        val values = ContentValues()
-
-        putField( field, study, values )
-
-        dao.writableDatabase.update(DAO.TABLE_FIELD, values, whereClause, args )
     }
 
     @SuppressLint("Range")
@@ -199,22 +170,6 @@ class FieldDAO(private var dao: DAO)
 
                 fields.add( field)
             }
-        }
-
-        cursor.close()
-
-        return fields
-    }
-
-    fun getFields(): List<Field>
-    {
-        val fields = ArrayList<Field>()
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD}"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            fields.add( buildField( cursor ))
         }
 
         cursor.close()

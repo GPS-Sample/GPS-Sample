@@ -27,51 +27,19 @@ import kotlin.collections.ArrayList
 
 class LocationDAO(private var dao: DAO)
 {
-    var versionCache: HashMap<String,String>? = null
-
-    fun createOrUpdateLocation( location: Location, enumArea : EnumArea, version: String ) : Location?
+    fun createOrUpdateLocation( location: Location, enumArea : EnumArea, version: String )
     {
         location.version = version
 
-        var exists: Boolean
-        var shouldUpdate: Boolean
-
-        if (versionCache == null)
+        if (location.altitude.isNaN())
         {
-            val (_exists, _shouldUpdate) = dao.getExistingInfo(DAO.TABLE_LOCATION, location.uuid, version )
-            exists = _exists
-            shouldUpdate = _shouldUpdate
-        }
-        else
-        {
-            val existingVersion = versionCache!![location.uuid]
-            exists = true
-            shouldUpdate = version != existingVersion
+            location.altitude = 0.0
         }
 
-        if (exists)
-        {
-            if (shouldUpdate)
-            {
-                updateLocation( location )
-                DAO.log("Updated Location to version ${location.version}" )
-            }
-        }
-        else
-        {
-            if (location.altitude.isNaN())
-            {
-                location.altitude = 0.0
-            }
+        val values = ContentValues()
+        putLocation( location, values )
 
-            val values = ContentValues()
-            putLocation( location, values )
-            if (dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values) < 0)
-            {
-                return null
-            }
-            DAO.log("Created Location with version ${location.version}" )
-        }
+        dao.upsert( DAO.TABLE_LOCATION, values )
 
         updateConnectorTable( location, enumArea )
 
@@ -80,8 +48,6 @@ class LocationDAO(private var dao: DAO)
             enumerationItem.locationUuid = location.uuid
             DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, enumerationItem.version )
         }
-
-        return location
     }
 
     private fun updateConnectorTable( location : Location, enumArea : EnumArea )
@@ -96,17 +62,6 @@ class LocationDAO(private var dao: DAO)
             dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_LOCATION__ENUM_AREA, null, values)
         }
         cursor.close()
-    }
-
-    fun updateLocation( location: Location )
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(location.uuid)
-        val values = ContentValues()
-
-        putLocation( location, values )
-
-        dao.writableDatabase.update(DAO.TABLE_LOCATION, values, whereClause, args )
     }
 
     fun putLocation( location: Location, values: ContentValues)

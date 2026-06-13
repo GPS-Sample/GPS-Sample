@@ -17,30 +17,14 @@ import edu.gtri.gpssample.database.models.Location
 
 class EnumAreaDAO(private var dao: DAO)
 {
-    fun createOrUpdateEnumArea( enumArea: EnumArea, version: String ) : EnumArea?
+    fun createOrUpdateEnumArea( enumArea: EnumArea, version: String )
     {
         enumArea.version = version
 
-        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_ENUM_AREA, enumArea.uuid, version )
+        val values = ContentValues()
+        putEnumArea( enumArea, values )
 
-        if (exists)
-        {
-            if (shouldUpdate)
-            {
-                updateEnumArea( enumArea )
-                DAO.log("Updated EnumerationArea to version ${enumArea.version}" )
-            }
-        }
-        else
-        {
-            val values = ContentValues()
-            putEnumArea( enumArea, values )
-            if (dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA, null, values) < 0)
-            {
-                return null
-            }
-            DAO.log("Created EnumerationArea with version ${enumArea.version}" )
-        }
+        dao.upsert( DAO.TABLE_ENUM_AREA, values )
 
         enumArea.mapTileRegion?.let {
             DAO.mapTileRegionDAO.createOrUpdateMapTileRegion( it, enumArea )
@@ -66,8 +50,6 @@ class EnumAreaDAO(private var dao: DAO)
         {
             DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breacrumb, breacrumb.version )
         }
-
-        return enumArea
     }
 
     fun putEnumArea( enumArea: EnumArea, values: ContentValues )
@@ -99,40 +81,6 @@ class EnumAreaDAO(private var dao: DAO)
         val selectedCollectionTeamUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_UUID))
 
         return EnumArea( uuid, creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, selectedEnumerationTeamUuid, selectedCollectionTeamUuid, version )
-    }
-
-    fun updateEnumArea( enumArea: EnumArea )
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(enumArea.uuid)
-        val values = ContentValues()
-
-        putEnumArea( enumArea, values )
-
-        dao.writableDatabase.update(DAO.TABLE_ENUM_AREA, values, whereClause, args )
-    }
-
-    fun getEnumArea( uuid: String ): EnumArea?
-    {
-        var enumArea: EnumArea? = null
-        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            enumArea = buildEnumArea( cursor )
-            enumArea.mapTileRegion = DAO.mapTileRegionDAO.getMapTileRegion( enumArea )
-            enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaUuid( enumArea.uuid )
-            enumArea.locations = DAO.locationDAO.getLocations( enumArea )
-            enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
-            enumArea.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( enumArea )
-            enumArea.breadcrumbs = DAO.breadcrumbDAO.getBreadcrumbs( enumArea.uuid )
-        }
-
-        cursor.close()
-
-        return enumArea
     }
 
     fun getEnumAreas( config: Config ): ArrayList<EnumArea>

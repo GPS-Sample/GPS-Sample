@@ -23,21 +23,10 @@ class RuleDAO(private var dao: DAO)
 {
     fun createOrUpdateRule( rule: Rule ) : Rule?
     {
-        if (dao.exists( DAO.TABLE_RULE, DAO.COLUMN_UUID, rule.uuid ))
-        {
-            updateRule( rule )
-            DAO.log("Updated Rule with ID ${rule.uuid}")
-        }
-        else
-        {
-            val values = ContentValues()
-            putRule( rule, values )
-            if (dao.writableDatabase.insert(DAO.TABLE_RULE, null, values) < 0)
-            {
-                return null
-            }
-            DAO.log("Created Rule with ID ${rule.uuid}")
-        }
+        val values = ContentValues()
+        putRule( rule, values )
+
+        dao.upsert( DAO.TABLE_RULE, values )
 
         for (fieldDataOption in rule.fieldDataOptions)
         {
@@ -62,17 +51,6 @@ class RuleDAO(private var dao: DAO)
         rule.filterOperator?.let { filterOperator ->
             values.put(DAO.COLUMN_FILTEROPERATOR_UUID, filterOperator.uuid)
         }
-    }
-
-    fun updateRule( rule: Rule )
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(rule.uuid)
-        val values = ContentValues()
-
-        putRule( rule, values )
-
-        dao.writableDatabase.update(DAO.TABLE_RULE, values, whereClause, args )
     }
 
     @SuppressLint("Range")
@@ -111,27 +89,6 @@ class RuleDAO(private var dao: DAO)
         cursor.close()
 
         return null
-    }
-
-    fun getRules() : ArrayList<Rule>
-    {
-        val rules = ArrayList<Rule>()
-
-        val query = "SELECT * FROM ${DAO.TABLE_RULE}"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            val rule = buildRule( cursor )
-            rule?.let{rule->
-                rule.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( rule )
-                rules.add( rule)
-            }
-        }
-
-        cursor.close()
-
-        return rules
     }
 
     fun getPrimaryRules( field : Field ) : ArrayList<Rule>

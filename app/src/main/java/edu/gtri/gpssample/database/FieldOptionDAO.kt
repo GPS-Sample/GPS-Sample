@@ -16,34 +16,16 @@ import edu.gtri.gpssample.database.models.FieldOption
 
 class FieldOptionDAO(private var dao: DAO)
 {
-    fun createOrUpdateFieldOption( fieldOption: FieldOption, field: Field, version: String ) : FieldOption?
+    fun createOrUpdateFieldOption( fieldOption: FieldOption, field: Field, version: String )
     {
         fieldOption.version = version
 
-        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD_OPTION, fieldOption.uuid, version )
+        val values = ContentValues()
+        putFieldOption( fieldOption, values )
 
-        if (exists)
-        {
-            if (shouldUpdate)
-            {
-                updateFieldOption( fieldOption )
-                DAO.log("Updated FieldOption to version ${fieldOption.version}")
-            }
-        }
-        else
-        {
-            val values = ContentValues()
-            putFieldOption( fieldOption, values )
-            if (dao.writableDatabase.insert(DAO.TABLE_FIELD_OPTION, null, values) < 0)
-            {
-                return null
-            }
-            DAO.log("Created FieldOption with version ${fieldOption.version}")
-        }
+        dao.upsert( DAO.TABLE_FIELD_OPTION, values )
 
         createConnection( fieldOption, field )
-
-        return fieldOption
     }
 
     private fun createConnection( fieldOption: FieldOption, field: Field )
@@ -65,17 +47,6 @@ class FieldOptionDAO(private var dao: DAO)
         values.put( DAO.COLUMN_UUID, fieldOption.uuid )
         values.put( DAO.COLUMN_VERSION, fieldOption.version )
         values.put( DAO.COLUMN_FIELD_OPTION_NAME, fieldOption.name )
-    }
-
-    fun updateFieldOption( fieldOption: FieldOption )
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(fieldOption.uuid)
-        val values = ContentValues()
-
-        putFieldOption( fieldOption, values )
-
-        dao.writableDatabase.update(DAO.TABLE_FIELD_OPTION, values, whereClause, args )
     }
 
     @SuppressLint("Range")

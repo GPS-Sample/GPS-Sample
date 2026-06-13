@@ -1315,6 +1315,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
         val enumerationItem = EnumerationItem()
 
+        enumerationItem.uuid = UUID.randomUUID().toString()
+        enumerationItem.version = UUID.randomUUID().toString()
         enumerationItem.enumerationIncompleteReason = ""
         enumerationItem.enumerationState = EnumerationState.Enumerated
         enumerationItem.enumerationNotes = ""

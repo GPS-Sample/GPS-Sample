@@ -184,11 +184,10 @@ class CreateEnumerationTeamFragment : Fragment(),
 
                 val enumerationTeam = EnumerationTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygonPoints, locationUuids )
 
-                DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( enumerationTeam, enumerationTeam.version )?.let { team ->
-                    enumArea.enumerationTeams.add(team)
-                    activity!!.runOnUiThread {
-                        findNavController().popBackStack()
-                    }
+                DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( enumerationTeam, enumerationTeam.version )
+                enumArea.enumerationTeams.add(enumerationTeam)
+                activity!!.runOnUiThread {
+                    findNavController().popBackStack()
                 }
             }.start()
         }

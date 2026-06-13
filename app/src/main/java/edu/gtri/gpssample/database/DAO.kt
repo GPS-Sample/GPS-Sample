@@ -9,6 +9,7 @@ package edu.gtri.gpssample.database
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.DatabaseUtils
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
@@ -446,45 +447,21 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         createIndexes(db)
     }
 
-    fun upsert(table: String, values: ContentValues)
+    fun upsert( table: String, values: ContentValues ): Long
     {
-        val keys = values.keySet().toList()
+        val uuid = values.getAsString(COLUMN_UUID) ?: throw IllegalArgumentException("UUID missing for upsert into $table")
 
-        val columns = keys.joinToString(", ")
-        val placeholders = keys.joinToString(", ") { "?" }
+        // 1. Try UPDATE first (fast path for existing rows)
+        val updateResult = writableDatabase.update( table, values, "$COLUMN_UUID = ?", arrayOf(uuid))
 
-        val query = """
-        INSERT INTO $table (
-            $columns
-        )
-        VALUES (
-            $placeholders
-        )
-        ON CONFLICT(${COLUMN_UUID})
-        DO UPDATE SET
-            ${COLUMN_VERSION} = excluded.${COLUMN_VERSION}
-        WHERE excluded.${COLUMN_VERSION} <> ${COLUMN_VERSION}
-    """.trimIndent()
-
-        val stmt = writableDatabase.compileStatement(query)
-
-        keys.forEachIndexed { index, key ->
-            val value = values.get(key)
-
-            when (value) {
-                null -> stmt.bindNull(index + 1)
-                is String -> stmt.bindString(index + 1, value)
-                is Int -> stmt.bindLong(index + 1, value.toLong())
-                is Long -> stmt.bindLong(index + 1, value)
-                is Float -> stmt.bindDouble(index + 1, value.toDouble())
-                is Double -> stmt.bindDouble(index + 1, value)
-                is Boolean -> stmt.bindLong(index + 1, if (value) 1 else 0)
-                else -> stmt.bindString(index + 1, value.toString())
-            }
+        if (updateResult > 0) {
+            return updateResult.toLong()
         }
 
-        stmt.execute()
-        stmt.close()
+        // 2. Insert if not exists
+        val insertResult = writableDatabase.insert( table, null, values)
+
+        return insertResult.toLong()
     }
 
     fun exists(table: String, column: String, value: String): Boolean

@@ -18,35 +18,12 @@ class StrataDAO(private var dao: DAO)
 {
     fun createOrUpdateStrata( strata: Strata ) : Strata?
     {
-        if (dao.exists(DAO.TABLE_STRATA, DAO.COLUMN_UUID, strata.uuid ))
-        {
-            getStrata( strata.uuid )?.let { existingStrata ->
-                if (strata.doesNotEqual( existingStrata ))
-                {
-                    updateStrata( strata )
-                    DAO.log("Updated LatLon with ID ${strata.uuid}" )
-                }
-            }
-        }
-        else
-        {
-            val values = ContentValues()
-            putStrata( strata, values )
-            if (dao.writableDatabase.insert(DAO.TABLE_STRATA, null, values) < 0)
-            {
-                return null
-            }
-            DAO.log("Created LatLon with ID ${strata.uuid}" )
-        }
+        val values = ContentValues()
+        putStrata( strata, values )
+
+        dao.upsert( DAO.TABLE_STRATA, values )
 
         return strata
-    }
-
-    fun exists( strata: Strata ): Boolean
-    {
-        getStrata( strata.uuid )?.let {
-            return true
-        } ?: return false
     }
 
     private fun putStrata( strata: Strata, values: ContentValues )
@@ -72,17 +49,6 @@ class StrataDAO(private var dao: DAO)
         val sampleType = SampleType.values()[sampleTypeIndex]
 
         return Strata( uuid, creationDate, studyUuid, name, sampleSize, sampleType )
-    }
-
-    fun updateStrata( strata: Strata )
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(strata.uuid)
-        val values = ContentValues()
-
-        putStrata( strata, values )
-
-        dao.writableDatabase.update(DAO.TABLE_STRATA, values, whereClause, args )
     }
 
     fun getStrata( uuid: String ): Strata?

@@ -19,47 +19,16 @@ import java.util.HashMap
 
 class FieldDataOptionDAO(private var dao: DAO)
 {
-    var versionCache: HashMap<String, String>? = null
 //    val fieldDataOptionCache = HashMap<String, FieldDataOption>()
 
-    fun createOrUpdateFieldDataOption(fieldDataOption: FieldDataOption, obj: Any, version: String) : FieldDataOption?
+    fun createOrUpdateFieldDataOption(fieldDataOption: FieldDataOption, obj: Any, version: String)
     {
         fieldDataOption.version = version
 
-        var exists: Boolean
-        var shouldUpdate: Boolean
+        val values = ContentValues()
+        putFieldDataOption( fieldDataOption, values )
 
-        if (versionCache == null)
-        {
-            val (_exists, _shouldUpdate) = dao.getExistingInfo(DAO.TABLE_FIELD_DATA_OPTION, fieldDataOption.uuid, version )
-            exists = _exists
-            shouldUpdate = _shouldUpdate
-        }
-        else
-        {
-            val existingVersion = versionCache!![fieldDataOption.uuid]
-            exists = true
-            shouldUpdate = version != existingVersion
-        }
-
-        if (exists)
-        {
-            if (shouldUpdate)
-            {
-                updateFieldDataOption( fieldDataOption )
-                DAO.log("Updated FieldDataOption to version ${fieldDataOption.version}")
-            }
-        }
-        else
-        {
-            val values = ContentValues()
-            putFieldDataOption( fieldDataOption, values )
-            if (dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA_OPTION, null, values) < 0)
-            {
-                return null
-            }
-            DAO.log("Created FieldDataOption with version ${fieldDataOption.version}")
-        }
+        dao.upsert( DAO.TABLE_FIELD_DATA_OPTION, values )
 
         val fieldData = obj as? FieldData
 
@@ -72,8 +41,6 @@ class FieldDataOptionDAO(private var dao: DAO)
         rule?.let {
             createRuleConnection( fieldDataOption, it )
         }
-
-        return fieldDataOption
     }
 
     private fun createFieldDataConnection(fieldDataOption: FieldDataOption, fieldData: FieldData)
@@ -110,17 +77,6 @@ class FieldDataOptionDAO(private var dao: DAO)
         values.put( DAO.COLUMN_VERSION, fieldDataOption.version )
         values.put( DAO.COLUMN_FIELD_DATA_OPTION_NAME, fieldDataOption.name )
         values.put( DAO.COLUMN_FIELD_DATA_OPTION_VALUE, fieldDataOption.value )
-    }
-
-    fun updateFieldDataOption( fieldDataOption: FieldDataOption)
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(fieldDataOption.uuid)
-        val values = ContentValues()
-
-        putFieldDataOption( fieldDataOption, values )
-
-        dao.writableDatabase.update(DAO.TABLE_FIELD_DATA_OPTION, values, whereClause, args )
     }
 
     @SuppressLint("Range")

@@ -27,10 +27,8 @@ import kotlin.time.Duration
 
 class ConfigDAO(private var dao: DAO)
 {
-    fun createOrUpdateConfig( config: Config, version: String ) : Boolean
+    fun createOrUpdateConfig( config: Config, version: String )
     {
-        var success = true
-
         config.version = version
 
         MainApplication.instance.user?.let { user ->
@@ -40,49 +38,16 @@ class ConfigDAO(private var dao: DAO)
             }
         }
 
-        val start = Date().time / 1000L
+        dao.writableDatabase.beginTransaction()
 
-//        DAO.locationDAO.versionCache = dao.loadVersionCache( DAO.TABLE_LOCATION )
-//        DAO.enumerationItemDAO.versionCache = dao.loadVersionCache( DAO.TABLE_ENUMERATION_ITEM )
-//        DAO.fieldDataDAO.versionCache = dao.loadVersionCache( DAO.TABLE_FIELD_DATA )
-//        DAO.fieldDataOptionDAO.versionCache = dao.loadVersionCache( DAO.TABLE_FIELD_DATA_OPTION )
+        val start = Date().time / 1000L
 
         val vals = ContentValues()
         putConfig( config, vals )
         dao.upsert( DAO.TABLE_CONFIG, vals )
 
-        dao.writableDatabase.beginTransaction()
-
-        val (exists, shouldUpdate) = getExistingInfo(config )
-
-        if (exists)
-        {
-            if (shouldUpdate)
-            {
-                updateConfig( config )
-                DAO.log("Updated Config to version ${config.version}" )
-            }
-        }
-        else
-        {
-            val values = ContentValues()
-            putConfig( config, values )
-            if (dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values) < 0)
-            {
-                success = false
-                Log.d( "xxx", "Failed to Create Config with ID = ${config.uuid}")
-            }
-            else
-            {
-                DAO.log("Created Config with version = ${config.version}")
-            }
-        }
-
-        if (success)
-        {
-            createOrUpdateEnumAreas(config)
-            createOrUpdateStudies(config)
-        }
+        createOrUpdateEnumAreas(config)
+        createOrUpdateStudies(config)
 
         dao.writableDatabase.setTransactionSuccessful()
         dao.writableDatabase.endTransaction()
@@ -90,93 +55,8 @@ class ConfigDAO(private var dao: DAO)
         val duration= Date().time / 1000L - start
         val minutes = duration / 60
         val seconds = duration % 60
+
         Log.d("xxx", "Config update time: %d:%02d".format(minutes, seconds))
-
-//        DAO.locationDAO.versionCache?.clear()
-//        DAO.locationDAO.versionCache = null
-//
-//        DAO.enumerationItemDAO.versionCache?.clear()
-//        DAO.enumerationItemDAO.versionCache = null
-//
-//        DAO.fieldDataDAO.versionCache?.clear()
-//        DAO.fieldDataDAO.versionCache = null
-//
-//        DAO.fieldDataOptionDAO.versionCache?.clear()
-//        DAO.fieldDataOptionDAO.versionCache = null
-
-        return success
-    }
-
-    @SuppressLint("Range")
-    fun getExistingInfo( newConfig: Config ): Pair<Boolean, Boolean>
-    {
-        val query = """
-            SELECT ${DAO.COLUMN_VERSION}, ${DAO.COLUMN_CONFIG_VALID_USERS}
-            FROM ${DAO.TABLE_CONFIG}
-            WHERE ${DAO.COLUMN_UUID} = ?
-            """.trimIndent()
-
-        var shouldUpdate = false
-
-        dao.readableDatabase.rawQuery(query, arrayOf(newConfig.uuid)).use { cursor ->
-
-            if (!cursor.moveToFirst())
-            {
-                return Pair(false, false)
-            }
-
-            val oldVersion = cursor.getString(0)
-            val oldValidUsers = cursor.getString(1)
-
-            if (newConfig.version != oldVersion)
-            {
-                shouldUpdate = true
-            }
-
-            if (newConfig.validUsers.trim().length != oldValidUsers.trim().length)
-            {
-                shouldUpdate = true
-
-                // combine old & new users
-                val oldUsers = oldValidUsers.split(" ")
-                val newUsers = newConfig.validUsers.split(" ")
-
-                newConfig.validUsers = ""
-
-                for (user in oldUsers)
-                {
-                    val trimmedUser = user.trim()
-                    if (trimmedUser.isNotEmpty() &&
-                        !newConfig.validUsers.contains(trimmedUser))
-                    {
-                        newConfig.validUsers += "$trimmedUser "
-                    }
-                }
-
-                for (user in newUsers)
-                {
-                    val trimmedUser = user.trim()
-                    if (trimmedUser.isNotEmpty() &&
-                        !newConfig.validUsers.contains(trimmedUser))
-                    {
-                        newConfig.validUsers += "$trimmedUser "
-                    }
-                }
-
-                newConfig.validUsers = newConfig.validUsers.trim()
-            }
-        }
-
-        return Pair(true, shouldUpdate )
-    }
-
-    fun updateConfig( config: Config )
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(config.uuid)
-        val values = ContentValues()
-        putConfig( config, values )
-        dao.writableDatabase.update(DAO.TABLE_CONFIG, values, whereClause, args )
     }
 
     fun putConfig( config: Config, values: ContentValues )

@@ -21,50 +21,14 @@ import kotlin.collections.ArrayList
 
 class EnumerationItemDAO(private var dao: DAO)
 {
-    var versionCache: HashMap<String,String>? = null
-
-    fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location, version: String ) : EnumerationItem?
+    fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location, version: String )
     {
         enumerationItem.version = version
 
-        var exists: Boolean
-        var shouldUpdate: Boolean
+        val values = ContentValues()
+        putEnumerationItem( enumerationItem, location, values )
 
-        if (versionCache == null)
-        {
-            val (_exists, _shouldUpdate) = dao.getExistingInfo(DAO.TABLE_ENUMERATION_ITEM, enumerationItem.uuid, version )
-            exists = _exists
-            shouldUpdate = _shouldUpdate
-        }
-        else
-        {
-            val existingVersion = versionCache!![enumerationItem.uuid]
-            exists = true
-            shouldUpdate = version != existingVersion
-        }
-
-        if (exists)
-        {
-            if (shouldUpdate)
-            {
-                updateEnumerationItem( enumerationItem, location )
-                DAO.log("Updated EnumerationItem to version ${enumerationItem.version}")
-            }
-        }
-        else
-        {
-            if (enumerationItem.uuid.isEmpty())
-            {
-                enumerationItem.uuid = UUID.randomUUID().toString()
-            }
-            val values = ContentValues()
-            putEnumerationItem( enumerationItem, location, values )
-            if (dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values) < 0)
-            {
-                return null
-            }
-            DAO.log("Created EnumerationItem with version ${enumerationItem.version}" )
-        }
+        dao.upsert( DAO.TABLE_ENUMERATION_ITEM, values )
 
         enumerationItem.fieldDataList?.let { fieldDataList ->
             for (fieldData in fieldDataList)
@@ -72,17 +36,6 @@ class EnumerationItemDAO(private var dao: DAO)
                 DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem, fieldData.version )
             }
         }
-
-        return enumerationItem
-    }
-
-    fun updateEnumerationItem( enumerationItem: EnumerationItem, location : Location )
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(enumerationItem.uuid)
-        val values = ContentValues()
-        putEnumerationItem( enumerationItem, location, values )
-        dao.writableDatabase.update(DAO.TABLE_ENUMERATION_ITEM, values, whereClause, args )
     }
 
     fun putEnumerationItem( enumerationItem: EnumerationItem, location : Location, values: ContentValues )
@@ -165,24 +118,6 @@ class EnumerationItemDAO(private var dao: DAO)
         )
     }
 
-    private fun getEnumerationItem( uuid: String ) : EnumerationItem?
-    {
-        var enumerationItem : EnumerationItem? = null
-
-        val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_ITEM} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            enumerationItem = buildEnumerationItem( cursor )
-        }
-
-        cursor.close()
-
-        return enumerationItem
-    }
-
     fun getEnumerationItems( location: Location ) : ArrayList<EnumerationItem>
     {
         val enumerationItems = ArrayList<EnumerationItem>()
@@ -194,24 +129,6 @@ class EnumerationItemDAO(private var dao: DAO)
         {
             val enumerationItem = buildEnumerationItem( cursor )
             enumerationItem.fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
-            enumerationItems.add( enumerationItem )
-        }
-
-        cursor.close()
-
-        return enumerationItems
-    }
-
-    fun getEnumerationItems() : ArrayList<EnumerationItem>
-    {
-        val enumerationItems = ArrayList<EnumerationItem>()
-
-        val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_ITEM}"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            val enumerationItem = buildEnumerationItem( cursor )
             enumerationItems.add( enumerationItem )
         }
 

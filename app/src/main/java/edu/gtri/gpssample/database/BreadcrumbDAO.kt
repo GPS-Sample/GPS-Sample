@@ -3,48 +3,18 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
-import android.util.Log
 import edu.gtri.gpssample.database.models.Breadcrumb
 
 class BreadcrumbDAO(private var dao: DAO)
 {
-    fun createOrUpdateBreadcrumb(breadcrumb: Breadcrumb, version: String): Breadcrumb?
+    fun createOrUpdateBreadcrumb( breadcrumb: Breadcrumb, version: String )
     {
         breadcrumb.version = version
 
-        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_BREADCRUMB, breadcrumb.uuid, version )
-
-        if (exists)
-        {
-            if (shouldUpdate)
-            {
-                updateBreadcrumb( breadcrumb )
-                DAO.log("Updated Breadcrumb to version ${breadcrumb.version}")
-            }
-        }
-        else
-        {
-            val values = ContentValues()
-            putBreadcrumb(breadcrumb, values)
-            if (dao.writableDatabase.insert(DAO.TABLE_BREADCRUMB, null, values) < 0) {
-                return null
-            }
-
-            DAO.log("Created Breadcrumb with version ${breadcrumb.version}")
-        }
-
-        return breadcrumb
-    }
-
-    fun updateBreadcrumb(breadcrumb: Breadcrumb)
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(breadcrumb.uuid)
         val values = ContentValues()
-
         putBreadcrumb( breadcrumb, values )
 
-        dao.writableDatabase.update(DAO.TABLE_BREADCRUMB, values, whereClause, args )
+        dao.upsert( DAO.TABLE_BREADCRUMB, values )
     }
 
     private fun putBreadcrumb( breadcrumb: Breadcrumb, values: ContentValues)
@@ -72,24 +42,6 @@ class BreadcrumbDAO(private var dao: DAO)
         val groupId = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_GROUP_ID))
 
         return Breadcrumb( uuid, creationDate, enumAreaUuid, enumTeamName, latitude, longitude, groupId, version )
-    }
-
-    fun getBreadcrumb( uuid: String ): Breadcrumb?
-    {
-        var breadcrumb: Breadcrumb? = null
-
-        val query = "SELECT * FROM ${DAO.TABLE_BREADCRUMB} where ${DAO.COLUMN_UUID}='${uuid}'"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            breadcrumb = buildBreadcrumb( cursor )
-        }
-
-        cursor.close()
-
-        return breadcrumb
     }
 
     fun getBreadcrumbs( enumAreaUuid: String ): ArrayList<Breadcrumb>

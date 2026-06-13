@@ -15,30 +15,14 @@ import edu.gtri.gpssample.database.models.*
 
 class EnumerationTeamDAO(private var dao: DAO)
 {
-    fun createOrUpdateEnumerationTeam(enumerationTeam: EnumerationTeam, version: String) : EnumerationTeam?
+    fun createOrUpdateEnumerationTeam( enumerationTeam: EnumerationTeam, version: String )
     {
         enumerationTeam.version = version
 
-        val (exists, shouldUpdate) = dao.getExistingInfo(DAO.TABLE_ENUMERATION_TEAM, enumerationTeam.uuid, version )
+        val values = ContentValues()
+        putTeam( enumerationTeam, values )
 
-        if (exists)
-        {
-            if (shouldUpdate)
-            {
-                updateTeam( enumerationTeam )
-                DAO.log("Updated EnumerationTeam to version ${enumerationTeam.version}")
-            }
-        }
-        else
-        {
-            val values = ContentValues()
-            putTeam( enumerationTeam, values )
-            if (dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_TEAM, null, values) < 0)
-            {
-                return null
-            }
-            DAO.log("Created EnumerationTeam with version ${enumerationTeam.version}")
-        }
+        dao.upsert( DAO.TABLE_ENUMERATION_TEAM, values )
 
         for (latLon in enumerationTeam.polygon)
         {
@@ -47,7 +31,7 @@ class EnumerationTeamDAO(private var dao: DAO)
 
         updateConnectorTable( enumerationTeam )
 
-        return enumerationTeam
+        return
     }
 
     fun updateConnectorTable( enumerationTeam: EnumerationTeam )
@@ -107,55 +91,11 @@ class EnumerationTeamDAO(private var dao: DAO)
         return enumerationTeam
     }
 
-    fun updateTeam( enumerationTeam: EnumerationTeam )
-    {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(enumerationTeam.uuid)
-        val values = ContentValues()
-
-        putTeam( enumerationTeam, values )
-
-        dao.writableDatabase.update(DAO.TABLE_ENUMERATION_TEAM, values, whereClause, args )
-    }
-
-    fun getEnumerationTeam( uuid: String ): EnumerationTeam?
-    {
-        var enumerationTeam: EnumerationTeam? = null
-        val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            enumerationTeam = buildTeam( cursor )
-        }
-
-        cursor.close()
-
-        return enumerationTeam
-    }
-
     fun getEnumerationTeams( enumArea: EnumArea ): ArrayList<EnumerationTeam>
     {
         val enumerationTeams = ArrayList<EnumerationTeam>()
 
         val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}' ORDER BY ${DAO.COLUMN_CREATION_DATE}"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            enumerationTeams.add( buildTeam( cursor ))
-        }
-
-        cursor.close()
-
-        return enumerationTeams
-    }
-
-    fun getEnumerationTeams(): ArrayList<EnumerationTeam>
-    {
-        val enumerationTeams = ArrayList<EnumerationTeam>()
-        val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM}"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
