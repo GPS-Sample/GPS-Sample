@@ -38,9 +38,9 @@ class ConfigDAO(private var dao: DAO)
             }
         }
 
-        dao.writableDatabase.beginTransaction()
-
         val start = Date().time / 1000L
+
+        dao.writableDatabase.beginTransaction()
 
         val vals = ContentValues()
         putConfig( config, vals )

@@ -207,7 +207,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                             {
                                 enumArea.selectedEnumerationTeamUuid = ""
                                 enumArea.selectedCollectionTeamUuid = ""
-                                DAO.enumAreaDAO.loadLazyLocations( enumArea ) // if needed
+//                                DAO.enumAreaDAO.loadLazyLocations( enumArea ) // if needed
                             }
                         }
 
@@ -447,29 +447,28 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                     }
                 }
 
-                Log.d("MEM", "before import = ${usedMB()} MB")
+                Log.d("xxx", "before import = ${usedMB()} MB")
 
-                nearbySessionClientManager?.connect( sessionId ) { config ->
+                nearbySessionClientManager?.connect( sessionId ) { config, enumerationItems ->
                     nearbySessionStatusDialog?.setStatus( "Saving Configuration..." )
 
                     viewLifecycleOwner.lifecycleScope.launch {
-                        withContext(Dispatchers.IO) {
+                        withContext(Dispatchers.IO)
+                        {
                             DAO.configDAO.createOrUpdateConfig( config,config.version )
+                            DAO.enumerationItemDAO.createOrUpdateEnumerationItems( enumerationItems )
+
                             // TODO!!! re-fetch the config from the db
                         }
 
-                        System.gc()
-
-                        Log.d("MEM", "after import = ${usedMB()} MB")
-
                         // back on the main thread...
+
+                        System.gc()
+                        Log.d("xxx", "after import = ${usedMB()} MB")
+
                         nearbySessionStatusDialog?.dismiss()
 
                         sharedViewModel.setCurrentConfig( config )
-
-                        System.gc()
-
-                        Log.d("MEM", "after setCurrent = ${usedMB()} MB")
 
                         refreshView( config )
                     }

@@ -401,11 +401,11 @@ class ManageConfigurationsFragment : Fragment()
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private val getQrCode = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
-    {
-        if (it.resultCode == ResultCode.BarcodeScanned.value)
+    { result ->
+        if (result.resultCode == ResultCode.BarcodeScanned.value)
         {
             // payload contains the sessionId
-            it.data!!.getStringExtra(Keys.kPayload.value )?.let { sessionId ->
+            result.data!!.getStringExtra(Keys.kPayload.value )?.let { sessionId ->
                 nearbySessionClientManager = NearbySessionClientManager( requireContext().applicationContext )
 
                 nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(),getString(R.string.import_configuration))
@@ -422,15 +422,18 @@ class ManageConfigurationsFragment : Fragment()
                     }
                 }
 
-                nearbySessionClientManager?.connect( sessionId ) { config ->
+                nearbySessionClientManager?.connect( sessionId ) { config, enumerationItems ->
                     nearbySessionStatusDialog?.setStatus( "Saving Configuration..." )
 
                     viewLifecycleOwner.lifecycleScope.launch {
-                        withContext(Dispatchers.IO) {
+                        withContext(Dispatchers.IO)
+                        {
                             DAO.configDAO.createOrUpdateConfig( config,config.version )
+                            DAO.enumerationItemDAO.createOrUpdateEnumerationItems( enumerationItems )
                         }
 
                         // back on the main thread...
+
                         nearbySessionStatusDialog?.dismiss()
 
                         minimalConfigurations.find { it.uuid == config.uuid } ?.let {

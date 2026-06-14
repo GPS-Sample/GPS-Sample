@@ -6,8 +6,8 @@ import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Image
-import edu.gtri.gpssample.managers.NearbySessionCore.Companion.SERVICE_ID
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +24,7 @@ class NearbySessionClientManager(private val context: Context)
     // -------------------------------------------------------------------------
 
     private val client: ConnectionsClient = Nearby.getConnectionsClient(context)
+
     private val json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
@@ -34,7 +35,6 @@ class NearbySessionClientManager(private val context: Context)
     // -------------------------------------------------------------------------
 
     private val _state = MutableStateFlow<NearbySessionState>(NearbySessionState.Idle)
-
     val state: StateFlow<NearbySessionState> = _state.asStateFlow()
 
     // -------------------------------------------------------------------------
@@ -50,7 +50,6 @@ class NearbySessionClientManager(private val context: Context)
     // -------------------------------------------------------------------------
 
     private var connectedEndpointId: String? = null
-
     private var connectDeferred: CompletableDeferred<Unit>? = null
 
     // -------------------------------------------------------------------------
@@ -59,24 +58,27 @@ class NearbySessionClientManager(private val context: Context)
 
     private enum class PendingRequest {
         CONFIG,
+        ENUMERATION_ITEMS,
         IMAGE
     }
 
     private var pendingRequest: PendingRequest? = null
+
     private var configDeferred: CompletableDeferred<Config>? = null
+    private var enumItemsDeferred: CompletableDeferred<List<EnumerationItem>>? = null
     private var imageDeferred: CompletableDeferred<Image>? = null
 
     // -------------------------------------------------------------------------
     // Public API
     // -------------------------------------------------------------------------
 
-    fun connect(sessionId: String, completion: ((config: Config)->Unit))
+    fun connect(sessionId: String, completion: (Config, List<EnumerationItem>) -> Unit)
     {
         if (clientJob != null) return
 
         clientJob = scope.launch {
             try {
-                runClient( sessionId, completion )
+                runClient(sessionId, completion)
             } catch (ce: CancellationException) {
                 // expected
             } catch (e: Exception) {
@@ -91,7 +93,6 @@ class NearbySessionClientManager(private val context: Context)
     {
         clientJob?.cancel()
         clientJob = null
-
         cleanup()
     }
 
@@ -102,29 +103,28 @@ class NearbySessionClientManager(private val context: Context)
     }
 
     // -------------------------------------------------------------------------
-    // Client workflow
+    // Main flow
     // -------------------------------------------------------------------------
 
-    private suspend fun runClient(sessionId: String, completion: ((config: Config)->Unit))
+    private suspend fun runClient(sessionId: String, completion: (Config, List<EnumerationItem>) -> Unit)
     {
         _state.value = NearbySessionState.Connecting
 
         startDiscovery(sessionId)
-
         waitForConnection()
 
         _state.value = NearbySessionState.Connected
 
         val config = requestConfig()
+        val enumerationItems = requestEnumerationItems()
 
         downloadImages(config)
 
         withContext(Dispatchers.Main) {
-            completion( config )
+            completion(config, enumerationItems)
         }
 
         sendDone()
-
         disconnect()
 
         _state.value = NearbySessionState.Idle
@@ -136,9 +136,15 @@ class NearbySessionClientManager(private val context: Context)
 
     private fun startDiscovery(sessionId: String)
     {
-        val options = DiscoveryOptions.Builder().setStrategy(Strategy.P2P_STAR).build()
+        val options = DiscoveryOptions.Builder()
+            .setStrategy(Strategy.P2P_STAR)
+            .build()
 
-        client.startDiscovery(SERVICE_ID, discoveryCallback(sessionId), options)
+        client.startDiscovery(
+            NearbySessionCore.SERVICE_ID,
+            discoveryCallback(sessionId),
+            options
+        )
     }
 
     private fun stopDiscovery()
@@ -146,19 +152,19 @@ class NearbySessionClientManager(private val context: Context)
         client.stopDiscovery()
     }
 
-    private fun discoveryCallback(sessionId: String) = object : EndpointDiscoveryCallback()
-    {
-        override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo)
+    private fun discoveryCallback(sessionId: String) =
+        object : EndpointDiscoveryCallback()
         {
-            if (info.endpointName != sessionId) return
+            override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo)
+            {
+                if (info.endpointName != sessionId) return
 
-            stopDiscovery()
+                stopDiscovery()
+                client.requestConnection("client", endpointId, connectionCallback)
+            }
 
-            client.requestConnection("Client", endpointId, connectionCallback)
+            override fun onEndpointLost(endpointId: String) {}
         }
-
-        override fun onEndpointLost(endpointId: String) {}
-    }
 
     // -------------------------------------------------------------------------
     // Connection
@@ -168,23 +174,24 @@ class NearbySessionClientManager(private val context: Context)
     {
         override fun onConnectionInitiated(endpointId: String, connectionInfo: ConnectionInfo)
         {
-            client.acceptConnection(endpointId, payloadCallback) }
+            client.acceptConnection(endpointId, payloadCallback)
+        }
 
-            override fun onConnectionResult(endpointId: String, result: ConnectionResolution)
+        override fun onConnectionResult(endpointId: String, result: ConnectionResolution)
+        {
+            if (result.status.isSuccess)
             {
-                if (result.status.isSuccess)
-                {
-                    connectedEndpointId = endpointId
-                    connectDeferred?.complete(Unit)
-                }
-            }
-
-            override fun onDisconnected(endpointId: String)
-            {
-                connectedEndpointId = null
-                _state.value = NearbySessionState.Idle
+                connectedEndpointId = endpointId
+                connectDeferred?.complete(Unit)
             }
         }
+
+        override fun onDisconnected(endpointId: String)
+        {
+            connectedEndpointId = null
+            _state.value = NearbySessionState.Idle
+        }
+    }
 
     private suspend fun waitForConnection()
     {
@@ -198,42 +205,43 @@ class NearbySessionClientManager(private val context: Context)
 
     private val payloadCallback = object : PayloadCallback()
     {
-            override fun onPayloadReceived(endpointId: String, payload: Payload)
+        override fun onPayloadReceived(endpointId: String, payload: Payload)
+        {
+            if (payload.type != Payload.Type.STREAM) return
+
+            val stream = payload.asStream() ?: return
+            val input = stream.asInputStream()
+
+            when (pendingRequest)
             {
-                if (payload.type != Payload.Type.STREAM) return
+                PendingRequest.CONFIG ->
+                    receiveConfig(input)
 
-                val stream = payload.asStream() ?: return
-                val input = stream.asInputStream()
+                PendingRequest.ENUMERATION_ITEMS ->
+                    receiveEnumerationItems(input)
 
-                when (pendingRequest)
-                {
-                    PendingRequest.CONFIG ->
-                        receiveConfig(input)
+                PendingRequest.IMAGE ->
+                    receiveImage(input)
 
-                    PendingRequest.IMAGE ->
-                        receiveImage(input)
-
-                    null ->
-                        Log.d("xxx", "Unexpected payload")
-                }
+                null ->
+                    Log.d("Nearby", "Unexpected payload")
             }
-
-            override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate) = Unit
         }
 
+        override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate) = Unit
+    }
+
     // -------------------------------------------------------------------------
-    // Config request
+    // CONFIG
     // -------------------------------------------------------------------------
 
     private suspend fun requestConfig(): Config
     {
         pendingRequest = PendingRequest.CONFIG
-
         val deferred = CompletableDeferred<Config>()
-
         configDeferred = deferred
 
-        sendRequest(Request(Command.GET_CONFIG))
+        sendRequest(Command.GET_CONFIG)
 
         _state.value = NearbySessionState.ReceivingConfig
 
@@ -245,29 +253,120 @@ class NearbySessionClientManager(private val context: Context)
         }
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
+    private fun receiveConfig(input: InputStream)
+    {
+        scope.launch(Dispatchers.IO) {
+            input.use {
+                val config = json.decodeFromStream(Config.serializer(), it)
+                configDeferred?.complete(config)
+            }
+        }
+    }
+
     // -------------------------------------------------------------------------
-    // Image request loop
+    // ENUMERATION ITEMS (NEW)
+    // -------------------------------------------------------------------------
+
+    private suspend fun requestEnumerationItems(): List<EnumerationItem>
+    {
+        pendingRequest = PendingRequest.ENUMERATION_ITEMS
+        val deferred = CompletableDeferred<List<EnumerationItem>>()
+        enumItemsDeferred = deferred
+
+        _state.value = NearbySessionState.ReceivingEnumerationItems
+
+        sendRequest(Command.GET_ENUMERATION_ITEMS)
+
+        return try {
+            deferred.await()
+        } finally {
+            pendingRequest = null
+            enumItemsDeferred = null
+        }
+    }
+
+    private fun receiveEnumerationItemsXX(input: InputStream)
+    {
+        scope.launch(Dispatchers.IO) {
+            input.use {
+                val items = mutableListOf<EnumerationItem>()
+
+                val reader = it.bufferedReader()
+
+                reader.forEachLine { line ->
+                    if (line.isNotBlank()) {
+                        val item = json.decodeFromString(
+                            EnumerationItem.serializer(),
+                            line
+                        )
+                        items.add(item)
+                    }
+                }
+
+                enumItemsDeferred?.complete(items)
+            }
+        }
+    }
+
+    private fun receiveEnumerationItems(input: InputStream)
+    {
+        scope.launch(Dispatchers.IO)
+        {
+            val items = mutableListOf<EnumerationItem>()
+
+            try {
+                input.bufferedReader().useLines { lines ->
+                    for (line in lines)
+                    {
+                        if (line.isBlank()) continue
+
+                        try {
+                            items.add(json.decodeFromString(EnumerationItem.serializer(), line))
+                        }
+                        catch (ex: Exception)
+                        {
+                            Log.e("Nearby", "Failed to parse item line: $line", ex)
+                        }
+                    }
+                }
+
+                enumItemsDeferred?.complete(items )
+            }
+            catch (ex: Exception)
+            {
+                Log.e("Nearby", "Enumeration stream failed", ex)
+                enumItemsDeferred?.completeExceptionally(ex)
+            }
+            finally
+            {
+                try {
+                    input.close()
+                } catch (_: Exception) {}
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // IMAGES
     // -------------------------------------------------------------------------
 
     private suspend fun downloadImages(config: Config)
     {
-        for (enumArea in config.enumAreas)
+        for (area in config.enumAreas)
         {
-            for (location in enumArea.locations)
+            for (location in area.locations)
             {
                 val id = location.imageUuid
-
                 if (id.isEmpty()) continue
 
                 if (ImageDAO.instance().doesNotExist(id))
                 {
                     pendingRequest = PendingRequest.IMAGE
-
                     val deferred = CompletableDeferred<Image>()
-
                     imageDeferred = deferred
 
-                    sendRequest(Request(Command.GET_IMAGE, id))
+                    sendRequest(Command.GET_IMAGE, id)
 
                     _state.value = NearbySessionState.ReceivingImages
 
@@ -284,36 +383,12 @@ class NearbySessionClientManager(private val context: Context)
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Receive handlers
-    // -------------------------------------------------------------------------
-
-    @OptIn(ExperimentalSerializationApi::class)
-    private fun receiveConfig(input: InputStream)
-    {
-        scope.launch(Dispatchers.IO) {
-            input.use { stream ->
-                try {
-                    val config = json.decodeFromStream(Config.serializer(), stream)
-                    configDeferred?.complete(config)
-                } catch( ex: Exception ) {
-                    Log.d( "xxx", ex.stackTraceToString())
-                }
-            }
-        }
-    }
-
-    @OptIn(ExperimentalSerializationApi::class)
     private fun receiveImage(input: InputStream)
     {
         scope.launch(Dispatchers.IO) {
-            input.use { stream ->
-                try {
-                    val image = json.decodeFromStream(Image.serializer(), stream)
-                    imageDeferred?.complete(image)
-                } catch( ex: Exception ) {
-                    Log.d( "xxx", ex.stackTraceToString())
-                }
+            input.use {
+                val image = json.decodeFromStream(Image.serializer(), it)
+                imageDeferred?.complete(image)
             }
         }
     }
@@ -322,44 +397,41 @@ class NearbySessionClientManager(private val context: Context)
     // Send helpers
     // -------------------------------------------------------------------------
 
-    private fun sendRequest(request: Request)
+    private fun sendRequest(command: Command, imageUuid: String? = null)
     {
         val endpoint = connectedEndpointId ?: return
 
-        try {
-            val bytes = json.encodeToString(Request.serializer(), request).toByteArray()
-            client.sendPayload(endpoint, Payload.fromBytes(bytes))
-        } catch( ex: Exception ) {
-            Log.d( "xxx", ex.stackTraceToString())
-        }
+        val req = Request(command, imageUuid)
+        val bytes = json.encodeToString(Request.serializer(), req).toByteArray()
+
+        client.sendPayload(endpoint, Payload.fromBytes(bytes))
     }
 
     private fun sendDone()
     {
-        sendRequest(Request(Command.DONE))
-    }
-
-    private fun disconnect()
-    {
-        connectedEndpointId?.let {
-            client.disconnectFromEndpoint(it)
-        }
-
-        connectedEndpointId = null
+        sendRequest(Command.DONE)
     }
 
     // -------------------------------------------------------------------------
     // Cleanup
     // -------------------------------------------------------------------------
 
+    private fun disconnect()
+    {
+        connectedEndpointId?.let {
+            client.disconnectFromEndpoint(it)
+        }
+        connectedEndpointId = null
+    }
+
     private fun cleanup()
     {
         stopDiscovery()
-
         disconnect()
 
         connectDeferred?.cancel()
         configDeferred?.cancel()
+        enumItemsDeferred?.cancel()
         imageDeferred?.cancel()
 
         pendingRequest = null

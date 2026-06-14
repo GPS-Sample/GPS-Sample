@@ -118,18 +118,28 @@ class NearbySessionStatusDialog
                 showCancelButton()
             }
 
-            NearbySessionState.ReceivingConfig -> {
-                setStatus("Receiving Config...")
-                showCancelButton()
-            }
-
-            NearbySessionState.ReceivingImages -> {
-                setStatus("Receiving Images...")
+            NearbySessionState.SendingEnumerationItems -> {
+                setStatus("Sending EnumerationItems...")
                 showCancelButton()
             }
 
             NearbySessionState.SendingImage -> {
                 setStatus("Sending Image...")
+                showCancelButton()
+            }
+
+            NearbySessionState.ReceivingConfig -> {
+                setStatus("Receiving Config...")
+                showCancelButton()
+            }
+
+            NearbySessionState.ReceivingEnumerationItems -> {
+                setStatus("Receiving EnumerationItems...")
+                showCancelButton()
+            }
+
+            NearbySessionState.ReceivingImages -> {
+                setStatus("Receiving Images...")
                 showCancelButton()
             }
 

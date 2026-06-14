@@ -15,13 +15,15 @@ data class Request(
 )
 
 @Serializable
-enum class Command
-{
+enum class Command {
     GET_CONFIG,
+    GET_ENUMERATION_ITEMS,
     GET_IMAGE,
-    DONE
+    DONE,
+    ACK_CONFIG,
+    ACK_ENUMERATION_ITEMS,
+    ACK_IMAGE
 }
-
 /**
  * ============================================================================
  * State
@@ -40,8 +42,10 @@ sealed interface NearbySessionState
     object Connected : NearbySessionState
     object Done : NearbySessionState
     object SendingConfig : NearbySessionState
+    object SendingEnumerationItems : NearbySessionState
     object SendingImage : NearbySessionState
     object ReceivingConfig : NearbySessionState
+    object ReceivingEnumerationItems : NearbySessionState
     object ReceivingImages : NearbySessionState
     object Closed : NearbySessionState
 
