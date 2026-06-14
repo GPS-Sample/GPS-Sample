@@ -18,16 +18,10 @@ class LatLonDAO(private var dao: DAO)
 {
     fun createOrUpdateLatLon( latLon: LatLon, enumArea : EnumArea?, config: Config? ) : LatLon?
     {
-        if (!dao.exists(DAO.TABLE_LAT_LON, DAO.COLUMN_UUID, latLon.uuid )) // LatLon's are never updated
-        {
-            val values = ContentValues()
-            putLatLon( latLon, values )
-            if (dao.writableDatabase.insert(DAO.TABLE_LAT_LON, null, values) < 0)
-            {
-                return null
-            }
-//            DAO.log("Created LatLon with ID ${latLon.uuid}" )
-        }
+        val values = ContentValues()
+        putLatLon( latLon, values )
+
+        dao.upsert( DAO.TABLE_LAT_LON, values )
 
         enumArea?.let { enumArea ->
             val values = ContentValues()
