@@ -383,6 +383,7 @@ class NearbySessionClientManager(private val context: Context)
         }
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     private fun receiveImage(input: InputStream)
     {
         scope.launch(Dispatchers.IO) {

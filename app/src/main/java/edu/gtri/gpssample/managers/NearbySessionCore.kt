@@ -19,10 +19,7 @@ enum class Command {
     GET_CONFIG,
     GET_ENUMERATION_ITEMS,
     GET_IMAGE,
-    DONE,
-    ACK_CONFIG,
-    ACK_ENUMERATION_ITEMS,
-    ACK_IMAGE
+    DONE
 }
 /**
  * ============================================================================
@@ -34,9 +31,7 @@ sealed interface NearbySessionState
 {
     object Idle : NearbySessionState
 
-    data class Advertising(
-        val sessionId: String
-    ) : NearbySessionState
+    data class Advertising( val sessionId: String) : NearbySessionState
 
     object Connecting : NearbySessionState
     object Connected : NearbySessionState

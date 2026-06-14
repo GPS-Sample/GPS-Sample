@@ -1,15 +1,12 @@
 package edu.gtri.gpssample.managers
 
 import android.content.Context
-import android.util.Log
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Image
-import edu.gtri.gpssample.managers.NearbySessionCore.Companion.SERVICE_ID
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -68,18 +65,6 @@ class NearbySessionHostManager(
     // -------------------------------------------------------------------------
 
     private val transferMutex = Mutex()
-
-    // -------------------------------------------------------------------------
-    // ACK tracking
-    // -------------------------------------------------------------------------
-
-    private var ackDeferred: CompletableDeferred<Unit>? = null
-
-    private suspend fun awaitAck() = ackDeferred?.await()
-
-    private fun signalAck() {
-        ackDeferred?.complete(Unit)
-    }
 
     // -------------------------------------------------------------------------
     // Start / Stop
@@ -227,24 +212,19 @@ class NearbySessionHostManager(
 
                     Command.GET_CONFIG -> {
                         sendConfig(endpointId)
-                        sendAck(endpointId, Command.ACK_CONFIG)
                     }
 
                     Command.GET_ENUMERATION_ITEMS -> {
                         sendEnumerationItems(endpointId)
-                        sendAck(endpointId, Command.ACK_ENUMERATION_ITEMS)
                     }
 
                     Command.GET_IMAGE -> {
                         sendImage(endpointId, request.imageUuid!!)
-                        sendAck(endpointId, Command.ACK_IMAGE)
                     }
 
                     Command.DONE -> {
                         client.disconnectFromEndpoint(endpointId)
                     }
-
-                    else -> Unit
                 }
             }
         }
@@ -316,6 +296,7 @@ class NearbySessionHostManager(
     // IMAGE
     // -------------------------------------------------------------------------
 
+    @OptIn(ExperimentalSerializationApi::class)
     private suspend fun sendImage(endpointId: String, imageId: String) =
         transferMutex.withLock {
 
@@ -337,19 +318,6 @@ class NearbySessionHostManager(
                 }
             }
         }
-
-    // -------------------------------------------------------------------------
-    // ACK
-    // -------------------------------------------------------------------------
-
-    private fun sendAck(endpointId: String, ack: Command) {
-        val bytes = json.encodeToString(
-            Request.serializer(),
-            Request(ack)
-        ).toByteArray()
-
-        client.sendPayload(endpointId, Payload.fromBytes(bytes))
-    }
 
     // -------------------------------------------------------------------------
     // Cleanup
