@@ -258,8 +258,10 @@ class NearbySessionClientManager(private val context: Context)
     {
         scope.launch(Dispatchers.IO) {
             input.use {
-                val config = json.decodeFromStream(Config.serializer(), it)
-                configDeferred?.complete(config)
+                try {
+                    val config = json.decodeFromStream(Config.serializer(), it)
+                    configDeferred?.complete(config)
+                } catch( ex: Exception ) {}
             }
         }
     }
@@ -283,29 +285,6 @@ class NearbySessionClientManager(private val context: Context)
         } finally {
             pendingRequest = null
             enumItemsDeferred = null
-        }
-    }
-
-    private fun receiveEnumerationItemsXX(input: InputStream)
-    {
-        scope.launch(Dispatchers.IO) {
-            input.use {
-                val items = mutableListOf<EnumerationItem>()
-
-                val reader = it.bufferedReader()
-
-                reader.forEachLine { line ->
-                    if (line.isNotBlank()) {
-                        val item = json.decodeFromString(
-                            EnumerationItem.serializer(),
-                            line
-                        )
-                        items.add(item)
-                    }
-                }
-
-                enumItemsDeferred?.complete(items)
-            }
         }
     }
 
@@ -388,8 +367,10 @@ class NearbySessionClientManager(private val context: Context)
     {
         scope.launch(Dispatchers.IO) {
             input.use {
-                val image = json.decodeFromStream(Image.serializer(), it)
-                imageDeferred?.complete(image)
+                try {
+                    val image = json.decodeFromStream(Image.serializer(), it)
+                    imageDeferred?.complete(image)
+                } catch( ex: Exception ) {}
             }
         }
     }

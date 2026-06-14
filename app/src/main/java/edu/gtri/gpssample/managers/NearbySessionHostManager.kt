@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.managers
 
 import android.content.Context
+import android.util.Log
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import edu.gtri.gpssample.database.DAO
@@ -202,14 +203,11 @@ class NearbySessionHostManager(
 
             if (payload.type != Payload.Type.BYTES) return
 
-            val request = json.decodeFromString(
-                Request.serializer(),
-                String(payload.asBytes()!!)
-            )
+            val request = json.decodeFromString(Request.serializer(), String(payload.asBytes()!!))
 
             scope.launch {
-                when (request.command) {
-
+                when (request.command)
+                {
                     Command.GET_CONFIG -> {
                         sendConfig(endpointId)
                     }
@@ -239,9 +237,9 @@ class NearbySessionHostManager(
     // CONFIG
     // -------------------------------------------------------------------------
 
+    @OptIn(ExperimentalSerializationApi::class)
     private suspend fun sendConfig(endpointId: String) =
         transferMutex.withLock {
-
             _state.value = NearbySessionState.SendingConfig
 
             val output = PipedOutputStream()
@@ -252,8 +250,11 @@ class NearbySessionHostManager(
             withContext(Dispatchers.IO) {
                 try {
                     json.encodeToStream(Config.serializer(), config, output)
+                } catch( ex: Exception ) {
                 } finally {
-                    output.close()
+                    try {
+                        output.close()
+                    } catch( ex: Exception ) {}
                 }
             }
         }
@@ -277,17 +278,19 @@ class NearbySessionHostManager(
                 val cursor = db.rawQuery("SELECT * FROM enumeration_item", null)
 
                 try {
-                    while (cursor.moveToNext())
-                    {
-                        val jsonLine = DAO.enumerationItemDAO.buildJson( cursor )
+                    while (cursor.moveToNext()) {
+                        val jsonLine = DAO.enumerationItemDAO.buildJson(cursor)
                         output.write(jsonLine.toByteArray())
                         output.write('\n'.code)
                     }
 
                     output.flush()
+                } catch (ex: Exception ) {
                 } finally {
-                    cursor.close()
-                    output.close()
+                    try {
+                        cursor.close()
+                        output.close()
+                    } catch( ex: Exception ) {}
                 }
             }
         }
@@ -299,11 +302,9 @@ class NearbySessionHostManager(
     @OptIn(ExperimentalSerializationApi::class)
     private suspend fun sendImage(endpointId: String, imageId: String) =
         transferMutex.withLock {
-
             _state.value = NearbySessionState.SendingImage
 
-            val image =
-                ImageDAO.instance().getImage(imageId) ?: return
+            val image = ImageDAO.instance().getImage(imageId) ?: return@withLock
 
             val output = PipedOutputStream()
             val input = PipedInputStream(output, 64 * 1024)
@@ -313,8 +314,14 @@ class NearbySessionHostManager(
             withContext(Dispatchers.IO) {
                 try {
                     json.encodeToStream(Image.serializer(), image, output)
+                } catch( ex: Exception ) {
+                    Log.d( "xxx", ex.stackTraceToString())
                 } finally {
-                    output.close()
+                    try {
+                        output.close()
+                    } catch( ex: Exception ) {
+                        Log.d( "xxx", ex.stackTraceToString())
+                    }
                 }
             }
         }
