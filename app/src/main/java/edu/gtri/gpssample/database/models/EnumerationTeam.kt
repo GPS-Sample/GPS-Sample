@@ -27,24 +27,6 @@ data class EnumerationTeam(
     constructor( enumAreaUuid: String,  name: String, polygon: ArrayList<LatLon>, locationUuids: ArrayList<String> )
             : this(UUID.randomUUID().toString(), Date().time, enumAreaUuid, name, polygon, locationUuids, UUID.randomUUID().toString())
 
-    fun equals( other: EnumerationTeam ): Boolean
-    {
-        if (this.uuid == other.uuid &&
-            this.creationDate == other.creationDate &&
-            this.enumAreaUuid == other.enumAreaUuid &&
-            this.name == other.name)
-        {
-            return true
-        }
-
-        return false
-    }
-
-    fun doesNotEqual( enumerationTeam: EnumerationTeam ): Boolean
-    {
-        return !this.equals( enumerationTeam )
-    }
-
     fun pack() : String
     {
         return Json.encodeToString( this )

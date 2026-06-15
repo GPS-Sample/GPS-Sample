@@ -16,8 +16,10 @@ import edu.gtri.gpssample.database.models.*
 
 class LatLonDAO(private var dao: DAO)
 {
-    fun createOrUpdateLatLon( latLon: LatLon, enumArea : EnumArea?, config: Config? ) : LatLon?
+    fun createOrUpdateLatLon( latLon: LatLon, enumArea : EnumArea?, version: String ) : LatLon?
     {
+        latLon.version = version
+
         val values = ContentValues()
         putLatLon( latLon, values )
 
@@ -42,6 +44,7 @@ class LatLonDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_UUID, latLon.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, latLon.creationDate )
+        values.put( DAO.COLUMN_VERSION, latLon.version )
         values.put( DAO.COLUMN_LAT, latLon.latitude )
         values.put( DAO.COLUMN_LON, latLon.longitude )
     }
@@ -51,10 +54,11 @@ class LatLonDAO(private var dao: DAO)
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LAT))
         val lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LON))
 
-        return LatLon( uuid, creationDate, lat, lon )
+        return LatLon( uuid, creationDate, lat, lon, version )
     }
 
     fun getLatLonsWithEnumAreaUuid( enumAreaUuid: String ): ArrayList<LatLon>

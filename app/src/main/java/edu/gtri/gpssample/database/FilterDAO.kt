@@ -27,8 +27,10 @@ class FilterDAO(private var dao: DAO)
 {
     private val kFilterOperatorOrderUndefined = 0
 
-    fun createOrUpdateFilter( filter: Filter, study : Study ) : Filter?
+    fun createOrUpdateFilter( filter: Filter, study: Study, version: String ) : Filter?
     {
+        filter.version = version
+
         val values = ContentValues()
         putFilter( filter, study, values )
 
@@ -50,7 +52,7 @@ class FilterDAO(private var dao: DAO)
 
     fun ruleCheck(rule : Rule)
     {
-        DAO.ruleDAO.createOrUpdateRule(rule)
+        DAO.ruleDAO.createOrUpdateRule(rule,rule.version)
     }
 
     private fun addEmptyFilterOperator(rule: Rule, filter : Filter)
@@ -111,6 +113,8 @@ class FilterDAO(private var dao: DAO)
         val index = SampleTypeConverter.toIndex(filter.samplingType)
 
         values.put( DAO.COLUMN_UUID, filter.uuid )
+        values.put( DAO.COLUMN_CREATION_DATE, filter.creationDate )
+        values.put( DAO.COLUMN_VERSION, filter.version )
         values.put( DAO.COLUMN_STUDY_UUID, study.uuid )
         values.put( DAO.COLUMN_FILTER_NAME, filter.name )
         values.put( DAO.COLUMN_FILTER_SAMPLE_SIZE, filter.sampleSize )
@@ -121,11 +125,13 @@ class FilterDAO(private var dao: DAO)
     private fun  buildFilter(cursor: Cursor, study : Study ): Filter?
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_NAME))
         val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE))
 
         val type = SampleTypeConverter.fromIndex(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX))
-        val filter = Filter( uuid, name, type, sampleSize )
+        val filter = Filter( uuid, creationDate, name, type, sampleSize, version )
 
         findFieldOperators(filter)
 

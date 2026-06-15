@@ -46,7 +46,7 @@ class LocationDAO(private var dao: DAO)
         for (enumerationItem in location.enumerationItems)
         {
             enumerationItem.locationUuid = location.uuid
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, enumerationItem.version )
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, enumerationItem.version )
         }
     }
 

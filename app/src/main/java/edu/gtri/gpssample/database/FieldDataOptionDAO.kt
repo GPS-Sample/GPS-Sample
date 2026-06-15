@@ -74,6 +74,7 @@ class FieldDataOptionDAO(private var dao: DAO)
     fun putFieldDataOption(fieldDataOption: FieldDataOption, values: ContentValues)
     {
         values.put( DAO.COLUMN_UUID, fieldDataOption.uuid )
+        values.put( DAO.COLUMN_CREATION_DATE, fieldDataOption.creationDate )
         values.put( DAO.COLUMN_VERSION, fieldDataOption.version )
         values.put( DAO.COLUMN_FIELD_DATA_OPTION_NAME, fieldDataOption.name )
         values.put( DAO.COLUMN_FIELD_DATA_OPTION_VALUE, fieldDataOption.value )
@@ -83,11 +84,12 @@ class FieldDataOptionDAO(private var dao: DAO)
     private fun  buildFieldDataOption(cursor: Cursor): FieldDataOption
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_NAME))
         val value = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_VALUE)).toBoolean()
 
-        return FieldDataOption(uuid, name, value, version)
+        return FieldDataOption(uuid, creationDate, name, value, version)
     }
 
 //    fun loadCache()

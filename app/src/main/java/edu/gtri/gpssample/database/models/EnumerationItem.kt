@@ -24,7 +24,6 @@ import kotlin.collections.ArrayList
 data class EnumerationItem(
     var uuid : String,
     var creationDate: Long,
-    var syncCode : Int,
     var distance : Double,      // not stored in DB!
     var distanceUnits: String,  // not stored in DB!
     var isVisible : Boolean,    // not stored in DB!
@@ -51,7 +50,6 @@ data class EnumerationItem(
     constructor() : this(
         "",
         Date().time,
-        0,
         0.0,
         "",
         true,

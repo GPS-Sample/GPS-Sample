@@ -11,6 +11,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -422,17 +423,27 @@ class ManageConfigurationsFragment : Fragment()
                     }
                 }
 
-                nearbySessionClientManager?.connect( sessionId ) { config, enumerationItems ->
+                val start = Date().time / 1000L
+                Log.d("xxx", "before import = ${usedMB()} MB")
+
+                nearbySessionClientManager?.connect( sessionId ) { config ->
                     nearbySessionStatusDialog?.setStatus( "Saving Configuration..." )
 
                     viewLifecycleOwner.lifecycleScope.launch {
                         withContext(Dispatchers.IO)
                         {
                             DAO.configDAO.createOrUpdateConfig( config,config.version )
-                            DAO.enumerationItemDAO.createOrUpdateEnumerationItems( enumerationItems )
                         }
 
                         // back on the main thread...
+
+                        System.gc()
+                        Log.d("xxx", "after import = ${usedMB()} MB")
+                        val duration= Date().time / 1000L - start
+                        val minutes = duration / 60
+                        val seconds = duration % 60
+
+                        Log.d("xxx", "Transfer time: %d:%02d".format(minutes, seconds))
 
                         nearbySessionStatusDialog?.dismiss()
 
@@ -448,6 +459,11 @@ class ManageConfigurationsFragment : Fragment()
                 }
             }
         }
+    }
+
+    fun usedMB(): Long {
+        val runtime = Runtime.getRuntime()
+        return (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024
     }
 
     fun didReceiveConfiguration( config: Config )

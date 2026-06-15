@@ -21,8 +21,10 @@ import kotlin.collections.ArrayList
 
 class RuleDAO(private var dao: DAO)
 {
-    fun createOrUpdateRule( rule: Rule ) : Rule?
+    fun createOrUpdateRule( rule: Rule, version: String ) : Rule?
     {
+        rule.version = version
+
         val values = ContentValues()
         putRule( rule, values )
 
@@ -39,13 +41,15 @@ class RuleDAO(private var dao: DAO)
     private fun putRule( rule: Rule, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, rule.uuid )
-        values.put(DAO.COLUMN_FIELD_UUID, rule.fieldUuid)
+        values.put( DAO.COLUMN_CREATION_DATE, rule.creationDate )
+        values.put( DAO.COLUMN_VERSION, rule.version )
+        values.put( DAO.COLUMN_FIELD_UUID, rule.fieldUuid )
         values.put( DAO.COLUMN_RULE_NAME, rule.name )
         values.put( DAO.COLUMN_RULE_VALUE, rule.value )
         values.put( DAO.COLUMN_RULE_IS_SUBSET_RULE, rule.isSubsetRule )
 
         rule.operator?.let { operator ->
-            values.put( DAO.COLUMN_OPERATOR_ID, OperatorConverter.toIndex(operator) )
+            values.put( DAO.COLUMN_OPERATOR_ID, OperatorConverter.toIndex(operator))
         }
 
         rule.filterOperator?.let { filterOperator ->
@@ -57,6 +61,8 @@ class RuleDAO(private var dao: DAO)
     private fun buildRule(cursor: Cursor): Rule?
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val fieldUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_NAME))
         val operatorId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_OPERATOR_ID))
@@ -67,7 +73,7 @@ class RuleDAO(private var dao: DAO)
         val operator = OperatorConverter.fromIndex(operatorId)
 
         field?.let { rule->
-            return Rule( uuid, fieldUuid, name, value, isSubsetRule, operator, null )
+            return Rule( uuid, creationDate, fieldUuid, name, value, isSubsetRule, operator, null, version )
         }
 
         return null

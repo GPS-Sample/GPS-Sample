@@ -11,7 +11,6 @@ package edu.gtri.gpssample.database.models
 import android.util.Log
 import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.constants.SamplingMethod
-import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.utils.EncryptionUtil
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -51,29 +50,6 @@ data class Study(
     {
         val jsonString = Json.encodeToString( this )
         return  EncryptionUtil.Encrypt(jsonString,password)
-    }
-
-    fun equals( other: Study ): Boolean
-    {
-        if (this.uuid == other.uuid &&
-            this.creationDate == other.creationDate &&
-            this.name == other.name &&
-            this.samplingMethod == other.samplingMethod &&
-            this.sampleSize == other.sampleSize &&
-            this.sampleType == other.sampleType &&
-            this.subsetSampleName == other.subsetSampleName &&
-            this.subsetSampleSize == other.subsetSampleSize &&
-            this.subsetSampleType == other.subsetSampleType)
-        {
-            return true
-        }
-
-        return false
-    }
-
-    fun doesNotEqual( study: Study ): Boolean
-    {
-        return !this.equals( study )
     }
 
     companion object

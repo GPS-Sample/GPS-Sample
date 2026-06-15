@@ -50,26 +50,6 @@ data class EnumArea (
     constructor( creationDate: Long, configUuid: String, strataUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, vertices: ArrayList<LatLon>, mapTileRegion: MapTileRegion?)
             : this(UUID.randomUUID().toString(), creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion, ArrayList<Breadcrumb>(), UUID.randomUUID().toString())
 
-    fun equals( other: EnumArea ): Boolean
-    {
-        if (this.uuid == other.uuid &&
-            this.creationDate == other.creationDate &&
-            this.configUuid == other.configUuid &&
-            this.name == other.name &&
-            this.selectedEnumerationTeamUuid == other.selectedEnumerationTeamUuid &&
-            this.selectedCollectionTeamUuid == other.selectedCollectionTeamUuid)
-        {
-            return true
-        }
-
-        return false
-    }
-
-    fun doesNotEqual( enumArea: EnumArea ): Boolean
-    {
-        return !this.equals( enumArea )
-    }
-
     fun pack(password: String) : String
     {
         try

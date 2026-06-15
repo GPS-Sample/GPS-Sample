@@ -8,8 +8,6 @@
 @file:OptIn(kotlinx.serialization.InternalSerializationApi::class)
 package edu.gtri.gpssample.database.models
 
-import android.util.Log
-import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.LocationType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -44,23 +42,6 @@ data class Location(
 
     constructor( timeZone: Int, type: LocationType, gpsAccuracy: Int, latitude: Double, longitude: Double, altitude: Double, isLandmark: Boolean, description: String, properties: String ) :
             this( UUID.randomUUID().toString(), Date().time, timeZone, 0.0, "", true, type, gpsAccuracy, latitude, longitude, altitude, isLandmark, description,"", false, properties, ArrayList<EnumerationItem>(),UUID.randomUUID().toString())
-
-    fun equals( other: Location ) : Boolean
-    {
-        if (this.creationDate > other.creationDate) // new date is newer thant old date, should update
-        {
-            return false
-        }
-        else
-        {
-            return true // no need to update
-        }
-    }
-
-    fun doesNotEqual( location: Location ): Boolean
-    {
-        return !this.equals( location )
-    }
 
     fun pack() : String
     {

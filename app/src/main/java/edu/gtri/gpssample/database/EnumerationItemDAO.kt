@@ -30,24 +30,7 @@ class EnumerationItemDAO(private var dao: DAO)
 
         dao.upsert( DAO.TABLE_ENUMERATION_ITEM, values )
 
-        enumerationItem.fieldDataList?.let { fieldDataList ->
-            for (fieldData in fieldDataList)
-            {
-                DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem, fieldData.version )
-            }
-        }
-    }
-
-    fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location, version: String )
-    {
-        enumerationItem.version = version
-
-        val values = ContentValues()
-        putEnumerationItem( enumerationItem, location.uuid, values )
-
-        dao.upsert( DAO.TABLE_ENUMERATION_ITEM, values )
-
-        enumerationItem.fieldDataList?.let { fieldDataList ->
+        enumerationItem.fieldDataList.let { fieldDataList ->
             for (fieldData in fieldDataList)
             {
                 DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem, fieldData.version )
@@ -81,7 +64,6 @@ class EnumerationItemDAO(private var dao: DAO)
         values.put( DAO.COLUMN_UUID, enumerationItem.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, enumerationItem.creationDate )
         values.put( DAO.COLUMN_VERSION, enumerationItem.version )
-        values.put( DAO.COLUMN_SYNC_CODE, enumerationItem.syncCode)
         values.put( DAO.COLUMN_LOCATION_UUID, locationUuid)
         values.put( DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS, enumerationItem.subAddress )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME, enumerationItem.enumeratorName )
@@ -106,7 +88,6 @@ class EnumerationItemDAO(private var dao: DAO)
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
-        val syncCode = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_SYNC_CODE))
         val locationUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_UUID))
         val subAddress = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS))
         val enumeratorName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME))
@@ -130,7 +111,6 @@ class EnumerationItemDAO(private var dao: DAO)
         return EnumerationItem(
             uuid,
             creationDate,
-            syncCode,
             0.0,
             "",
             true,
@@ -156,68 +136,23 @@ class EnumerationItemDAO(private var dao: DAO)
         )
     }
 
-    fun buildJson(cursor: Cursor): String
+    fun getEnumerationItem( uuid: String ): EnumerationItem?
     {
-        val uuid = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_UUID))
-        val creationDate = cursor.getLong(cursor.getColumnIndexOrThrow(DAO.COLUMN_CREATION_DATE))
-        val version = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_VERSION))
-        val syncCode = cursor.getInt(cursor.getColumnIndexOrThrow(DAO.COLUMN_SYNC_CODE))
+        var enumerationItem: EnumerationItem? = null
 
-        val locationUuid = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_LOCATION_UUID))
-        val subAddress = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS))
-        val enumeratorName = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME))
+        val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_ITEM} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
 
-        val enumerationState = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE))
-        val enumerationDate = cursor.getLong(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_DATE))
-        val enumerationIncompleteReason = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_INCOMPLETE_REASON))
-        val enumerationNotes = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_NOTES))
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
-        val eligibleSampling = cursor.getInt(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SAMPLING))
-        val eligibleSubset = cursor.getInt(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SUBSET_SAMPLING))
-
-        val samplingState = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_SAMPLING_STATE))
-        val subsetSamplingState = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_SUBSET_SAMPLING_STATE))
-
-        val collectorName = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME))
-        val collectionState = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_STATE))
-        val collectionDate = cursor.getLong(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_DATE))
-        val collectionIncompleteReason = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON))
-        val collectionNotes = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES))
-
-        val odkUri = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI))
-
-        val json = """
+        while (cursor.moveToNext())
         {
-            "uuid":"$uuid",
-            "creationDate":$creationDate,
-            "version":"$version",
-            "syncCode":$syncCode,
-            "distance":0.0,
-            "distanceUnits":"",
-            "isVisible":true,
-            "locationUuid":"$locationUuid",
-            "subAddress":"${subAddress ?: ""}",
-            "enumeratorName":"${enumeratorName ?: ""}",
-            "enumerationState":"$enumerationState",
-            "enumerationDate":$enumerationDate,
-            "enumerationIncompleteReason":"${enumerationIncompleteReason ?: ""}",
-            "enumerationNotes":"${enumerationNotes ?: ""}",
-            "enumerationEligibleForSampling":${eligibleSampling != 0},
-            "enumerationEligibleForSubsetSampling":${eligibleSubset != 0},
-            "samplingState":"$samplingState",
-            "subsetSamplingState":"$subsetSamplingState",
-            "collectorName":"${collectorName ?: ""}",
-            "collectionState":"$collectionState",
-            "collectionDate":$collectionDate,
-            "collectionIncompleteReason":"${collectionIncompleteReason ?: ""}",
-            "collectionNotes":"${collectionNotes ?: ""}",
-            "fieldDataList":[],
-            "odkRecordUri":"",
-            "odkInstanceUri":"${odkUri ?: ""}"
+            enumerationItem = buildEnumerationItem( cursor )
+            enumerationItem.fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
         }
-    """.trimIndent()
 
-        return json.replace("\n", "")
+        cursor.close()
+
+        return enumerationItem
     }
 
     fun getEnumerationItems( location: Location ) : ArrayList<EnumerationItem>

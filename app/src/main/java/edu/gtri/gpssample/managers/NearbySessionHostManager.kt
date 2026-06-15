@@ -7,6 +7,7 @@ import com.google.android.gms.nearby.connection.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Image
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -279,12 +280,13 @@ class NearbySessionHostManager(
 
                 try {
                     while (cursor.moveToNext()) {
-                        val jsonLine = DAO.enumerationItemDAO.buildJson(cursor)
-                        output.write(jsonLine.toByteArray())
-                        output.write('\n'.code)
+                        val uuid = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_UUID))
+                        DAO.enumerationItemDAO.getEnumerationItem(uuid)?.let { item ->
+                            val jsonLine = json.encodeToString(EnumerationItem.serializer(), item)
+                            output.write(jsonLine.toByteArray())
+                            output.write('\n'.code)
+                        }
                     }
-
-                    output.flush()
                 } catch (ex: Exception ) {
                 } finally {
                     try {

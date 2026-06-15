@@ -18,25 +18,26 @@ import java.util.*
 @Serializable
 data class Rule(
     var uuid : String,
+    var creationDate: Long,
     var fieldUuid: String,
     var name: String,
     var value: String,
     var isSubsetRule: Boolean,
     var operator : Operator?,
     var filterOperator: FilterOperator?,
-    var fieldDataOptions : ArrayList<FieldDataOption>
-    )
+    var fieldDataOptions : ArrayList<FieldDataOption>,
+    var version: String)
 {
-    constructor() : this(UUID.randomUUID().toString(), "", "", "", false, Operator.Equal, null, ArrayList<FieldDataOption>())
+    constructor() : this(UUID.randomUUID().toString(), Date().time, "", "", "", false, Operator.Equal, null, ArrayList<FieldDataOption>(), UUID.randomUUID().toString())
 
     constructor( fieldUuid: String, name: String, value: String, operator: Operator)
-            : this(UUID.randomUUID().toString(), fieldUuid, name, value, false, operator, null, ArrayList<FieldDataOption>())
+            : this(UUID.randomUUID().toString(), Date().time, fieldUuid, name, value, false, operator, null, ArrayList<FieldDataOption>(), UUID.randomUUID().toString())
 
     constructor( fieldUuid: String, name: String, value: String)
-            : this(UUID.randomUUID().toString(), fieldUuid, name, value, false, null, null, ArrayList<FieldDataOption>())
+            : this(UUID.randomUUID().toString(), Date().time, fieldUuid, name, value, false, null, null, ArrayList<FieldDataOption>(), UUID.randomUUID().toString())
 
-    constructor(uuid : String, fieldUuid: String, name: String, value: String, isSubsetRule: Boolean, operator: Operator, filterOperator: FilterOperator?)
-            : this(uuid, fieldUuid, name, value, isSubsetRule, operator, filterOperator, ArrayList<FieldDataOption>())
+    constructor(uuid : String, creationDate: Long, fieldUuid: String, name: String, value: String, isSubsetRule: Boolean, operator: Operator, filterOperator: FilterOperator?, version: String)
+            : this(uuid, creationDate, fieldUuid, name, value, isSubsetRule, operator, filterOperator, ArrayList<FieldDataOption>(), version)
 
     fun pack() : String
     {

@@ -28,6 +28,8 @@ class MapTileRegionDAO(private var dao: DAO)
     private fun putMapTileRegion( mapTileRegion: MapTileRegion, enumArea: EnumArea, values: ContentValues)
     {
         values.put( DAO.COLUMN_UUID, mapTileRegion.uuid )
+        values.put( DAO.COLUMN_CREATION_DATE, mapTileRegion.creationDate )
+        values.put( DAO.COLUMN_VERSION, mapTileRegion.version )
         values.put( DAO.COLUMN_ENUM_AREA_UUID, enumArea.uuid )
         values.put( DAO.COLUMN_NORTH_EAST_LAT, mapTileRegion.northEast.latitude )
         values.put( DAO.COLUMN_NORTH_EAST_LON, mapTileRegion.northEast.longitude )
@@ -39,12 +41,14 @@ class MapTileRegionDAO(private var dao: DAO)
     private fun buildMapTileRegion(cursor: Cursor): MapTileRegion
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val ne_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_NORTH_EAST_LAT))
         val ne_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_NORTH_EAST_LON))
         val sw_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_SOUTH_WEST_LAT))
         val sw_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_SOUTH_WEST_LON))
 
-        return MapTileRegion( uuid, LatLon( 0, ne_lat, ne_lon ), LatLon( 0, sw_lat, sw_lon ))
+        return MapTileRegion( uuid, creationDate, version, LatLon( 0, ne_lat, ne_lon ), LatLon( 0, sw_lat, sw_lon ))
     }
 
     fun getMapTileRegion( enumArea: EnumArea ): MapTileRegion?

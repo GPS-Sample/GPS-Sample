@@ -449,14 +449,13 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
 
                 Log.d("xxx", "before import = ${usedMB()} MB")
 
-                nearbySessionClientManager?.connect( sessionId ) { config, enumerationItems ->
+                nearbySessionClientManager?.connect( sessionId ) { config ->
                     nearbySessionStatusDialog?.setStatus( "Saving Configuration..." )
 
                     viewLifecycleOwner.lifecycleScope.launch {
                         withContext(Dispatchers.IO)
                         {
                             DAO.configDAO.createOrUpdateConfig( config,config.version )
-                            DAO.enumerationItemDAO.createOrUpdateEnumerationItems( enumerationItems )
 
                             // TODO!!! re-fetch the config from the db
                         }
@@ -540,6 +539,13 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
             config.selectedEnumAreaUuid = enumArea.uuid
+            for (location in enumArea.locations)
+            {
+                if (location.enumerationItems.isEmpty())
+                {
+                    location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+                }
+            }
             sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
                 config.selectedStudyUuid = study.uuid
                 sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)

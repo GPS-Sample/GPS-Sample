@@ -17,28 +17,12 @@ import java.util.*
 @Serializable
 data class FieldDataOption(
     var uuid : String,
+    var creationDate: Long,
     var name : String,
     var value: Boolean,
     var version: String)
 {
-    constructor(name: String, value: Boolean) : this(UUID.randomUUID().toString(), name, value, UUID.randomUUID().toString())
-
-    fun equals( other: FieldDataOption ) : Boolean
-    {
-        if (this.uuid == other.uuid &&
-            this.name == other.name &&
-            this.value == other.value )
-        {
-            return true
-        }
-
-        return false
-    }
-
-    fun doesNotEqual( fieldDataOption: FieldDataOption ): Boolean
-    {
-        return !this.equals( fieldDataOption )
-    }
+    constructor(name: String, value: Boolean) : this(UUID.randomUUID().toString(), Date().time, name, value, UUID.randomUUID().toString())
 
     fun pack() : String
     {

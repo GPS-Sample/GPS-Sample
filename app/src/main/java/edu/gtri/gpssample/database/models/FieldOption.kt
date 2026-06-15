@@ -17,10 +17,11 @@ import java.util.*
 @Serializable
 data class FieldOption(
     var uuid : String,
+    var creationDate: Long,
     var name: String,
     var version: String)
 {
-    constructor(name: String) : this(UUID.randomUUID().toString(), name, UUID.randomUUID().toString())
+    constructor(name: String) : this(UUID.randomUUID().toString(), Date().time, name, UUID.randomUUID().toString())
 
     fun pack() : String
     {

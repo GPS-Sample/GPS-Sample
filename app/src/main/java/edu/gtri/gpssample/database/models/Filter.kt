@@ -18,13 +18,16 @@ import java.util.*
 @Serializable
 data class Filter(
     var uuid : String,
+    var creationDate: Long,
     var name: String,
     var samplingType : SampleType,
     var sampleSize: Int,
-    var rule : Rule?)
+    var rule : Rule?,
+    var version: String)
 {
-    constructor(name: String) : this(UUID.randomUUID().toString(), name, SampleType.None, 0, null)
-    constructor(uuid: String, name: String, samplingType : SampleType, sampleSize: Int) : this(uuid, name, samplingType, sampleSize, null)
+    constructor(name: String) : this( UUID.randomUUID().toString(), Date().time, name, SampleType.None, 0, null, UUID.randomUUID().toString())
+    constructor(uuid: String, creationDate: Long, name: String, samplingType : SampleType, sampleSize: Int, version: String) : this(uuid, creationDate, name, samplingType, sampleSize, null, version )
+
     fun pack() : String
     {
         return Json.encodeToString( this )

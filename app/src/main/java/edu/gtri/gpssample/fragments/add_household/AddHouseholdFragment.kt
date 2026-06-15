@@ -582,6 +582,7 @@ class AddHouseholdFragment : Fragment(),
 
         enumerationItem.enumerationNotes = notes
         enumerationItem.enumerationDate = Date().time
+        enumerationItem.locationUuid = location.uuid
         enumerationItem.version = UUID.randomUUID().toString()
         enumerationItem.subAddress = binding.subaddressEditText.text.toString()
 
@@ -615,7 +616,7 @@ class AddHouseholdFragment : Fragment(),
             enumerationItem.enumeratorName = user.name
         }
 
-        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location,UUID.randomUUID().toString())
+        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem,UUID.randomUUID().toString())
 
         location.creationDate = Date().time
         DAO.locationDAO.createOrUpdateLocation( location, enumArea, UUID.randomUUID().toString())

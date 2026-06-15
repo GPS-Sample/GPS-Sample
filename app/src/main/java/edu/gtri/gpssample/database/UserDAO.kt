@@ -15,8 +15,12 @@ import edu.gtri.gpssample.extensions.toBoolean
 
 class UserDAO(private var dao: DAO)
 {
-    fun createUser( user: User)
+    fun createUser( user: User, version: String )
     {
+        assert( user.uuid.isNotEmpty())
+
+        user.version = version
+
         val values = ContentValues()
 
         putUser( user, values )
@@ -27,6 +31,8 @@ class UserDAO(private var dao: DAO)
     fun putUser( user: User, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, user.uuid )
+        values.put( DAO.COLUMN_CREATION_DATE, user.creationDate )
+        values.put( DAO.COLUMN_VERSION, user.version )
         values.put( DAO.COLUMN_USER_ROLE, user.role )
         values.put( DAO.COLUMN_USER_NAME, user.name )
         values.put( DAO.COLUMN_USER_RECOVERY_QUESTION, user.recoveryQuestion )
@@ -55,13 +61,15 @@ class UserDAO(private var dao: DAO)
     private fun buildUser(cursor: Cursor) : User
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_NAME))
         val role = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_ROLE))
         val recoveryQuestion = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_RECOVERY_QUESTION))
         val recoveryAnswer = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_RECOVERY_ANSWER))
         val isOnline = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_IS_ONLINE)).toBoolean()
 
-        return User(uuid, name, role, recoveryQuestion, recoveryAnswer, isOnline )
+        return User(uuid, creationDate, name, role, recoveryQuestion, recoveryAnswer, isOnline, version )
     }
 
     fun updateUser( user: User )

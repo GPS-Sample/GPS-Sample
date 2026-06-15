@@ -43,10 +43,10 @@ object TestUtils
             {
                 enumerationItem.subAddress = count.toString()
                 enumerationItem.enumerationDate = Date().time
+                enumerationItem.locationUuid = location.uuid
                 enumerationItem.enumerationEligibleForSampling = true
-                enumerationItem.syncCode = enumerationItem.syncCode + 1
                 enumerationItem.enumerationState = EnumerationState.Enumerated
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, enumerationItem.toString())
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem,enumerationItem.toString())
                 count += 1
             }
         }
@@ -72,10 +72,10 @@ object TestUtils
             for (enumerationItem in location.enumerationItems)
             {
                 enumerationItem.collectionDate = Date().time
-                enumerationItem.syncCode = enumerationItem.syncCode + 1
+                enumerationItem.locationUuid = location.uuid
                 enumerationItem.collectionState = CollectionState.Complete
                 enumerationItem.samplingState = SamplingState.Sampled
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, enumerationItem.toString())
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem,enumerationItem.toString())
             }
         }
 

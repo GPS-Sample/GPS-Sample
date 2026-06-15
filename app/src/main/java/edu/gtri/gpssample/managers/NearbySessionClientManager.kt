@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumerationItem
@@ -65,14 +66,14 @@ class NearbySessionClientManager(private val context: Context)
     private var pendingRequest: PendingRequest? = null
 
     private var configDeferred: CompletableDeferred<Config>? = null
-    private var enumItemsDeferred: CompletableDeferred<List<EnumerationItem>>? = null
+    private var enumItemsDeferred: CompletableDeferred<Unit>? = null
     private var imageDeferred: CompletableDeferred<Image>? = null
 
     // -------------------------------------------------------------------------
     // Public API
     // -------------------------------------------------------------------------
 
-    fun connect(sessionId: String, completion: (Config, List<EnumerationItem>) -> Unit)
+    fun connect(sessionId: String, completion: (Config) -> Unit)
     {
         if (clientJob != null) return
 
@@ -106,7 +107,7 @@ class NearbySessionClientManager(private val context: Context)
     // Main flow
     // -------------------------------------------------------------------------
 
-    private suspend fun runClient(sessionId: String, completion: (Config, List<EnumerationItem>) -> Unit)
+    private suspend fun runClient(sessionId: String, completion: (Config) -> Unit)
     {
         _state.value = NearbySessionState.Connecting
 
@@ -116,12 +117,12 @@ class NearbySessionClientManager(private val context: Context)
         _state.value = NearbySessionState.Connected
 
         val config = requestConfig()
-        val enumerationItems = requestEnumerationItems()
+        requestEnumerationItems()
 
         downloadImages(config)
 
         withContext(Dispatchers.Main) {
-            completion(config, enumerationItems)
+            completion(config)
         }
 
         sendDone()
@@ -270,10 +271,10 @@ class NearbySessionClientManager(private val context: Context)
     // ENUMERATION ITEMS (NEW)
     // -------------------------------------------------------------------------
 
-    private suspend fun requestEnumerationItems(): List<EnumerationItem>
+    private suspend fun requestEnumerationItems(): Unit
     {
         pendingRequest = PendingRequest.ENUMERATION_ITEMS
-        val deferred = CompletableDeferred<List<EnumerationItem>>()
+        val deferred = CompletableDeferred<Unit>()
         enumItemsDeferred = deferred
 
         _state.value = NearbySessionState.ReceivingEnumerationItems
@@ -295,13 +296,16 @@ class NearbySessionClientManager(private val context: Context)
             val items = mutableListOf<EnumerationItem>()
 
             try {
+                DAO.instance().writableDatabase.beginTransaction()
+
                 input.bufferedReader().useLines { lines ->
                     for (line in lines)
                     {
                         if (line.isBlank()) continue
 
                         try {
-                            items.add(json.decodeFromString(EnumerationItem.serializer(), line))
+                            val enumerationItem = json.decodeFromString(EnumerationItem.serializer(), line)
+                            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, enumerationItem.version )
                         }
                         catch (ex: Exception)
                         {
@@ -310,7 +314,9 @@ class NearbySessionClientManager(private val context: Context)
                     }
                 }
 
-                enumItemsDeferred?.complete(items )
+                DAO.instance().writableDatabase.setTransactionSuccessful()
+
+                enumItemsDeferred?.complete(Unit )
             }
             catch (ex: Exception)
             {
@@ -320,6 +326,7 @@ class NearbySessionClientManager(private val context: Context)
             finally
             {
                 try {
+                    DAO.instance().writableDatabase.endTransaction()
                     input.close()
                 } catch (_: Exception) {}
             }

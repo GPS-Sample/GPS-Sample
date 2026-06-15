@@ -45,28 +45,6 @@ data class FieldData (
     constructor( fieldUuid: String,  name : String, type : FieldType, textValue: String, numberValue: Double, dateValue: Long, dropdownIndex: Int, blockNumber: Int ) :
             this( UUID.randomUUID().toString(), Date().time, fieldUuid, name, type,  textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>(), UUID.randomUUID().toString())
 
-    fun equals( other: FieldData ) : Boolean
-    {
-        if (this.uuid == other.uuid &&
-            this.name == other.name &&
-            this.type == other.type &&
-            this.textValue == other.textValue &&
-            this.numberValue == other.numberValue &&
-            this.dateValue == other.dateValue &&
-            this.dropdownIndex == other.dropdownIndex &&
-            this.blockNumber == other.blockNumber)
-        {
-            return true
-        }
-
-        return false
-    }
-
-    fun doesNotEqual( fieldData: FieldData ): Boolean
-    {
-        return !this.equals( fieldData )
-    }
-
     fun copy() : FieldData
     {
         return unpack(pack())

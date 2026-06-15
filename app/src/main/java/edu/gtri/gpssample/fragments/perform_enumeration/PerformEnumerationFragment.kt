@@ -1154,7 +1154,11 @@ class PerformEnumerationFragment : Fragment(),
                             ConfirmationDialog.ButtonPress.Right -> {
                                 val enumerationItem = EnumerationItem()
 
-                                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, enumerationItem.version )
+                                enumerationItem.locationUuid = location.uuid
+
+                                // oops!!! enumeration.uuid is an empty string at this point, which means that the primary key is empty
+
+                                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem,enumerationItem.version )
                                 location.enumerationItems.add(enumerationItem)
                                 sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
 

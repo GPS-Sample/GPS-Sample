@@ -22,6 +22,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +31,7 @@ import com.mapbox.geojson.Point
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
@@ -37,6 +39,9 @@ import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.osmdroid.views.MapView
 
 class CreateConfigurationFragment : Fragment(), View.OnTouchListener
@@ -178,7 +183,7 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
                 return@setOnClickListener
             }
 
-            sharedViewModel.currentConfiguration?.value?.let {config ->
+            sharedViewModel.currentConfiguration?.value?.let { config ->
                 if (config.minGpsPrecision == 0)
                 {
                     Toast.makeText(activity!!.applicationContext, resources.getString(R.string.desired_gps_position), Toast.LENGTH_SHORT).show()
@@ -187,14 +192,17 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
                 {
                     val busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.saving_configuration), null, false )
 
-                    Thread {
-                        sharedViewModel.updateConfiguration()
-
-                        activity!!.runOnUiThread {
-                            busyIndicatorDialog.alertDialog.cancel()
-                            findNavController().popBackStack()
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        withContext(Dispatchers.IO)
+                        {
+                            DAO.configDAO.createOrUpdateConfig( config,config.version )
                         }
-                    }.start()
+
+                        // back on the main thread...
+                        busyIndicatorDialog.alertDialog.cancel()
+
+                        findNavController().popBackStack()
+                    }
                 }
             }
         }

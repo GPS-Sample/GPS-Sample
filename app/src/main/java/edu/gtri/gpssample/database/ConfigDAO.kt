@@ -8,22 +8,16 @@
 package edu.gtri.gpssample.database
 
 import android.annotation.SuppressLint
-import android.app.Application
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Study
-import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.managers.PreferencesManager
 import java.util.Date
-import java.util.UUID
-import kotlin.math.min
-import kotlin.time.Duration
 
 class ConfigDAO(private var dao: DAO)
 {

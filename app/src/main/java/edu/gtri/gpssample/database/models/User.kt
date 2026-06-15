@@ -17,14 +17,16 @@ import java.util.*
 @Serializable
 data class User(
     var uuid : String,
+    var creationDate : Long,
     var name: String,
     var role: String,
     var recoveryQuestion: String,
     var recoveryAnswer: String,
-    var isOnline: Boolean )
+    var isOnline: Boolean,
+    var version: String)
 {
-    constructor(name: String, role: String, recoveryQuestion: String, recoveryAnswer: String, isOnline: Boolean) :
-                this( UUID.randomUUID().toString(), name, role, recoveryQuestion, recoveryAnswer, isOnline)
+    constructor( name: String, role: String, recoveryQuestion: String, recoveryAnswer: String, isOnline: Boolean) :
+                this(UUID.randomUUID().toString(), Date().time, name, role, recoveryQuestion, recoveryAnswer, isOnline,UUID.randomUUID().toString())
 
     fun pack() : String
     {

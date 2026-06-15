@@ -45,6 +45,7 @@ class FieldOptionDAO(private var dao: DAO)
     fun putFieldOption( fieldOption: FieldOption, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, fieldOption.uuid )
+        values.put( DAO.COLUMN_CREATION_DATE, fieldOption.creationDate )
         values.put( DAO.COLUMN_VERSION, fieldOption.version )
         values.put( DAO.COLUMN_FIELD_OPTION_NAME, fieldOption.name )
     }
@@ -53,10 +54,11 @@ class FieldOptionDAO(private var dao: DAO)
     private fun  buildFieldOption(cursor: Cursor ): FieldOption
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_NAME))
 
-        return FieldOption(uuid, name, version)
+        return FieldOption(uuid, creationDate, name, version)
     }
 
     fun getFieldOption( uuid : String ): FieldOption?

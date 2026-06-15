@@ -40,31 +40,31 @@ class StudyDAO(private var dao: DAO)
         // add primary rules
         for (rule in study.primaryRules)
         {
-            DAO.ruleDAO.createOrUpdateRule( rule )
+            DAO.ruleDAO.createOrUpdateRule( rule,rule.version )
         }
 
         // add subset rules
         for (rule in study.subsetRules)
         {
-            DAO.ruleDAO.createOrUpdateRule( rule )
+            DAO.ruleDAO.createOrUpdateRule( rule,rule.version )
         }
 
         // add primary filters
         for (filter in study.primaryFilters)
         {
-            DAO.filterDAO.createOrUpdateFilter( filter, study );
+            DAO.filterDAO.createOrUpdateFilter( filter, study,filter.version );
         }
 
         // add subset filters
         for (filter in study.subsetFilters)
         {
-            DAO.filterDAO.createOrUpdateFilter( filter, study );
+            DAO.filterDAO.createOrUpdateFilter( filter, study, filter.version );
         }
 
         // add stratas
         for (strata in study.stratas)
         {
-            DAO.strataDAO.createOrUpdateStrata( strata )
+            DAO.strataDAO.createOrUpdateStrata( strata, strata.version )
         }
 
         return study

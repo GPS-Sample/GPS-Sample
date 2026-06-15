@@ -17,30 +17,13 @@ data class LatLon (
     var uuid : String,
     var creationDate : Long,
     var latitude: Double,
-    var longitude: Double)
+    var longitude: Double,
+    var version: String)
 {
-    constructor( creationDate: Long, latitude: Double, longitude: Double ) : this(UUID.randomUUID().toString(), creationDate, latitude, longitude)
+    constructor( creationDate: Long, latitude: Double, longitude: Double ) : this(UUID.randomUUID().toString(), creationDate, latitude, longitude, UUID.randomUUID().toString())
 
     fun toLatLng() : LatLng
     {
         return LatLng( latitude, longitude )
-    }
-
-    fun equals( other: LatLon ) : Boolean
-    {
-        if (this.uuid == other.uuid &&
-            this.creationDate == other.creationDate &&
-            this.latitude == other.latitude &&
-            this.longitude == other.longitude)
-        {
-            return true
-        }
-
-        return false
-    }
-
-    fun doesNotEqual( latLon: LatLon ): Boolean
-    {
-        return !this.equals( latLon )
     }
 }

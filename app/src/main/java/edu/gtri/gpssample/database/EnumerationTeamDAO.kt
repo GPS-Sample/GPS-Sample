@@ -26,7 +26,7 @@ class EnumerationTeamDAO(private var dao: DAO)
 
         for (latLon in enumerationTeam.polygon)
         {
-            DAO.latLonDAO.createOrUpdateLatLon(latLon,null, null)
+            DAO.latLonDAO.createOrUpdateLatLon(latLon,null, latLon.version)
         }
 
         updateConnectorTable( enumerationTeam )

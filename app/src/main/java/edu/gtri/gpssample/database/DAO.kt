@@ -12,6 +12,7 @@ import android.content.Context
 import android.database.DatabaseUtils
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.database.sqlite.SQLiteStatement
 import android.util.Log
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.CollectionState
@@ -21,6 +22,7 @@ import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.Image
 import java.util.*
 import androidx.core.database.sqlite.transaction
+import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.database.models.Study
 
 class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
@@ -32,6 +34,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableUser = ("CREATE TABLE " +
                     TABLE_USER + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_USER_ROLE + " TEXT" + "," +
                     COLUMN_USER_NAME + " TEXT" + "," +
                     COLUMN_USER_RECOVERY_QUESTION + " TEXT" + "," +
@@ -103,6 +107,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableStrata = ("CREATE TABLE " +
                     TABLE_STRATA + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_STUDY_UUID + " TEXT" + "," +
                     COLUMN_STRATA_NAME + " TEXT" + "," +
@@ -152,6 +157,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableFieldOption = ("CREATE TABLE " +
                     TABLE_FIELD_OPTION + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_FIELD_OPTION_NAME + " TEXT" +
                     ") WITHOUT ROWID")
@@ -170,6 +176,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableRule = ("CREATE TABLE " +
                     TABLE_RULE + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_FIELD_UUID + " TEXT" + "," +
                     COLUMN_RULE_NAME + " TEXT" + "," +
                     COLUMN_OPERATOR_ID + " INTEGER" + "," +
@@ -184,6 +192,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableFilter = ("CREATE TABLE " +
                     TABLE_FILTER + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_STUDY_UUID + " TEXT" + "," +
                     COLUMN_FILTER_NAME + " TEXT" + "," +
                     COLUMN_FILTER_SAMPLE_SIZE + " INTEGER" + "," +
@@ -285,7 +295,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_VERSION + " TEXT" + "," +
-                    COLUMN_SYNC_CODE + " INTEGER" + "," +
                     COLUMN_LOCATION_UUID + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME + " TEXT" + "," +
@@ -330,6 +339,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableFieldDataOption = ("CREATE TABLE " +
                     TABLE_FIELD_DATA_OPTION + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_FIELD_DATA_OPTION_NAME + " TEXT" + "," +
                     COLUMN_FIELD_DATA_OPTION_VALUE + " INTEGER" +
@@ -360,6 +370,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_LAT_LON + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_LAT + " REAL" + "," +
                     COLUMN_LON + " REAL" +
                     ") WITHOUT ROWID")
@@ -401,6 +412,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableMapTileRegion = ("CREATE TABLE " +
                     TABLE_MAP_TILE_REGION + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_VERSION + " TEXT" + "," +
                     COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
                     COLUMN_NORTH_EAST_LAT + " REAL" + "," +
                     COLUMN_NORTH_EAST_LON + " REAL" + "," +
@@ -877,7 +890,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_UUID_TYPE = " TEXT PRIMARY KEY NOT NULL"
 
         const val COLUMN_TIME_ZONE = "time_zone"
-        const val COLUMN_SYNC_CODE = "sync_code"
         const val COLUMN_CREATION_DATE = "creation_date"
 
         // foreign key columns

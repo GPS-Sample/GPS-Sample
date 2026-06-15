@@ -177,7 +177,7 @@ class SignUpFragment : Fragment()
                 editor.commit()
 
                 val user = User( name, role, question, answer, false )
-                DAO.userDAO.createUser( user )
+                DAO.userDAO.createUser( user,user.version )
 
                 val bundle = Bundle()
                 bundle.putString( Keys.kRole.value, role )
