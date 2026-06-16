@@ -43,6 +43,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.osmdroid.views.MapView
+import java.util.UUID
 
 class CreateConfigurationFragment : Fragment(), View.OnTouchListener
 {
@@ -195,7 +196,7 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
                     viewLifecycleOwner.lifecycleScope.launch {
                         withContext(Dispatchers.IO)
                         {
-                            DAO.configDAO.createOrUpdateConfig( config,config.version )
+                            DAO.configDAO.createOrUpdateConfig( config,UUID.randomUUID().toString())
                         }
 
                         // back on the main thread...

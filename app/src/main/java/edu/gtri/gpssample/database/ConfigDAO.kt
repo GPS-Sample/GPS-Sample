@@ -10,6 +10,7 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import android.os.Build
 import android.util.Log
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
@@ -53,11 +54,25 @@ class ConfigDAO(private var dao: DAO)
 
         val start = Date().time / 1000L
 
+        // Possible future improvement, if needed
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+//        {
+//            // This will do a real upsert
+//            ColumnBinding.bindStatement( stmt = upsertStatement, uuid = config.uuid, columns = columnBindings, item = config )
+//            upsertStatement.execute()
+//        }
+//        else
+//        {
+//            val values = ContentValues()
+//            putConfig( config, values )
+//            dao.upsert( DAO.TABLE_CONFIG, values )
+//        }
+
         dao.writableDatabase.beginTransaction()
 
-        val vals = ContentValues()
-        putConfig( config, vals )
-        dao.upsert( DAO.TABLE_CONFIG, vals )
+        val values = ContentValues()
+        putConfig( config, values )
+        dao.upsert( DAO.TABLE_CONFIG, values )
 
         createOrUpdateEnumAreas(config)
         createOrUpdateStudies(config)
@@ -414,5 +429,8 @@ class ConfigDAO(private var dao: DAO)
             ColumnBinding<Config>(COLUMN_STUDY_UUID,"TEXT",Config::selectedStudyUuid),
             ColumnBinding<Config>(COLUMN_CONFIG_VALID_USERS,"TEXT",Config::validUsers),
         )
+
+//        val sql = ColumnBinding.createUpsertSQL(DAO.TABLE_CONFIG, columnBindings )
+//        val upsertStatement = DAO.instance().writableDatabase.compileStatement( sql )
     }
 }
