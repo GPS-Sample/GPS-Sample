@@ -1102,7 +1102,10 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             Thread {
                 try
                 {
+                    DAO.instance().writableDatabase.beginTransaction()
                     parseGeoJson( json, nameKey, strataKey )
+                    DAO.instance().writableDatabase.setTransactionSuccessful()
+                    DAO.instance().writableDatabase.endTransaction()
                 }
                 catch( ex: Exception)
                 {
@@ -1293,7 +1296,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
                 if (shouldAutoEnumerateLocations)
                 {
-                    location.enumerationItems.add( autoEnumerate( location ))
+//                    location.enumerationItems.add( autoEnumerate( location ))
+                    autoEnumerate( location )
                 }
 
                 val enumArea = findEnumAreaOfLocation( allEnumAreas, LatLng( point.point.coordinates.latitude, point.point.coordinates.longitude ))?.let { enumArea ->
@@ -1314,7 +1318,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
     var subAddress = 0
 
-    fun autoEnumerate( location: Location ) : EnumerationItem
+    fun autoEnumerate( location: Location )
     {
         subAddress+= 1
 
@@ -1404,7 +1408,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             enumerationItem.fieldDataList.add( fieldData )
         }
 
-        return enumerationItem
+        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, enumerationItem.version )
     }
 
     data class PointWithProperty( var point: Point, var property: String )
