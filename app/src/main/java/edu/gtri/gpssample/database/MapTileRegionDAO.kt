@@ -10,27 +10,33 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
-import android.util.Log
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_NORTH_EAST_LAT
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_NORTH_EAST_LON
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_SOUTH_WEST_LAT
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_SOUTH_WEST_LON
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.*
 
 class MapTileRegionDAO(private var dao: DAO)
 {
-    fun createOrUpdateMapTileRegion( mapTileRegion: MapTileRegion, enumArea: EnumArea ) : MapTileRegion?
+    fun createOrUpdateMapTileRegion( mapTileRegion: MapTileRegion ) : MapTileRegion?
     {
         val values = ContentValues()
-        putMapTileRegion( mapTileRegion, enumArea, values )
+        putMapTileRegion( mapTileRegion, values )
 
         dao.upsert( DAO.TABLE_MAP_TILE_REGION, values )
 
         return mapTileRegion
     }
 
-    private fun putMapTileRegion( mapTileRegion: MapTileRegion, enumArea: EnumArea, values: ContentValues)
+    private fun putMapTileRegion( mapTileRegion: MapTileRegion, values: ContentValues)
     {
         values.put( DAO.COLUMN_UUID, mapTileRegion.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, mapTileRegion.creationDate )
         values.put( DAO.COLUMN_VERSION, mapTileRegion.version )
-        values.put( DAO.COLUMN_ENUM_AREA_UUID, enumArea.uuid )
+        values.put( DAO.COLUMN_ENUM_AREA_UUID, mapTileRegion.enumAreaUuid )
         values.put( DAO.COLUMN_NORTH_EAST_LAT, mapTileRegion.northEast.latitude )
         values.put( DAO.COLUMN_NORTH_EAST_LON, mapTileRegion.northEast.longitude )
         values.put( DAO.COLUMN_SOUTH_WEST_LAT, mapTileRegion.southWest.latitude )
@@ -47,8 +53,9 @@ class MapTileRegionDAO(private var dao: DAO)
         val ne_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_NORTH_EAST_LON))
         val sw_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_SOUTH_WEST_LAT))
         val sw_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_SOUTH_WEST_LON))
+        val enumAreauuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
 
-        return MapTileRegion( uuid, creationDate, version, LatLon( 0, ne_lat, ne_lon ), LatLon( 0, sw_lat, sw_lon ))
+        return MapTileRegion( uuid, creationDate, version, LatLon( 0, ne_lat, ne_lon ), LatLon( 0, sw_lat, sw_lon ), enumAreauuid)
     }
 
     fun getMapTileRegion( enumArea: EnumArea ): MapTileRegion?
@@ -75,5 +82,18 @@ class MapTileRegionDAO(private var dao: DAO)
         val args = arrayOf(mapTileRegion.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_MAP_TILE_REGION, whereClause, args)
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<MapTileRegion>(COLUMN_CREATION_DATE,"INTEGER",MapTileRegion::creationDate ),
+            ColumnBinding<MapTileRegion>(COLUMN_VERSION,"TEXT",MapTileRegion::version ),
+            ColumnBinding<MapTileRegion>(COLUMN_ENUM_AREA_UUID,"TEXT",MapTileRegion::enumAreaUuid ),
+            ColumnBinding<MapTileRegion>(COLUMN_NORTH_EAST_LAT,"REAL",{ it.northEast.latitude }),
+            ColumnBinding<MapTileRegion>(COLUMN_NORTH_EAST_LON,"REAL",{ it.northEast.longitude } ),
+            ColumnBinding<MapTileRegion>(COLUMN_SOUTH_WEST_LAT,"REAL",{ it.southWest.latitude } ),
+            ColumnBinding<MapTileRegion>(COLUMN_SOUTH_WEST_LON,"REAL",{ it.southWest.longitude } ),
+        )
     }
 }

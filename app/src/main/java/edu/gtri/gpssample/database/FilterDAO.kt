@@ -14,6 +14,13 @@ import android.util.Log
 import edu.gtri.gpssample.constants.Connector
 import edu.gtri.gpssample.constants.ConnectorConverter
 import edu.gtri.gpssample.constants.SampleTypeConverter
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FILTER_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FILTER_SAMPLE_SIZE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FILTER_SAMPLE_TYPE_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
+import edu.gtri.gpssample.database.models.CollectionTeam
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.FilterOperator
 import edu.gtri.gpssample.database.models.Rule
@@ -27,12 +34,12 @@ class FilterDAO(private var dao: DAO)
 {
     private val kFilterOperatorOrderUndefined = 0
 
-    fun createOrUpdateFilter( filter: Filter, study: Study, version: String ) : Filter?
+    fun createOrUpdateFilter( filter: Filter, version: String ) : Filter?
     {
         filter.version = version
 
         val values = ContentValues()
-        putFilter( filter, study, values )
+        putFilter( filter,values )
 
         deleteAllFilterOperators(filter)
 
@@ -108,14 +115,14 @@ class FilterDAO(private var dao: DAO)
         dao.writableDatabase.insert(DAO.TABLE_FILTEROPERATOR, null, values).toInt()
     }
 
-    private fun putFilter( filter: Filter, study: Study, values: ContentValues )
+    private fun putFilter( filter: Filter, values: ContentValues )
     {
         val index = SampleTypeConverter.toIndex(filter.samplingType)
 
         values.put( DAO.COLUMN_UUID, filter.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, filter.creationDate )
         values.put( DAO.COLUMN_VERSION, filter.version )
-        values.put( DAO.COLUMN_STUDY_UUID, study.uuid )
+        values.put( DAO.COLUMN_STUDY_UUID, filter.studyUuid )
         values.put( DAO.COLUMN_FILTER_NAME, filter.name )
         values.put( DAO.COLUMN_FILTER_SAMPLE_SIZE, filter.sampleSize )
         values.put( DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX, index )
@@ -129,9 +136,11 @@ class FilterDAO(private var dao: DAO)
         val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_NAME))
         val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE))
+        val studyUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_UUID))
 
         val type = SampleTypeConverter.fromIndex(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX))
-        val filter = Filter( uuid, creationDate, name, type, sampleSize, version )
+
+        val filter = Filter( uuid, creationDate, name, type, sampleSize, studyUuid, version )
 
         findFieldOperators(filter)
 
@@ -277,5 +286,17 @@ class FilterDAO(private var dao: DAO)
         val whereClause = "${DAO.COLUMN_FILTER_UUID} = ?"
         val args = arrayOf(filter.uuid)
         dao.writableDatabase.delete(DAO.TABLE_FILTEROPERATOR, whereClause, args)
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<Filter>(COLUMN_CREATION_DATE,"INTEGER",Filter::creationDate ),
+            ColumnBinding<Filter>(COLUMN_VERSION,"TEXT",Filter::version ),
+            ColumnBinding<Filter>(COLUMN_STUDY_UUID,"TEXT",Filter::studyUuid ),
+            ColumnBinding<Filter>(COLUMN_FILTER_NAME,"TEXT",Filter::name ),
+            ColumnBinding<Filter>(COLUMN_FILTER_SAMPLE_SIZE,"INTEGER",Filter::sampleSize ),
+            ColumnBinding<Filter>(COLUMN_FILTER_SAMPLE_TYPE_INDEX,"INTEGER",{SampleTypeConverter.toIndex(it.samplingType)} ),
+        )
     }
 }

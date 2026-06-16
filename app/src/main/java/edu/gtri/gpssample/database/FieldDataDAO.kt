@@ -10,24 +10,31 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
-import android.util.Log
 import androidx.core.database.getDoubleOrNull
 import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
-import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_DATA_BLOCK_NUMBER
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_DATA_DATE_VALUE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_DATA_DROPDOWN_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_DATA_NUMBER_VALUE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_DATA_TEXT_VALUE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_TYPE_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.*
-import edu.gtri.gpssample.extensions.toBoolean
-import java.util.HashMap
 
 class FieldDataDAO(private var dao: DAO)
 {
-    fun createOrUpdateFieldData( fieldData: FieldData, enumerationItem: EnumerationItem, version: String )
+    fun createOrUpdateFieldData( fieldData: FieldData, version: String )
     {
         fieldData.version = version
 
         val values = ContentValues()
-        putFieldData( fieldData, values, enumerationItem )
+        putFieldData( fieldData, values )
 
         dao.upsert( DAO.TABLE_FIELD_DATA, values )
 
@@ -37,12 +44,8 @@ class FieldDataDAO(private var dao: DAO)
         }
     }
 
-    fun putFieldData(fieldData: FieldData, values: ContentValues, enumerationItem: EnumerationItem?)
+    fun putFieldData(fieldData: FieldData, values: ContentValues)
     {
-        enumerationItem?.let {
-            values.put( DAO.COLUMN_ENUMERATION_ITEM_UUID, it.uuid )
-        }
-
         values.put( DAO.COLUMN_UUID, fieldData.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, fieldData.creationDate )
         values.put( DAO.COLUMN_VERSION, fieldData.version )
@@ -54,6 +57,7 @@ class FieldDataDAO(private var dao: DAO)
         values.put( DAO.COLUMN_FIELD_DATA_DATE_VALUE, fieldData.dateValue )
         values.put( DAO.COLUMN_FIELD_DATA_DROPDOWN_INDEX, fieldData.dropdownIndex )
         values.put( DAO.COLUMN_FIELD_DATA_BLOCK_NUMBER, fieldData.blockNumber )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_UUID, fieldData.enumerationItemUuid )
     }
 
     @SuppressLint("Range")
@@ -70,8 +74,9 @@ class FieldDataDAO(private var dao: DAO)
         val dateValue = cursor.getLongOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_DATE_VALUE))
         val dropdownIndex = cursor.getIntOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_DROPDOWN_INDEX))
         val blockNumber = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_BLOCK_NUMBER))
+        val enumerationItemUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_UUID))
 
-        return FieldData( uuid, creationDate, fieldUuid, name, type, textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>(), version )
+        return FieldData( uuid, creationDate, fieldUuid, name, type, textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>(), enumerationItemUuid, version )
     }
 
     fun getFieldDataList( enumerationItem: EnumerationItem ): ArrayList<FieldData>
@@ -104,5 +109,22 @@ class FieldDataDAO(private var dao: DAO)
         val args = arrayOf(fieldData.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_FIELD_DATA, whereClause, args)
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<FieldData>(COLUMN_CREATION_DATE,"INTEGER",FieldData::creationDate ),
+            ColumnBinding<FieldData>(COLUMN_VERSION,"TEXT",FieldData::version ),
+            ColumnBinding<FieldData>(COLUMN_FIELD_UUID,"TEXT",FieldData::fieldUuid ),
+            ColumnBinding<FieldData>(COLUMN_ENUMERATION_ITEM_UUID,"TEXT",FieldData::enumerationItemUuid ),
+            ColumnBinding<FieldData>(COLUMN_FIELD_NAME,"TEXT",FieldData::name ),
+            ColumnBinding<FieldData>(COLUMN_FIELD_TYPE_INDEX,"INTEGER",{FieldTypeConverter.toIndex(it.type)} ),
+            ColumnBinding<FieldData>(COLUMN_FIELD_DATA_TEXT_VALUE,"TEXT",FieldData::textValue ),
+            ColumnBinding<FieldData>(COLUMN_FIELD_DATA_NUMBER_VALUE,"REAL",FieldData::numberValue ),
+            ColumnBinding<FieldData>(COLUMN_FIELD_DATA_DATE_VALUE,"INTEGER",FieldData::dateValue ),
+            ColumnBinding<FieldData>(COLUMN_FIELD_DATA_DROPDOWN_INDEX,"INTEGER",FieldData::dropdownIndex ),
+            ColumnBinding<FieldData>(COLUMN_FIELD_DATA_BLOCK_NUMBER,"INTEGER",FieldData::blockNumber ),
+        )
     }
 }

@@ -17,7 +17,8 @@ data class MapTileRegion (
     var creationDate: Long,
     var version: String,
     var northEast: LatLon,
-    var southWest: LatLon)
+    var southWest: LatLon,
+    var enumAreaUuid: String)
 {
-    constructor( northEast: LatLon, southWest: LatLon ) : this( UUID.randomUUID().toString(), Date().time, UUID.randomUUID().toString(), northEast, southWest )
+    constructor( northEast: LatLon, southWest: LatLon, enumAreaUuid: String ) : this( UUID.randomUUID().toString(), Date().time, UUID.randomUUID().toString(), northEast, southWest, enumAreaUuid )
 }

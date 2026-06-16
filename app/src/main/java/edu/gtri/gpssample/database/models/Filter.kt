@@ -23,10 +23,11 @@ data class Filter(
     var samplingType : SampleType,
     var sampleSize: Int,
     var rule : Rule?,
+    var studyUuid : String,
     var version: String)
 {
-    constructor(name: String) : this( UUID.randomUUID().toString(), Date().time, name, SampleType.None, 0, null, UUID.randomUUID().toString())
-    constructor(uuid: String, creationDate: Long, name: String, samplingType : SampleType, sampleSize: Int, version: String) : this(uuid, creationDate, name, samplingType, sampleSize, null, version )
+    constructor(name: String, studyUuid: String) : this( UUID.randomUUID().toString(), Date().time, name, SampleType.None, 0, null, studyUuid, UUID.randomUUID().toString())
+    constructor(uuid: String, creationDate: Long, name: String, samplingType : SampleType, sampleSize: Int, studyUuid: String, version: String) : this(uuid, creationDate, name, samplingType, sampleSize, null, studyUuid, version )
 
     fun pack() : String
     {

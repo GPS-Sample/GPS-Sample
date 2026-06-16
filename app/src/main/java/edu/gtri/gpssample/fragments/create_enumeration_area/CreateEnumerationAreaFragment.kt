@@ -672,7 +672,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         enumArea?.let{  enumArea ->
             val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-            val location = Location( timeZone, LocationType.Enumeration, -1, latitude, longitude, altitude, false, "", "")
+            val location = Location( timeZone, -1, latitude, longitude, altitude, false, "", "")
             enumArea.locations.add(location)
             refreshMap()
         }
@@ -842,7 +842,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
         val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
 
-        val mapTileRegion = MapTileRegion( northEast, southWest )
+        val mapTileRegion = MapTileRegion( northEast, southWest, "" )
 
         if (name.isEmpty())
         {
@@ -854,6 +854,8 @@ class CreateEnumerationAreaFragment : Fragment(),
             selectedEnumArea = EnumArea( config.uuid, "", name, "", 0, vertices, mapTileRegion )
             unsavedEnumAreas.add( selectedEnumArea!! )
         }
+
+        mapTileRegion.enumAreaUuid = selectedEnumArea!!.uuid
 
         refreshMap()
 
@@ -1187,9 +1189,11 @@ class CreateEnumerationAreaFragment : Fragment(),
                         val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
                         val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
 
-                        val mapTileRegion = MapTileRegion( northEast, southWest )
+                        val mapTileRegion = MapTileRegion( northEast, southWest, "" )
 
                         val enumArea = EnumArea(creationDate++,config.uuid, "", name, "", 0, vertices, mapTileRegion )
+
+                        mapTileRegion.enumAreaUuid = enumArea.uuid
 
                         var strata: Strata? = null
 
@@ -1307,7 +1311,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                 }
 
                 val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                val location = Location( timeZone, LocationType.Enumeration, -1, point.point.coordinates.latitude, point.point.coordinates.longitude, altitude, false, "", point.property )
+                val location = Location( timeZone, -1, point.point.coordinates.latitude, point.point.coordinates.longitude, altitude, false, "", point.property )
 
                 if (shouldAutoEnumerateLocations)
                 {
@@ -1352,12 +1356,13 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         if (config.studies[0].fields.isEmpty())
         {
-            val noteField = Field( null, 1, "Note", FieldType.Note, false, false, false, false, false, false, null, null)
-            val textField = Field( null, 2, "Text", FieldType.Text, false, false, false, false, false, false, null, null)
-            val numberField = Field( null, 3, "Number", FieldType.Number, false, false, true, false, false, false, null, null)
-            val dateField = Field( null, 4, "Date", FieldType.Date, false, false, false, false, true, false, null, null)
-            val checkBoxField = Field( null, 5, "Checkbox", FieldType.Checkbox, false, false, false, false, false, false, null, null)
-            val dropDownField = Field( null, 6, "Dropdown", FieldType.Dropdown, false, false, false, false, false, false, null, null)
+            val study = config.studies[0]
+            val noteField = Field( null, 1, "Note", FieldType.Note, false, false, false, false, false, false, null, null,study.uuid)
+            val textField = Field( null, 2, "Text", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid)
+            val numberField = Field( null, 3, "Number", FieldType.Number, false, false, true, false, false, false, null, null,study.uuid)
+            val dateField = Field( null, 4, "Date", FieldType.Date, false, false, false, false, true, false, null, null,study.uuid)
+            val checkBoxField = Field( null, 5, "Checkbox", FieldType.Checkbox, false, false, false, false, false, false, null, null,study.uuid)
+            val dropDownField = Field( null, 6, "Dropdown", FieldType.Dropdown, false, false, false, false, false, false, null, null, study.uuid )
 
             checkBoxField.fieldOptions.add( FieldOption("CB 1" ))
             checkBoxField.fieldOptions.add( FieldOption("CB 2" ))
@@ -1379,7 +1384,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         for (field in config.studies[0].fields)
         {
-            val fieldData = FieldData(creationDate++, field.uuid )
+            val fieldData = FieldData(creationDate++, field.uuid, enumerationItem.uuid )
 
             if (field.type == FieldType.Note)
             {

@@ -10,6 +10,11 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import android.util.Log
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_COLLECTION_TEAM_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.*
 
 class CollectionTeamDAO(private var dao: DAO)
@@ -22,6 +27,11 @@ class CollectionTeamDAO(private var dao: DAO)
         putTeam( collectionTeam, values )
 
         dao.upsert( DAO.TABLE_COLLECTION_TEAM, values )
+
+        for (latLon in collectionTeam.polygon)
+        {
+            DAO.latLonDAO.createOrUpdateLatLon(latLon,null, latLon.version)
+        }
 
         updateConnectorTable( collectionTeam )
     }
@@ -39,6 +49,7 @@ class CollectionTeamDAO(private var dao: DAO)
                 values.put( DAO.COLUMN_COLLECTION_TEAM_UUID, collectionTeam.uuid )
                 dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON, null, values)
             }
+
             cursor.close()
         }
 
@@ -72,30 +83,13 @@ class CollectionTeamDAO(private var dao: DAO)
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
-        val enum_area_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
+        val enumAreaUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_NAME))
 
-        val collectionTeam = CollectionTeam(uuid, creationDate, enum_area_uuid, name, ArrayList<LatLon>(), ArrayList<String>(), version)
+        val collectionTeam = CollectionTeam(uuid, creationDate, enumAreaUuid, name, ArrayList<LatLon>(), ArrayList<String>(), version)
 
         collectionTeam.polygon = DAO.latLonDAO.getLatLonsWithCollectionTeamId( collectionTeam.uuid )
         collectionTeam.locationUuids = DAO.locationDAO.getCollectionTeamLocationUuids( collectionTeam )
-
-        return collectionTeam
-    }
-
-    fun getCollectionTeam( uuid: String ): CollectionTeam?
-    {
-        var collectionTeam: CollectionTeam? = null
-        val query = "SELECT * FROM ${DAO.TABLE_COLLECTION_TEAM} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            collectionTeam = buildTeam( cursor )
-        }
-
-        cursor.close()
 
         return collectionTeam
     }
@@ -123,5 +117,15 @@ class CollectionTeamDAO(private var dao: DAO)
         val args = arrayOf(collectionTeam.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_COLLECTION_TEAM, whereClause, args)
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<CollectionTeam>(COLUMN_CREATION_DATE,"INTEGER", CollectionTeam::creationDate ),
+            ColumnBinding<CollectionTeam>(COLUMN_VERSION,"TEXT", CollectionTeam::version ),
+            ColumnBinding<CollectionTeam>(COLUMN_ENUM_AREA_UUID,"TEXT", CollectionTeam::enumAreaUuid ),
+            ColumnBinding<CollectionTeam>(COLUMN_COLLECTION_TEAM_NAME,"TEXT", CollectionTeam::name ),
+        )
     }
 }

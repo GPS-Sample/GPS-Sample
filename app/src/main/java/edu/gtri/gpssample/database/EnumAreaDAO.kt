@@ -11,6 +11,15 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_COLLECTION_TEAM_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_TEAM_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_MBTILESPATH
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_MBTILESSIZE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STRATA_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Location
@@ -27,7 +36,8 @@ class EnumAreaDAO(private var dao: DAO)
         dao.upsert( DAO.TABLE_ENUM_AREA, values )
 
         enumArea.mapTileRegion?.let {
-            DAO.mapTileRegionDAO.createOrUpdateMapTileRegion( it, enumArea )
+            it.enumAreaUuid = enumArea.uuid
+            DAO.mapTileRegionDAO.createOrUpdateMapTileRegion( it )
         }
 
         for (latLon in enumArea.vertices) {
@@ -154,5 +164,21 @@ class EnumAreaDAO(private var dao: DAO)
         val args = arrayOf(enumArea.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_ENUM_AREA, whereClause, args)
+    }
+
+    companion object
+    {
+        // Note!! CREATION_DATE was moved up to the standard column position
+        val columnBindings = listOf(
+            ColumnBinding<EnumArea>(COLUMN_CREATION_DATE, "INTEGER",EnumArea::creationDate ),
+            ColumnBinding<EnumArea>(COLUMN_VERSION,"TEXT",EnumArea::version ),
+            ColumnBinding<EnumArea>(COLUMN_CONFIG_UUID,"TEXT",EnumArea::configUuid ),
+            ColumnBinding<EnumArea>(COLUMN_STRATA_UUID,"TEXT",EnumArea::strataUuid ),
+            ColumnBinding<EnumArea>(COLUMN_ENUM_AREA_NAME,"TEXT",EnumArea::name ),
+            ColumnBinding<EnumArea>(COLUMN_ENUM_AREA_MBTILESPATH,"TEXT",EnumArea::mbTilesPath ),
+            ColumnBinding<EnumArea>(COLUMN_ENUM_AREA_MBTILESSIZE,"INTEGER",EnumArea::mbTilesSize ),
+            ColumnBinding<EnumArea>(COLUMN_ENUMERATION_TEAM_UUID,"TEXT",EnumArea::selectedEnumerationTeamUuid ),
+            ColumnBinding<EnumArea>(COLUMN_COLLECTION_TEAM_UUID,"TEXT",EnumArea::selectedCollectionTeamUuid ),
+        )
     }
 }

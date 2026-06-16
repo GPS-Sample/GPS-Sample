@@ -480,9 +480,11 @@ class WalkEnumerationAreaFragment : Fragment(),
             val latLngBounds = GeoUtils.findGeobounds(vertices)
             val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
             val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-            val mapTileRegion = MapTileRegion( northEast, southWest )
-
+            val mapTileRegion = MapTileRegion( northEast, southWest, "" )
             val enumArea = EnumArea( config.uuid,"", name2, "", 0, vertices, mapTileRegion )
+
+            mapTileRegion.enumAreaUuid = enumArea.uuid
+
             val enumerationTeam = EnumerationTeam( enumArea.uuid, "Auto Gen", enumArea.vertices, ArrayList<String>())
 
             config.enumAreas.add( enumArea )

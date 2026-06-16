@@ -180,7 +180,7 @@ class AddHouseholdAdapter( val recyclerView: RecyclerView, val editMode: Boolean
 
                             for (blockField in blockFields)
                             {
-                                val blockFieldData = FieldData(creationDate + count, blockField.uuid, blockNumber )
+                                val blockFieldData = FieldData(creationDate + count, blockField.uuid, blockNumber, enumerationItem.uuid )
 
                                 count += 1
 

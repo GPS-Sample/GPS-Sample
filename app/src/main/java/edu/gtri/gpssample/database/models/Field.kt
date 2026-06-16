@@ -37,10 +37,11 @@ data class Field(
     var maximum: Double?,
     var fieldOptions: ArrayList<FieldOption>,
     var fields: ArrayList<Field>?,
+    var studyUuid: String,
     var version: String)
 {
-    constructor(parentUUID: String?, index: Int, name: String, type: FieldType, pii: Boolean, required: Boolean, integerOnly: Boolean, numberOfResidents: Boolean, date: Boolean, time: Boolean, minimum: Double?, maximum: Double?)
-            : this(UUID.randomUUID().toString(), Date().time, parentUUID, index, name, type, pii, required, integerOnly, numberOfResidents, date, time, null, null, ArrayList<FieldOption>(), null, UUID.randomUUID().toString())
+    constructor(parentUUID: String?, index: Int, name: String, type: FieldType, pii: Boolean, required: Boolean, integerOnly: Boolean, numberOfResidents: Boolean, date: Boolean, time: Boolean, minimum: Double?, maximum: Double?, studyUuid: String)
+            : this(UUID.randomUUID().toString(), Date().time, parentUUID, index, name, type, pii, required, integerOnly, numberOfResidents, date, time, null, null, ArrayList<FieldOption>(), null, studyUuid, UUID.randomUUID().toString())
 
     fun copy() : Field
     {

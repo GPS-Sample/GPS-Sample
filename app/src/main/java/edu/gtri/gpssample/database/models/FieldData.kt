@@ -31,19 +31,20 @@ data class FieldData (
     var dropdownIndex : Int?,
     var blockNumber : Int?,
     var fieldDataOptions : ArrayList<FieldDataOption>,
+    var enumerationItemUuid: String,
     var version : String )
 {
-    constructor( creationDate: Long, fieldUuid: String ) : this( UUID.randomUUID().toString(), creationDate, fieldUuid, "", FieldType.None,
-        "", null, null, null, null, ArrayList<FieldDataOption>(), UUID.randomUUID().toString())
+    constructor( creationDate: Long, fieldUuid: String, enumerationItemUuid: String ) :
+            this( UUID.randomUUID().toString(), creationDate, fieldUuid, "", FieldType.None, "", null, null, null, null, ArrayList<FieldDataOption>(), enumerationItemUuid, UUID.randomUUID().toString())
 
-    constructor( fieldUuid: String, blockNumber: Int ) : this( UUID.randomUUID().toString(), Date().time, fieldUuid, "", FieldType.None,
-        "", null, null, null, blockNumber, ArrayList<FieldDataOption>(), UUID.randomUUID().toString())
+    constructor( fieldUuid: String, blockNumber: Int, enumerationItemUuid: String ) :
+            this( UUID.randomUUID().toString(), Date().time, fieldUuid, "", FieldType.None, "", null, null, null, blockNumber, ArrayList<FieldDataOption>(), enumerationItemUuid, UUID.randomUUID().toString())
 
-    constructor( creationDate: Long, fieldUuid: String, blockNumber: Int ) : this( UUID.randomUUID().toString(), creationDate, fieldUuid, "", FieldType.None,
-        "", null, null, null, blockNumber, ArrayList<FieldDataOption>(), UUID.randomUUID().toString())
+    constructor( creationDate: Long, fieldUuid: String, blockNumber: Int, enumerationItemUuid: String ) :
+            this( UUID.randomUUID().toString(), creationDate, fieldUuid, "", FieldType.None, "", null, null, null, blockNumber, ArrayList<FieldDataOption>(), enumerationItemUuid, UUID.randomUUID().toString())
 
-    constructor( fieldUuid: String,  name : String, type : FieldType, textValue: String, numberValue: Double, dateValue: Long, dropdownIndex: Int, blockNumber: Int ) :
-            this( UUID.randomUUID().toString(), Date().time, fieldUuid, name, type,  textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>(), UUID.randomUUID().toString())
+    constructor( fieldUuid: String,  name : String, type : FieldType, textValue: String, numberValue: Double, dateValue: Long, dropdownIndex: Int, blockNumber: Int, enumerationItemUuid: String ) :
+            this( UUID.randomUUID().toString(), Date().time, fieldUuid, name, type,  textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>(), enumerationItemUuid, UUID.randomUUID().toString())
 
     fun copy() : FieldData
     {

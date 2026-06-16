@@ -16,6 +16,20 @@ import android.util.Log
 import androidx.core.database.getIntOrNull
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.LocationTypeConverter
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_ALTITUDE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_DESCRIPTION
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_GPS_ACCURACY
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_IMAGE_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_IS_LANDMARK
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_IS_MULTI_FAMILY
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_LATITUDE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_LONGITUDE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_PROPERTIES
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_TYPE_ID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_TIME_ZONE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.extensions.toInt
@@ -70,16 +84,15 @@ class LocationDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, location.creationDate )
         values.put( DAO.COLUMN_VERSION, location.version )
         values.put( DAO.COLUMN_TIME_ZONE, location.timeZone )
-        values.put( DAO.COLUMN_LOCATION_TYPE_ID, LocationTypeConverter.toIndex(location.type) )
         values.put( DAO.COLUMN_LOCATION_GPS_ACCURACY, location.gpsAccuracy )
         values.put( DAO.COLUMN_LOCATION_LATITUDE, location.latitude )
         values.put( DAO.COLUMN_LOCATION_LONGITUDE, location.longitude )
         values.put( DAO.COLUMN_LOCATION_ALTITUDE, location.altitude )
-        values.put( DAO.COLUMN_LOCATION_IS_LANDMARK, location.isLandmark.toInt())
+        values.put( DAO.COLUMN_LOCATION_IS_LANDMARK, location.isLandmark)
         values.put( DAO.COLUMN_LOCATION_DESCRIPTION, location.description)
         values.put( DAO.COLUMN_LOCATION_IMAGE_UUID, location.imageUuid)
         values.put( DAO.COLUMN_LOCATION_PROPERTIES, location.properties)
-        values.put( DAO.COLUMN_LOCATION_IS_MULTI_FAMILY, location.isMultiFamily.toInt())
+        values.put( DAO.COLUMN_LOCATION_IS_MULTI_FAMILY, location.isMultiFamily)
     }
 
     @SuppressLint("Range")
@@ -89,7 +102,6 @@ class LocationDAO(private var dao: DAO)
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val version = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_VERSION))
         val timeZone = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TIME_ZONE))
-        val locationTypeId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_TYPE_ID))
         val gpsAccuracy = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_GPS_ACCURACY))
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LOCATION_LATITUDE))
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LOCATION_LONGITUDE))
@@ -100,7 +112,7 @@ class LocationDAO(private var dao: DAO)
         val isMultiFamily = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_MULTI_FAMILY)).toBoolean()
         val properties = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_PROPERTIES))
 
-        return Location( uuid, creationDate, timeZone, 0.0, "", true, LocationTypeConverter.fromIndex(locationTypeId), gpsAccuracy, latitude, longitude, altitude, isLandmark, description, imageUuid, isMultiFamily, properties, ArrayList<EnumerationItem>(), version)
+        return Location( uuid, creationDate, timeZone, 0.0, "", true, gpsAccuracy, latitude, longitude, altitude, isLandmark, description, imageUuid, isMultiFamily, properties, ArrayList<EnumerationItem>(), version)
     }
 
     fun getLocation( uuid: String ) : Location?
@@ -201,5 +213,23 @@ class LocationDAO(private var dao: DAO)
         dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_LOCATION__ENUM_AREA, whereClause, args)
         dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM, whereClause, args)
         dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM, whereClause, args)
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<Location>(COLUMN_CREATION_DATE, "INTEGER", Location::creationDate),
+            ColumnBinding<Location>(COLUMN_VERSION,"TEXT",Location::version ),
+            ColumnBinding<Location>(COLUMN_TIME_ZONE,"INTEGER",Location::timeZone ),
+            ColumnBinding<Location>(COLUMN_LOCATION_GPS_ACCURACY,"INTEGER",Location::gpsAccuracy ),
+            ColumnBinding<Location>(COLUMN_LOCATION_LATITUDE,"REAL",Location::latitude ),
+            ColumnBinding<Location>(COLUMN_LOCATION_LONGITUDE,"REAL",Location::longitude ),
+            ColumnBinding<Location>(COLUMN_LOCATION_ALTITUDE,"REAL",Location::altitude ),
+            ColumnBinding<Location>(COLUMN_LOCATION_IS_LANDMARK,"INTEGER",Location::isLandmark ),
+            ColumnBinding<Location>(COLUMN_LOCATION_DESCRIPTION,"TEXT",Location::description ),
+            ColumnBinding<Location>(COLUMN_LOCATION_IMAGE_UUID,"TEXT",Location::imageUuid ),
+            ColumnBinding<Location>(COLUMN_LOCATION_IS_MULTI_FAMILY,"INTEGER",Location::isMultiFamily ),
+            ColumnBinding<Location>(COLUMN_LOCATION_PROPERTIES,"TEXT",Location::properties )
+        )
     }
 }

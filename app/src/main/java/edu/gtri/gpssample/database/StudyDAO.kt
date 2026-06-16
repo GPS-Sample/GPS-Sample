@@ -11,10 +11,39 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import edu.gtri.gpssample.constants.DateFormatConverter
+import edu.gtri.gpssample.constants.DistanceFormatConverter
 import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.constants.SampleTypeConverter
 import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.constants.SamplingMethodConverter
+import edu.gtri.gpssample.constants.TimeFormatConverter
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DATE_FORMAT_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DB_VERSION
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_ENCRYPTION_PASSWORD
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_MAP_ENGINE_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_MIN_GPS_PRECISION
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_PROXIMITY_WARNING_VALUE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_TIME_FORMAT_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_VALID_USERS
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SAMPLE_SIZE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SAMPLE_SIZE_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SAMPLING_METHOD_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SUBSET_SAMPLE_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SUBSET_SAMPLE_SIZE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SUBSET_SAMPLE_SIZE_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_TIME_ZONE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.extensions.toBoolean
@@ -34,7 +63,8 @@ class StudyDAO(private var dao: DAO)
         // add fields
         for (field in study.fields)
         {
-            DAO.fieldDAO.createOrUpdateField( field, study,field.version )
+            field.studyUuid = study.uuid
+            DAO.fieldDAO.createOrUpdateField( field,field.version )
         }
 
         // add primary rules
@@ -52,13 +82,15 @@ class StudyDAO(private var dao: DAO)
         // add primary filters
         for (filter in study.primaryFilters)
         {
-            DAO.filterDAO.createOrUpdateFilter( filter, study,filter.version );
+            filter.studyUuid = study.uuid
+            DAO.filterDAO.createOrUpdateFilter( filter,filter.version );
         }
 
         // add subset filters
         for (filter in study.subsetFilters)
         {
-            DAO.filterDAO.createOrUpdateFilter( filter, study, filter.version );
+            filter.studyUuid = study.uuid
+            DAO.filterDAO.createOrUpdateFilter( filter,filter.version );
         }
 
         // add stratas
@@ -180,5 +212,20 @@ class StudyDAO(private var dao: DAO)
         val args = arrayOf(study.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_STUDY, whereClause, args)
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<Study>(COLUMN_CREATION_DATE, "INTEGER",Study::creationDate),
+            ColumnBinding<Study>(COLUMN_VERSION,"TEXT",Study::version ),
+            ColumnBinding<Study>(COLUMN_STUDY_NAME,"TEXT",Study::name ),
+            ColumnBinding<Study>(COLUMN_STUDY_SAMPLING_METHOD_INDEX,"INTEGER",{SamplingMethodConverter.toIndex(it.samplingMethod)} ),
+            ColumnBinding<Study>(COLUMN_STUDY_SAMPLE_SIZE,"INTEGER",Study::sampleSize ),
+            ColumnBinding<Study>(COLUMN_STUDY_SAMPLE_SIZE_INDEX,"INTEGER",{SampleTypeConverter.toIndex(it.sampleType)} ),
+            ColumnBinding<Study>(COLUMN_STUDY_SUBSET_SAMPLE_NAME,"TEXT",Study::subsetSampleName ),
+            ColumnBinding<Study>(COLUMN_STUDY_SUBSET_SAMPLE_SIZE,"INTEGER",Study::subsetSampleSize ),
+            ColumnBinding<Study>(COLUMN_STUDY_SUBSET_SAMPLE_SIZE_INDEX,"INTEGER",{SampleTypeConverter.toIndex(it.subsetSampleType)} ),
+        )
     }
 }

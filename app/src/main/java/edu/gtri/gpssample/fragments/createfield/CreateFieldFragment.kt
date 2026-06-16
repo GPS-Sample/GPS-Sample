@@ -431,6 +431,8 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
             }
             else
             {
+                field.studyUuid = study.uuid
+
                 minimumNumberEditText.text.toString().toDoubleOrNull()?.let {
                     field.minimum = it
                 }
@@ -470,7 +472,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
                     sharedViewModel.createFieldModel.setParentField( field )
 
                     field.fields?.let { fields ->
-                        val childField = Field( field.uuid, fields.size+1,"", FieldType.Text, false, false, false, false, false, false, null, null )
+                        val childField = Field( field.uuid, fields.size+1,"", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid )
                         fields.add( childField )
                         sharedViewModel.createFieldModel.setCurrentField( childField )
                         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
@@ -490,6 +492,8 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
             }
             else
             {
+                field.studyUuid = study.uuid
+
                 minimumNumberEditText.text.toString().toDoubleOrNull()?.let {
                     field.minimum = it
                 }
@@ -516,7 +520,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
                 {
                     sharedViewModel.createFieldModel.parentField?.value?.let { parentField ->
                         parentField.fields?.let { fields ->
-                            val childField = Field( parentField.uuid, fields.size+1, "", FieldType.Text, false, false, false, false, false, false, null, null )
+                            val childField = Field( parentField.uuid, fields.size+1, "", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid )
                             fields.add( childField )
                             sharedViewModel.createFieldModel.setCurrentField( childField )
                             findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )

@@ -50,7 +50,7 @@ class CreateFilterModel {
     val createFilterAdapter = CreateFilterAdapter(listOf<Rule>())
     fun createNewFilter()
     {
-        val newFilter = Filter("" )
+        val newFilter = Filter("","" )
         _currentFilter = MutableLiveData(newFilter)
         currentFilter = _currentFilter
     }

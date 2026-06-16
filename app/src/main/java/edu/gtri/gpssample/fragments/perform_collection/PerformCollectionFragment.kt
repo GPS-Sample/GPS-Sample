@@ -192,9 +192,13 @@ class PerformCollectionFragment : Fragment(),
             config = it
         }
 
-        DAO.collectionTeamDAO.getCollectionTeam( enumArea.selectedCollectionTeamUuid )?.let {
-            collectionTeam = it
+        enumArea.collectionTeams.find { it.uuid == sharedViewModel.currentCollectionTeamUuid }?.let { collectionTeam ->
+            this@PerformCollectionFragment.collectionTeam = collectionTeam
         }
+
+//        DAO.collectionTeamDAO.getCollectionTeam( enumArea.selectedCollectionTeamUuid )?.let {
+//            collectionTeam = it
+//        }
 
         sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
             if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)

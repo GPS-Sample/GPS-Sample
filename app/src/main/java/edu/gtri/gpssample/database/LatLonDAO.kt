@@ -12,6 +12,10 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LAT
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LON
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.*
 
 class LatLonDAO(private var dao: DAO)
@@ -89,7 +93,7 @@ class LatLonDAO(private var dao: DAO)
 
         val query = "SELECT latlon.*, conn.${DAO.COLUMN_LAT_LON_UUID}, conn.${DAO.COLUMN_ENUMERATION_TEAM_UUID} FROM ${DAO.TABLE_LAT_LON} AS latlon, " +
                 "${DAO.CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON} AS conn WHERE latlon.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LAT_LON_UUID} AND conn.${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${teamUuid}'" +
-                "ORDER BY ${DAO.COLUMN_CREATION_DATE} ASC"
+                " ORDER BY ${DAO.COLUMN_CREATION_DATE} ASC"
 
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
@@ -111,7 +115,7 @@ class LatLonDAO(private var dao: DAO)
 
         val query = "SELECT latlon.*, conn.${DAO.COLUMN_LAT_LON_UUID}, conn.${DAO.COLUMN_COLLECTION_TEAM_UUID} FROM ${DAO.TABLE_LAT_LON} AS latlon, " +
                 "${DAO.CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON} AS conn WHERE latlon.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LAT_LON_UUID} AND conn.${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${teamUuid}'" +
-                "ORDER BY ${DAO.COLUMN_CREATION_DATE} ASC"
+                " ORDER BY ${DAO.COLUMN_CREATION_DATE} ASC"
 
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
@@ -139,5 +143,15 @@ class LatLonDAO(private var dao: DAO)
         whereClause = "${DAO.COLUMN_UUID} = ?"
 
         dao.writableDatabase.delete(DAO.TABLE_LAT_LON, whereClause, args)
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<LatLon>(COLUMN_CREATION_DATE,"INTEGER",LatLon::creationDate ),
+            ColumnBinding<LatLon>(COLUMN_VERSION,"TEXT",LatLon::version ),
+            ColumnBinding<LatLon>(COLUMN_LAT,"REAL",LatLon::creationDate ),
+            ColumnBinding<LatLon>(COLUMN_LON,"REAL",LatLon::creationDate ),
+        )
     }
 }

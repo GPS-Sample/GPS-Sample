@@ -177,7 +177,7 @@ class AddHouseholdFragment : Fragment(),
             {
                 if (field.parentUUID == null)
                 {
-                    val fieldData = FieldData(creationDate++, field.uuid)
+                    val fieldData = FieldData(creationDate++, field.uuid, enumerationItem.uuid )
                     enumerationItem.fieldDataList.add(fieldData)
 
                     if (field.type == FieldType.Checkbox || field.type == FieldType.Dropdown)

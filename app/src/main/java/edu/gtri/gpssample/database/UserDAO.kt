@@ -10,6 +10,19 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_ALTITUDE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_DESCRIPTION
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_GPS_ACCURACY
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_IMAGE_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_IS_LANDMARK
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_IS_MULTI_FAMILY
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_LATITUDE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_LONGITUDE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_PROPERTIES
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_TIME_ZONE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
+import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.extensions.toBoolean
 
@@ -97,5 +110,18 @@ class UserDAO(private var dao: DAO)
         cursor.close()
 
         return users
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<User>(DAO.COLUMN_CREATION_DATE, "INTEGER", User::creationDate),
+            ColumnBinding<User>(DAO.COLUMN_VERSION,"TEXT",User::version ),
+            ColumnBinding<User>(DAO.COLUMN_USER_ROLE,"TEXT",User::role ),
+            ColumnBinding<User>(DAO.COLUMN_USER_NAME,"TEXT",User::name ),
+            ColumnBinding<User>(DAO.COLUMN_USER_RECOVERY_QUESTION,"TEXT",User::recoveryQuestion ),
+            ColumnBinding<User>(DAO.COLUMN_USER_RECOVERY_ANSWER,"TEXT",User::recoveryAnswer ),
+            ColumnBinding<User>(DAO.COLUMN_USER_IS_ONLINE,"INTEGER",User::isOnline ),
+        )
     }
 }

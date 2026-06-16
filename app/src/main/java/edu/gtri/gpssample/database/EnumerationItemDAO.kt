@@ -14,6 +14,25 @@ import android.util.Log
 import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.SamplingState
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_COLLECTION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_COLLECTION_STATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ENUMERATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SAMPLING
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SUBSET_SAMPLING
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ENUMERATION_INCOMPLETE_REASON
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ENUMERATION_NOTES
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_SAMPLING_STATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_SUBSET_SAMPLING_STATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.extensions.toBoolean
 import java.util.*
@@ -33,7 +52,8 @@ class EnumerationItemDAO(private var dao: DAO)
         enumerationItem.fieldDataList.let { fieldDataList ->
             for (fieldData in fieldDataList)
             {
-                DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem, fieldData.version )
+                fieldData.enumerationItemUuid = enumerationItem.uuid
+                DAO.fieldDataDAO.createOrUpdateFieldData( fieldData,fieldData.version )
             }
         }
     }
@@ -190,5 +210,30 @@ class EnumerationItemDAO(private var dao: DAO)
         val args = arrayOf(enumerationItem.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_ENUMERATION_ITEM, whereClause, args)
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<EnumerationItem>(COLUMN_CREATION_DATE,"INTEGER",EnumerationItem::creationDate ),
+            ColumnBinding<EnumerationItem>(COLUMN_VERSION,"TEXT",EnumerationItem::version ),
+            ColumnBinding<EnumerationItem>(COLUMN_LOCATION_UUID,"TEXT",EnumerationItem::locationUuid ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_SUB_ADDRESS,"TEXT",EnumerationItem::subAddress ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME,"TEXT",EnumerationItem::enumeratorName ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE,"TEXT",EnumerationItem::enumerationState ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_ENUMERATION_DATE,"INTEGER",EnumerationItem::enumerationDate ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_ENUMERATION_INCOMPLETE_REASON,"TEXT",EnumerationItem::enumerationIncompleteReason ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_ENUMERATION_NOTES,"TEXT",EnumerationItem::enumerationNotes ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SAMPLING,"TEXT",EnumerationItem::enumerationEligibleForSampling ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SUBSET_SAMPLING,"TEXT",EnumerationItem::enumerationEligibleForSubsetSampling ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_SAMPLING_STATE,"TEXT",EnumerationItem::samplingState ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_SUBSET_SAMPLING_STATE,"TEXT",EnumerationItem::subsetSamplingState ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME,"TEXT",EnumerationItem::collectorName ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_COLLECTION_STATE,"TEXT",EnumerationItem::collectionState ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_COLLECTION_DATE,"INTEGER",EnumerationItem::collectionDate ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON,"TEXT",EnumerationItem::collectionIncompleteReason ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES,"TEXT",EnumerationItem::collectionNotes ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI,"TEXT",EnumerationItem::odkRecordUri ),
+        )
     }
 }

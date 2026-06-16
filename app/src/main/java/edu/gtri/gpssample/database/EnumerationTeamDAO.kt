@@ -11,6 +11,10 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_TEAM_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.*
 
 class EnumerationTeamDAO(private var dao: DAO)
@@ -114,5 +118,15 @@ class EnumerationTeamDAO(private var dao: DAO)
         val args = arrayOf(enumerationTeam.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_ENUMERATION_TEAM, whereClause, args)
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<EnumerationTeam>(COLUMN_CREATION_DATE,"INTEGER",EnumerationTeam::creationDate ),
+            ColumnBinding<EnumerationTeam>(COLUMN_VERSION,"TEXT",EnumerationTeam::version ),
+            ColumnBinding<EnumerationTeam>(COLUMN_ENUM_AREA_UUID,"TEXT", EnumerationTeam::enumAreaUuid ),
+            ColumnBinding<EnumerationTeam>(COLUMN_ENUMERATION_TEAM_NAME,"TEXT", EnumerationTeam::name ),
+        )
     }
 }

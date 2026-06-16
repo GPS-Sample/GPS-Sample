@@ -503,7 +503,7 @@ class PerformEnumerationFragment : Fragment(),
                     currentGPSAccuracy?.let { accuracy ->
                         currentGPSLocation?.let { point ->
                             val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                            val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), true, "", "")
+                            val location = Location( timeZone, accuracy, point.latitude(), point.longitude(), point.altitude(), true, "", "")
                             DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
                             enumArea.locations.add(location)
                             sharedViewModel.currentLocationUuid = location.uuid
@@ -743,7 +743,7 @@ class PerformEnumerationFragment : Fragment(),
             }
 
             val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-            val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), false, "", "")
+            val location = Location( timeZone, accuracy, point.latitude(), point.longitude(), point.altitude(), false, "", "")
 
             DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
             enumArea.locations.add(location)
@@ -773,7 +773,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     val pt = tag as Point
                     val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                    val location = Location( timeZone, LocationType.Enumeration, accuracy, pt.latitude(), pt.longitude(), pt.altitude(), false, "", "")
+                    val location = Location( timeZone, accuracy, pt.latitude(), pt.longitude(), pt.altitude(), false, "", "")
 
                     DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
                     enumArea.locations.add(location)
@@ -1585,7 +1585,7 @@ class PerformEnumerationFragment : Fragment(),
                     }
 
                     val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                    val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(),point.altitude(), false, "", "")
+                    val location = Location( timeZone, accuracy, point.latitude(), point.longitude(),point.altitude(), false, "", "")
 
                     if (gpsLocationIsGood( location ))
                     {

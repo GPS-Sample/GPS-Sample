@@ -11,6 +11,21 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.constants.SampleType
+import edu.gtri.gpssample.constants.SampleTypeConverter
+import edu.gtri.gpssample.constants.SamplingMethodConverter
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STRATA_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STRATA_SAMPLE_SIZE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STRATA_SAMPLE_TYPE_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SAMPLE_SIZE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SAMPLE_SIZE_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SAMPLING_METHOD_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SUBSET_SAMPLE_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SUBSET_SAMPLE_SIZE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SUBSET_SAMPLE_SIZE_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.*
 
 class StrataDAO(private var dao: DAO)
@@ -93,5 +108,18 @@ class StrataDAO(private var dao: DAO)
         val whereClause = "${DAO.COLUMN_UUID} = ?"
 
         dao.writableDatabase.delete(DAO.TABLE_STRATA, whereClause, args )
+    }
+
+    companion object
+    {
+        // Note!! CREATION_DATE was moved up to the standard column position
+        val columnBindings = listOf(
+            ColumnBinding<Strata>(COLUMN_CREATION_DATE, "INTEGER",Strata::creationDate),
+            ColumnBinding<Strata>(COLUMN_VERSION,"TEXT",Strata::version ),
+            ColumnBinding<Strata>(COLUMN_STUDY_UUID,"TEXT",Strata::studyUuid ),
+            ColumnBinding<Strata>(COLUMN_STRATA_NAME,"TEXT",Strata::name ),
+            ColumnBinding<Strata>(COLUMN_STRATA_SAMPLE_SIZE,"INTEGER",Strata::sampleSize ),
+            ColumnBinding<Strata>(COLUMN_STRATA_SAMPLE_TYPE_INDEX,"INTEGER",{it.sampleType.ordinal} ),
+        )
     }
 }

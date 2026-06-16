@@ -3,7 +3,15 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_TEAM_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_GROUP_ID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LATITUDE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LONGITUDE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.Breadcrumb
+import edu.gtri.gpssample.database.models.Field
 
 class BreadcrumbDAO(private var dao: DAO)
 {
@@ -66,4 +74,18 @@ class BreadcrumbDAO(private var dao: DAO)
         val args = arrayOf(breadcrumb.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_BREADCRUMB, whereClause, args)
-    }}
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<Breadcrumb>(COLUMN_CREATION_DATE,"INTEGER",Breadcrumb::creationDate ),
+            ColumnBinding<Breadcrumb>(COLUMN_VERSION,"TEXT",Breadcrumb::version ),
+            ColumnBinding<Breadcrumb>(COLUMN_ENUM_AREA_UUID,"TEXT",Breadcrumb::version ),
+            ColumnBinding<Breadcrumb>(COLUMN_ENUMERATION_TEAM_NAME,"TEXT",Breadcrumb::version ),
+            ColumnBinding<Breadcrumb>(COLUMN_LATITUDE,"REAL",Breadcrumb::version ),
+            ColumnBinding<Breadcrumb>(COLUMN_LONGITUDE,"REAL",Breadcrumb::version ),
+            ColumnBinding<Breadcrumb>(COLUMN_GROUP_ID,"TEXT",Breadcrumb::version ),
+        )
+    }
+}

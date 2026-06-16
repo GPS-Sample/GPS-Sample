@@ -12,6 +12,15 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
 import edu.gtri.gpssample.constants.OperatorConverter
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FILTEROPERATOR_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_OPERATOR_ID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_RULE_IS_SUBSET_RULE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_RULE_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_RULE_VALUE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
+import edu.gtri.gpssample.database.models.CollectionTeam
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
@@ -145,5 +154,27 @@ class RuleDAO(private var dao: DAO)
         val args = arrayOf(rule.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_RULE, whereClause, args)
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<Rule>(COLUMN_CREATION_DATE,"INTEGER", Rule::creationDate ),
+            ColumnBinding<Rule>(COLUMN_VERSION,"TEXT", Rule::version ),
+            ColumnBinding<Rule>(COLUMN_FIELD_UUID,"TEXT", Rule::fieldUuid ),
+            ColumnBinding<Rule>(COLUMN_RULE_NAME,"TEXT", Rule::name ),
+            ColumnBinding<Rule>(COLUMN_OPERATOR_ID,"INTEGER",{
+                if (it.operator != null) {
+                    OperatorConverter.toIndex(it.operator!!)
+                } else null
+            }),
+            ColumnBinding<Rule>(COLUMN_RULE_VALUE,"TEXT", Rule::value ),
+            ColumnBinding<Rule>(COLUMN_RULE_IS_SUBSET_RULE,"INTEGER", Rule::isSubsetRule ),
+            ColumnBinding<Rule>(COLUMN_FILTEROPERATOR_UUID,"TEXT", {
+                if (it.filterOperator != null) {
+                    it.filterOperator!!.uuid
+                } else null
+            }),
+        )
     }
 }

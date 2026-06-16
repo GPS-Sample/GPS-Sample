@@ -11,6 +11,12 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_DATA_OPTION_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_DATA_OPTION_VALUE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_OPTION_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
+import edu.gtri.gpssample.database.models.CollectionTeam
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.FieldDataOption
 import edu.gtri.gpssample.database.models.Rule
@@ -204,5 +210,15 @@ class FieldDataOptionDAO(private var dao: DAO)
         val args = arrayOf(fieldDataOption.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_FIELD_DATA_OPTION, whereClause, args)
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<FieldDataOption>(COLUMN_CREATION_DATE,"INTEGER", FieldDataOption::creationDate ),
+            ColumnBinding<FieldDataOption>(COLUMN_VERSION,"TEXT", FieldDataOption::version ),
+            ColumnBinding<FieldDataOption>(COLUMN_FIELD_DATA_OPTION_NAME,"TEXT", FieldDataOption::name ),
+            ColumnBinding<FieldDataOption>(COLUMN_FIELD_DATA_OPTION_VALUE,"TEXT", FieldDataOption::value ),
+        )
     }
 }

@@ -257,7 +257,7 @@ class MapManager
 
                 override fun onZoom(event: org.osmdroid.events.ZoomEvent?): Boolean {
                     event?.let {
-                        delegate!!.onZoomLevelChanged( it.zoomLevel )
+                        delegate?.onZoomLevelChanged( it.zoomLevel )
                     }
                     return true
                 }

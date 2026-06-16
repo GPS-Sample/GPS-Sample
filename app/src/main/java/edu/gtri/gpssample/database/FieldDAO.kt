@@ -16,27 +16,51 @@ import androidx.core.database.getLongOrNull
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.constants.OperatorConverter
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_INTEGER_ONLY
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_MAXIMUM
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_MINIMUM
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_NUMBER_OF_RESIDENTS
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_OPTION_1
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_OPTION_2
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_OPTION_3
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_OPTION_4
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_PARENT_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_PII
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_REQUIRED
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_TIME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_TYPE_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STRATA_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STRATA_SAMPLE_SIZE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STRATA_SAMPLE_TYPE_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldOption
 import edu.gtri.gpssample.database.models.Rule
+import edu.gtri.gpssample.database.models.Strata
 import edu.gtri.gpssample.database.models.Study
 
 class FieldDAO(private var dao: DAO)
 {
-    fun createOrUpdateField( field: Field, study : Study, version: String )
+    fun createOrUpdateField( field: Field, version: String )
     {
         field.version = version
 
         val values = ContentValues()
-        putField( field, study, values )
+        putField( field, values )
 
         dao.upsert( DAO.TABLE_FIELD, values )
 
         field.fields?.let { fields ->
-            for (field in fields)
+            for (blockField in fields)
             {
-                createOrUpdateField( field, study,field.version )
+                blockField.studyUuid = field.studyUuid
+                createOrUpdateField( blockField,blockField.version )
             }
         }
 
@@ -46,13 +70,13 @@ class FieldDAO(private var dao: DAO)
         }
     }
 
-    fun putField( field: Field, study : Study, values: ContentValues )
+    fun putField( field: Field, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, field.uuid )
         values.put( DAO.COLUMN_FIELD_PARENT_UUID, field.parentUUID )
         values.put( DAO.COLUMN_CREATION_DATE, field.creationDate )
         values.put( DAO.COLUMN_VERSION, field.version )
-        values.put( DAO.COLUMN_STUDY_UUID, study.uuid )
+        values.put( DAO.COLUMN_STUDY_UUID, field.studyUuid )
         values.put( DAO.COLUMN_FIELD_INDEX, field.index )
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
         values.put( DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(field.type))
@@ -88,10 +112,11 @@ class FieldDAO(private var dao: DAO)
         val time = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TIME)).toBoolean()
         val minimum = cursor.getDoubleOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_MINIMUM))
         val maximum = cursor.getDoubleOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_MAXIMUM))
+        val studyUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_UUID))
 
         val type = FieldTypeConverter.fromIndex(typeIndex)
 
-        return Field( uuid, creationDate, parentUUID, index, name, type, pii, required, integerOnly, numberOfResidents, date, time, minimum, maximum, ArrayList<FieldOption>(), ArrayList<Field>(), version )
+        return Field( uuid, creationDate, parentUUID, index, name, type, pii, required, integerOnly, numberOfResidents, date, time, minimum, maximum, ArrayList<FieldOption>(), ArrayList<Field>(), studyUuid, version )
     }
 
     fun getField( uuid : String ): Field?
@@ -190,5 +215,26 @@ class FieldDAO(private var dao: DAO)
         val args = arrayOf(field.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_FIELD, whereClause, args)
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<Field>(COLUMN_CREATION_DATE, "INTEGER",Field::creationDate),
+            ColumnBinding<Field>(COLUMN_VERSION,"TEXT",Field::version ),
+            ColumnBinding<Field>(COLUMN_STUDY_UUID,"TEXT",Field::studyUuid ),
+            ColumnBinding<Field>(COLUMN_FIELD_PARENT_UUID,"TEXT",Field::parentUUID ),
+            ColumnBinding<Field>(COLUMN_FIELD_INDEX,"INTEGER",Field::index ),
+            ColumnBinding<Field>(COLUMN_FIELD_NAME,"TEXT",Field::name ),
+            ColumnBinding<Field>(COLUMN_FIELD_TYPE_INDEX,"INTEGER",{FieldTypeConverter.toIndex(it.type)} ),
+            ColumnBinding<Field>(COLUMN_FIELD_PII,"INTEGER",Field::pii ),
+            ColumnBinding<Field>(COLUMN_FIELD_REQUIRED,"INTEGER",Field::required ),
+            ColumnBinding<Field>(COLUMN_FIELD_INTEGER_ONLY,"INTEGER",Field::integerOnly ),
+            ColumnBinding<Field>(COLUMN_FIELD_NUMBER_OF_RESIDENTS,"INTEGER",Field::numberOfResidents ),
+            ColumnBinding<Field>(COLUMN_FIELD_DATE,"INTEGER",Field::date ),
+            ColumnBinding<Field>(COLUMN_FIELD_TIME,"INTEGER",Field::time ),
+            ColumnBinding<Field>(COLUMN_FIELD_MINIMUM,"REAL",Field::minimum ),
+            ColumnBinding<Field>(COLUMN_FIELD_MAXIMUM,"REAL",Field::maximum ),
+        )
     }
 }

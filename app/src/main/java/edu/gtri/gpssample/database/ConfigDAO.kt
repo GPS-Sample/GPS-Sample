@@ -13,6 +13,25 @@ import android.database.Cursor
 import android.util.Log
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DATE_FORMAT_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DB_VERSION
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_ENCRYPTION_PASSWORD
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_MAP_ENGINE_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_MIN_GPS_PRECISION
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_PROXIMITY_WARNING_VALUE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_TIME_FORMAT_INDEX
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_VALID_USERS
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_UUID
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_TIME_ZONE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.extensions.toBoolean
@@ -370,5 +389,30 @@ class ConfigDAO(private var dao: DAO)
 
         dao.writableDatabase.setTransactionSuccessful()
         dao.writableDatabase.endTransaction()
+    }
+
+    companion object
+    {
+        val columnBindings = listOf(
+            ColumnBinding<Config>(COLUMN_CREATION_DATE, "INTEGER",Config::creationDate),
+            ColumnBinding<Config>(COLUMN_VERSION,"TEXT",Config::version ),
+            ColumnBinding<Config>(COLUMN_TIME_ZONE,"INTEGER",Config::timeZone),
+            ColumnBinding<Config>(COLUMN_CONFIG_NAME,"TEXT UNIQUE NOT NULL",Config::name),
+            ColumnBinding<Config>(COLUMN_CONFIG_DB_VERSION,"INTEGER",Config::creationDate),
+            ColumnBinding<Config>(COLUMN_CONFIG_MAP_ENGINE_INDEX,"INTEGER",Config::mapEngineIndex),
+            ColumnBinding<Config>(COLUMN_CONFIG_DATE_FORMAT_INDEX,"INTEGER",{ DateFormatConverter.toIndex(it.dateFormat) }),
+            ColumnBinding<Config>(COLUMN_CONFIG_TIME_FORMAT_INDEX,"INTEGER",{ TimeFormatConverter.toIndex(it.timeFormat) }),
+            ColumnBinding<Config>(COLUMN_CONFIG_DISTANCE_FORMAT_INDEX,"INTEGER",{ DistanceFormatConverter.toIndex(it.distanceFormat) }),
+            ColumnBinding<Config>(COLUMN_CONFIG_MIN_GPS_PRECISION,"INTEGER",Config::minGpsPrecision),
+            ColumnBinding<Config>(COLUMN_CONFIG_ENCRYPTION_PASSWORD,"TEXT",Config::encryptionPassword),
+            ColumnBinding<Config>(COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY,"INTEGER",Config::allowManualLocationEntry),
+            ColumnBinding<Config>(COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED,"INTEGER",Config::subaddressIsrequired),
+            ColumnBinding<Config>(COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS,"INTEGER",Config::autoIncrementSubaddress),
+            ColumnBinding<Config>(COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED,"INTEGER",Config::proximityWarningIsEnabled),
+            ColumnBinding<Config>(COLUMN_CONFIG_PROXIMITY_WARNING_VALUE,"INTEGER",Config::proximityWarningValue),
+            ColumnBinding<Config>(COLUMN_ENUM_AREA_UUID,"TEXT",Config::selectedEnumAreaUuid),
+            ColumnBinding<Config>(COLUMN_STUDY_UUID,"TEXT",Config::selectedStudyUuid),
+            ColumnBinding<Config>(COLUMN_CONFIG_VALID_USERS,"TEXT",Config::validUsers),
+        )
     }
 }

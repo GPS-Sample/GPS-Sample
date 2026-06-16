@@ -234,7 +234,7 @@ class MapFragment : Fragment(),
                                     longitude = point.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
                                     val southWest = LatLon( 0, latitude, longitude )
 
-                                    mapTileRegion = MapTileRegion( northEast, southWest )
+                                    mapTileRegion = MapTileRegion( northEast, southWest, "" )
 
                                     mapTileRegion?.let {
                                         addPolygon( it )
@@ -442,7 +442,7 @@ class MapFragment : Fragment(),
     {
         val mapEngines = resources.getTextArray( R.array.map_engines )
 
-        ConfirmationDialog( activity, resources.getString(R.string.select_map_engine), "", mapEngines[0].toString(), mapEngines[1].toString(), null, false ) { buttonPressed, tag ->
+        ConfirmationDialog( activity, resources.getString(R.string.select_map_engine), "", mapEngines[0].toString(), mapEngines[1].toString(), null, true ) { buttonPressed, tag ->
             when( buttonPressed )
             {
                 ConfirmationDialog.ButtonPress.Left -> {
