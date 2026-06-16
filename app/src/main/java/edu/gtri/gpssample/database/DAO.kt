@@ -1073,6 +1073,20 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
+        fun logSchema()
+        {
+            val cursor = DAO.instance().writableDatabase.rawQuery("SELECT name, sql FROM sqlite_master WHERE type='table' ORDER BY name", null)
+
+            while (cursor.moveToNext())
+            {
+                val tableName = cursor.getString(0)
+                val createSql = cursor.getString(1)
+                Log.d("xxx", "$createSql\n")
+            }
+
+            cursor.close()
+        }
+
         fun log( msg: String )
         {
             Log.d( "xxx", msg )
