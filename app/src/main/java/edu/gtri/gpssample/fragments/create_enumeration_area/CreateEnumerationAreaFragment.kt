@@ -1108,7 +1108,10 @@ class CreateEnumerationAreaFragment : Fragment(),
             Thread {
                 try
                 {
+                    DAO.instance().writableDatabase.beginTransaction()
                     parseGeoJson( json, nameKey, strataKey )
+                    DAO.instance().writableDatabase.setTransactionSuccessful()
+                    DAO.instance().writableDatabase.endTransaction()
 
                     if (showCurrentLocation && unsavedEnumAreas.isNotEmpty())
                     {
@@ -1315,7 +1318,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                 if (shouldAutoEnumerateLocations)
                 {
-                    location.enumerationItems.add( autoEnumerate( location ))
+                    autoEnumerate( location )
                 }
 
                 val enumArea = findEnumAreaOfLocation( allEnumAreas, LatLng( point.point.coordinates.latitude, point.point.coordinates.longitude ))?.let { enumArea ->
@@ -1336,7 +1339,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     var subAddress = 0
 
-    fun autoEnumerate( location: Location ) : EnumerationItem
+    fun autoEnumerate( location: Location )
     {
         subAddress+= 1
 
@@ -1424,7 +1427,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             enumerationItem.fieldDataList.add( fieldData )
         }
 
-        return enumerationItem
+        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, enumerationItem.version )
     }
 
     private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {

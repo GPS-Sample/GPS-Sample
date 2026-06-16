@@ -1296,7 +1296,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
                 if (shouldAutoEnumerateLocations)
                 {
-//                    location.enumerationItems.add( autoEnumerate( location ))
                     autoEnumerate( location )
                 }
 
