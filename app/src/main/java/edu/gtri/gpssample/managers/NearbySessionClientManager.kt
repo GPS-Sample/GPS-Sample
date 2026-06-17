@@ -7,7 +7,7 @@ import com.google.android.gms.nearby.connection.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumerationItem
+import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Image
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,7 +59,7 @@ class NearbySessionClientManager(private val context: Context)
 
     private enum class PendingRequest {
         CONFIG,
-        ENUMERATION_ITEMS,
+        ENUMERATION_AREAS,
         IMAGE
     }
 
@@ -117,7 +117,7 @@ class NearbySessionClientManager(private val context: Context)
         _state.value = NearbySessionState.Connected
 
         val config = requestConfig()
-        requestEnumerationItems()
+        requestEnumerationAreas()
 
         downloadImages(config)
 
@@ -218,8 +218,8 @@ class NearbySessionClientManager(private val context: Context)
                 PendingRequest.CONFIG ->
                     receiveConfig(input)
 
-                PendingRequest.ENUMERATION_ITEMS ->
-                    receiveEnumerationItems(input)
+                PendingRequest.ENUMERATION_AREAS ->
+                    receiveEnumerationAreas(input)
 
                 PendingRequest.IMAGE ->
                     receiveImage(input)
@@ -271,15 +271,15 @@ class NearbySessionClientManager(private val context: Context)
     // ENUMERATION ITEMS (NEW)
     // -------------------------------------------------------------------------
 
-    private suspend fun requestEnumerationItems(): Unit
+    private suspend fun requestEnumerationAreas(): Unit
     {
-        pendingRequest = PendingRequest.ENUMERATION_ITEMS
+        pendingRequest = PendingRequest.ENUMERATION_AREAS
         val deferred = CompletableDeferred<Unit>()
         enumItemsDeferred = deferred
 
-        _state.value = NearbySessionState.ReceivingEnumerationItems
+        _state.value = NearbySessionState.ReceivingEnumerationAreas
 
-        sendRequest(Command.GET_ENUMERATION_ITEMS)
+        sendRequest(Command.GET_ENUMERATION_AREAS)
 
         return try {
             deferred.await()
@@ -289,12 +289,10 @@ class NearbySessionClientManager(private val context: Context)
         }
     }
 
-    private fun receiveEnumerationItems(input: InputStream)
+    private fun receiveEnumerationAreas(input: InputStream)
     {
         scope.launch(Dispatchers.IO)
         {
-            val items = mutableListOf<EnumerationItem>()
-
             try {
                 DAO.instance().writableDatabase.beginTransaction()
 
@@ -304,8 +302,8 @@ class NearbySessionClientManager(private val context: Context)
                         if (line.isBlank()) continue
 
                         try {
-                            val enumerationItem = json.decodeFromString(EnumerationItem.serializer(), line)
-                            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, enumerationItem.version )
+                            val enumArea = json.decodeFromString(EnumArea.serializer(), line)
+                            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, enumArea.version )
                         }
                         catch (ex: Exception)
                         {

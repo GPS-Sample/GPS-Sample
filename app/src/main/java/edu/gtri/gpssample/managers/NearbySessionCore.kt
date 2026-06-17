@@ -17,7 +17,7 @@ data class Request(
 @Serializable
 enum class Command {
     GET_CONFIG,
-    GET_ENUMERATION_ITEMS,
+    GET_ENUMERATION_AREAS,
     GET_IMAGE,
     DONE
 }
@@ -37,10 +37,10 @@ sealed interface NearbySessionState
     object Connected : NearbySessionState
     object Done : NearbySessionState
     object SendingConfig : NearbySessionState
-    object SendingEnumerationItems : NearbySessionState
+    data class SendingEnumerationAreas( val message: String ) : NearbySessionState
     object SendingImage : NearbySessionState
     object ReceivingConfig : NearbySessionState
-    object ReceivingEnumerationItems : NearbySessionState
+    object ReceivingEnumerationAreas : NearbySessionState
     object ReceivingImages : NearbySessionState
     object Closed : NearbySessionState
 

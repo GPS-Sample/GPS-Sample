@@ -100,10 +100,10 @@ class NearbySessionStatusDialog
         imageView.setImageBitmap( qrgEncoder.bitmap )
     }
 
-    fun updateState( state: NearbySessionState ) {
-
-        when (state) {
-
+    fun updateState( state: NearbySessionState )
+    {
+        when (state)
+        {
             NearbySessionState.Connecting -> {
                 setStatus("Connecting...")
             }
@@ -118,8 +118,8 @@ class NearbySessionStatusDialog
                 showCancelButton()
             }
 
-            NearbySessionState.SendingEnumerationItems -> {
-                setStatus("Sending EnumerationItems...")
+            is NearbySessionState.SendingEnumerationAreas -> {
+                setStatus(state.message)
                 showCancelButton()
             }
 
@@ -133,8 +133,8 @@ class NearbySessionStatusDialog
                 showCancelButton()
             }
 
-            NearbySessionState.ReceivingEnumerationItems -> {
-                setStatus("Receiving EnumerationItems...")
+            NearbySessionState.ReceivingEnumerationAreas -> {
+                setStatus("Receiving EnumerationAreas...")
                 showCancelButton()
             }
 

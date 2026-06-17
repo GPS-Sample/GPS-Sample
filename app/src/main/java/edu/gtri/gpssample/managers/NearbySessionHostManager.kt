@@ -1,13 +1,12 @@
 package edu.gtri.gpssample.managers
 
 import android.content.Context
-import android.util.Log
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumerationItem
+import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Image
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,16 +20,9 @@ import kotlinx.serialization.json.encodeToStream
 import java.io.*
 import java.util.UUID
 
-class NearbySessionHostManager(
-    private val context: Context,
-    private val config: Config
-) {
-    // -------------------------------------------------------------------------
-    // Nearby
-    // -------------------------------------------------------------------------
-
-    private val client: ConnectionsClient =
-        Nearby.getConnectionsClient(context)
+class NearbySessionHostManager( private val context: Context, private val config: Config )
+{
+    private val client: ConnectionsClient = Nearby.getConnectionsClient(context)
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -42,8 +34,7 @@ class NearbySessionHostManager(
     // State
     // -------------------------------------------------------------------------
 
-    private val _state =
-        MutableStateFlow<NearbySessionState>(NearbySessionState.Idle)
+    private val _state = MutableStateFlow<NearbySessionState>(NearbySessionState.Idle)
 
     val state: StateFlow<NearbySessionState> = _state.asStateFlow()
 
@@ -72,7 +63,8 @@ class NearbySessionHostManager(
     // Start / Stop
     // -------------------------------------------------------------------------
 
-    fun startHosting() {
+    fun startHosting()
+    {
         if (hostJob != null) return
 
         hostJob = scope.launch {
@@ -84,12 +76,14 @@ class NearbySessionHostManager(
         }
     }
 
-    fun stopHosting() {
+    fun stopHosting()
+    {
         hostJob?.cancel()
         hostJob = null
     }
 
-    fun shutdown() {
+    fun shutdown()
+    {
         stopHosting()
         scope.cancel()
     }
@@ -98,9 +92,10 @@ class NearbySessionHostManager(
     // Main loop
     // -------------------------------------------------------------------------
 
-    private suspend fun runHostLoop() {
-        while (scope.isActive) {
-
+    private suspend fun runHostLoop()
+    {
+        while (scope.isActive)
+        {
             val id = UUID.randomUUID().toString()
             sessionId = id
 
@@ -121,20 +116,15 @@ class NearbySessionHostManager(
     // Advertising
     // -------------------------------------------------------------------------
 
-    private fun startAdvertising(id: String) {
-        val options = AdvertisingOptions.Builder()
-            .setStrategy(Strategy.P2P_STAR)
-            .build()
+    private fun startAdvertising(id: String)
+    {
+        val options = AdvertisingOptions.Builder().setStrategy(Strategy.P2P_STAR).build()
 
-        client.startAdvertising(
-            id,
-            NearbySessionCore.SERVICE_ID,
-            connectionCallback,
-            options
-        )
+        client.startAdvertising(id, NearbySessionCore.SERVICE_ID, connectionCallback, options)
     }
 
-    private fun stopAdvertising() {
+    private fun stopAdvertising()
+    {
         client.stopAdvertising()
     }
 
@@ -145,21 +135,25 @@ class NearbySessionHostManager(
     private var connectionDeferred = CompletableDeferred<Unit>()
     private var disconnectDeferred = CompletableDeferred<Unit>()
 
-    private suspend fun waitForConnection() {
+    private suspend fun waitForConnection()
+    {
         connectionDeferred = CompletableDeferred()
         connectionDeferred.await()
     }
 
-    private fun signalConnected() {
+    private fun signalConnected()
+    {
         connectionDeferred.complete(Unit)
     }
 
-    private suspend fun waitForDisconnect() {
+    private suspend fun waitForDisconnect()
+    {
         disconnectDeferred = CompletableDeferred()
         disconnectDeferred.await()
     }
 
-    private fun signalDisconnected() {
+    private fun signalDisconnected()
+    {
         disconnectDeferred.complete(Unit)
     }
 
@@ -167,29 +161,29 @@ class NearbySessionHostManager(
     // Connection callback
     // -------------------------------------------------------------------------
 
-    private val connectionCallback = object : ConnectionLifecycleCallback() {
-
-        override fun onConnectionInitiated(
-            endpointId: String,
-            connectionInfo: ConnectionInfo
-        ) {
+    private val connectionCallback = object : ConnectionLifecycleCallback()
+    {
+        override fun onConnectionInitiated(endpointId: String, connectionInfo: ConnectionInfo)
+        {
             client.acceptConnection(endpointId, payloadCallback)
         }
 
-        override fun onConnectionResult(
-            endpointId: String,
-            result: ConnectionResolution
-        ) {
-            if (result.status.isSuccess) {
+        override fun onConnectionResult(endpointId: String, result: ConnectionResolution)
+        {
+            if (result.status.isSuccess)
+            {
                 connectedEndpointId = endpointId
                 stopAdvertising()
                 signalConnected()
-            } else {
+            }
+            else
+            {
                 _state.value = NearbySessionState.Error("Connection failed")
             }
         }
 
-        override fun onDisconnected(endpointId: String) {
+        override fun onDisconnected(endpointId: String)
+        {
             signalDisconnected()
         }
     }
@@ -198,10 +192,10 @@ class NearbySessionHostManager(
     // Payload handler
     // -------------------------------------------------------------------------
 
-    private val payloadCallback = object : PayloadCallback() {
-
-        override fun onPayloadReceived(endpointId: String, payload: Payload) {
-
+    private val payloadCallback = object : PayloadCallback()
+    {
+        override fun onPayloadReceived(endpointId: String, payload: Payload)
+        {
             if (payload.type != Payload.Type.BYTES) return
 
             val request = json.decodeFromString(Request.serializer(), String(payload.asBytes()!!))
@@ -213,8 +207,8 @@ class NearbySessionHostManager(
                         sendConfig(endpointId)
                     }
 
-                    Command.GET_ENUMERATION_ITEMS -> {
-                        sendEnumerationItems(endpointId)
+                    Command.GET_ENUMERATION_AREAS -> {
+                        sendEnumerationAreas(endpointId)
                     }
 
                     Command.GET_IMAGE -> {
@@ -248,53 +242,52 @@ class NearbySessionHostManager(
 
             client.sendPayload(endpointId, Payload.fromStream(input))
 
-            withContext(Dispatchers.IO) {
-                try {
-                    json.encodeToStream(Config.serializer(), config, output)
-                } catch( ex: Exception ) {
-                } finally {
-                    try {
-                        output.close()
-                    } catch( ex: Exception ) {}
-                }
-            }
+            try {
+                json.encodeToStream(Config.serializer(), config, output)
+            } catch( ex: Exception ) { } finally { try { output.close() } catch( ex: Exception ) {}}
         }
 
     // -------------------------------------------------------------------------
-    // ENUMERATION ITEMS (streaming NDJSON)
+    // ENUMERATION AREAS (streaming NDJSON)
     // -------------------------------------------------------------------------
 
-    private suspend fun sendEnumerationItems(endpointId: String) =
+    private suspend fun sendEnumerationAreas(endpointId: String) =
         transferMutex.withLock {
-            _state.value = NearbySessionState.SendingEnumerationItems
-
             val output = PipedOutputStream()
             val input = PipedInputStream(output, 64 * 1024)
 
             client.sendPayload(endpointId, Payload.fromStream(input))
 
-            withContext(Dispatchers.IO)
-            {
-                val db = DAO.instance().readableDatabase
-                val cursor = db.rawQuery("SELECT * FROM enumeration_item", null)
+            try {
+                if (config.enumAreas.size == 1)
+                {
+                    _state.value = NearbySessionState.SendingEnumerationAreas("Sending EnumArea 1/1" )
+                    val jsonLine = json.encodeToString(EnumArea.serializer(),config.enumAreas.first())
+                    output.write(jsonLine.toByteArray())
+                    output.write('\n'.code)
+                }
+                else
+                {
+                    val db = DAO.instance().readableDatabase
+                    val query = "SELECT ${DAO.COLUMN_UUID} FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_CONFIG_UUID} = '${config.uuid}' ORDER BY ${DAO.COLUMN_CREATION_DATE} ASC"
 
-                try {
-                    while (cursor.moveToNext()) {
-                        val uuid = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_UUID))
-                        DAO.enumerationItemDAO.getEnumerationItem(uuid)?.let { item ->
-                            val jsonLine = json.encodeToString(EnumerationItem.serializer(), item)
-                            output.write(jsonLine.toByteArray())
-                            output.write('\n'.code)
+                    db.rawQuery(query, null).use { cursor ->
+                        val numItems = cursor.count
+                        var count = 1
+
+                        while (cursor.moveToNext())
+                        {
+                            _state.value = NearbySessionState.SendingEnumerationAreas("Sending EnumArea ${count++}/${numItems}" )
+                            val uuid = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_UUID))
+                            DAO.enumAreaDAO.getEnumArea(uuid)?.let { enumArea ->
+                                val jsonLine = json.encodeToString(EnumArea.serializer(), enumArea)
+                                output.write(jsonLine.toByteArray())
+                                output.write('\n'.code)
+                            }
                         }
                     }
-                } catch (ex: Exception ) {
-                } finally {
-                    try {
-                        cursor.close()
-                        output.close()
-                    } catch( ex: Exception ) {}
                 }
-            }
+            } catch( ex: Exception ) {} finally { try { output.close() } catch( ex: Exception ) {}}
         }
 
     // -------------------------------------------------------------------------
@@ -313,19 +306,9 @@ class NearbySessionHostManager(
 
             client.sendPayload(endpointId, Payload.fromStream(input))
 
-            withContext(Dispatchers.IO) {
-                try {
-                    json.encodeToStream(Image.serializer(), image, output)
-                } catch( ex: Exception ) {
-                    Log.d( "xxx", ex.stackTraceToString())
-                } finally {
-                    try {
-                        output.close()
-                    } catch( ex: Exception ) {
-                        Log.d( "xxx", ex.stackTraceToString())
-                    }
-                }
-            }
+            try {
+                json.encodeToStream(Image.serializer(), image, output)
+            } catch( ex: Exception ) {} finally { try { output.close() } catch( ex: Exception ) {}}
         }
 
     // -------------------------------------------------------------------------

@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.LocationServices
 import com.mapbox.geojson.Point
+import com.mapbox.maps.extension.style.atmosphere.generated.atmosphere
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -225,6 +226,8 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                                     nearbySessionStatusDialog = null
                                 }
 
+                                config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
+
                                 nearbySessionHostManager = NearbySessionHostManager( requireContext().applicationContext, config )
 
                                 viewLifecycleOwner.lifecycleScope.launch {
@@ -258,7 +261,8 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                                             when( buttonPressed )
                                             {
                                                 ConfirmationDialog.ButtonPress.Left -> {
-                                                    ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages, false ) { success ->
+                                                    config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
+                                                    ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages ) { success ->
                                                         if (success)
                                                         {
                                                             Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
@@ -343,9 +347,9 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                 sharedViewModel.createStudyModel.setCurrentStudy(config.studies[0])
             }
 
-            val enumAreaSummary = DAO.configDAO.getEnumAreaSummary(config.uuid )
+            val enumAreaSummaries = DAO.enumAreaDAO.getEnumAreaSummary(config.uuid )
 
-            enumerationAreasAdapter = ConfigurationAdapter( config.enumAreas, enumAreaSummary )
+            enumerationAreasAdapter = ConfigurationAdapter(enumAreaSummaries )
             enumerationAreasAdapter.didSelectEnumArea = this::didSelectEnumArea
         }
 
@@ -363,7 +367,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
     fun refreshView( config: Config )
     {
         studiesAdapter.updateStudies( config.studies )
-        enumerationAreasAdapter.updateEnumAreas( config.enumAreas )
+//        enumerationAreasAdapter.updateEnumAreas( config.enumAreas )
 
         binding.configNameTextView.text = config.name
 
@@ -535,35 +539,49 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
         }
     }
 
-    private fun didSelectEnumArea(enumArea: EnumArea)
+    private fun didSelectEnumArea(uuid: String)
     {
+        if (sharedViewModel.createStudyModel.currentStudy == null)
+        {
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
+            return
+        }
+
         sharedViewModel.currentConfiguration?.value?.let { config ->
-            config.selectedEnumAreaUuid = enumArea.uuid
-            for (location in enumArea.locations)
-            {
-                if (location.enumerationItems.isEmpty())
-                {
-                    location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
-                }
-            }
             sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                config.selectedStudyUuid = study.uuid
-                sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-                ConfirmationDialog( activity, resources.getString(R.string.select_task), "", resources.getString(R.string.client), resources.getString(R.string.survey), null, true ) { buttonPressed, tag ->
-                    when( buttonPressed )
-                    {
-                        ConfirmationDialog.ButtonPress.Left -> {
-                            findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamsFragment )
-                        }
-                        ConfirmationDialog.ButtonPress.Right -> {
-                            findNavController().navigate( R.id.action_navigate_to_CreateSampleFragment )
-                        }
-                        ConfirmationDialog.ButtonPress.None -> {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    binding.overlayView.visibility = View.VISIBLE
+
+                    val enumArea = withContext(Dispatchers.IO) {
+                        DAO.enumAreaDAO.getEnumArea( uuid )
+                    }
+
+                    // back on main thread
+
+                    binding.overlayView.visibility = View.GONE
+
+                    enumArea?.let { enumArea ->
+                        config.selectedEnumAreaUuid = uuid
+                        config.enumAreas.clear()
+                        config.enumAreas.add( enumArea )
+                        config.selectedStudyUuid = study.uuid
+                        sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
+                        ConfirmationDialog( activity, resources.getString(R.string.select_task), "", resources.getString(R.string.client), resources.getString(R.string.survey), null, true ) { buttonPressed, tag ->
+                            when( buttonPressed )
+                            {
+                                ConfirmationDialog.ButtonPress.Left -> {
+                                    findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamsFragment )
+                                }
+                                ConfirmationDialog.ButtonPress.Right -> {
+                                    findNavController().navigate( R.id.action_navigate_to_CreateSampleFragment )
+                                }
+                                ConfirmationDialog.ButtonPress.None -> {
+                                }
+                            }
                         }
                     }
                 }
-
-            } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -575,7 +593,8 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
             {
                 data?.data?.let { uri ->
                     sharedViewModel.currentConfiguration?.value?.let { config ->
-                        ZipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages, false, uri ) { error ->
+                        config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
+                        ZipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { error ->
                             if (error.isEmpty())
                             {
                                 Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()

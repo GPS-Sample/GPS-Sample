@@ -39,6 +39,7 @@ import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.managers.NearbySessionClientManager
+import edu.gtri.gpssample.managers.PerformanceManager
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
@@ -423,8 +424,7 @@ class ManageConfigurationsFragment : Fragment()
                     }
                 }
 
-                val start = Date().time / 1000L
-                Log.d("xxx", "before import = ${usedMB()} MB")
+                PerformanceManager.startTimer()
 
                 nearbySessionClientManager?.connect( sessionId ) { config ->
                     nearbySessionStatusDialog?.setStatus( "Saving Configuration..." )
@@ -437,13 +437,7 @@ class ManageConfigurationsFragment : Fragment()
 
                         // back on the main thread...
 
-                        System.gc()
-                        Log.d("xxx", "after import = ${usedMB()} MB")
-                        val duration= Date().time / 1000L - start
-                        val minutes = duration / 60
-                        val seconds = duration % 60
-
-                        Log.d("xxx", "Transfer time: %d:%02d".format(minutes, seconds))
+                        Log.d("xxx", "Transfer time: ${PerformanceManager.elapsedTime()}")
 
                         nearbySessionStatusDialog?.dismiss()
 

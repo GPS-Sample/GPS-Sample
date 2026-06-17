@@ -10,7 +10,6 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
-import android.os.Build
 import android.util.Log
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
@@ -52,8 +51,21 @@ class ConfigDAO(private var dao: DAO)
             }
         }
 
-        val start = Date().time / 1000L
+        dao.writableDatabase.beginTransaction()
 
+        val values = ContentValues()
+        putConfig( config, values )
+        dao.upsert( DAO.TABLE_CONFIG, values )
+
+        createOrUpdateEnumAreas(config)
+        createOrUpdateStudies(config)
+
+        dao.writableDatabase.setTransactionSuccessful()
+        dao.writableDatabase.endTransaction()
+    }
+
+    fun doRealUpsert()
+    {
         // Possible future improvement, if needed
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
 //        {
@@ -67,24 +79,6 @@ class ConfigDAO(private var dao: DAO)
 //            putConfig( config, values )
 //            dao.upsert( DAO.TABLE_CONFIG, values )
 //        }
-
-        dao.writableDatabase.beginTransaction()
-
-        val values = ContentValues()
-        putConfig( config, values )
-        dao.upsert( DAO.TABLE_CONFIG, values )
-
-        createOrUpdateEnumAreas(config)
-        createOrUpdateStudies(config)
-
-        dao.writableDatabase.setTransactionSuccessful()
-        dao.writableDatabase.endTransaction()
-
-        val duration= Date().time / 1000L - start
-        val minutes = duration / 60
-        val seconds = duration % 60
-
-        Log.d("xxx", "Config update time: %d:%02d".format(minutes, seconds))
     }
 
     fun putConfig( config: Config, values: ContentValues )
@@ -164,8 +158,6 @@ class ConfigDAO(private var dao: DAO)
 
     fun getConfig( uuid: String ): Config?
     {
-//        DAO.fieldDataOptionDAO.loadCache()
-
         var config: Config? = null
 
         val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
@@ -176,7 +168,8 @@ class ConfigDAO(private var dao: DAO)
         {
             config = buildConfig( cursor )
             config.studies = DAO.studyDAO.getStudies( config )
-            config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+            // enumAreas are lazy loaded as needed
+//            config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
         }
 
         cursor.close()
@@ -299,79 +292,6 @@ class ConfigDAO(private var dao: DAO)
                     eligibleCount = c.getInt(eligibleIndex),
                     sampledCount = c.getInt(sampledIndex),
                     surveyedCount = c.getInt(surveyedIndex)
-                )
-            }
-        }
-
-        return result
-    }
-
-    data class EnumAreaSummary(
-        val enumAreaUuid: String,
-        val enumeratedCount: Int,
-        val eligibleCount: Int,
-        val sampledCount: Int,
-        val surveyedCount: Int
-    )
-
-    fun getEnumAreaSummary(configUuid: String): List<EnumAreaSummary> {
-
-        val db = dao.readableDatabase
-
-        val query = """
-        SELECT
-            lea.enum_area_uuid AS enum_area_uuid,
-
-            SUM(CASE
-                WHEN ei.enumeration_item_enumeration_state IN ('Enumerated', 'Incomplete')
-                THEN 1 ELSE 0 END) AS enumerated_count,
-
-            SUM(CASE
-                WHEN ei.enumeration_item_enumeration_eligible_for_sampling = 1
-                  OR ei.enumeration_item_enumeration_eligible_for_subset_sampling = 1
-                THEN 1 ELSE 0 END) AS eligible_count,
-
-            SUM(CASE
-                WHEN ei.enumeration_item_sampling_state = 'Sampled'
-                  OR ei.enumeration_item_subset_sampling_state = 'Sampled'
-                THEN 1 ELSE 0 END) AS sampled_count,
-
-            SUM(CASE
-                WHEN ei.enumeration_item_collection_state = 'Complete'
-                THEN 1 ELSE 0 END) AS surveyed_count
-
-        FROM enumeration_item ei
-        JOIN location l
-            ON ei.location_uuid = l.uuid
-        JOIN location__enum_area lea
-            ON lea.location_uuid = l.uuid
-        JOIN enum_area ea
-            ON ea.uuid = lea.enum_area_uuid
-        WHERE ea.config_uuid = ?
-        GROUP BY lea.enum_area_uuid
-    """.trimIndent()
-
-        val cursor = db.rawQuery(query, arrayOf(configUuid))
-
-        val result = ArrayList<EnumAreaSummary>()
-
-        cursor.use { c ->
-
-            val uuidIdx = c.getColumnIndexOrThrow("enum_area_uuid")
-            val enumIdx = c.getColumnIndexOrThrow("enumerated_count")
-            val eligIdx = c.getColumnIndexOrThrow("eligible_count")
-            val sampIdx = c.getColumnIndexOrThrow("sampled_count")
-            val survIdx = c.getColumnIndexOrThrow("surveyed_count")
-
-            while (c.moveToNext()) {
-                result.add(
-                    EnumAreaSummary(
-                        enumAreaUuid = c.getString(uuidIdx),
-                        enumeratedCount = c.getInt(enumIdx),
-                        eligibleCount = c.getInt(eligIdx),
-                        sampledCount = c.getInt(sampIdx),
-                        surveyedCount = c.getInt(survIdx)
-                    )
                 )
             }
         }

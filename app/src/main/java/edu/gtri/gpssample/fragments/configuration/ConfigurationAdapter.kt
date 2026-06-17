@@ -15,29 +15,25 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.CollectionState
-import edu.gtri.gpssample.constants.EnumerationState
-import edu.gtri.gpssample.constants.SamplingState
-import edu.gtri.gpssample.database.ConfigDAO.EnumAreaSummary
-import edu.gtri.gpssample.database.models.EnumArea
-import java.util.*
-import kotlin.collections.ArrayList
+import edu.gtri.gpssample.database.EnumAreaDAO.EnumAreaSummary
 
-class ConfigurationAdapter(var enumAreas: List<EnumArea>?, var enumAreaSummaries: List<EnumAreaSummary>) : RecyclerView.Adapter<ConfigurationAdapter.ViewHolder>()
+class ConfigurationAdapter(var enumAreaSummaries: List<EnumAreaSummary>?) : RecyclerView.Adapter<ConfigurationAdapter.ViewHolder>()
 {
-    override fun getItemCount() : Int {
-        enumAreas?.let {enumAreas ->
-            return enumAreas.count()
+    override fun getItemCount() : Int
+    {
+        enumAreaSummaries?.let {
+            return it.count()
         }
+
         return 0
     }
 
     private lateinit var context: Context
-    lateinit var didSelectEnumArea: ((enumArea: EnumArea) -> Unit)
+    lateinit var didSelectEnumArea: ((uuid: String) -> Unit)
 
-    fun updateEnumAreas( areas: List<EnumArea>? )
+    fun updateEnumAreas( summaries: List<EnumAreaSummary>? )
     {
-        this.enumAreas = areas
+        this.enumAreaSummaries = summaries
         notifyDataSetChanged()
     }
 
@@ -56,18 +52,15 @@ class ConfigurationAdapter(var enumAreas: List<EnumArea>?, var enumAreaSummaries
     {
         holder.itemView.isSelected = false
 
-        val enumArea = enumAreas!!.get(holder.adapterPosition)
+        val enumAreaSummary = enumAreaSummaries!!.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( enumArea.name )
-
-        enumAreaSummaries.find { it.enumAreaUuid == enumArea.uuid } ?.let {
-            holder.enumeratedTextView.text = "${it.enumeratedCount}"
-            holder.sampledTextView.text = "${it.sampledCount}"
-            holder.surveyedTextView.text = "${it.surveyedCount}"
-        }
+        holder.nameTextView.setText( enumAreaSummary.name )
+        holder.enumeratedTextView.text = enumAreaSummary.enumeratedCount.toString()
+        holder.sampledTextView.text = enumAreaSummary.sampledCount.toString()
+        holder.surveyedTextView.text = enumAreaSummary.surveyedCount.toString()
 
         holder.itemView.setOnClickListener {
-            didSelectEnumArea(enumArea)
+            didSelectEnumArea(enumAreaSummary.uuid)
         }
     }
 
@@ -77,6 +70,5 @@ class ConfigurationAdapter(var enumAreas: List<EnumArea>?, var enumAreaSummaries
         val enumeratedTextView : TextView = itemView.findViewById(R.id.number_enumerated_text_view)
         val sampledTextView : TextView = itemView.findViewById(R.id.number_sampled_text_view)
         val surveyedTextView : TextView = itemView.findViewById(R.id.number_surveyed_text_view)
-
     }
 }

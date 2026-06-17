@@ -93,6 +93,30 @@ class EnumAreaDAO(private var dao: DAO)
         return EnumArea( uuid, creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, selectedEnumerationTeamUuid, selectedCollectionTeamUuid, version )
     }
 
+    fun getEnumArea( uuid: String ): EnumArea?
+    {
+        var enumArea: EnumArea? = null
+
+        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_UUID} = '${uuid}'"
+
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            enumArea = buildEnumArea( cursor )
+            enumArea.mapTileRegion = DAO.mapTileRegionDAO.getMapTileRegion( enumArea )
+            enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaUuid( enumArea.uuid )
+            enumArea.locations = DAO.locationDAO.getLocations( enumArea )
+            enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
+            enumArea.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( enumArea )
+            enumArea.breadcrumbs = DAO.breadcrumbDAO.getBreadcrumbs( enumArea.uuid )
+        }
+
+        cursor.close()
+
+        return enumArea
+    }
+
     fun getEnumAreas( config: Config ): ArrayList<EnumArea>
     {
         val enumAreas = ArrayList<EnumArea>()
@@ -127,6 +151,83 @@ class EnumAreaDAO(private var dao: DAO)
                 location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
             }
         }
+    }
+
+    data class EnumAreaSummary(
+        val uuid: String,
+        val name: String,
+        val enumeratedCount: Int,
+        val eligibleCount: Int,
+        val sampledCount: Int,
+        val surveyedCount: Int
+    )
+
+    fun getEnumAreaSummary(configUuid: String): List<EnumAreaSummary> {
+
+        val db = dao.readableDatabase
+
+        val query = """
+        SELECT
+            lea.enum_area_uuid AS enum_area_uuid,
+            ea.enum_area_name AS name,
+
+            SUM(CASE
+                WHEN ei.enumeration_item_enumeration_state IN ('Enumerated', 'Incomplete')
+                THEN 1 ELSE 0 END) AS enumerated_count,
+
+            SUM(CASE
+                WHEN ei.enumeration_item_enumeration_eligible_for_sampling = 1
+                  OR ei.enumeration_item_enumeration_eligible_for_subset_sampling = 1
+                THEN 1 ELSE 0 END) AS eligible_count,
+
+            SUM(CASE
+                WHEN ei.enumeration_item_sampling_state = 'Sampled'
+                  OR ei.enumeration_item_subset_sampling_state = 'Sampled'
+                THEN 1 ELSE 0 END) AS sampled_count,
+
+            SUM(CASE
+                WHEN ei.enumeration_item_collection_state = 'Complete'
+                THEN 1 ELSE 0 END) AS surveyed_count
+
+        FROM enumeration_item ei
+        JOIN location l
+            ON ei.location_uuid = l.uuid
+        JOIN location__enum_area lea
+            ON lea.location_uuid = l.uuid
+        JOIN enum_area ea
+            ON ea.uuid = lea.enum_area_uuid
+        WHERE ea.config_uuid = ?
+        GROUP BY lea.enum_area_uuid
+    """.trimIndent()
+
+        val cursor = db.rawQuery(query, arrayOf(configUuid))
+
+        val result = ArrayList<EnumAreaSummary>()
+
+        cursor.use { c ->
+
+            val uuidIdx = c.getColumnIndexOrThrow("enum_area_uuid")
+            val nameIdx = c.getColumnIndexOrThrow("name")
+            val enumIdx = c.getColumnIndexOrThrow("enumerated_count")
+            val eligIdx = c.getColumnIndexOrThrow("eligible_count")
+            val sampIdx = c.getColumnIndexOrThrow("sampled_count")
+            val survIdx = c.getColumnIndexOrThrow("surveyed_count")
+
+            while (c.moveToNext()) {
+                result.add(
+                    EnumAreaSummary(
+                        uuid = c.getString(uuidIdx),
+                        name = c.getString(nameIdx),
+                        enumeratedCount = c.getInt(enumIdx),
+                        eligibleCount = c.getInt(eligIdx),
+                        sampledCount = c.getInt(sampIdx),
+                        surveyedCount = c.getInt(survIdx)
+                    )
+                )
+            }
+        }
+
+        return result
     }
 
     fun delete( enumArea: EnumArea )

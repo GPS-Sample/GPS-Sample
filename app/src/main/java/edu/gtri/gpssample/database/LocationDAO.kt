@@ -184,8 +184,7 @@ class LocationDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val location = buildLocation( cursor )
-            // enumerationItems will be lazy loaded as needed
-            // location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
             locations.add( location )
         }
 

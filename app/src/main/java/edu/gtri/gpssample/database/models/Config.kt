@@ -44,7 +44,8 @@ data class Config(
     var proximityWarningIsEnabled: Boolean,
     var proximityWarningValue: Int,
     var studies : ArrayList<Study>,
-    var enumAreas : ArrayList<EnumArea>,
+    @kotlinx.serialization.Transient
+    var enumAreas : ArrayList<EnumArea> = ArrayList(),
     var selectedStudyUuid: String,
     var selectedEnumAreaUuid: String,
     var validUsers : String,
@@ -87,6 +88,8 @@ data class Config(
 
             val jsonString = Json.encodeToString( this )
 
+            val config = unpack( jsonString, encryptionPassword )
+
             // step 2: compress the json string
 
             val byteArrayOutputStream = ByteArrayOutputStream(jsonString.length)
@@ -98,16 +101,9 @@ data class Config(
 
             val compressedString = Base64.encodeToString( byteArray, Base64.DEFAULT )
 
-            // step 3: encrypt the json string, if necessary
+            // step 3: encrypt the json string
 
-            if (encryptionPassword.isEmpty())
-            {
-                return  compressedString
-            }
-            else
-            {
-                return  EncryptionUtil.Encrypt(compressedString, encryptionPassword)
-            }
+            return  EncryptionUtil.Encrypt(compressedString, encryptionPassword)
         }
         catch( ex: Exception )
         {

@@ -3,13 +3,10 @@ package edu.gtri.gpssample.utils
 import android.app.Activity
 import android.net.Uri
 import android.content.ContentValues
-import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Image
@@ -22,7 +19,7 @@ import java.util.zip.ZipOutputStream
 
 object ZipUtils
 {
-    fun zipToUri( activity: Activity, config: Config, fileName: String, includeConfig: Boolean, includeImages: Boolean, shouldPackMinimal: Boolean, zipUri: Uri, completion: (error: String) -> Unit)
+    fun zipToUri( activity: Activity, config: Config, fileName: String, includeConfig: Boolean, includeImages: Boolean, zipUri: Uri, completion: (error: String) -> Unit)
     {
         Thread {
             try {
@@ -33,7 +30,7 @@ object ZipUtils
                         // ---- CONFIG JSON ----
                         if (includeConfig)
                         {
-                            val packedConfig = if (shouldPackMinimal) config.packMinimal() else config.pack()
+                            val packedConfig = config.pack()
 
                             val configEntry = ZipEntry("$fileName.json")
                             zipOut.putNextEntry(configEntry)
@@ -81,64 +78,7 @@ object ZipUtils
         }.start()
     }
 
-    fun unzip( activity: Activity, zipUri: Uri, password: String, completion: (Pair<Config?, Config.ErrorCode>)->Unit )
-    {
-        Thread {
-            try
-            {
-                var config: Config? = null
-                var errorCode = Config.ErrorCode.None
-
-                activity.contentResolver.openInputStream(zipUri)?.use { inputStream ->
-                    ZipInputStream(BufferedInputStream(inputStream)).use { zis ->
-                        var entry = zis.nextEntry
-
-                        while (entry != null)
-                        {
-                            val reader = BufferedReader(InputStreamReader(zis))
-                            val content = reader.readText()
-
-                            if (entry.name.contains( "-img"))
-                            {
-                                ImageList.unpack( content, password )?.let { imageList ->
-                                    for (image in imageList.images)
-                                    {
-                                        if (ImageDAO.instance().getImage( image.uuid ) == null)
-                                        {
-                                            Log.d( "xxx", "imported image with uuid: ${image.uuid}")
-                                            ImageDAO.instance().createImage( image )
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                val (cfg, eCode) = Config.unpack( content, password )
-                                config = cfg
-                                errorCode = eCode
-                            }
-
-                            zis.closeEntry()
-                            entry = zis.nextEntry
-                        }
-                    }
-                }
-
-                activity.runOnUiThread {
-                    completion( Pair(config, errorCode ))
-                }
-            }
-            catch( ex: Exception )
-            {
-                Log.d( "xxx", ex.stackTraceToString())
-                activity.runOnUiThread {
-                    completion( Pair(null,Config.ErrorCode.UnknownError))
-                }
-            }
-        }.start()
-    }
-
-    fun zipToPublicDocuments( activity: Activity, config: Config, fileName: String, subDirectory: String, includeConfig: Boolean, includeImages: Boolean, shouldPackMinimal: Boolean, completion: (Boolean) -> Unit)
+    fun zipToPublicDocuments( activity: Activity, config: Config, fileName: String, subDirectory: String, includeConfig: Boolean, includeImages: Boolean, completion: (Boolean) -> Unit)
     {
         Thread {
             try
@@ -174,7 +114,7 @@ object ZipUtils
                         // ---- CONFIG JSON ----
                         if (includeConfig)
                         {
-                            val packedConfig = if (shouldPackMinimal) config.packMinimal() else config.pack()
+                            val packedConfig = config.pack()
                             val configEntry = ZipEntry("$fileName.json")
                             zipOut.putNextEntry(configEntry)
                             zipOut.write(packedConfig.toByteArray())
@@ -215,6 +155,62 @@ object ZipUtils
             {
                 Log.d("xxx", ex.stackTraceToString())
                 activity.runOnUiThread { completion(false) }
+            }
+        }.start()
+    }
+
+    fun unzip( activity: Activity, zipUri: Uri, password: String, completion: (Pair<Config?, Config.ErrorCode>)->Unit )
+    {
+        Thread {
+            try
+            {
+                var config: Config? = null
+                var errorCode = Config.ErrorCode.None
+
+                activity.contentResolver.openInputStream(zipUri)?.use { inputStream ->
+                    ZipInputStream(BufferedInputStream(inputStream)).use { zis ->
+                        var entry = zis.nextEntry
+
+                        while (entry != null)
+                        {
+                            val reader = BufferedReader(InputStreamReader(zis))
+                            val content = reader.readText()
+
+                            if (entry.name.contains( "-img"))
+                            {
+                                ImageList.unpack( content, password )?.let { imageList ->
+                                    for (image in imageList.images)
+                                    {
+                                        if (ImageDAO.instance().getImage( image.uuid ) == null)
+                                        {
+                                            ImageDAO.instance().createImage( image )
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                val (cfg, eCode) = Config.unpack( content, password )
+                                config = cfg
+                                errorCode = eCode
+                            }
+
+                            zis.closeEntry()
+                            entry = zis.nextEntry
+                        }
+                    }
+                }
+
+                activity.runOnUiThread {
+                    completion( Pair(config, errorCode ))
+                }
+            }
+            catch( ex: Exception )
+            {
+                Log.d( "xxx", ex.stackTraceToString())
+                activity.runOnUiThread {
+                    completion( Pair(null,Config.ErrorCode.UnknownError))
+                }
             }
         }.start()
     }

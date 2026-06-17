@@ -568,7 +568,7 @@ class PerformEnumerationFragment : Fragment(),
                                         when( buttonPressed )
                                         {
                                             ConfirmationDialog.ButtonPress.Left -> {
-                                                ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Enumerated", includeConfig, includeImages, shouldPackMinimal()) { success ->
+                                                ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Enumerated", includeConfig, includeImages ) { success ->
                                                     if (success)
                                                     {
                                                         Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
@@ -1225,29 +1225,6 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
-    fun shouldPackMinimal() : Boolean
-    {
-        (activity!!.application as MainApplication).user?.let { user->
-            when(user.role)
-            {
-                Role.Admin.value,
-                Role.Supervisor.value ->
-                {
-                    return true
-                }
-
-                Role.Enumerator.value,
-                Role.DataCollector.value ->
-                {
-                    return false
-                }
-                Role.Undefined.value -> {}
-            }
-        }
-
-        return false
-    }
-
     fun getFileName() : String
     {
         (activity!!.application as MainApplication).user?.let { user ->
@@ -1308,7 +1285,7 @@ class PerformEnumerationFragment : Fragment(),
                 if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR && resultCode == Activity.RESULT_OK)
                 {
                     data?.data?.let { uri ->
-                        ZipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages, shouldPackMinimal(), uri ) { error ->
+                        ZipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { error ->
                             if (error.isEmpty())
                             {
                                 Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
