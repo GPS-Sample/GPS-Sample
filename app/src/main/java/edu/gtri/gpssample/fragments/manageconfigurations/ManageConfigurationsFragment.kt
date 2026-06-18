@@ -649,9 +649,9 @@ class ManageConfigurationsFragment : Fragment()
 
                         if (config == null)
                         {
-                            if (errorCode != Config.ErrorCode.None)
+                            if (errorCode != ErrorCode.None)
                             {
-                                val message = if (errorCode == Config.ErrorCode.PasswordError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
+                                val message = if (errorCode == ErrorCode.DecryptError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
                                 NotificationDialog( activity!!, resources.getString(R.string.error), message)
                             }
                         }

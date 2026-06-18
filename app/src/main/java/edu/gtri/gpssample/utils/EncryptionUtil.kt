@@ -9,10 +9,8 @@ package edu.gtri.gpssample.utils
 
 import android.util.Base64
 import android.util.Log
-import java.security.MessageDigest
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
-import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
@@ -26,9 +24,9 @@ object EncryptionUtil {
     {
         try
         {
-            val ivParameterSpec = IvParameterSpec(Base64.decode(kIv, Base64.DEFAULT))
+            val ivParameterSpec = IvParameterSpec(Base64.decode(kIv, Base64.NO_WRAP))
             val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
-            val spec = PBEKeySpec(password.toCharArray(), Base64.decode(kSalt, Base64.DEFAULT), 10000, 128)
+            val spec = PBEKeySpec(password.toCharArray(), Base64.decode(kSalt, Base64.NO_WRAP), 10000, 128)
 
             val tmp = factory.generateSecret(spec)
             val secretKeySpec = SecretKeySpec(tmp.encoded, "AES")
@@ -36,10 +34,7 @@ object EncryptionUtil {
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec)
 
-            return Base64.encodeToString(
-                cipher.doFinal(strToEncrypt.toByteArray(Charsets.UTF_8)),
-                Base64.DEFAULT
-            )
+            return Base64.encodeToString(cipher.doFinal(strToEncrypt.toByteArray(Charsets.UTF_8)), Base64.NO_WRAP)
         }
         catch (e: Exception)
         {
@@ -52,16 +47,16 @@ object EncryptionUtil {
     fun Decrypt(strToDecrypt : String, password: String) : String? {
         try
         {
-            val ivParameterSpec =  IvParameterSpec(Base64.decode(kIv, Base64.DEFAULT))
+            val ivParameterSpec =  IvParameterSpec(Base64.decode(kIv, Base64.NO_WRAP))
             val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
-            val spec =  PBEKeySpec(password.toCharArray(), Base64.decode(kSalt, Base64.DEFAULT), 10000, 128)
+            val spec =  PBEKeySpec(password.toCharArray(), Base64.decode(kSalt, Base64.NO_WRAP), 10000, 128)
             val tmp = factory.generateSecret(spec);
             val secretKeySpec =  SecretKeySpec(tmp.encoded, "AES")
 
             val cipher = Cipher.getInstance("AES/GCM/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
 
-            return  String(cipher.doFinal(Base64.decode(strToDecrypt, Base64.DEFAULT)))
+            return  String(cipher.doFinal(Base64.decode(strToDecrypt, Base64.NO_WRAP)))
         }
         catch (e : Exception)
         {

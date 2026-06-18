@@ -321,7 +321,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
 
                 if (config == null)
                 {
-                    val messageType = if (errorCode == Config.ErrorCode.PasswordError) MessageType.PasswordFailed else MessageType.ImportFailed
+                    val messageType = if (errorCode == ErrorCode.DecryptError) MessageType.PasswordFailed else MessageType.ImportFailed
                     delegate?.importFailed( messageType )
                 }
                 else

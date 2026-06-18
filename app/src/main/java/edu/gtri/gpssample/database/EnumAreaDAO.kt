@@ -198,6 +198,7 @@ class EnumAreaDAO(private var dao: DAO)
             ON ea.uuid = lea.enum_area_uuid
         WHERE ea.config_uuid = ?
         GROUP BY lea.enum_area_uuid
+        ORDER BY ea.creation_date ASC
     """.trimIndent()
 
         val cursor = db.rawQuery(query, arrayOf(configUuid))

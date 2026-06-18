@@ -35,6 +35,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.ErrorCode
 import edu.gtri.gpssample.fragments.manageconfigurations.ManageConfigurationsFragment
 
 class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegate,
@@ -42,7 +43,7 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
 
     interface ManageConfigurationNetworkDelegate
     {
-        fun didReceiveConfiguration(errorCode: Config.ErrorCode)
+        fun didReceiveConfiguration(errorCode: ErrorCode)
     }
 
     private var _activity : Activity? = null
@@ -173,7 +174,7 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
        // }
     }
 
-    override fun didReceiveConfiguration(errorCode: Config.ErrorCode)
+    override fun didReceiveConfiguration(errorCode: ErrorCode)
     {
         runBlocking(Dispatchers.Main) {
             networkClientModel.resetState()

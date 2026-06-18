@@ -26,6 +26,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.ErrorCode
 import edu.gtri.gpssample.database.models.Image
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.User
@@ -54,7 +55,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
 
     interface NetworkConnectDelegate
     {
-        fun didReceiveConfiguration(errorCode: Config.ErrorCode)
+        fun didReceiveConfiguration(errorCode: ErrorCode)
         fun didSendData(complete: Boolean)
     }
 
@@ -179,7 +180,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
 
                     if (config == null)
                     {
-                        val error = if (errorCode == Config.ErrorCode.PasswordError) NetworkStatus.PasswordError else NetworkStatus.DataReceivedError
+                        val error = if (errorCode == ErrorCode.DecryptError) NetworkStatus.PasswordError else NetworkStatus.DataReceivedError
                         _dataReceived.postValue( error )
                         connectDelegate?.didReceiveConfiguration( errorCode )
                     }
@@ -192,7 +193,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
 
                         configurationDelegate?.configurationReceived(config)
                         _dataReceived.postValue(NetworkStatus.DataReceived)
-                        connectDelegate?.didReceiveConfiguration(Config.ErrorCode.None)
+                        connectDelegate?.didReceiveConfiguration(ErrorCode.None)
                     }
                 }
             }
@@ -651,6 +652,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
         _commandSent.postValue(NetworkStatus.CommandError)
         _dataReceived.postValue(NetworkStatus.DataReceivedError)
         sleep(kDialogTimeout)
-        connectDelegate?.didReceiveConfiguration(Config.ErrorCode.UnknownError)
+        connectDelegate?.didReceiveConfiguration(ErrorCode.UnknownError)
     }
 }

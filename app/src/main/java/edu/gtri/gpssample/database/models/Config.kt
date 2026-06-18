@@ -86,9 +86,7 @@ data class Config(
         {
             // step 1: create the json string
 
-            val jsonString = Json.encodeToString( this )
-
-            return jsonString
+            val jsonString = json.encodeToString( this )
 
             // step 2: compress the json string
 
@@ -99,7 +97,7 @@ data class Config(
             val byteArray = byteArrayOutputStream.toByteArray()
             byteArrayOutputStream.close()
 
-            val compressedString = Base64.encodeToString( byteArray, Base64.DEFAULT )
+            val compressedString = Base64.encodeToString( byteArray, Base64.NO_WRAP )
 
             // step 3: encrypt the json string
 
@@ -113,72 +111,53 @@ data class Config(
         return ""
     }
 
-    enum class ErrorCode
-    {
-        PasswordError,
-        DecompressError,
-        DecodeError,
-        UnknownError,
-        None
-    }
-
     companion object
     {
+        private val json = Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+            prettyPrint = false
+        }
+
         fun unpack( jsonString: String, password: String ) : Pair<Config?, ErrorCode>
         {
-            var errorCode = ErrorCode.None
+            var config: Config? = null
+            var errorCode = ErrorCode.DecryptError
 
             try
             {
-                // check for a cleartext string
+                // step 1: decrypt the json string
 
-                if (jsonString.isNotEmpty() && jsonString.first() == '{')
-                {
-                    val config = Json.decodeFromString<Config>( jsonString )
-                    return Pair( config, ErrorCode.None )
+                EncryptionUtil.Decrypt(jsonString, password)?.let { clearText ->
+
+                    // step 2: decompress the json string
+
+                    errorCode = ErrorCode.DecompressError
+
+                    val byteArray = Base64.decode( clearText, Base64.NO_WRAP )
+                    val byteArrayInputStream = ByteArrayInputStream( byteArray )
+                    val gzipInputStream = GZIPInputStream( byteArrayInputStream, byteArray.size )
+                    val bytes = gzipInputStream.readBytes()
+                    val uncompressedString = bytes.decodeToString()
+                    gzipInputStream.close()
+                    byteArrayInputStream.close()
+
+                    // step 3: decode the JSON string into a Config object
+
+                    errorCode = ErrorCode.DecodeError
+
+                    config = json.decodeFromString<Config>( uncompressedString )
+
+                    errorCode = ErrorCode.None
                 }
-
-                var clearText = ""
-
-                // step 1: decrypt the json string, if necessary
-
-                if (password.isNotEmpty())
-                {
-                    EncryptionUtil.Decrypt(jsonString, password)?.let {
-                        clearText = it
-                    }
-                }
-
-                if (clearText.isEmpty())
-                {
-                    return Pair( null, ErrorCode.PasswordError )
-                }
-
-                // step 2: decompress the json string
-
-                errorCode = ErrorCode.DecompressError
-
-                val byteArray = Base64.decode( clearText, Base64.DEFAULT )
-                val byteArrayInputStream = ByteArrayInputStream( byteArray )
-                val gzipInputStream = GZIPInputStream( byteArrayInputStream, byteArray.size )
-                val bytes = gzipInputStream.readBytes()
-                val uncompressedString = bytes.decodeToString()
-                gzipInputStream.close()
-                byteArrayInputStream.close()
-
-                // step 3: decode the JSON string into a Config object
-
-                errorCode = ErrorCode.DecodeError
-
-                val config = Json.decodeFromString<Config>( uncompressedString )
-                return Pair( config, ErrorCode.None )
             }
             catch( ex: Exception )
             {
+                errorCode = ErrorCode.UnknownError
                 Log.d( "xxx", ex.stackTraceToString())
             }
 
-            return Pair( null, errorCode )
+            return Pair( config, errorCode  )
         }
     }
 }

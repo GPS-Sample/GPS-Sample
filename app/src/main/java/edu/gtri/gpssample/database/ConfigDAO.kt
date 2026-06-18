@@ -169,8 +169,6 @@ class ConfigDAO(private var dao: DAO)
         {
             config = buildConfig( cursor )
             config.studies = DAO.studyDAO.getStudies( config )
-            // enumAreas are lazy loaded as needed
-//            config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
         }
 
         cursor.close()

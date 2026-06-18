@@ -39,92 +39,168 @@ data class EnumArea (
     var selectedCollectionTeamUuid: String,
     var mapTileRegion: MapTileRegion?,
     var breadcrumbs: ArrayList<Breadcrumb>,
-    var version: String )
-{
-    constructor( uuid: String, creationDate: Long, configUuid: String, strataUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, selectedEnumerationTeamUuid: String, selectedCollectionTeamUuid: String, version: String )
-            : this(uuid, creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>(), selectedEnumerationTeamUuid, ArrayList<CollectionTeam>(), selectedCollectionTeamUuid,null, ArrayList<Breadcrumb>(), version )
+    var version: String ) {
+    constructor(
+        uuid: String,
+        creationDate: Long,
+        configUuid: String,
+        strataUuid: String,
+        name: String,
+        mbTilesPath: String,
+        mbTilesSize: Long,
+        selectedEnumerationTeamUuid: String,
+        selectedCollectionTeamUuid: String,
+        version: String
+    )
+            : this(
+        uuid,
+        creationDate,
+        configUuid,
+        strataUuid,
+        name,
+        mbTilesPath,
+        mbTilesSize,
+        ArrayList<LatLon>(),
+        ArrayList<Location>(),
+        ArrayList<EnumerationTeam>(),
+        selectedEnumerationTeamUuid,
+        ArrayList<CollectionTeam>(),
+        selectedCollectionTeamUuid,
+        null,
+        ArrayList<Breadcrumb>(),
+        version
+    )
 
-    constructor( configUuid: String, strataUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, vertices: ArrayList<LatLon>, mapTileRegion: MapTileRegion?)
-            : this(UUID.randomUUID().toString(), Date().time, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion, ArrayList<Breadcrumb>(), UUID.randomUUID().toString())
+    constructor(
+        configUuid: String,
+        strataUuid: String,
+        name: String,
+        mbTilesPath: String,
+        mbTilesSize: Long,
+        vertices: ArrayList<LatLon>,
+        mapTileRegion: MapTileRegion?
+    )
+            : this(
+        UUID.randomUUID().toString(),
+        Date().time,
+        configUuid,
+        strataUuid,
+        name,
+        mbTilesPath,
+        mbTilesSize,
+        vertices,
+        ArrayList<Location>(),
+        ArrayList<EnumerationTeam>(),
+        "",
+        ArrayList<CollectionTeam>(),
+        "",
+        mapTileRegion,
+        ArrayList<Breadcrumb>(),
+        UUID.randomUUID().toString()
+    )
 
-    constructor( creationDate: Long, configUuid: String, strataUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, vertices: ArrayList<LatLon>, mapTileRegion: MapTileRegion?)
-            : this(UUID.randomUUID().toString(), creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion, ArrayList<Breadcrumb>(), UUID.randomUUID().toString())
+    constructor(
+        creationDate: Long,
+        configUuid: String,
+        strataUuid: String,
+        name: String,
+        mbTilesPath: String,
+        mbTilesSize: Long,
+        vertices: ArrayList<LatLon>,
+        mapTileRegion: MapTileRegion?
+    )
+            : this(
+        UUID.randomUUID().toString(),
+        creationDate,
+        configUuid,
+        strataUuid,
+        name,
+        mbTilesPath,
+        mbTilesSize,
+        vertices,
+        ArrayList<Location>(),
+        ArrayList<EnumerationTeam>(),
+        "",
+        ArrayList<CollectionTeam>(),
+        "",
+        mapTileRegion,
+        ArrayList<Breadcrumb>(),
+        UUID.randomUUID().toString()
+    )
 
-    fun pack(password: String) : String
-    {
-        try
-        {
+    fun pack(password: String): String {
+        try {
             // step 1: create the json string
 
-            val jsonString = Json.encodeToString( this )
+            val jsonString = json.encodeToString(this)
 
             // step 2: compress the json string
 
             val byteArrayOutputStream = ByteArrayOutputStream(jsonString.length)
-            val gzipOutputStream = GZIPOutputStream( byteArrayOutputStream )
+            val gzipOutputStream = GZIPOutputStream(byteArrayOutputStream)
             gzipOutputStream.write(jsonString.toByteArray())
             gzipOutputStream.close()
             val byteArray = byteArrayOutputStream.toByteArray()
             byteArrayOutputStream.close()
 
-            val compressedString = Base64.encodeToString( byteArray, Base64.DEFAULT )
+            val compressedString = Base64.encodeToString(byteArray, Base64.NO_WRAP)
 
             // step 3: encrypt the json string, if necessary
 
-            if (password.isEmpty())
-            {
-                return compressedString
-            }
-            else
-            {
-                return EncryptionUtil.Encrypt(compressedString,password)
-            }
-        }
-        catch (ex: Exception)
-        {
-            Log.d( "xxx", ex.stackTraceToString())
+            return EncryptionUtil.Encrypt(compressedString, password)
+        } catch (ex: Exception) {
+            Log.d("xxx", ex.stackTraceToString())
         }
 
         return ""
     }
 
-    companion object
-    {
-        fun unpack( jsonString: String, password: String ) : EnumArea?
+    companion object {
+        private val json = Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+            prettyPrint = false
+        }
+
+        fun unpack( jsonString: String, password: String ) : Pair<EnumArea?,ErrorCode>
         {
+            var enumArea: EnumArea? = null
+            var errorCode = ErrorCode.DecryptError
+
             try
             {
-                var clearText = jsonString
+                // step 1: decrypt the json string
 
-                // step 1: decrypt the json string, if necessary
+                EncryptionUtil.Decrypt(jsonString, password)?.let { clearText ->
 
-                if (password.isNotEmpty())
-                {
-                    EncryptionUtil.Decrypt(jsonString, password)?.let {
-                        clearText = it
-                    }
+                    // step 2: decompress the json string
+
+                    errorCode = ErrorCode.DecompressError
+
+                    val byteArray = Base64.decode( clearText, Base64.NO_WRAP )
+                    val byteArrayInputStream = ByteArrayInputStream( byteArray )
+                    val gzipInputStream = GZIPInputStream( byteArrayInputStream, byteArray.size )
+                    val bytes = gzipInputStream.readBytes()
+                    val uncompressedString = bytes.decodeToString()
+                    gzipInputStream.close()
+                    byteArrayInputStream.close()
+
+                    // step 3: decode the JSON string into a Config object
+
+                    errorCode = ErrorCode.DecodeError
+
+                    enumArea = json.decodeFromString<EnumArea>( uncompressedString )
+
+                    errorCode = ErrorCode.None
                 }
-
-                // step 2: decompress the json string
-
-                val byteArray = Base64.decode( clearText, Base64.DEFAULT )
-                val byteArrayInputStream = ByteArrayInputStream( byteArray )
-                val gzipInputStream = GZIPInputStream( byteArrayInputStream, byteArray.size )
-                val bytes = gzipInputStream.readBytes()
-                val uncompressedString = bytes.decodeToString()
-                gzipInputStream.close()
-                byteArrayInputStream.close()
-
-                // step 3: decode the JSON string into a Config object
-
-                return Json.decodeFromString<EnumArea>( uncompressedString )
             }
-            catch (ex: Exception)
+            catch( ex: Exception )
             {
+                errorCode = ErrorCode.UnknownError
                 Log.d( "xxx", ex.stackTraceToString())
             }
 
-            return null
+            return Pair(enumArea,errorCode )
         }
     }
 }

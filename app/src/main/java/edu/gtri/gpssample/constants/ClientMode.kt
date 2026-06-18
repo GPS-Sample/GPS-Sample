@@ -12,7 +12,6 @@ enum class ClientMode(val format : String) {
     Configuration("Configuration Client"),
     EnumerationTeam("Enumeration Team Client"),
     CollectionTeam( "Connection Team Client")
-
 }
 
 object ClientModeConverter {

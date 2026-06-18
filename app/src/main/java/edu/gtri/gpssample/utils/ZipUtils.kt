@@ -18,6 +18,7 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.ErrorCode
 import edu.gtri.gpssample.managers.NearbySessionState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -77,20 +78,15 @@ class ZipUtils()
             {
                 _state.value = NearbySessionState.Message("Exporting EnumArea 1/1" )
                 writeEnumAreaHeader( 1, zipOut )
-                val line = json.encodeToString(EnumArea.serializer(), config.enumAreas.first())
-                zipOut.write(line.toByteArray())
+                val packedEnumArea = config.enumAreas[0].pack( config.encryptionPassword )
+                zipOut.write(packedEnumArea.toByteArray())
                 zipOut.write('\n'.code)
             }
             else
             {
-                val query = """
-                SELECT ${DAO.COLUMN_UUID}
-                FROM ${DAO.TABLE_ENUM_AREA}
-                WHERE ${DAO.COLUMN_CONFIG_UUID} = ?
-                ORDER BY ${DAO.COLUMN_CREATION_DATE}
-            """.trimIndent()
+                val  query = "SELECT ${DAO.COLUMN_UUID} FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_CONFIG_UUID} = '${config.uuid}' ORDER BY ${DAO.COLUMN_CREATION_DATE} ASC"
 
-                DAO.instance().readableDatabase.rawQuery(query, arrayOf(config.uuid)).use { cursor ->
+                DAO.instance().readableDatabase.rawQuery(query, null ).use { cursor ->
                     var count = 1
                     val totalCount = cursor.count
 
@@ -105,8 +101,8 @@ class ZipUtils()
                         val uuid = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_UUID))
 
                         DAO.enumAreaDAO.getEnumArea(uuid)?.let { enumArea ->
-                            val line = json.encodeToString(EnumArea.serializer(), enumArea)
-                            zipOut.write(line.toByteArray())
+                            val packedEnumArea = enumArea.pack( config.encryptionPassword )
+                            zipOut.write(packedEnumArea.toByteArray())
                             zipOut.write('\n'.code)
                         }
                     }
@@ -261,14 +257,14 @@ class ZipUtils()
         }
     }
 
-    fun unzip( activity: Activity, zipUri: Uri, password: String, completion: (Pair<Config?, Config.ErrorCode>)->Unit )
+    fun unzip( activity: Activity, zipUri: Uri, password: String, completion: (Pair<Config?, ErrorCode>)->Unit )
     {
         currentJob?.cancel()
 
         currentJob = scope.launch {
             var config: Config? = null
             var transactionStarted = false
-            var errorCode = Config.ErrorCode.None
+            var errorCode = ErrorCode.None
 
             try {
                 _state.value = NearbySessionState.Message("Importing Configuration..." )
@@ -277,7 +273,7 @@ class ZipUtils()
                     ZipInputStream(BufferedInputStream(inputStream)).use { zis ->
                         var entry = zis.nextEntry
 
-                        while (entry != null)
+                        while (errorCode == ErrorCode.None && entry != null)
                         {
                             if (entry.name.contains("-enumAreas"))
                             {
@@ -299,12 +295,22 @@ class ZipUtils()
 
                                     _state.value = NearbySessionState.Message("Importing EnumArea ${count++}/${totalCount}" )
 
-                                    val enumArea = json.decodeFromString(EnumArea.serializer(), line)
-
-                                    DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea, enumArea.version)
+                                    val (ea, eCode) = EnumArea.unpack(line, password )
+                                    if (eCode != ErrorCode.None)
+                                    {
+                                        config= null
+                                        errorCode = eCode
+                                        break
+                                    }
+                                    ea?.let { enumArea ->
+                                        DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea, enumArea.version)
+                                    }
                                 }
 
-                                DAO.instance().writableDatabase.setTransactionSuccessful()
+                                if (errorCode == ErrorCode.None)
+                                {
+                                    DAO.instance().writableDatabase.setTransactionSuccessful()
+                                }
                             }
                             else
                             {
@@ -326,7 +332,7 @@ class ZipUtils()
                                 }
                                 else
                                 {
-                                    val (cfg, eCode) = Config.unpack(content, password)
+                                    val (cfg, eCode) = Config.unpack(content, password )
                                     config = cfg
                                     errorCode = eCode
                                 }
@@ -341,12 +347,12 @@ class ZipUtils()
             catch (ce: CancellationException)
             {
                 config = null
-                errorCode = Config.ErrorCode.None
+                errorCode = ErrorCode.None
             }
             catch( ex: Exception )
             {
                 config = null
-                errorCode = Config.ErrorCode.UnknownError
+                errorCode = ErrorCode.UnknownError
             }
             finally
             {
