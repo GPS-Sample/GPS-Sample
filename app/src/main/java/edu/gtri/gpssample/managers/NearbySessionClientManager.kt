@@ -117,9 +117,12 @@ class NearbySessionClientManager(private val context: Context)
         _state.value = NearbySessionState.Connected
 
         val config = requestConfig()
+
+        // EnumAreas are saved directly to the database
         requestEnumerationAreas()
 
-        downloadImages(config)
+        // Images are saved directly to the database
+        requestImages(config)
 
         withContext(Dispatchers.Main) {
             completion(config)
@@ -335,7 +338,7 @@ class NearbySessionClientManager(private val context: Context)
     // IMAGES
     // -------------------------------------------------------------------------
 
-    private suspend fun downloadImages(config: Config)
+    private suspend fun requestImages(config: Config)
     {
         for (area in config.enumAreas)
         {
