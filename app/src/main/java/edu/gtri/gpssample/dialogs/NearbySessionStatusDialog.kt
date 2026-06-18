@@ -118,7 +118,7 @@ class NearbySessionStatusDialog
                 showCancelButton()
             }
 
-            is NearbySessionState.SendingEnumerationAreas -> {
+            is NearbySessionState.Message -> {
                 setStatus(state.message)
                 showCancelButton()
             }

@@ -21,5 +21,13 @@ class PerformanceManager
             val seconds = duration % 60
             return "%d:%02d".format(minutes,seconds)
         }
+
+        fun usedMB( ): Long
+        {
+            System.gc()
+            val runtime = Runtime.getRuntime()
+            return (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024
+        }
+
     }
 }

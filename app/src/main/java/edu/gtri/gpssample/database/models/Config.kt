@@ -88,7 +88,7 @@ data class Config(
 
             val jsonString = Json.encodeToString( this )
 
-            val config = unpack( jsonString, encryptionPassword )
+            return jsonString
 
             // step 2: compress the json string
 
@@ -111,64 +111,6 @@ data class Config(
         }
 
         return ""
-    }
-
-    fun packMinimal() : String
-    {
-        var packedConfig = this.pack()
-
-        if (this.selectedEnumAreaUuid.isNotEmpty())
-        {
-            val (config, error) = unpack( packedConfig, encryptionPassword )
-
-            if (config != null)
-            {
-                for (enumArea in config.enumAreas)
-                {
-                    if (enumArea.uuid == config.selectedEnumAreaUuid)
-                    {
-                        config.enumAreas.clear()
-                        config.enumAreas.add( enumArea )
-                        break
-                    }
-                }
-
-                val enumArea = config.enumAreas[0]
-
-                if (enumArea.selectedCollectionTeamUuid.isNotEmpty())
-                {
-                    enumArea.enumerationTeams.clear()
-
-                    for (collectionTeam in enumArea.collectionTeams)
-                    {
-                        if (collectionTeam.uuid == enumArea.selectedCollectionTeamUuid)
-                        {
-                            enumArea.collectionTeams.clear()
-                            enumArea.collectionTeams.add( collectionTeam )
-                            break
-                        }
-                    }
-                }
-                else if (enumArea.selectedEnumerationTeamUuid.isNotEmpty())
-                {
-                    enumArea.collectionTeams.clear()
-
-                    for (enumerationTeam in enumArea.enumerationTeams)
-                    {
-                        if (enumerationTeam.uuid == enumArea.selectedEnumerationTeamUuid)
-                        {
-                            enumArea.enumerationTeams.clear()
-                            enumArea.enumerationTeams.add( enumerationTeam )
-                            break
-                        }
-                    }
-                }
-
-                packedConfig = config.pack()
-            }
-        }
-
-        return packedConfig
     }
 
     enum class ErrorCode

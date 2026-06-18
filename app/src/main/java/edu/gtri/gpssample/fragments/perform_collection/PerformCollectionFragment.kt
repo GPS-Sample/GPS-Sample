@@ -55,6 +55,7 @@ import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionHostManager
+import edu.gtri.gpssample.managers.PerformanceManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
@@ -662,15 +663,34 @@ class PerformCollectionFragment : Fragment(),
                                             when( buttonPressed )
                                             {
                                                 ConfirmationDialog.ButtonPress.Left -> {
-                                                    ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Surveyed", includeConfig, includeImages,) { success ->
+                                                    val zipUtils = ZipUtils()
+
+                                                    nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.import_configuration )) {
+                                                        zipUtils.cancel()
+                                                    }
+
+                                                    viewLifecycleOwner.lifecycleScope.launch {
+                                                        zipUtils.state.collect { state ->
+                                                            nearbySessionStatusDialog?.updateState(state)
+                                                        }
+                                                    }
+
+                                                    PerformanceManager.startTimer()
+
+                                                    zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Surveyed", includeConfig, includeImages,) { success ->
                                                         if (success)
                                                         {
-                                                            Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                                            NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.export_succeeded))
                                                         }
                                                         else
                                                         {
                                                             NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
                                                         }
+
+                                                        nearbySessionStatusDialog?.dismiss()
+                                                        nearbySessionStatusDialog = null
+
+                                                        Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
                                                     }
                                                 }
                                                 ConfirmationDialog.ButtonPress.Right -> {
@@ -1027,15 +1047,34 @@ class PerformCollectionFragment : Fragment(),
                 if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR && resultCode == Activity.RESULT_OK)
                 {
                     data?.data?.let { uri ->
-                        ZipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { error ->
-                            if (error.isEmpty())
+                        val zipUtils = ZipUtils()
+
+                        nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
+                            zipUtils.cancel()
+                        }
+
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            zipUtils.state.collect { state ->
+                                nearbySessionStatusDialog?.updateState(state)
+                            }
+                        }
+
+                        PerformanceManager.startTimer()
+
+                        zipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { success ->
+                            if (success)
                             {
-                                Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.export_succeeded))
                             }
                             else
                             {
                                 NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
                             }
+
+                            nearbySessionStatusDialog?.dismiss()
+                            nearbySessionStatusDialog = null
+
+                            Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
                         }
                     }
                 }

@@ -13,7 +13,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.*
@@ -607,8 +606,6 @@ class ManageConfigurationsFragment : Fragment()
                     getQrCode.launch(intent)
                 }
                 ConfirmationDialog.ButtonPress.Right -> {
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.select_configuration_file), Toast.LENGTH_LONG).show()
-
                     val intent = Intent()
                         .setType("*/*")
                         .setAction(Intent.ACTION_GET_CONTENT)
@@ -632,17 +629,31 @@ class ManageConfigurationsFragment : Fragment()
             uri?.let { uri ->
                 try
                 {
-                    binding.progressOverlayView.visibility = View.VISIBLE
+                    val zipUtils = ZipUtils()
 
-                    ZipUtils.unzip( activity!!, uri, encryptionPassword ) { result ->
+                    nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.import_configuration )) {
+                        zipUtils.cancel()
+                    }
+
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        zipUtils.state.collect { state ->
+                            nearbySessionStatusDialog?.updateState(state)
+                        }
+                    }
+
+                    PerformanceManager.startTimer()
+
+                    zipUtils.unzip( activity!!, uri, encryptionPassword ) { result ->
                         val config = result.first
                         val errorCode = result.second
 
                         if (config == null)
                         {
-                            binding.progressOverlayView.visibility = View.GONE
-                            val message = if (errorCode == Config.ErrorCode.PasswordError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
-                            InfoDialog( activity!!, resources.getString(R.string.error), message, resources.getString(R.string.ok), null, null)
+                            if (errorCode != Config.ErrorCode.None)
+                            {
+                                val message = if (errorCode == Config.ErrorCode.PasswordError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
+                                NotificationDialog( activity!!, resources.getString(R.string.error), message)
+                            }
                         }
                         else
                         {
@@ -655,10 +666,13 @@ class ManageConfigurationsFragment : Fragment()
                             minimalConfigurations.add( config )
                             manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
 
-                            binding.progressOverlayView.visibility = View.GONE
-
                             didReceiveConfiguration( config )
                         }
+
+                        nearbySessionStatusDialog?.dismiss()
+                        nearbySessionStatusDialog = null
+
+                        Log.d( "xxx", "Import time : ${PerformanceManager.elapsedTime()}")
                     }
                 }
                 catch( ex: java.lang.Exception )

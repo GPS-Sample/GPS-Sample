@@ -37,7 +37,7 @@ sealed interface NearbySessionState
     object Connected : NearbySessionState
     object Done : NearbySessionState
     object SendingConfig : NearbySessionState
-    data class SendingEnumerationAreas( val message: String ) : NearbySessionState
+    data class Message( val message: String ) : NearbySessionState
     object SendingImage : NearbySessionState
     object ReceivingConfig : NearbySessionState
     object ReceivingEnumerationAreas : NearbySessionState

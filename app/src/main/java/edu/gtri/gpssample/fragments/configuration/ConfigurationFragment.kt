@@ -31,7 +31,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.LocationServices
 import com.mapbox.geojson.Point
-import com.mapbox.maps.extension.style.atmosphere.generated.atmosphere
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -52,6 +51,7 @@ import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionClientManager
 import edu.gtri.gpssample.managers.NearbySessionHostManager
+import edu.gtri.gpssample.managers.PerformanceManager
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.coroutines.Dispatchers
@@ -176,7 +176,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                         getQrCode.launch(intent)
                     }
                     ConfirmationDialog.ButtonPress.Right -> {
-                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.select_configuration_file), Toast.LENGTH_LONG).show()
                         val intent = Intent()
                             .setType("*/*")
                             .setAction(Intent.ACTION_GET_CONTENT)
@@ -200,19 +199,14 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                     binding.overlayView.visibility = View.VISIBLE
 
                     viewLifecycleOwner.lifecycleScope.launch {
-                        Log.d("MEM", "minimal config = ${usedMB()} MB")
-
                         withContext(Dispatchers.IO) {
                             // this may take a while...
                             for (enumArea in config.enumAreas)
                             {
                                 enumArea.selectedEnumerationTeamUuid = ""
                                 enumArea.selectedCollectionTeamUuid = ""
-//                                DAO.enumAreaDAO.loadLazyLocations( enumArea ) // if needed
                             }
                         }
-
-                        Log.d("MEM", "full config = ${usedMB()} MB")
 
                         // back on the main thread...
 
@@ -262,15 +256,35 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                                             {
                                                 ConfirmationDialog.ButtonPress.Left -> {
                                                     config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
-                                                    ZipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages ) { success ->
+
+                                                    val zipUtils = ZipUtils()
+
+                                                    nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.import_configuration )) {
+                                                        zipUtils.cancel()
+                                                    }
+
+                                                    viewLifecycleOwner.lifecycleScope.launch {
+                                                        zipUtils.state.collect { state ->
+                                                            nearbySessionStatusDialog?.updateState(state)
+                                                        }
+                                                    }
+
+                                                    PerformanceManager.startTimer()
+
+                                                    zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages ) { success ->
                                                         if (success)
                                                         {
-                                                            Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                                            NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.export_succeeded))
                                                         }
                                                         else
                                                         {
                                                             NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
                                                         }
+
+                                                        nearbySessionStatusDialog?.dismiss()
+                                                        nearbySessionStatusDialog = null
+
+                                                        Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
                                                     }
                                                 }
                                                 ConfirmationDialog.ButtonPress.Right -> {
@@ -367,7 +381,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
     fun refreshView( config: Config )
     {
         studiesAdapter.updateStudies( config.studies )
-//        enumerationAreasAdapter.updateEnumAreas( config.enumAreas )
 
         binding.configNameTextView.text = config.name
 
@@ -416,14 +429,13 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                 }
 
                 // back on main thread
-                val numRemaining = summaryInfo.sampledCount - summaryInfo.surveyedCount
 
-                binding.numberOfEnumerationAreasTextView.text = "${config.enumAreas.size}"
+                binding.numberOfEnumerationAreasTextView.text = "${summaryInfo.enumAreaCount}"
                 binding.numberEnumeratedTextView.text = "${summaryInfo.enumerationCount}"
                 binding.numberEligibleTextView.text = "${summaryInfo.eligibleCount}"
                 binding.numberSampledTextView.text = "${summaryInfo.sampledCount}"
                 binding.numberSurveyedTextView.text = "${summaryInfo.surveyedCount}"
-                binding.numberRemainingTextView.text = "${numRemaining}"
+                binding.numberRemainingTextView.text = "${summaryInfo.sampledCount - summaryInfo.surveyedCount}"
             }
         }
     }
@@ -451,8 +463,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                     }
                 }
 
-                Log.d("xxx", "before import = ${usedMB()} MB")
-
                 nearbySessionClientManager?.connect( sessionId ) { config ->
                     nearbySessionStatusDialog?.setStatus( "Saving Configuration..." )
 
@@ -466,10 +476,8 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
 
                         // back on the main thread...
 
-                        System.gc()
-                        Log.d("xxx", "after import = ${usedMB()} MB")
-
                         nearbySessionStatusDialog?.dismiss()
+                        nearbySessionStatusDialog = null
 
                         sharedViewModel.setCurrentConfig( config )
 
@@ -478,11 +486,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                 }
             }
         }
-    }
-
-    fun usedMB(): Long {
-        val runtime = Runtime.getRuntime()
-        return (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024
     }
 
     private fun didSelectStudy(study: Study)
@@ -594,15 +597,35 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                 data?.data?.let { uri ->
                     sharedViewModel.currentConfiguration?.value?.let { config ->
                         config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
-                        ZipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { error ->
-                            if (error.isEmpty())
+
+                        val zipUtils = ZipUtils()
+
+                        nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
+                            zipUtils.cancel()
+                        }
+
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            zipUtils.state.collect { state ->
+                                nearbySessionStatusDialog?.updateState(state)
+                            }
+                        }
+
+                        PerformanceManager.startTimer()
+
+                        zipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { success ->
+                            if (success)
                             {
-                                Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.export_succeeded))
                             }
                             else
                             {
                                 NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
                             }
+
+                            nearbySessionStatusDialog?.dismiss()
+                            nearbySessionStatusDialog = null
+
+                            Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
                         }
                     }
                 }
@@ -613,19 +636,33 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
 
                 uri?.let { uri ->
                     sharedViewModel.currentConfiguration?.value?.let { currentConfig ->
-                        binding.overlayView.visibility = View.VISIBLE
-
                         try
                         {
-                            ZipUtils.unzip( activity!!, uri, currentConfig.encryptionPassword ) { result ->
+                            val zipUtils = ZipUtils()
+
+                            nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.import_configuration )) {
+                                zipUtils.cancel()
+                            }
+
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                zipUtils.state.collect { state ->
+                                    nearbySessionStatusDialog?.updateState(state)
+                                }
+                            }
+
+                            PerformanceManager.startTimer()
+
+                            zipUtils.unzip( activity!!, uri, currentConfig.encryptionPassword ) { result ->
                                 val config = result.first
                                 val errorCode = result.second
 
                                 if (config == null)
                                 {
-                                    binding.overlayView.visibility = View.GONE
-                                    val message = if (errorCode == Config.ErrorCode.PasswordError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
-                                    InfoDialog( activity!!, resources.getString(R.string.error), message, resources.getString(R.string.ok), null, null)
+                                    if (errorCode != Config.ErrorCode.None)
+                                    {
+                                        val message = if (errorCode == Config.ErrorCode.PasswordError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
+                                        NotificationDialog( activity!!, resources.getString(R.string.error), message)
+                                    }
                                 }
                                 else
                                 {
@@ -635,9 +672,13 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
 
                                     refreshView( config )
 
-                                    binding.overlayView.visibility = View.GONE
-                                    InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
+                                    NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded))
                                 }
+
+                                nearbySessionStatusDialog?.dismiss()
+                                nearbySessionStatusDialog = null
+
+                                Log.d( "xxx", "Import time : ${PerformanceManager.elapsedTime()}")
                             }
                         }
                         catch( ex: java.lang.Exception )

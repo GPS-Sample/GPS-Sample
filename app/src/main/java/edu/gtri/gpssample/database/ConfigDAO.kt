@@ -10,6 +10,7 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import android.database.DatabaseUtils
 import android.util.Log
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
@@ -230,6 +231,7 @@ class ConfigDAO(private var dao: DAO)
     }
 
     data class ConfigSummary(
+        val enumAreaCount: Int,
         val enumerationCount: Int,
         val eligibleCount: Int,
         val sampledCount: Int,
@@ -239,6 +241,12 @@ class ConfigDAO(private var dao: DAO)
     fun getConfigSummary(configUuid: String): ConfigSummary {
 
         val db = dao.readableDatabase
+
+        val enumAreaCount = DatabaseUtils.longForQuery(db,"""
+            SELECT COUNT(*)
+                FROM enum_area
+                WHERE config_uuid = ?
+            """.trimIndent(), arrayOf(configUuid)).toInt()
 
         val query = """
             SELECT
@@ -273,6 +281,7 @@ class ConfigDAO(private var dao: DAO)
         val cursor = db.rawQuery(query, arrayOf(configUuid))
 
         var result = ConfigSummary(
+            enumAreaCount = 0,
             enumerationCount = 0,
             eligibleCount = 0,
             sampledCount = 0,
@@ -288,6 +297,7 @@ class ConfigDAO(private var dao: DAO)
                 val surveyedIndex = c.getColumnIndexOrThrow("surveyed_count")
 
                 result = ConfigSummary(
+                    enumAreaCount = enumAreaCount,
                     enumerationCount = c.getInt(enumIndex),
                     eligibleCount = c.getInt(eligibleIndex),
                     sampledCount = c.getInt(sampledIndex),

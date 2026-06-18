@@ -248,11 +248,11 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 {
                     config?.let { config->
                         // Note! if config.selectedEnumAreaUuid is not set, packMinimal will return the full config
-                        val packedConfig = config.packMinimal()
-                        val tcpMessage = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig.toByteArray() )
-                        val byteArray = tcpMessage.toByteArray()
-                        socket.outputStream.write(byteArray)
-                        socket.outputStream.flush()
+//                        val packedConfig = config.packMinimal()
+//                        val tcpMessage = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig.toByteArray() )
+//                        val byteArray = tcpMessage.toByteArray()
+//                        socket.outputStream.write(byteArray)
+//                        socket.outputStream.flush()
                     }
                 }
             }
