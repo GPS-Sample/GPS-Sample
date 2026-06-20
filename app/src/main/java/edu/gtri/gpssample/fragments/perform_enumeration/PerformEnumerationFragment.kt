@@ -1319,7 +1319,7 @@ class PerformEnumerationFragment : Fragment(),
 
                         PerformanceManager.startTimer()
 
-                        ZipUtils().zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { success ->
+                        zipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { success ->
                             if (success)
                             {
                                 NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.export_succeeded))

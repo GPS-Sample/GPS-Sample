@@ -18,7 +18,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
-import java.util.Base64
+import android.util.Base64
 
 object CameraUtils
 {
@@ -82,7 +82,7 @@ object CameraUtils
             bm.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
             val byteArray = byteArrayOutputStream.toByteArray()
 
-            return Base64.getEncoder().encodeToString(byteArray)
+            return Base64.encodeToString( byteArray, android.util.Base64.NO_WRAP )
         }
         catch (e: Exception)
         {
@@ -96,7 +96,7 @@ object CameraUtils
     {
         try
         {
-            val byteArray = Base64.getDecoder().decode( imageData )
+            val byteArray = Base64.decode( imageData, Base64.NO_WRAP )
             val byteArrayInputStream = ByteArrayInputStream(byteArray)
             return BitmapFactory.decodeStream(byteArrayInputStream)
         }

@@ -44,10 +44,7 @@ class ImageDAO(private var context: Context, name: String?, factory: SQLiteDatab
     {
         val values = ContentValues()
         putImage( image, values )
-        if (this.writableDatabase.insert( TABLE_IMAGE, null, values ) < 0)
-        {
-            return null
-        }
+        this.writableDatabase.insertWithOnConflict(TABLE_IMAGE, null, values, SQLiteDatabase.CONFLICT_ABORT )
         return image
     }
 

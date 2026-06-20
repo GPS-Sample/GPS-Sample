@@ -482,6 +482,8 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                         sharedViewModel.setCurrentConfig( config )
 
                         refreshView( config )
+
+                        NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded))
                     }
                 }
             }

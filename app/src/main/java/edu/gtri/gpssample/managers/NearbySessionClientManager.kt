@@ -31,6 +31,8 @@ class NearbySessionClientManager(private val context: Context)
         encodeDefaults = true
     }
 
+    private val imageIds = ArrayList<String>()
+
     // -------------------------------------------------------------------------
     // State
     // -------------------------------------------------------------------------
@@ -294,6 +296,8 @@ class NearbySessionClientManager(private val context: Context)
 
     private fun receiveEnumerationAreas(input: InputStream)
     {
+        imageIds.clear()
+
         scope.launch(Dispatchers.IO)
         {
             try {
@@ -306,6 +310,15 @@ class NearbySessionClientManager(private val context: Context)
 
                         try {
                             val enumArea = json.decodeFromString(EnumArea.serializer(), line)
+
+                            for (location in enumArea.locations)
+                            {
+                                if (location.imageUuid.isNotEmpty() && ImageDAO.instance().doesNotExist( location.imageUuid ))
+                                {
+                                    imageIds.add( location.imageUuid )
+                                }
+                            }
+
                             DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, enumArea.version )
                         }
                         catch (ex: Exception)
@@ -321,7 +334,7 @@ class NearbySessionClientManager(private val context: Context)
             }
             catch (ex: Exception)
             {
-                Log.e("Nearby", "Enumeration stream failed", ex)
+                Log.e("xxx", "Enumeration stream failed", ex)
                 enumItemsDeferred?.completeExceptionally(ex)
             }
             finally
@@ -338,35 +351,30 @@ class NearbySessionClientManager(private val context: Context)
     // IMAGES
     // -------------------------------------------------------------------------
 
-    private suspend fun requestImages(config: Config)
-    {
-        for (area in config.enumAreas)
-        {
-            for (location in area.locations)
+    private suspend fun requestImages(config: Config) {
+        try {
+            for ((index,uuid) in imageIds.withIndex())
             {
-                val id = location.imageUuid
-                if (id.isEmpty()) continue
+                pendingRequest = PendingRequest.IMAGE
+                val deferred = CompletableDeferred<Image>()
+                imageDeferred = deferred
 
-                if (ImageDAO.instance().doesNotExist(id))
-                {
-                    pendingRequest = PendingRequest.IMAGE
-                    val deferred = CompletableDeferred<Image>()
-                    imageDeferred = deferred
+                sendRequest( Command.GET_IMAGE,uuid )
 
-                    sendRequest(Command.GET_IMAGE, id)
+                _state.value = NearbySessionState.Message("Requesting Image ${index+1}/${imageIds.count()}" )
 
-                    _state.value = NearbySessionState.ReceivingImages
-
-                    val image = try {
-                        deferred.await()
-                    } finally {
-                        pendingRequest = null
-                        imageDeferred = null
-                    }
-
-                    ImageDAO.instance().createImage(image)
+                val image = try {
+                    deferred.await()
+                } finally {
+                    pendingRequest = null
+                    imageDeferred = null
                 }
+
+                ImageDAO.instance().createImage(image)
             }
+        }
+        catch (ex: Exception) {
+            Log.d( "xxx", ex.stackTraceToString())
         }
     }
 

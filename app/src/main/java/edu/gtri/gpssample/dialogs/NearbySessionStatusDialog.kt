@@ -90,6 +90,7 @@ class NearbySessionStatusDialog
         qrgEncoder.colorWhite = Color.BLACK;
 
         val doneButton = view.findViewById<Button>(R.id.done_button)
+         doneButton.text = doneButtonText
         doneButton.visibility = View.VISIBLE
 
         val statusLinearLayout = view.findViewById<LinearLayout>( R.id.status_linear_layout )
@@ -106,6 +107,7 @@ class NearbySessionStatusDialog
         {
             NearbySessionState.Connecting -> {
                 setStatus("Connecting...")
+                showCancelButton()
             }
 
             NearbySessionState.Connected -> {
@@ -115,37 +117,30 @@ class NearbySessionStatusDialog
 
             NearbySessionState.SendingConfig -> {
                 setStatus("Sending Config...")
-                showCancelButton()
             }
 
             is NearbySessionState.Message -> {
                 setStatus(state.message)
-                showCancelButton()
             }
 
             NearbySessionState.SendingImage -> {
                 setStatus("Sending Image...")
-                showCancelButton()
             }
 
             NearbySessionState.ReceivingConfig -> {
                 setStatus("Receiving Config...")
-                showCancelButton()
             }
 
             NearbySessionState.ReceivingEnumerationAreas -> {
                 setStatus("Receiving EnumerationAreas...")
-                showCancelButton()
             }
 
             NearbySessionState.ReceivingImages -> {
                 setStatus("Receiving Images...")
-                showCancelButton()
             }
 
             NearbySessionState.Done -> {
                 setStatus("Done.")
-                showCancelButton()
             }
 
             NearbySessionState.Idle -> {

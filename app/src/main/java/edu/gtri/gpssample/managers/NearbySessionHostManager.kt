@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.managers
 
 import android.content.Context
+import android.util.Log
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import edu.gtri.gpssample.database.DAO
@@ -308,7 +309,13 @@ class NearbySessionHostManager( private val context: Context, private val config
 
             try {
                 json.encodeToStream(Image.serializer(), image, output)
-            } catch( ex: Exception ) {} finally { try { output.close() } catch( ex: Exception ) {}}
+            }
+            catch( ex: Exception ) {}
+            finally {
+                try {
+                    output.close()
+                }
+                catch( ex: Exception ) {}}
         }
 
     // -------------------------------------------------------------------------

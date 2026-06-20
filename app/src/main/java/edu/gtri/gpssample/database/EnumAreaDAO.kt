@@ -167,38 +167,35 @@ class EnumAreaDAO(private var dao: DAO)
         val db = dao.readableDatabase
 
         val query = """
-        SELECT
-            lea.enum_area_uuid AS enum_area_uuid,
-            ea.enum_area_name AS name,
+            SELECT
+                ea.uuid AS enum_area_uuid, ea.enum_area_name AS name,
 
-            SUM(CASE
+                COALESCE(SUM(CASE
                 WHEN ei.enumeration_item_enumeration_state IN ('Enumerated', 'Incomplete')
-                THEN 1 ELSE 0 END) AS enumerated_count,
+                THEN 1 ELSE 0 END), 0) AS enumerated_count,
 
-            SUM(CASE
-                WHEN ei.enumeration_item_enumeration_eligible_for_sampling = 1
-                  OR ei.enumeration_item_enumeration_eligible_for_subset_sampling = 1
-                THEN 1 ELSE 0 END) AS eligible_count,
+                COALESCE(SUM(CASE
+                    WHEN ei.enumeration_item_enumeration_eligible_for_sampling = 1
+                    OR ei.enumeration_item_enumeration_eligible_for_subset_sampling = 1
+                    THEN 1 ELSE 0 END), 0) AS eligible_count,
 
-            SUM(CASE
-                WHEN ei.enumeration_item_sampling_state = 'Sampled'
-                  OR ei.enumeration_item_subset_sampling_state = 'Sampled'
-                THEN 1 ELSE 0 END) AS sampled_count,
+                COALESCE(SUM(CASE
+                    WHEN ei.enumeration_item_sampling_state = 'Sampled'
+                    OR ei.enumeration_item_subset_sampling_state = 'Sampled'
+                    THEN 1 ELSE 0 END), 0) AS sampled_count,
 
-            SUM(CASE
-                WHEN ei.enumeration_item_collection_state = 'Complete'
-                THEN 1 ELSE 0 END) AS surveyed_count
+                COALESCE(SUM(CASE
+                    WHEN ei.enumeration_item_collection_state = 'Complete'
+                    THEN 1 ELSE 0 END), 0) AS surveyed_count
+            FROM enum_area ea
 
-        FROM enumeration_item ei
-        JOIN location l
-            ON ei.location_uuid = l.uuid
-        JOIN location__enum_area lea
-            ON lea.location_uuid = l.uuid
-        JOIN enum_area ea
-            ON ea.uuid = lea.enum_area_uuid
-        WHERE ea.config_uuid = ?
-        GROUP BY lea.enum_area_uuid
-        ORDER BY ea.creation_date ASC
+            LEFT JOIN location__enum_area lea ON lea.enum_area_uuid = ea.uuid
+            LEFT JOIN location l ON l.uuid = lea.location_uuid
+            LEFT JOIN enumeration_item ei ON ei.location_uuid = l.uuid
+            
+            WHERE ea.config_uuid = ?
+            GROUP BY ea.uuid
+            ORDER BY ea.creation_date ASC
     """.trimIndent()
 
         val cursor = db.rawQuery(query, arrayOf(configUuid))
@@ -206,7 +203,6 @@ class EnumAreaDAO(private var dao: DAO)
         val result = ArrayList<EnumAreaSummary>()
 
         cursor.use { c ->
-
             val uuidIdx = c.getColumnIndexOrThrow("enum_area_uuid")
             val nameIdx = c.getColumnIndexOrThrow("name")
             val enumIdx = c.getColumnIndexOrThrow("enumerated_count")
@@ -214,7 +210,8 @@ class EnumAreaDAO(private var dao: DAO)
             val sampIdx = c.getColumnIndexOrThrow("sampled_count")
             val survIdx = c.getColumnIndexOrThrow("surveyed_count")
 
-            while (c.moveToNext()) {
+            while (c.moveToNext())
+            {
                 result.add(
                     EnumAreaSummary(
                         uuid = c.getString(uuidIdx),

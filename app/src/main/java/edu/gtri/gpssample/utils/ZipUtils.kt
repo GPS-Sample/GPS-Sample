@@ -10,9 +10,7 @@ import android.provider.MediaStore
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Image
-import edu.gtri.gpssample.database.models.ImageList
 import java.io.*
-import java.util.ArrayList
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -52,16 +50,13 @@ class ZipUtils()
     }
 
     @Serializable
-    data class EnumAreaHeader(
+    data class Header(
         val count: Int
     )
 
-    private fun writeEnumAreaHeader( numItems: Int, zipOut: ZipOutputStream )
+    private fun writeHeader( numItems: Int, zipOut: ZipOutputStream )
     {
-        val header = json.encodeToString(
-            EnumAreaHeader(numItems)
-        )
-
+        val header = json.encodeToString(Header(numItems))
         zipOut.write(header.toByteArray())
         zipOut.write('\n'.code)
     }
@@ -77,7 +72,7 @@ class ZipUtils()
             if (config.enumAreas.size == 1)
             {
                 _state.value = NearbySessionState.Message("Exporting EnumArea 1/1" )
-                writeEnumAreaHeader( 1, zipOut )
+                writeHeader(1, zipOut )
                 val packedEnumArea = config.enumAreas[0].pack( config.encryptionPassword )
                 zipOut.write(packedEnumArea.toByteArray())
                 zipOut.write('\n'.code)
@@ -90,7 +85,7 @@ class ZipUtils()
                     var count = 1
                     val totalCount = cursor.count
 
-                    writeEnumAreaHeader( totalCount, zipOut )
+                    writeHeader( totalCount, zipOut )
 
                     while (cursor.moveToNext())
                     {
@@ -109,6 +104,46 @@ class ZipUtils()
                 }
             }
         }
+        catch( ex: Exception ) {}
+        finally
+        {
+            zipOut.closeEntry()
+        }
+    }
+
+    private fun writeImages(zipOut: ZipOutputStream, config: Config, fileName: String)
+    {
+        val entry = ZipEntry("$fileName-img.json")
+
+        zipOut.putNextEntry(entry)
+
+        try
+        {
+            val  query = "SELECT ${ImageDAO.COLUMN_UUID} FROM ${ImageDAO.TABLE_IMAGE}"
+
+            ImageDAO.instance().readableDatabase.rawQuery(query, null ).use { cursor ->
+                var count = 1
+                val totalCount = cursor.count
+
+                writeHeader( totalCount, zipOut )
+
+                while (cursor.moveToNext())
+                {
+                    if (currentJob == null) { break }
+
+                    _state.value = NearbySessionState.Message("Exporting Image ${count++}/${totalCount}" )
+
+                    val uuid = cursor.getString(cursor.getColumnIndexOrThrow(ImageDAO.COLUMN_UUID))
+
+                    ImageDAO.instance().getImage(uuid)?.let { image ->
+                        val packedImage = image.pack()
+                        zipOut.write(packedImage.toByteArray())
+                        zipOut.write('\n'.code)
+                    }
+                }
+            }
+        }
+        catch( ex: Exception ) {}
         finally
         {
             zipOut.closeEntry()
@@ -142,26 +177,7 @@ class ZipUtils()
                         // ---- IMAGE JSON ----
                         if (includeImages)
                         {
-                            val imageList = ImageList(config.uuid, ArrayList<Image>())
-                            for (enumArea in config.enumAreas)
-                            {
-                                for (location in enumArea.locations)
-                                {
-                                    ImageDAO.instance().getImage(location)?.let {
-
-                                        imageList.images.add(it)
-                                    }
-                                }
-                            }
-
-                            if (imageList.images.isNotEmpty())
-                            {
-                                val payload = imageList.pack(config.encryptionPassword)
-                                val imageEntry = ZipEntry("$fileName-img.json")
-                                zipOut.putNextEntry(imageEntry)
-                                zipOut.write(payload.toByteArray())
-                                zipOut.closeEntry()
-                            }
+                            writeImages(zipOut, config, fileName)
                         }
                     }
                 }
@@ -181,6 +197,8 @@ class ZipUtils()
 
         currentJob = scope.launch {
             try {
+                _state.value = NearbySessionState.Message("Exporting Config..." )
+
                 val resolver = activity.contentResolver
                 val values = ContentValues().apply {
                     put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
@@ -224,26 +242,7 @@ class ZipUtils()
                         // ---- IMAGE JSON ----
                         if (includeImages)
                         {
-                            val imageList = ImageList(config.uuid, ArrayList<Image>())
-
-                            for (enumArea in config.enumAreas)
-                            {
-                                for (location in enumArea.locations)
-                                {
-                                    ImageDAO.instance().getImage(location)?.let {
-                                        imageList.images.add(it)
-                                    }
-                                }
-                            }
-
-                            if (imageList.images.isNotEmpty())
-                            {
-                                val payload = imageList.pack(config.encryptionPassword)
-                                val imageEntry = ZipEntry("$fileName-img.json")
-                                zipOut.putNextEntry(imageEntry)
-                                zipOut.write(payload.toByteArray())
-                                zipOut.closeEntry()
-                            }
+                            writeImages(zipOut, config, fileName)
                         }
                     }
                 }
@@ -263,11 +262,12 @@ class ZipUtils()
 
         currentJob = scope.launch {
             var config: Config? = null
-            var transactionStarted = false
             var errorCode = ErrorCode.None
+            var imageTransactionStarted = false
+            var enumAreaTransactionStarted = false
 
             try {
-                _state.value = NearbySessionState.Message("Importing Configuration..." )
+                _state.value = NearbySessionState.Message("Initializing..." )
 
                 activity.contentResolver.openInputStream(zipUri)?.use { inputStream ->
                     ZipInputStream(BufferedInputStream(inputStream)).use { zis ->
@@ -278,12 +278,12 @@ class ZipUtils()
                             if (entry.name.contains("-enumAreas"))
                             {
                                 val reader = BufferedReader(InputStreamReader(zis))
-                                val header = json.decodeFromString<EnumAreaHeader>(reader.readLine())
+                                val header = json.decodeFromString<Header>(reader.readLine())
                                 val totalCount = header.count
                                 var count = 1
 
                                 DAO.instance().writableDatabase.beginTransaction()
-                                transactionStarted = true
+                                enumAreaTransactionStarted = true
 
                                 while (true)
                                 {
@@ -312,30 +312,41 @@ class ZipUtils()
                                     DAO.instance().writableDatabase.setTransactionSuccessful()
                                 }
                             }
-                            else
+                            else if (entry.name.contains("-img"))
                             {
                                 val reader = BufferedReader(InputStreamReader(zis))
-                                val content = reader.readText()
+                                val header = json.decodeFromString<Header>(reader.readLine())
+                                val totalCount = header.count
+                                var count = 1
 
-                                if (entry.name.contains("-img"))
+                                ImageDAO.instance().writableDatabase.beginTransaction()
+                                imageTransactionStarted = true
+
+                                while (true)
                                 {
-                                    ImageList.unpack(content, password)?.let { imageList ->
+                                    ensureActive()
 
-                                        for (image in imageList.images)
-                                        {
-                                            if (ImageDAO.instance().getImage(image.uuid) == null)
-                                            {
-                                                ImageDAO.instance().createImage(image)
-                                            }
-                                        }
+                                    val line = reader.readLine() ?: break
+
+                                    if (line.isBlank()) continue
+
+                                    _state.value = NearbySessionState.Message("Importing Image ${count++}/${totalCount}" )
+
+                                    Image.unpack(line )?.let { image ->
+                                        ImageDAO.instance().createImage( image )
                                     }
                                 }
-                                else
-                                {
-                                    val (cfg, eCode) = Config.unpack(content, password )
-                                    config = cfg
-                                    errorCode = eCode
-                                }
+
+                                ImageDAO.instance().writableDatabase.setTransactionSuccessful()
+                            }
+                            else
+                            {
+                                _state.value = NearbySessionState.Message("Importing Configuration..." )
+                                val reader = BufferedReader(InputStreamReader(zis))
+                                val content = reader.readText()
+                                val (cfg, eCode) = Config.unpack(content, password )
+                                config = cfg
+                                errorCode = eCode
                             }
 
                             zis.closeEntry()
@@ -356,9 +367,13 @@ class ZipUtils()
             }
             finally
             {
-                if (transactionStarted)
+                if (enumAreaTransactionStarted)
                 {
                     DAO.instance().writableDatabase.endTransaction()
+                }
+                if (imageTransactionStarted)
+                {
+                    ImageDAO.instance().writableDatabase.endTransaction()
                 }
                 withContext(NonCancellable + Dispatchers.Main) { completion( Pair(config,errorCode)) }
             }

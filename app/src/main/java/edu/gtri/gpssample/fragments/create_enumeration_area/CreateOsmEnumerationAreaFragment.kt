@@ -35,12 +35,12 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.*
 import com.mapbox.maps.*
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.*
@@ -61,7 +61,6 @@ import org.locationtech.jts.geom.GeometryFactory
 import org.osmdroid.events.MapListener
 import java.io.File
 import java.util.*
-import kotlin.io.path.Path
 
 class CreateOsmEnumerationAreaFragment : Fragment(),
     View.OnTouchListener,
@@ -1320,6 +1319,10 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     fun autoEnumerate( location: Location )
     {
         subAddress+= 1
+
+        ImageDAO.instance().createImage( edu.gtri.gpssample.database.models.Image( location.uuid, TestImage.imageData.replace( "\n", "" )))?.let { image ->
+            location.imageUuid = image.uuid
+        }
 
         val enumerationItem = EnumerationItem()
 
