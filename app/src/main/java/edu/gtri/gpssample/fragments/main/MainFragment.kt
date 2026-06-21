@@ -391,6 +391,37 @@ class MainFragment : Fragment()
         private const val REQUEST_CODE = 1
 
         private val REQUIRED_RUNTIME_PERMISSIONS: Array<String> =
+            buildList {
+
+                add(Manifest.permission.CAMERA)
+
+                add(Manifest.permission.ACCESS_FINE_LOCATION)
+                add(Manifest.permission.ACCESS_COARSE_LOCATION)
+
+                add(Manifest.permission.ACCESS_NETWORK_STATE)
+                add(Manifest.permission.CHANGE_NETWORK_STATE)
+
+                // Android 12+ (API 31)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    add(Manifest.permission.BLUETOOTH_SCAN)
+                    add(Manifest.permission.BLUETOOTH_CONNECT)
+                    add(Manifest.permission.BLUETOOTH_ADVERTISE)
+                }
+
+                // Android 13+ (API 33)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    add(Manifest.permission.NEARBY_WIFI_DEVICES)
+                }
+
+                // Android 9 and below
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                    add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    add(Manifest.permission.READ_EXTERNAL_STORAGE)
+                }
+
+            }.toTypedArray()
+
+        private val REQUIRED_RUNTIME_PERMISSIONS_XXX: Array<String> =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 arrayOf(
                     Manifest.permission.CAMERA,

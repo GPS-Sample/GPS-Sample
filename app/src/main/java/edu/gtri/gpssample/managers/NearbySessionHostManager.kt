@@ -101,6 +101,7 @@ class NearbySessionHostManager( private val context: Context, private val config
             sessionId = id
 
             startAdvertising(id)
+
             _state.value = NearbySessionState.Advertising(id)
 
             waitForConnection()
@@ -122,6 +123,12 @@ class NearbySessionHostManager( private val context: Context, private val config
         val options = AdvertisingOptions.Builder().setStrategy(Strategy.P2P_STAR).build()
 
         client.startAdvertising(id, NearbySessionCore.SERVICE_ID, connectionCallback, options)
+            .addOnSuccessListener {
+                Log.d("xxx", "Advertising started. SessionId=$id")
+            }
+            .addOnFailureListener { ex ->
+                Log.d("xxx", "Advertising failed. SessionId=$id", ex)
+            }
     }
 
     private fun stopAdvertising()
@@ -166,11 +173,15 @@ class NearbySessionHostManager( private val context: Context, private val config
     {
         override fun onConnectionInitiated(endpointId: String, connectionInfo: ConnectionInfo)
         {
+            Log.d("xxx","Connection initiated. endpointId=$endpointId endpointName=${connectionInfo.endpointName}")
+
             client.acceptConnection(endpointId, payloadCallback)
         }
 
         override fun onConnectionResult(endpointId: String, result: ConnectionResolution)
         {
+            Log.d("xxx", "Connection result. endpointId=$endpointId status=${result.status.statusCode}")
+
             if (result.status.isSuccess)
             {
                 connectedEndpointId = endpointId
@@ -223,10 +234,13 @@ class NearbySessionHostManager( private val context: Context, private val config
             }
         }
 
-        override fun onPayloadTransferUpdate(
-            endpointId: String,
-            update: PayloadTransferUpdate
-        ) = Unit
+        override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate)
+        {
+            if (update.status == PayloadTransferUpdate.Status.FAILURE)
+            {
+                Log.d("xxx","PayloadTransfer failed. id=${update.payloadId}")
+            }
+        }
     }
 
     // -------------------------------------------------------------------------

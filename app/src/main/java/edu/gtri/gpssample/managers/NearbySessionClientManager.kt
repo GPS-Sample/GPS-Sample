@@ -142,15 +142,15 @@ class NearbySessionClientManager(private val context: Context)
 
     private fun startDiscovery(sessionId: String)
     {
-        val options = DiscoveryOptions.Builder()
-            .setStrategy(Strategy.P2P_STAR)
-            .build()
+        val options = DiscoveryOptions.Builder().setStrategy(Strategy.P2P_STAR).build()
 
-        client.startDiscovery(
-            NearbySessionCore.SERVICE_ID,
-            discoveryCallback(sessionId),
-            options
-        )
+        client.startDiscovery(NearbySessionCore.SERVICE_ID, discoveryCallback(sessionId), options )
+            .addOnSuccessListener {
+                Log.d("xxx", "Discovery started")
+            }
+            .addOnFailureListener {
+                Log.d("xxx", "Discovery failed", it)
+            }
     }
 
     private fun stopDiscovery()
@@ -163,9 +163,12 @@ class NearbySessionClientManager(private val context: Context)
         {
             override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo)
             {
+                Log.d("xxx","Endpoint found. endpointId=$endpointId endpointName=${info.endpointName}")
+
                 if (info.endpointName != sessionId) return
 
                 stopDiscovery()
+
                 client.requestConnection("client", endpointId, connectionCallback)
             }
 
@@ -230,11 +233,17 @@ class NearbySessionClientManager(private val context: Context)
                     receiveImage(input)
 
                 null ->
-                    Log.d("Nearby", "Unexpected payload")
+                    Log.d("xxx", "Unexpected payload")
             }
         }
 
-        override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate) = Unit
+        override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate)
+        {
+            if (update.status == PayloadTransferUpdate.Status.FAILURE)
+            {
+                Log.d("xxx","PayloadTransfer failed. id=${update.payloadId}")
+            }
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -323,7 +332,7 @@ class NearbySessionClientManager(private val context: Context)
                         }
                         catch (ex: Exception)
                         {
-                            Log.e("Nearby", "Failed to parse item line: $line", ex)
+                            Log.d("xxx", "Failed to parse item line: $line", ex)
                         }
                     }
                 }
@@ -334,7 +343,7 @@ class NearbySessionClientManager(private val context: Context)
             }
             catch (ex: Exception)
             {
-                Log.e("xxx", "Enumeration stream failed", ex)
+                Log.d("xxx", "Enumeration stream failed", ex)
                 enumItemsDeferred?.completeExceptionally(ex)
             }
             finally
