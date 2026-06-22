@@ -485,6 +485,8 @@
     <string name="edit_enumeration_area">Edit Enumeration Area</string>
     <string name="delete_all_enumeration_areas">Delete all Enumeration Areas</string>
     <string name="delete_all_enumeration_areas_message">"Are you sure you want to permanently delete all Enumeration Areas?"</string>
+    <string name="draw_boundary">Draw the team boundary on the map</string>
+    <string name="tap_boundary">Tap the team boundary points on the map</string>
 
     <string-array name="collection_apps">
         <item>"ODK Collect"</item>
