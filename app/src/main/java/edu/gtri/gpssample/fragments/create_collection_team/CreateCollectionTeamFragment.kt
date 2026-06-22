@@ -32,6 +32,7 @@ import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationTeamBinding
+import edu.gtri.gpssample.fragments.create_enumeration_team.CreateEnumerationTeamFragment
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
@@ -54,15 +55,20 @@ class CreateCollectionTeamFragment : Fragment(),
     private var fingerPolyline: Any? = null
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
-
     private var osmMapListener: MapListener? = null
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
     private val binding get() = _binding!!
-
-    private var createMode = false
     private var intersectionPolygon: Any? = null
     private val locationUuids = ArrayList<String>()
     private val polyLinePoints = ArrayList<Point>()
+
+    enum class TapType {
+        None,
+        DrawBoundary,
+        TapBoundary,
+    }
+
+    private var currentTapType = TapType.None
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -124,24 +130,63 @@ class CreateCollectionTeamFragment : Fragment(),
         binding.mapOverlayView.visibility = View.GONE
 
         binding.drawPolygonButton.setOnClickListener {
-
-            if (createMode)
+            if (currentTapType != TapType.None)
             {
-                createMode = false
+                currentTapType = TapType.None
                 binding.mapOverlayView.visibility = View.GONE
                 binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
+                binding.tapPolygonButton.setBackgroundResource( R.drawable.add_location_blue )
+
+                refreshMap()
             }
             else
             {
+                refreshMap()
+
                 intersectionPolygon?.let {
                     MapManager.instance().removePolygon( mapView, it )
                     intersectionPolygon = null
                 }
 
-                createMode = true
                 polyLinePoints.clear()
+                currentTapType = TapType.DrawBoundary
                 binding.mapOverlayView.visibility = View.VISIBLE
                 binding.drawPolygonButton.setBackgroundResource( R.drawable.save_blue )
+
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.draw_boundary), Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.tapPolygonButton.setOnClickListener {
+            if (currentTapType != TapType.None)
+            {
+                currentTapType = TapType.None
+                binding.mapOverlayView.visibility = View.GONE
+                binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
+                binding.tapPolygonButton.setBackgroundResource( R.drawable.add_location_blue )
+
+                refreshMap()
+
+                if (polyLinePoints.size >  2)
+                {
+                    createIntersectionPolygon()
+                }
+            }
+            else
+            {
+                refreshMap()
+
+                intersectionPolygon?.let {
+                    MapManager.instance().removePolygon( mapView, it )
+                    intersectionPolygon = null
+                }
+
+                polyLinePoints.clear()
+                currentTapType = TapType.TapBoundary
+                binding.mapOverlayView.visibility = View.VISIBLE
+                binding.tapPolygonButton.setBackgroundResource( R.drawable.save_blue )
+
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.tap_boundary), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -210,6 +255,8 @@ class CreateCollectionTeamFragment : Fragment(),
 
     fun refreshMap()
     {
+        MapManager.instance().clearMap( mapView )
+
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
@@ -303,142 +350,43 @@ class CreateCollectionTeamFragment : Fragment(),
     override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
     {
         p1?.let { p1 ->
-            if (p1.action == MotionEvent.ACTION_UP)
+            val point = MapManager.instance().getLocationFromPixelPoint( mapView, p1 )
+
+            if (currentTapType == TapType.TapBoundary)
             {
-                createMode = false
-                binding.mapOverlayView.visibility = View.GONE
-                binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
-
-                fingerPolyline?.let {
-                    MapManager.instance().removePolyline( mapView, it )
-                    fingerPolyline = null
-                }
-
-                val points1 = GeoUtils.ArrayListOfLatLonToArrayListOfCoordinate( enumArea.vertices )
-
-                // close the polygon, if necessary
-                if (!points1.first().equals(points1.last()))
+                if (p1.action == MotionEvent.ACTION_DOWN)
                 {
-                    points1.add( points1[0])
-                }
-
-                // create a copy of the newly drawn polyline
-                val polyList = ArrayList<Point>( polyLinePoints )
-
-                // close the polygon
-                polyList.add( polyLinePoints[0])
-
-                val points2 = GeoUtils.ArrayListOfPointToArrayListOfCoordinate( polyList )
-
-                // compute the intersection of points1 & points2
-                val geometryFactory = GeometryFactory()
-                val enumAreaPolygon: Geometry = geometryFactory.createPolygon(points1.toTypedArray())
-                val selectionPolygon: Geometry = geometryFactory.createPolygon(points2.toTypedArray())
-
-                try {
-                    enumAreaPolygon.intersection(selectionPolygon)?.let { intersectedPolygon ->
-                        if (!intersectedPolygon.isEmpty())
-                        {
-                            var finalSelectedPolygon = intersectedPolygon.copy()
-
-                            // subtract any existing teams from the selection
-                            for (collectionTeam in enumArea.collectionTeams)
-                            {
-                                val points = GeoUtils.ArrayListOfLatLonToArrayListOfCoordinate(collectionTeam.polygon)
-
-                                GeoUtils.createValidPolygon(points.toTypedArray())?.let { teamPolygon ->
-                                    // compute the intersection of the selected polygon with the existing team polygon
-                                    finalSelectedPolygon.intersection(teamPolygon)?.let { intersection ->
-                                        if (!intersection.isEmpty())
-                                        {
-                                            // subtract the intersected polygon from the selectionPolygon
-                                            finalSelectedPolygon.difference(intersection)?.let { remainder ->
-                                                GeoUtils.createValidPolygon( remainder )?.let { validPolygon ->
-                                                    finalSelectedPolygon = validPolygon
-                                                } ?: {
-                                                    throw Exception("Polygon difference failed" )
-                                                }
-                                            }
-                                        }
-                                    }
-                                } ?: {
-                                    throw Exception( "Create valid team polygon failed" )
-                                }
-                            }
-
-                            finalSelectedPolygon.boundary?.coordinates?.let { coordinates ->
-
-                                locationUuids.clear()
-
-                                for (location in enumArea.locations)
-                                {
-                                    val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
-                                    if (finalSelectedPolygon.contains(geometry3))
-                                    {
-                                        if (!locationBelongsToTeam( location ))
-                                        {
-                                            locationUuids.add( location.uuid )
-                                        }
-                                    }
-                                }
-
-                                val count = locationUuids.size
-
-                                // now look for HH's that are in the selectionPolygon but outside of the EA
-                                for (location in enumArea.locations)
-                                {
-                                    val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
-                                    if (selectionPolygon.contains(geometry3))
-                                    {
-                                        if (!locationBelongsToTeam( location ))
-                                        {
-                                            if (!locationUuids.contains( location.uuid ))
-                                            {
-                                                locationUuids.add(location.uuid)
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (locationUuids.size == count) // all HH's are within the EA
-                                {
-                                    val vertices = GeoUtils.ArrayListOfCoordinateToArrayListOfPoint( coordinates )
-
-                                    val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
-                                    pointList.add( vertices )
-
-                                    intersectionPolygon = MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x30 )
-                                }
-                                else // some HH's are outside of the EA, use the selectionPolygon
-                                {
-                                    val vertices = GeoUtils.ArrayListOfCoordinateToArrayListOfPoint( selectionPolygon.coordinates )
-
-                                    val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
-                                    pointList.add( vertices )
-
-                                    intersectionPolygon = MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x30 )
-                                }
-                            }
-                        }
-                    }
-                }
-                catch( ex: Exception )
-                {
-                    Log.d( "xxx", ex.stackTraceToString())
+                    polyLinePoints.add( point )
+                    MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.location_blue, "" )
                 }
             }
-            else
+            else if (currentTapType == TapType.DrawBoundary)
             {
-                val point = MapManager.instance().getLocationFromPixelPoint( mapView, p1 )
-                polyLinePoints.add( point )
-
-                if (fingerPolyline == null)
+                if (p1.action == MotionEvent.ACTION_UP)
                 {
-                    fingerPolyline = MapManager.instance().createPolyline( mapView, polyLinePoints, Color.rgb( 0xee, 0x4e,0x8b) )
+                    currentTapType = TapType.None
+                    binding.mapOverlayView.visibility = View.GONE
+                    binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
+
+                    fingerPolyline?.let {
+                        MapManager.instance().removePolyline( mapView, it )
+                        fingerPolyline = null
+                    }
+
+                    createIntersectionPolygon()
                 }
                 else
                 {
-                    MapManager.instance().updatePolyline( mapView, fingerPolyline!!, point )
+                    polyLinePoints.add( point )
+
+                    if (fingerPolyline == null)
+                    {
+                        fingerPolyline = MapManager.instance().createPolyline( mapView, polyLinePoints, Color.rgb( 0xee, 0x4e,0x8b) )
+                    }
+                    else
+                    {
+                        MapManager.instance().updatePolyline( mapView, fingerPolyline!!, point )
+                    }
                 }
             }
         }
@@ -446,6 +394,121 @@ class CreateCollectionTeamFragment : Fragment(),
         return true
     }
 
+    fun createIntersectionPolygon()
+    {
+        val points1 = GeoUtils.ArrayListOfLatLonToArrayListOfCoordinate( enumArea.vertices )
+
+        // close the polygon, if necessary
+        if (!points1.first().equals(points1.last()))
+        {
+            points1.add( points1[0])
+        }
+
+        // create a copy of the newly drawn polyline
+        val polyList = ArrayList<Point>( polyLinePoints )
+
+        // close the polygon
+        polyList.add( polyLinePoints[0])
+
+        val points2 = GeoUtils.ArrayListOfPointToArrayListOfCoordinate( polyList )
+
+        // compute the intersection of points1 & points2
+        val geometryFactory = GeometryFactory()
+        val enumAreaPolygon: Geometry = geometryFactory.createPolygon(points1.toTypedArray())
+        val selectionPolygon: Geometry = geometryFactory.createPolygon(points2.toTypedArray())
+
+        try {
+            enumAreaPolygon.intersection(selectionPolygon)?.let { intersectedPolygon ->
+                if (!intersectedPolygon.isEmpty())
+                {
+                    var finalSelectedPolygon = intersectedPolygon.copy()
+
+                    // subtract any existing teams from the selection
+                    for (collectionTeam in enumArea.collectionTeams)
+                    {
+                        val points = GeoUtils.ArrayListOfLatLonToArrayListOfCoordinate(collectionTeam.polygon)
+
+                        GeoUtils.createValidPolygon(points.toTypedArray())?.let { teamPolygon ->
+                            // compute the intersection of the selected polygon with the existing team polygon
+                            finalSelectedPolygon.intersection(teamPolygon)?.let { intersection ->
+                                if (!intersection.isEmpty())
+                                {
+                                    // subtract the intersected polygon from the selectionPolygon
+                                    finalSelectedPolygon.difference(intersection)?.let { remainder ->
+                                        GeoUtils.createValidPolygon( remainder )?.let { validPolygon ->
+                                            finalSelectedPolygon = validPolygon
+                                        } ?: {
+                                            throw Exception("Polygon difference failed" )
+                                        }
+                                    }
+                                }
+                            }
+                        } ?: {
+                            throw Exception( "Create valid team polygon failed" )
+                        }
+                    }
+
+                    finalSelectedPolygon.boundary?.coordinates?.let { coordinates ->
+
+                        locationUuids.clear()
+
+                        for (location in enumArea.locations)
+                        {
+                            val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
+                            if (finalSelectedPolygon.contains(geometry3))
+                            {
+                                if (!locationBelongsToTeam( location ))
+                                {
+                                    locationUuids.add( location.uuid )
+                                }
+                            }
+                        }
+
+                        val count = locationUuids.size
+
+                        // now look for HH's that are in the selectionPolygon but outside of the EA
+                        for (location in enumArea.locations)
+                        {
+                            val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
+                            if (selectionPolygon.contains(geometry3))
+                            {
+                                if (!locationBelongsToTeam( location ))
+                                {
+                                    if (!locationUuids.contains( location.uuid ))
+                                    {
+                                        locationUuids.add(location.uuid)
+                                    }
+                                }
+                            }
+                        }
+
+                        if (locationUuids.size == count) // all HH's are within the EA
+                        {
+                            val vertices = GeoUtils.ArrayListOfCoordinateToArrayListOfPoint( coordinates )
+
+                            val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+                            pointList.add( vertices )
+
+                            intersectionPolygon = MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x30 )
+                        }
+                        else // some HH's are outside of the EA, use the selectionPolygon
+                        {
+                            val vertices = GeoUtils.ArrayListOfCoordinateToArrayListOfPoint( selectionPolygon.coordinates )
+
+                            val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+                            pointList.add( vertices )
+
+                            intersectionPolygon = MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x30 )
+                        }
+                    }
+                }
+            }
+        }
+        catch( ex: Exception )
+        {
+            Log.d( "xxx", ex.stackTraceToString())
+        }
+    }
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_map_style_min, menu)

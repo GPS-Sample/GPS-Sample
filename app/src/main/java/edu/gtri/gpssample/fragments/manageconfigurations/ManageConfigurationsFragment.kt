@@ -593,7 +593,9 @@ class ManageConfigurationsFragment : Fragment()
     @RequiresApi(Build.VERSION_CODES.Q)
     fun importConfiguration( password: String )
     {
-        if (password != "******")
+        val allStars = password.isNotEmpty() && password.all { it == '*' }
+
+        if (!allStars)
         {
             encryptionPassword = password
         }
