@@ -71,15 +71,16 @@ class LocationService : Service()
     private fun buildNotification(): Notification {
         val channelId = "location_channel"
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Location Tracking",
-                NotificationManager.IMPORTANCE_LOW
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(
+            channelId,
+            "Location Tracking",
+            NotificationManager.IMPORTANCE_LOW
+        )
+        val manager = getSystemService(NotificationManager::class.java)
+
+        channel.setShowBadge(false)
+
+        manager.createNotificationChannel(channel)
 
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("Tracking Location")
