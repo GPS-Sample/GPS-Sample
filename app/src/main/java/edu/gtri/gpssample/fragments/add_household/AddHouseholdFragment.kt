@@ -145,7 +145,7 @@ class AddHouseholdFragment : Fragment(),
             findNavController().popBackStack()
         }
 
-        if (editMode && enumerationItem.uuid.isNotEmpty() && !isMultiHousehold)
+        if (editMode && enumerationItem.version.isNotEmpty() && !isMultiHousehold)
         {
             binding.addMultiButton.visibility = View.VISIBLE
 
@@ -197,7 +197,7 @@ class AddHouseholdFragment : Fragment(),
             NotificationDialog( requireActivity(), "", resources.getString(R.string.subaddress_hint))
         }
 
-        if (enumerationItem.uuid.isEmpty())
+        if (enumerationItem.version.isEmpty())
         {
             binding.uuidLayout.visibility = View.GONE
             binding.additionalInfoLayout.visibility = View.GONE
@@ -314,7 +314,7 @@ class AddHouseholdFragment : Fragment(),
             binding.hideAdditionalInfoImageView.visibility = View.VISIBLE
             binding.defaultInfoLayout.visibility = View.VISIBLE
 
-            if (enumerationItem.uuid.isNotEmpty())
+            if (enumerationItem.version.isNotEmpty())
             {
                 binding.additionalInfoLayout.visibility = View.VISIBLE
             }

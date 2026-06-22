@@ -471,20 +471,22 @@ class ManageConfigurationsFragment : Fragment()
         navigateBasedOnRole( config )
     }
 
-    fun navigateBasedOnRole( minimalConfig: Config )
+    fun navigateBasedOnRole( config: Config )
     {
-        var config = minimalConfig
-
         binding.progressOverlayView.visibility = View.VISIBLE
 
         viewLifecycleOwner.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                // get the full config, if necessary
-                if (minimalConfig.studies.isEmpty() && minimalConfig.enumAreas.isEmpty())
+                if (config.studies.isEmpty())
                 {
-                    // get the full config...
-                    DAO.configDAO.getConfig(minimalConfig.uuid )?.let {
-                        config = it
+                    config.studies = DAO.studyDAO.getStudies( config )
+                }
+
+                if ((user.role == Role.Enumerator.value || user.role == Role.DataCollector.value)
+                && (config.enumAreas.isEmpty() && config.selectedEnumAreaUuid.isNotEmpty()))
+                {
+                    DAO.enumAreaDAO.getEnumArea( config.selectedEnumAreaUuid )?.let { enumArea ->
+                        config.enumAreas.add( enumArea )
                     }
                 }
             }

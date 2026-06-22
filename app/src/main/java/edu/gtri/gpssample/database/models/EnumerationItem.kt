@@ -48,7 +48,7 @@ data class EnumerationItem(
     var version : String)
 {
     constructor() : this(
-        "",
+        UUID.randomUUID().toString(),
         Date().time,
         0.0,
         "",
@@ -71,7 +71,7 @@ data class EnumerationItem(
         ArrayList<FieldData>(),
         "",
         "",
-        UUID.randomUUID().toString())
+        "")
 
     fun pack() : String
     {
