@@ -461,8 +461,6 @@ class ManageConfigurationsFragment : Fragment()
 
     fun didReceiveConfiguration( config: Config )
     {
-        InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
-
         if (user.role == Role.Enumerator.toString() && config.selectedEnumAreaUuid.isEmpty())
         {
             binding.walkButton.visibility = View.VISIBLE
