@@ -270,131 +270,133 @@ class ManageConfigurationsFragment : Fragment(),
 
     private fun cloneConfig( config: Config )
     {
-        val newConfig = config.copy()
+        getFullConfig( config ) { fullConfig ->
+            val newConfig = fullConfig.copy()
 
-        // update config base
-        newConfig.uuid = UUID.randomUUID().toString()
-        newConfig.creationDate = Date().time
-        newConfig.name += "-copy"
-        newConfig.selectedStudyUuid = ""
-        newConfig.validUsers = ""
+            // update config base
+            newConfig.uuid = UUID.randomUUID().toString()
+            newConfig.creationDate = Date().time
+            newConfig.name += "-copy"
+            newConfig.selectedStudyUuid = ""
+            newConfig.validUsers = ""
 
-        // update enumAreas
-        for (enumArea in newConfig.enumAreas)
-        {
-            enumArea.uuid = UUID.randomUUID().toString()
-            enumArea.creationDate = Date().time
-            enumArea.configUuid = newConfig.uuid
-            enumArea.enumerationTeams.clear()
-            enumArea.collectionTeams.clear()
-            enumArea.selectedEnumerationTeamUuid = ""
-            enumArea.selectedCollectionTeamUuid = ""
-
-            var creationDate = Date().time
-
-            // update vertices
-            for (vertice in enumArea.vertices)
+            // update enumAreas
+            for (enumArea in newConfig.enumAreas)
             {
-                vertice.uuid = UUID.randomUUID().toString()
-                vertice.creationDate = creationDate
-                creationDate += 1
-            }
+                enumArea.uuid = UUID.randomUUID().toString()
+                enumArea.creationDate = Date().time
+                enumArea.configUuid = newConfig.uuid
+                enumArea.enumerationTeams.clear()
+                enumArea.collectionTeams.clear()
+                enumArea.selectedEnumerationTeamUuid = ""
+                enumArea.selectedCollectionTeamUuid = ""
 
-            // update locations
-            for (location in enumArea.locations)
-            {
-                location.uuid = UUID.randomUUID().toString()
-                location.creationDate = Date().time
-                location.enumerationItems.clear()
+                var creationDate = Date().time
 
-                // update images
-                if (location.imageUuid.isNotEmpty())
+                // update vertices
+                for (vertice in enumArea.vertices)
                 {
-                    // create a copy of the image
-                    ImageDAO.instance().getImage( location.imageUuid )?.let { image ->
-                        image.uuid = UUID.randomUUID().toString()
-                        image.creationDate = Date().time
-                        image.locationUuid = location.uuid
-                        location.imageUuid = image.uuid
-                        // save the copy of the image to the image database
-                        ImageDAO.instance().createImage( image )
+                    vertice.uuid = UUID.randomUUID().toString()
+                    vertice.creationDate = creationDate
+                    creationDate += 1
+                }
+
+                // update locations
+                for (location in enumArea.locations)
+                {
+                    location.uuid = UUID.randomUUID().toString()
+                    location.creationDate = Date().time
+                    location.enumerationItems.clear()
+
+                    // update images
+                    if (location.imageUuid.isNotEmpty())
+                    {
+                        // create a copy of the image
+                        ImageDAO.instance().getImage( location.imageUuid )?.let { image ->
+                            image.uuid = UUID.randomUUID().toString()
+                            image.creationDate = Date().time
+                            image.locationUuid = location.uuid
+                            location.imageUuid = image.uuid
+                            // save the copy of the image to the image database
+                            ImageDAO.instance().createImage( image )
+                        }
                     }
                 }
             }
+
+            // update studies
+            if (newConfig.studies.isNotEmpty())
+            {
+                var numStudies = newConfig.studies.count()
+
+                // HACK! remove all studies except the first
+                while (numStudies > 1)
+                {
+                    newConfig.studies.remove(newConfig.studies.last())
+                    numStudies -= 1
+                }
+
+                newConfig.studies[0].uuid = UUID.randomUUID().toString()
+                newConfig.studies[0].creationDate = Date().time
+                newConfig.studies[0].primaryFilters.clear()
+                newConfig.studies[0].subsetFilters.clear()
+
+                // update fields
+                for (field in newConfig.studies[0].fields)
+                {
+                    val oldFieldUuid = field.uuid
+
+                    field.uuid = UUID.randomUUID().toString()
+                    field.creationDate = Date().time
+
+                    // update primary rules
+                    for (rule in newConfig.studies[0].primaryRules)
+                    {
+                        if (rule.fieldUuid == oldFieldUuid)
+                        {
+                            rule.fieldUuid = field.uuid
+                            rule.uuid = UUID.randomUUID().toString()
+                            break
+                        }
+                    }
+
+                    // update subset rules
+                    for (rule in newConfig.studies[0].subsetRules)
+                    {
+                        if (rule.fieldUuid == oldFieldUuid)
+                        {
+                            rule.fieldUuid = field.uuid
+                            rule.uuid = UUID.randomUUID().toString()
+                            break
+                        }
+                    }
+                }
+
+                // update stratas
+                for (strata in newConfig.studies[0].stratas)
+                {
+                    val oldStrataUuid = strata.uuid
+
+                    strata.uuid = UUID.randomUUID().toString()
+                    strata.creationDate = Date().time
+                    strata.studyUuid = newConfig.studies[0].uuid
+
+                    for (enumArea in newConfig.enumAreas)
+                    {
+                        if (enumArea.strataUuid == oldStrataUuid)
+                        {
+                            enumArea.strataUuid = strata.uuid
+                            break
+                        }
+                    }
+                }
+            }
+
+            // save the new config to the database
+            DAO.configDAO.createOrUpdateConfig( newConfig )
+            configurations.add( newConfig )
+            manageConfigurationsAdapter.updateConfigurations( configurations )
         }
-
-        // update studies
-        if (newConfig.studies.isNotEmpty())
-        {
-            var numStudies = newConfig.studies.count()
-
-            // HACK! remove all studies except the first
-            while (numStudies > 1)
-            {
-                newConfig.studies.remove(newConfig.studies.last())
-                numStudies -= 1
-            }
-
-            newConfig.studies[0].uuid = UUID.randomUUID().toString()
-            newConfig.studies[0].creationDate = Date().time
-            newConfig.studies[0].primaryFilters.clear()
-            newConfig.studies[0].subsetFilters.clear()
-
-            // update fields
-            for (field in newConfig.studies[0].fields)
-            {
-                val oldFieldUuid = field.uuid
-
-                field.uuid = UUID.randomUUID().toString()
-                field.creationDate = Date().time
-
-                // update primary rules
-                for (rule in newConfig.studies[0].primaryRules)
-                {
-                    if (rule.fieldUuid == oldFieldUuid)
-                    {
-                        rule.fieldUuid = field.uuid
-                        rule.uuid = UUID.randomUUID().toString()
-                        break
-                    }
-                }
-
-                // update subset rules
-                for (rule in newConfig.studies[0].subsetRules)
-                {
-                    if (rule.fieldUuid == oldFieldUuid)
-                    {
-                        rule.fieldUuid = field.uuid
-                        rule.uuid = UUID.randomUUID().toString()
-                        break
-                    }
-                }
-            }
-
-            // update stratas
-            for (strata in newConfig.studies[0].stratas)
-            {
-                val oldStrataUuid = strata.uuid
-
-                strata.uuid = UUID.randomUUID().toString()
-                strata.creationDate = Date().time
-                strata.studyUuid = newConfig.studies[0].uuid
-
-                for (enumArea in newConfig.enumAreas)
-                {
-                    if (enumArea.strataUuid == oldStrataUuid)
-                    {
-                        enumArea.strataUuid = strata.uuid
-                        break
-                    }
-                }
-            }
-        }
-
-        // save the new config to the database
-        DAO.configDAO.createOrUpdateConfig( newConfig )
-        configurations.add( newConfig )
-        manageConfigurationsAdapter.updateConfigurations( configurations )
     }
 
     private fun didSelectConfig( config: Config )
