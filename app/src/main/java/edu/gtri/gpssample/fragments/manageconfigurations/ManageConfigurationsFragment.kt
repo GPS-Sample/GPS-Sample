@@ -269,6 +269,16 @@ class ManageConfigurationsFragment : Fragment()
     {
         val newConfig = config.copy()
 
+        if (newConfig.studies.isEmpty())
+        {
+            newConfig.studies = DAO.studyDAO.getStudies( newConfig )
+        }
+
+        if (newConfig.enumAreas.isEmpty())
+        {
+            newConfig.enumAreas = DAO.enumAreaDAO.getEnumAreas( newConfig )
+        }
+
         // update config base
         newConfig.uuid = UUID.randomUUID().toString()
         newConfig.creationDate = Date().time
