@@ -564,7 +564,9 @@ class ManageConfigurationsFragment : Fragment(),
     @RequiresApi(Build.VERSION_CODES.Q)
     fun didEnterPassword( password: String )
     {
-        if (password != "******")
+        val allStars = password.isNotEmpty() && password.all { it == '*' }
+
+        if (!allStars)
         {
             encryptionPassword = password
         }
