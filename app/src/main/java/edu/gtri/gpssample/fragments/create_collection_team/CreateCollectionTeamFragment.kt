@@ -347,46 +347,56 @@ class CreateCollectionTeamFragment : Fragment(),
 
     override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
     {
-        p1?.let { p1 ->
-            val point = MapManager.instance().getLocationFromPixelPoint( mapView, p1 )
+        try
+        {
+            p1?.let { p1 ->
 
-            if (currentTapType == TapType.TapBoundary)
-            {
-                if (p1.action == MotionEvent.ACTION_DOWN)
+                val point = MapManager.instance().getLocationFromPixelPoint( mapView, p1 )
+
+                if (currentTapType == TapType.TapBoundary)
                 {
-                    polyLinePoints.add( point )
-                    MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.location_blue, "" )
+                    if (p1.action == MotionEvent.ACTION_UP)
+                    {
+                        polyLinePoints.add( point )
+                        MapManager.instance().createMarker( requireActivity(), mapView, point, R.drawable.location_blue, "" )
+
+                        p0?.performClick()
+                    }
+                }
+                else if (currentTapType == TapType.DrawBoundary)
+                {
+                    if (p1.action == MotionEvent.ACTION_UP)
+                    {
+                        currentTapType = TapType.None
+                        binding.mapOverlayView.visibility = View.GONE
+                        binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
+
+                        fingerPolyline?.let {
+                            MapManager.instance().removePolyline( mapView, it )
+                            fingerPolyline = null
+                        }
+
+                        createIntersectionPolygon()
+                    }
+                    else if (p1.action == MotionEvent.ACTION_MOVE)
+                    {
+                        polyLinePoints.add( point )
+
+                        if (fingerPolyline == null)
+                        {
+                            fingerPolyline = MapManager.instance().createPolyline( mapView, polyLinePoints, Color.rgb( 0xee, 0x4e,0x8b) )
+                        }
+                        else
+                        {
+                            MapManager.instance().updatePolyline( mapView, fingerPolyline!!, point )
+                        }
+                    }
                 }
             }
-            else if (currentTapType == TapType.DrawBoundary)
-            {
-                if (p1.action == MotionEvent.ACTION_UP)
-                {
-                    currentTapType = TapType.None
-                    binding.mapOverlayView.visibility = View.GONE
-                    binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
-
-                    fingerPolyline?.let {
-                        MapManager.instance().removePolyline( mapView, it )
-                        fingerPolyline = null
-                    }
-
-                    createIntersectionPolygon()
-                }
-                else
-                {
-                    polyLinePoints.add( point )
-
-                    if (fingerPolyline == null)
-                    {
-                        fingerPolyline = MapManager.instance().createPolyline( mapView, polyLinePoints, Color.rgb( 0xee, 0x4e,0x8b) )
-                    }
-                    else
-                    {
-                        MapManager.instance().updatePolyline( mapView, fingerPolyline!!, point )
-                    }
-                }
-            }
+        }
+        catch( ex: Exception )
+        {
+            Log.d( "xxx", ex.stackTraceToString())
         }
 
         return true
