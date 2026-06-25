@@ -68,7 +68,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
     private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
-
     private var nearbySessionHostManager: NearbySessionHostManager? = null
     private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private var nearbySessionClientManager: NearbySessionClientManager? = null
@@ -349,6 +348,11 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                 binding.proximityWarningTextView.visibility = View.GONE
             }
 
+            if (!config.geofenceIsEnabled)
+            {
+                binding.geofenceTextView.visibility = View.GONE
+            }
+
             binding.configNameTextView.text = config.name
 
             studiesAdapter = StudiesAdapter(config.studies)
@@ -404,10 +408,17 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
         binding.autoIncrementSubaddressSwitch.isChecked = config.autoIncrementSubaddress
         binding.proximityWarningSwitch.isChecked = config.proximityWarningIsEnabled
         binding.proximityWarningTextView.text = sharedViewModel.currentConfigurationProximityWarning
+        binding.geofenceSwitch.isChecked = config.geofenceIsEnabled
+        binding.geofenceTextView.text = sharedViewModel.currentConfigurationGeofenceBufferValue
 
         if (!config.proximityWarningIsEnabled)
         {
             binding.proximityWarningTextView.visibility = View.GONE
+        }
+
+        if (!config.geofenceIsEnabled)
+        {
+            binding.geofenceTextView.visibility = View.GONE
         }
 
         updateOverview()

@@ -20,6 +20,8 @@ import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DATE_FORMAT_INDEX
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DB_VERSION
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_ENCRYPTION_PASSWORD
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_GEOFENCE_BUFFER_VALUE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_GEOFENCE_IS_ENABLED
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_MAP_ENGINE_INDEX
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_MIN_GPS_PRECISION
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_NAME
@@ -100,6 +102,8 @@ class ConfigDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS, config.autoIncrementSubaddress )
         values.put( DAO.COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED, config.proximityWarningIsEnabled )
         values.put( DAO.COLUMN_CONFIG_PROXIMITY_WARNING_VALUE, config.proximityWarningValue )
+        values.put( DAO.COLUMN_CONFIG_GEOFENCE_IS_ENABLED, config.geofenceIsEnabled )
+        values.put( DAO.COLUMN_CONFIG_GEOFENCE_BUFFER_VALUE, config.geofenceBufferValue )
         values.put( DAO.COLUMN_CONFIG_VALID_USERS, config.validUsers )
 
         // TODO: these should be from lookup tables
@@ -140,6 +144,8 @@ class ConfigDAO(private var dao: DAO)
         val autoIncrementSubaddress = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS)).toBoolean()
         val proximityWarningIsEnabled = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED)).toBoolean()
         val proximityWarningValue = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_PROXIMITY_WARNING_VALUE))
+        val geofenceIsEnabled = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_GEOFENCE_IS_ENABLED)).toBoolean()
+        val geofenceBufferValue = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_GEOFENCE_BUFFER_VALUE))
         var validUsers = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_VALID_USERS))
 
         // HACK!!! is this really necessary?
@@ -154,7 +160,7 @@ class ConfigDAO(private var dao: DAO)
         val dateFormat = DateFormatConverter.fromIndex(dateFormatIndex)
         val timeFormat = TimeFormatConverter.fromIndex(timeFormatIndex)
 
-        return Config( uuid, creationDate, timeZone, name, dbVersion, mapEngineIndex, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsRequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, selectedStudyUuid, selectedEnumAreaUuid, validUsers, version )
+        return Config( uuid, creationDate, timeZone, name, dbVersion, mapEngineIndex, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsRequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, geofenceIsEnabled, geofenceBufferValue, selectedStudyUuid, selectedEnumAreaUuid, validUsers, version )
     }
 
     fun getConfig( uuid: String ): Config?
@@ -353,6 +359,8 @@ class ConfigDAO(private var dao: DAO)
             ColumnBinding<Config>(COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS,"INTEGER",Config::autoIncrementSubaddress),
             ColumnBinding<Config>(COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED,"INTEGER",Config::proximityWarningIsEnabled),
             ColumnBinding<Config>(COLUMN_CONFIG_PROXIMITY_WARNING_VALUE,"INTEGER",Config::proximityWarningValue),
+            ColumnBinding<Config>(COLUMN_CONFIG_GEOFENCE_IS_ENABLED,"INTEGER",Config::geofenceIsEnabled),
+            ColumnBinding<Config>(COLUMN_CONFIG_GEOFENCE_BUFFER_VALUE,"INTEGER",Config::geofenceBufferValue),
             ColumnBinding<Config>(COLUMN_ENUM_AREA_UUID,"TEXT",Config::selectedEnumAreaUuid),
             ColumnBinding<Config>(COLUMN_STUDY_UUID,"TEXT",Config::selectedStudyUuid),
             ColumnBinding<Config>(COLUMN_CONFIG_VALID_USERS,"TEXT",Config::validUsers),

@@ -792,6 +792,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS = "config_auto_increment_subaddress"
         const val COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED = "config_proximity_warning_is_enabled"
         const val COLUMN_CONFIG_PROXIMITY_WARNING_VALUE = "config_proximity_warning_value"
+        const val COLUMN_CONFIG_GEOFENCE_IS_ENABLED = "config_geofence_is_enabled"
+        const val COLUMN_CONFIG_GEOFENCE_BUFFER_VALUE = "config_geofence_buffer_value"
         const val COLUMN_CONFIG_VALID_USERS = "config_valid_users"
 
         // Study Table

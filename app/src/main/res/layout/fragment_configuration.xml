@@ -374,6 +374,45 @@
                             android:textAlignment="viewStart"
                             style="@android:style/Widget.EditText"
                             android:text="@{viewModel.currentConfigurationProximityWarning}"/>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp">
+
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="20dp"
+                                android:gravity="start|center_vertical"
+                                android:textAlignment="viewStart"
+                                android:text="@string/enforce_geofence_boundary"
+                                android:textSize="17sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primary_textcolor" />
+
+                            <androidx.appcompat.widget.SwitchCompat
+                                android:id="@+id/geofence_switch"
+                                android:clickable="false"
+                                android:checked="@={viewModel.currentConfiguration.geofenceIsEnabled}"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_marginStart="20dp"
+                                android:layout_marginEnd="20dp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/geofence_text_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:textSize="17sp"
+                            android:gravity="start|center_vertical"
+                            android:textAlignment="viewStart"
+                            style="@android:style/Widget.EditText"
+                            android:text="@{viewModel.currentConfigurationGeofenceBufferValue}"/>
                     </LinearLayout>
 
                     <Space

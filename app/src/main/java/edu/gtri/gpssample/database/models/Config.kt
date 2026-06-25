@@ -43,6 +43,8 @@ data class Config(
     var autoIncrementSubaddress: Boolean,
     var proximityWarningIsEnabled: Boolean,
     var proximityWarningValue: Int,
+    var geofenceIsEnabled: Boolean,
+    var geofenceBufferValue: Int,
     var studies : ArrayList<Study>,
     @kotlinx.serialization.Transient
     var enumAreas : ArrayList<EnumArea> = ArrayList(),
@@ -51,12 +53,12 @@ data class Config(
     var validUsers : String,
     var version : String )
 {
-    constructor(timeZone: Int, name: String, dbVersion: Int, mapEngine: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int)
-            : this(UUID.randomUUID().toString(), Date().time, timeZone, name, dbVersion, mapEngine, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
+    constructor(timeZone: Int, name: String, dbVersion: Int, mapEngine: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, geofenceIsEnabled: Boolean, geofenceBufferValue: Int)
+            : this(UUID.randomUUID().toString(), Date().time, timeZone, name, dbVersion, mapEngine, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, geofenceIsEnabled, geofenceBufferValue,
                 ArrayList<Study>(), ArrayList<EnumArea>(), "", "", "", UUID.randomUUID().toString())
     constructor(uuid: String, creationDate: Long, timeZone: Int, name: String, dbVersion: Int, mapEngine: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-                minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, selectedStudyUuid: String, selectedEnumAreaUuid: String, validUsers: String, version: String)
-            : this(uuid, creationDate, timeZone, name, dbVersion, mapEngine, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
+                minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, geofenceIsEnabled: Boolean, geofenceBufferValue: Int, selectedStudyUuid: String, selectedEnumAreaUuid: String, validUsers: String, version: String)
+            : this(uuid, creationDate, timeZone, name, dbVersion, mapEngine, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, geofenceIsEnabled, geofenceBufferValue,
                 ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyUuid, selectedEnumAreaUuid, validUsers, version)
 
     var minimumGPSPrecision : String
@@ -78,6 +80,16 @@ data class Config(
             value.toIntOrNull()?.let {
                 proximityWarningValue = it
             } ?: {proximityWarningValue = 5}
+        }
+
+    var geofenceBufferStringValue : String
+        get() {
+            return geofenceBufferValue.toString()
+        }
+        set(value){
+            value.toIntOrNull()?.let {
+                geofenceBufferValue = it
+            } ?: {geofenceBufferValue = 5}
         }
 
     fun pack() : String

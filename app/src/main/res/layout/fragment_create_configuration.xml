@@ -392,7 +392,8 @@
 
                     <EditText
                         android:id="@+id/proximity_warning_edit_text"
-                        android:layout_width="300dp"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
                         android:layout_height="50dp"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
@@ -402,8 +403,68 @@
                         android:hint="@string/proximity_warning_value" />
 
                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:gravity="center_vertical"
+                        android:text="@{viewModel.distanceFormatString}"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp">
+
+                    <TextView
                         android:layout_weight="1"
                         android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="20dp"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
+                        android:text="@string/enforce_geofence_boundary"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+
+                    <ImageView
+                        android:id="@+id/geofence_hint"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:padding="15dp"
+                        app:srcCompat="@drawable/info2" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/geofence_switch"
+                        android:checked="@={viewModel.currentConfiguration.geofenceIsEnabled}"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/geofence_layout"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp">
+
+                    <EditText
+                        android:id="@+id/geofence_edit_text"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:inputType="number"
+                        android:imeOptions="actionDone"
+                        android:text="@={viewModel.currentConfiguration.geofenceBufferStringValue}"
+                        android:hint="@string/enter_the_geofence_buffer_value" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"

@@ -136,6 +136,21 @@ class ConfigurationViewModel : ViewModel()
             return unavailable
         }
 
+    val currentConfigurationGeofenceBufferValue : String
+        get() {
+            currentConfiguration?.value?.let {config ->
+                if (config.distanceFormat == DistanceFormat.Meters)
+                {
+                    return "${config.geofenceBufferValue} ${minimumGpsPrecisionFormats[0]}"
+                }
+                else
+                {
+                    return "${config.geofenceBufferValue} ${minimumGpsPrecisionFormats[1]}"
+                }
+            }
+            return unavailable
+        }
+
     val currentConfigurationTimeFormat : String
         get() {
             currentConfiguration?.value?.let {config ->
@@ -234,7 +249,7 @@ class ConfigurationViewModel : ViewModel()
     fun createNewConfiguration()
     {
         val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-        val newConfig = Config(timeZone,"", DAO.DATABASE_VERSION, 0, DateFormat.None, TimeFormat.None, DistanceFormat.None, 20, "", false, false, false, true, 5 )
+        val newConfig = Config(timeZone,"", DAO.DATABASE_VERSION, 0, DateFormat.None, TimeFormat.None, DistanceFormat.None, 20, "", false, false, false, true, 5, false, 5 )
         _currentConfiguration = MutableLiveData(newConfig)
         //saveNewConfiguration()
     }

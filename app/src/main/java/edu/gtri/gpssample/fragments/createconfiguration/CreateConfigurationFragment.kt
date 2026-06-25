@@ -108,6 +108,10 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
             NotificationDialog( requireActivity(), "", resources.getString(R.string.proximity_hint))
         }
 
+        binding.geofenceHint.setOnClickListener {
+            NotificationDialog( requireActivity(), "", resources.getString(R.string.geofence_hint))
+        }
+
         binding.cancelButton.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -161,6 +165,10 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
             if (!config.proximityWarningIsEnabled)
             {
                 binding.proximityWarningLayout.visibility = View.GONE
+            }
+            if (!config.geofenceIsEnabled)
+            {
+                binding.geofenceLayout.visibility = View.GONE
             }
         }
 
@@ -216,6 +224,17 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
             else
             {
                 binding.proximityWarningLayout.visibility = View.GONE
+            }
+        }
+
+        binding.geofenceSwitch.setOnClickListener {
+            if (binding.geofenceSwitch.isChecked)
+            {
+                binding.geofenceLayout.visibility = View.VISIBLE
+            }
+            else
+            {
+                binding.geofenceLayout.visibility = View.GONE
             }
         }
 

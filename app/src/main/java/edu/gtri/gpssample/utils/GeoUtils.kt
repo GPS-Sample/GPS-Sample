@@ -12,6 +12,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.mapbox.geojson.Point
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
+import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.LatLon
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
@@ -231,5 +232,48 @@ object GeoUtils {
         }
 
         return null
+    }
+
+    fun distance( point: Point, enumArea: EnumArea ) : Double
+    {
+        // convert point and enumArea from degrees to meters from the centroid
+        // so that the distance will be computed in meters
+
+        val latLngBounds = findGeobounds(enumArea.vertices)
+        val center = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+
+        val refLat = center.latitude()
+        val refLon = center.longitude()
+
+        val metersPerDegreeLat = 111320.0
+        val metersPerDegreeLon = metersPerDegreeLat * cos(Math.toRadians(refLat))
+
+        val xyPoints = ArrayList<Coordinate>()
+
+        for (vertice in enumArea.vertices)
+        {
+            val x = (vertice.longitude - refLon) * metersPerDegreeLon
+            val y = (vertice.latitude - refLat) * metersPerDegreeLat
+            xyPoints.add(Coordinate(x,y,0.0))
+        }
+
+        // close the polygon
+        xyPoints.add( xyPoints.first())
+
+        val geometryFactory = GeometryFactory()
+        val xyPolygon = geometryFactory.createPolygon( xyPoints.toTypedArray())
+
+        val x = (point.longitude() - refLon) * metersPerDegreeLon
+        val y = (point.latitude() - refLat) * metersPerDegreeLat
+        val xyPoint = geometryFactory.createPoint(Coordinate(x,y,0.0))
+
+        if (xyPolygon.contains( xyPoint ))
+        {
+            return 0.0
+        }
+        else
+        {
+            return xyPolygon.distance(xyPoint )
+        }
     }
 }

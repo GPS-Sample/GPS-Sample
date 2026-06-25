@@ -62,10 +62,14 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.GeometryFactory
 import org.osmdroid.events.MapListener
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.math.cos
 
 class PerformEnumerationFragment : Fragment(),
     View.OnTouchListener,
@@ -738,6 +742,8 @@ class PerformEnumerationFragment : Fragment(),
     {
         currentGPSLocation?.let { point ->
             sharedViewModel.currentConfiguration?.value?.let { config ->
+                if (geofenceCheckFailed( config, point )) { return }
+
                 if (config.proximityWarningIsEnabled)
                 {
                     enumArea.locations.map{
@@ -1560,15 +1566,40 @@ class PerformEnumerationFragment : Fragment(),
         return Pair( distanceValue, distanceUnits )
     }
 
-    override fun onTouch(view: View?, motionEvent: MotionEvent?): Boolean {
-        view?.performClick()
+    fun geofenceCheckFailed( config: Config, point: Point ) : Boolean
+    {
+        if (config.geofenceIsEnabled)
+        {
+            var distance = GeoUtils.distance( point, enumArea )
 
+            if (config.distanceFormat == DistanceFormat.Feet)
+            {
+                distance *= 0.3048
+            }
+
+            if (distance > config.geofenceBufferValue)
+            {
+                Toast.makeText( requireContext(), resources.getString(R.string.geofence_error), Toast.LENGTH_LONG).show()
+                return true
+            }
+        }
+
+        return false
+    }
+
+    override fun onTouch(view: View?, motionEvent: MotionEvent?): Boolean
+    {
         motionEvent?.let {
-            if (it.action == MotionEvent.ACTION_DOWN) {
+            if (it.action == MotionEvent.ACTION_UP)
+            {
+                view?.performClick()
+
                 if (dropMode)
                 {
                     dropMode = false
+
                     var point = MapManager.instance().getLocationFromPixelPoint(mapView, motionEvent )
+
                     binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
 
                     currentGPSLocation?.let { current ->
@@ -1576,6 +1607,8 @@ class PerformEnumerationFragment : Fragment(),
                     }
 
                     sharedViewModel.currentConfiguration?.value?.let { config ->
+                        if (geofenceCheckFailed( config, point )) { return true }
+
                         if (config.proximityWarningIsEnabled)
                         {
                             enumArea.locations.map{
@@ -1592,40 +1625,40 @@ class PerformEnumerationFragment : Fragment(),
                                 }
                             }
                         }
+
+                        var accuracy = -1
+
+                        currentGPSAccuracy?.let {
+                            accuracy = it
+                        }
+
+                        val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+                        val location = Location( timeZone, accuracy, point.latitude(), point.longitude(),point.altitude(), false, "", "")
+
+                        if (gpsLocationIsGood( location ))
+                        {
+                            DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
+                            enumArea.locations.add(location)
+
+                            sharedViewModel.currentLocationUuid = location.uuid
+
+                            enumerationTeamLocations.add(location)
+                            enumerationTeam.locationUuids.add(location.uuid)
+                            DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
+                            navigateToAddHouseholdFragment()
+                        }
+                        else
+                        {
+                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
+                        }
+
+                        return true
                     }
-
-                    var accuracy = -1
-
-                    currentGPSAccuracy?.let {
-                        accuracy = it
-                    }
-
-                    val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                    val location = Location( timeZone, accuracy, point.latitude(), point.longitude(),point.altitude(), false, "", "")
-
-                    if (gpsLocationIsGood( location ))
-                    {
-                        DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
-                        enumArea.locations.add(location)
-
-                        sharedViewModel.currentLocationUuid = location.uuid
-
-                        enumerationTeamLocations.add(location)
-                        enumerationTeam.locationUuids.add(location.uuid)
-                        DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
-                        navigateToAddHouseholdFragment()
-                    }
-                    else
-                    {
-                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
-                    }
-
-                    return true
                 }
             }
         }
 
-        return false
+        return true
     }
 
     override fun onMarkerTapped( location: Location )

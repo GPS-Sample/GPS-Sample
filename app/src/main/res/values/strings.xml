@@ -488,6 +488,10 @@
     <string name="delete_location_message">"Would you also like to permanently delete this location?"</string>
     <string name="draw_boundary">Draw the team boundary on the map</string>
     <string name="tap_boundary">Tap the team boundary points on the map</string>
+    <string name="enforce_geofence_boundary">Enforce Geofence Boundary</string>
+    <string name="enter_the_geofence_buffer_value">Enter the geofence buffer value</string>
+    <string name="geofence_hint">"Placeholder for GeoFence Hint"</string>
+    <string name="geofence_error">"You are currently outside of the Geofence"</string>
 
     <string-array name="collection_apps">
         <item>"ODK Collect"</item>
