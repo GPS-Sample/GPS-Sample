@@ -45,6 +45,8 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.gestures.OnMapClickListener
+import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -84,6 +86,7 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
+    private lateinit var mapboxMapClickListener: OnMapClickListener
     private var isHandlingTapEvent = false
     private val binding get() = _binding!!
     private var isShowingBreadcrumbs = true
@@ -172,6 +175,8 @@ class PerformCollectionFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        mapboxMapClickListener = MapManager.instance().createMapboxMapClickListener( binding.mapboxMapView, true )
 
         if ((requireActivity().application as MainApplication).user == null)
         {
@@ -1042,7 +1047,7 @@ class PerformCollectionFragment : Fragment(),
 
             if (markerProperties.isNotEmpty())
             {
-                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, true )
+                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, mapboxMapClickListener )
             }
         }
     }
@@ -1450,6 +1455,8 @@ class PerformCollectionFragment : Fragment(),
 
     override fun onDestroyView()
     {
+        binding.mapboxMapView.gestures.removeOnMapClickListener(mapboxMapClickListener )
+
         binding.recyclerView.adapter = null
 
         nearbySessionStatusDialog?.dismiss()

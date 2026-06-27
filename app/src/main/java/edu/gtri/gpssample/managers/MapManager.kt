@@ -86,6 +86,7 @@ import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.compass.compass
+import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
@@ -730,7 +731,7 @@ class MapManager
             points.add( Point.fromLngLat( breadcrumb.longitude, breadcrumb.latitude ))
         }
 
-        createPolyline( mapView, points, Color.BLUE, 2f )
+        createPolyline( mapView, points, Color.BLUE, 4f )
     }
 
     fun createPolyline( mapView: View, points: List<Point>, color: Int, lineWidth: Float = 4.0f ) : Any?
@@ -746,7 +747,7 @@ class MapManager
             val polyline = Polyline()
             polyline.setPoints(geoPoints)
             polyline.setColor(color)
-            polyline.setWidth(lineWidth)
+            polyline.setWidth(8f)
 
             mapView.getOverlayManager().add(polyline);
             mapView.invalidate();
@@ -1077,7 +1078,27 @@ class MapManager
         return feature
     }
 
-    fun loadMarkers( context: Context, mapView: View, markerProperties: ArrayList<MarkerProperty>, showDetailButton: Boolean )
+    fun loadMarkers( activity: Activity, mapView: MapView, enumAreas: ArrayList<EnumArea> )
+    {
+        val geoJson = JSONObject()
+        geoJson.put("type", "FeatureCollection")
+
+        val features = JSONArray()
+
+        for (enumArea in enumAreas)
+        {
+            for (location in enumArea.locations)
+            {
+                features.put(instance().createFeature(location, MapManager.instance().getResourceName(location)))
+            }
+        }
+
+        geoJson.put("features", features)
+
+        loadMarkers( activity, mapView, geoJson.toString(), null )
+    }
+
+    fun loadMarkers( context: Context, mapView: View, markerProperties: ArrayList<MarkerProperty>, mapboxMapClickListener: OnMapClickListener? )
     {
         if (mapView is org.osmdroid.views.MapView)
         {
@@ -1129,31 +1150,11 @@ class MapManager
             geoJson.put("type", "FeatureCollection")
             geoJson.put("features", features)
 
-            loadMarkers( context, mapView, geoJson.toString(), showDetailButton )
+            loadMarkers( context, mapView, geoJson.toString(), mapboxMapClickListener )
         }
     }
 
-    fun loadMarkers( activity: Activity, mapView: MapView, enumAreas: ArrayList<EnumArea> )
-    {
-        val geoJson = JSONObject()
-        geoJson.put("type", "FeatureCollection")
-
-        val features = JSONArray()
-
-        for (enumArea in enumAreas)
-        {
-            for (location in enumArea.locations)
-            {
-                features.put(instance().createFeature(location, MapManager.instance().getResourceName(location)))
-            }
-        }
-
-        geoJson.put("features", features)
-
-        loadMarkers( activity, mapView, geoJson.toString(), false )
-    }
-
-    fun loadMarkers( context: Context, mapView: MapView, geoJson: String, showDetailButton: Boolean )
+    fun loadMarkers( context: Context, mapView: MapView, geoJson: String, mapboxMapClickListener: OnMapClickListener? )
     {
         val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
         val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
@@ -1202,81 +1203,88 @@ class MapManager
                 iconAnchor(IconAnchor.CENTER)
             }
         }) { style ->
-            mapView.gestures.addOnMapClickListener { point ->
+            mapboxMapClickListener?.let {
+                mapView.gestures.removeOnMapClickListener( mapboxMapClickListener )
+                mapView.gestures.addOnMapClickListener(mapboxMapClickListener )
+            }
+        }
+    }
 
-                currentPopup?.let {
-                    currentPopup?.get()?.visibility = View.GONE
-                    currentPopup = null
-                }
+    fun createMapboxMapClickListener( mapView: MapView, showDetailButton: Boolean ): OnMapClickListener
+    {
+        return OnMapClickListener { point ->
+            handleMapboxMapClick(mapView, point, showDetailButton)
+            true
+        }
+    }
 
-                val rectSize = 30.0 // pixels
-                val screenCoord = mapView.mapboxMap.pixelForCoordinate(point)
-                val queryRect = ScreenBox(
-                    ScreenCoordinate(screenCoord.x - rectSize / 2, screenCoord.y - rectSize / 2),
-                    ScreenCoordinate(screenCoord.x + rectSize / 2, screenCoord.y + rectSize / 2)
-                )
+    private fun handleMapboxMapClick( mapView: MapView, point: Point, showDetailButton: Boolean )
+    {
+        currentPopup?.let {
+            currentPopup?.get()?.visibility = View.GONE
+            currentPopup = null
+        }
 
-                mapView.mapboxMap.queryRenderedFeatures(
-                    RenderedQueryGeometry(queryRect),
-                    RenderedQueryOptions(listOf("CLUSTER_LAYER", "UNCLUSTERED_LAYER"), null)
-                ) { result ->
-                    val features = result.value
+        val rectSize = 30.0 // pixels
+        val screenCoord = mapView.mapboxMap.pixelForCoordinate(point)
+        val queryRect = ScreenBox(ScreenCoordinate(screenCoord.x - rectSize / 2, screenCoord.y - rectSize / 2), ScreenCoordinate(screenCoord.x + rectSize / 2, screenCoord.y + rectSize / 2))
 
-                    if (!features.isNullOrEmpty())
+        mapView.mapboxMap.queryRenderedFeatures(RenderedQueryGeometry(queryRect), RenderedQueryOptions(listOf("CLUSTER_LAYER", "UNCLUSTERED_LAYER"), null)) { result ->
+            val features = result.value
+
+            if (!features.isNullOrEmpty())
+            {
+                for (queriedFeature in features)
+                {
+                    var title = ""
+                    var isHH = true
+                    val feature = queriedFeature.queriedFeature.feature
+
+                    if (feature.hasProperty( "title" ))
                     {
-                        for (queriedFeature in features)
-                        {
-                            var title = ""
-                            var isHH = true
-                            val feature = queriedFeature.queriedFeature.feature
+                        isHH = true
+                        title = feature.getStringProperty( "title" )
+                    }
+                    else if (feature.hasProperty( "point_count" ))
+                    {
+                        isHH = false
+                        title = "# items: " + feature.getNumberProperty( "point_count" )
+                    }
 
-                            if (feature.hasProperty( "title" ))
-                            {
-                                isHH = true
-                                title = feature.getStringProperty( "title" )
-                            }
-                            else if (feature.hasProperty( "point_count" ))
-                            {
-                                isHH = false
-                                title = "# items: " + feature.getNumberProperty( "point_count" )
-                            }
+                    val locationUuid = feature.getStringProperty("locationUuid")
 
-                            val locationUuid = feature.getStringProperty("locationUuid")
+                    if (title.isEmpty() && locationUuid.isNotEmpty())
+                    {
+                        DAO.locationDAO.getLocation(locationUuid)?.let {
+                            _markerTapped.tryEmit(it )
+                        }
+                    }
+                    else
+                    {
+                        val featurePoint = feature.geometry() as? Point
+                        featurePoint?.let { point ->
+                            val screen = mapView.mapboxMap.pixelForCoordinate(point)
 
-                            if (title.isEmpty() && locationUuid.isNotEmpty())
+                            showHHPopup( mapView, screen, title, isHH && showDetailButton )
                             {
+                                currentPopup?.get()?.visibility = View.GONE
+                                currentPopup = null
                                 DAO.locationDAO.getLocation(locationUuid)?.let {
                                     _markerTapped.tryEmit(it )
                                 }
                             }
-                            else
-                            {
-                                val featurePoint = feature.geometry() as? Point
-                                featurePoint?.let { point ->
-                                    val screen = mapView.mapboxMap.pixelForCoordinate(point)
+                        }
 
-                                    showHHPopup( mapView, screen, title, isHH && showDetailButton )
-                                    {
-                                        currentPopup?.get()?.visibility = View.GONE
-                                        currentPopup = null
-                                        DAO.locationDAO.getLocation(locationUuid)?.let {
-                                            _markerTapped.tryEmit(it )
-                                        }
-                                    }
-                                }
-
-                                if (currentPopup != null)
-                                {
-                                    break
-                                }
-                            }
+                        if (currentPopup != null)
+                        {
+                            break
                         }
                     }
                 }
-
-                true
             }
         }
+
+        true
     }
 
     private var currentPopup : WeakReference<View>? = null

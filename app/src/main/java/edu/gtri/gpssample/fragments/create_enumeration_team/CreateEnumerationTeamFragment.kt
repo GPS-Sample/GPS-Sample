@@ -320,7 +320,7 @@ class CreateEnumerationTeamFragment : Fragment(), OnTouchListener
 
             if (markerProperties.isNotEmpty())
             {
-                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, false )
+                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, null )
             }
         }
     }

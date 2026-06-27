@@ -27,6 +27,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.mapbox.geojson.Point
 import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.gestures.OnMapClickListener
+import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -54,9 +56,9 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
     private lateinit var mapView: View
     private lateinit var config: Config
     private lateinit var enumArea: EnumArea
-    private var fingerPolyline: Any? = null
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private var fingerPolyline: Any? = null
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
     private val binding get() = _binding!!
     private var intersectionPolygon: Any? = null
@@ -343,7 +345,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
 
             if (markerProperties.isNotEmpty())
             {
-                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, false )
+                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, null )
             }
         }
     }

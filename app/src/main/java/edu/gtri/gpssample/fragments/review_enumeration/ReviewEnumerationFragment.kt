@@ -35,6 +35,8 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.gestures.OnMapClickListener
+import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
@@ -59,6 +61,7 @@ class ReviewEnumerationFragment : Fragment()
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
+    private lateinit var mapboxMapClickListener: OnMapClickListener
     private var _binding: FragmentReviewEnumerationBinding? = null
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
@@ -86,6 +89,8 @@ class ReviewEnumerationFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        mapboxMapClickListener = MapManager.instance().createMapboxMapClickListener( binding.mapboxMapView, true )
 
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
@@ -389,7 +394,7 @@ class ReviewEnumerationFragment : Fragment()
 
         if (markerProperties.isNotEmpty())
         {
-            MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, false )
+            MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, mapboxMapClickListener )
         }
     }
 
@@ -417,6 +422,10 @@ class ReviewEnumerationFragment : Fragment()
     private fun didSelectLocation( location: Location )
     {
         sharedViewModel.currentLocationUuid = location.uuid
+        if (location.enumerationItems.isNotEmpty())
+        {
+            sharedViewModel.currentEnumerationItemUuid = location.enumerationItems.first().uuid
+        }
 
         if (location.isLandmark)
         {
@@ -556,6 +565,7 @@ class ReviewEnumerationFragment : Fragment()
 
     override fun onDestroyView()
     {
+        binding.mapboxMapView.gestures.removeOnMapClickListener(mapboxMapClickListener )
         fusedLocationClient.removeLocationUpdates( locationCallback )
 
         _binding = null

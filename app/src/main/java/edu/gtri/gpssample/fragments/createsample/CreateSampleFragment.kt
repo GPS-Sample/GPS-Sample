@@ -43,6 +43,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.maps.model.LatLng
+import com.mapbox.maps.plugin.gestures.OnMapClickListener
+import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
@@ -56,6 +58,7 @@ class CreateSampleFragment : Fragment()
     private lateinit var enumArea: EnumArea
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var mapboxMapClickListener: OnMapClickListener
     private var mapView: View? = null
     private var sampleHasDuplicates = false
     private var sampleHasGeofenceViolations = false
@@ -107,6 +110,8 @@ class CreateSampleFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        mapboxMapClickListener = MapManager.instance().createMapboxMapClickListener( binding.mapboxMapView, true )
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
             this.config = config
@@ -258,6 +263,7 @@ class CreateSampleFragment : Fragment()
                                             ExcludeLocationDialog.ButtonPress.Cancel -> {
                                             }
                                             ExcludeLocationDialog.ButtonPress.Save -> {
+
                                                 for (enumerationItem in location.enumerationItems)
                                                 {
                                                     DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem,enumerationItem.version )
@@ -265,10 +271,14 @@ class CreateSampleFragment : Fragment()
 
                                                 if (samplingViewModel.samplePageState.value == SamplingViewModel.SamplePageState.DuplicatePage)
                                                 {
+                                                    duplicateLocations.removeIf{ it.uuid == location.uuid }
+                                                    duplicateLocations.add( location )
                                                     showMap( duplicateLocations )
                                                 }
                                                 else if (samplingViewModel.samplePageState.value == SamplingViewModel.SamplePageState.GeofenceViolationPage)
                                                 {
+                                                    geofenceViolations.removeIf{ it.uuid == location.uuid }
+                                                    geofenceViolations.add( location )
                                                     showMap(geofenceViolations )
                                                 }
                                             }
@@ -551,7 +561,7 @@ class CreateSampleFragment : Fragment()
                 binding.backButton.text = resources.getString(R.string.back )
                 binding.nextButton.text = resources.getString(R.string.next )
                 clearSample()
-                refreshMap()
+                refreshMap(false )
             }
             SamplingViewModel.SamplePageState.SaveSamplePage -> {
                 binding.nextButton.isEnabled = true
@@ -618,7 +628,7 @@ class CreateSampleFragment : Fragment()
         }
     }
 
-    fun refreshMap()
+    fun refreshMap( showExclusions: Boolean = true )
     {
         MapManager.instance().clearMap( mapView!! )
 
@@ -652,6 +662,11 @@ class CreateSampleFragment : Fragment()
             {
                 if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
+                    if (location.enumerationItems.first().isExcluded && !showExclusions)
+                    {
+                        continue
+                    }
+
                     val currentPage = samplingViewModel.samplePageState.value
                     val generateSamplePage = SamplingViewModel.SamplePageState.GenerateSamplePage
                     val saveSamplePage = SamplingViewModel.SamplePageState.SaveSamplePage
@@ -701,7 +716,9 @@ class CreateSampleFragment : Fragment()
 
         if (markerProperties.isNotEmpty())
         {
-            MapManager.instance().loadMarkers( activity!!, mapView!!, markerProperties, false )
+            binding.mapboxMapView.gestures.removeOnMapClickListener(mapboxMapClickListener )
+
+            MapManager.instance().loadMarkers( activity!!, mapView!!, markerProperties, null )
         }
     }
 
@@ -786,7 +803,7 @@ class CreateSampleFragment : Fragment()
 
         if (markerProperties.isNotEmpty())
         {
-            MapManager.instance().loadMarkers( activity!!, mapView!!, markerProperties, false )
+            MapManager.instance().loadMarkers( activity!!, mapView!!, markerProperties, mapboxMapClickListener )
         }
     }
 
@@ -866,6 +883,8 @@ class CreateSampleFragment : Fragment()
 
     override fun onDestroyView()
     {
+        binding.mapboxMapView.gestures.removeOnMapClickListener(mapboxMapClickListener )
+
         mapView = null
         _binding = null
 

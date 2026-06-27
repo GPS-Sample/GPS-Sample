@@ -32,6 +32,8 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.gestures.OnMapClickListener
+import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
@@ -40,6 +42,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentReviewCollectionBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionAdapter
+import edu.gtri.gpssample.fragments.perform_enumeration.PerformEnumerationAdapter
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
@@ -58,7 +61,8 @@ class ReviewCollectionFragment : Fragment()
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var fusedLocationClient : FusedLocationProviderClient
-    private lateinit var performCollectionAdapter: PerformCollectionAdapter
+    private lateinit var performCollectionAdapter: PerformEnumerationAdapter
+    private lateinit var mapboxMapClickListener: OnMapClickListener
     private var isShowingBreadcrumbs = true
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
@@ -90,6 +94,8 @@ class ReviewCollectionFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        mapboxMapClickListener = MapManager.instance().createMapboxMapClickListener( binding.mapboxMapView, true )
 
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
@@ -128,10 +134,19 @@ class ReviewCollectionFragment : Fragment()
             }
         }
 
-        performCollectionAdapter = PerformCollectionAdapter( ArrayList<EnumerationItem>(), ArrayList<Location>(), enumArea.name )
-        performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+        val filteredLocations = ArrayList<Location>()
+        for (location in enumArea.locations)
+        {
+            if (location.enumerationItems.isNotEmpty() && !location.enumerationItems.first().isExcluded)
+            {
+                filteredLocations.add( location )
+            }
+        }
 
-        performCollectionAdapter.didSelectItem = this::didSelectItem
+        performCollectionAdapter = PerformEnumerationAdapter(ArrayList<Location>(), enumArea.name )
+        performCollectionAdapter.updateLocations(filteredLocations)
+
+        performCollectionAdapter.didSelectLocation = this::didSelectLocation
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = performCollectionAdapter
@@ -166,7 +181,7 @@ class ReviewCollectionFragment : Fragment()
 
                     launch {
                         mapManager.markerTapped.collect { location ->
-                            // Handle tap
+                            didSelectLocation( location )
                         }
                     }
                 }
@@ -441,30 +456,32 @@ class ReviewCollectionFragment : Fragment()
 
         if (markerProperties.isNotEmpty())
         {
-            MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, false )
+            MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, mapboxMapClickListener )
         }
     }
 
-    private fun didSelectItem( item: Any )
+    private fun didSelectLocation( location: Location )
     {
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
 
-            if (item is Location)
+            sharedViewModel.currentLocationUuid = location.uuid
+
+            if (location.isLandmark)
             {
-                sharedViewModel.currentLocationUuid = item.uuid
                 findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
             }
-            else if (item is EnumerationItem)
+            else
             {
-                DAO.locationDAO.getLocation( item.locationUuid )?.let { location ->
-                    sharedViewModel.currentLocationUuid = location.uuid
-                    sharedViewModel.currentEnumerationItemUuid = item.uuid
-                    (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = item.uuid
-                    (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
-                    (this.activity!!.application as? MainApplication)?.currentSubAddress = item.subAddress
+                val bundle = Bundle()
+                bundle.putBoolean( Keys.kEditMode.value, false )
 
-                    val bundle = Bundle()
-                    bundle.putBoolean( Keys.kEditMode.value, false )
+                if (location.enumerationItems.size > 1)
+                {
+                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle)
+                }
+                else
+                {
+                    sharedViewModel.currentEnumerationItemUuid = location.enumerationItems.first().uuid
                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
                 }
             }
@@ -564,7 +581,7 @@ class ReviewCollectionFragment : Fragment()
                     }
                 }
 
-                performCollectionAdapter.updateItems( performCollectionAdapter.enumerationItems, performCollectionAdapter.locations )
+                performCollectionAdapter.updateLocations(performCollectionAdapter.locations )
             }
         }
     }
@@ -627,6 +644,7 @@ class ReviewCollectionFragment : Fragment()
 
     override fun onDestroyView()
     {
+        binding.mapboxMapView.gestures.removeOnMapClickListener(mapboxMapClickListener )
         fusedLocationClient.removeLocationUpdates( locationCallback )
 
         _binding = null
