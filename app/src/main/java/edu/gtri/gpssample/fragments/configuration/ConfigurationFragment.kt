@@ -55,6 +55,7 @@ import edu.gtri.gpssample.managers.PerformanceManager
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.osmdroid.events.*
@@ -722,13 +723,26 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kEditMode.value, false )
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
-                    {
-                        findNavController().navigate(R.id.action_navigate_to_CreateOsmEnumerationAreaFragment, bundle)
-                    }
-                    else if (config.mapEngineIndex == MapEngine.MapBox.value)
-                    {
-                        findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+
+                    binding.mapOverlayView.visibility = View.VISIBLE
+
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        withContext(Dispatchers.IO)
+                        {
+                            config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+                        }
+
+                        // back on the main thread...
+                        binding.mapOverlayView.visibility = View.GONE
+
+                        if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
+                        {
+                            findNavController().navigate(R.id.action_navigate_to_CreateOsmEnumerationAreaFragment, bundle)
+                        }
+                        else if (config.mapEngineIndex == MapEngine.MapBox.value)
+                        {
+                            findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+                        }
                     }
                 }
             }
