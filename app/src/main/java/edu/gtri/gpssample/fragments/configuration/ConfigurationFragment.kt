@@ -55,10 +55,8 @@ import edu.gtri.gpssample.managers.PerformanceManager
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.osmdroid.events.*
 import org.osmdroid.views.MapView
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -193,7 +191,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                         config.selectedStudyUuid = study.uuid
                     }
 
-                    binding.overlayView.visibility = View.VISIBLE
+                    binding.progressOverlayView.visibility = View.VISIBLE
 
                     viewLifecycleOwner.lifecycleScope.launch {
                         withContext(Dispatchers.IO) {
@@ -207,7 +205,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
 
                         // back on the main thread...
 
-                        binding.overlayView.visibility = View.GONE
+                        binding.progressOverlayView.visibility = View.GONE
 
                         when( buttonPressed )
                         {
@@ -304,8 +302,8 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
 
         binding.mapOverlayView.setOnTouchListener(this)
 
-        binding.overlayView.isClickable = true
-        binding.overlayView.isFocusable = true
+        binding.progressOverlayView.isClickable = true
+        binding.progressOverlayView.isFocusable = true
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
 
@@ -564,7 +562,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
         sharedViewModel.currentConfiguration?.value?.let { config ->
             sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
                 viewLifecycleOwner.lifecycleScope.launch {
-                    binding.overlayView.visibility = View.VISIBLE
+                    binding.progressOverlayView.visibility = View.VISIBLE
 
                     val enumArea = withContext(Dispatchers.IO) {
                         DAO.enumAreaDAO.getEnumArea( uuid )
@@ -572,7 +570,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
 
                     // back on main thread
 
-                    binding.overlayView.visibility = View.GONE
+                    binding.progressOverlayView.visibility = View.GONE
 
                     enumArea?.let { enumArea ->
                         config.selectedEnumAreaUuid = uuid
@@ -694,7 +692,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                         }
                         catch( ex: java.lang.Exception )
                         {
-                            binding.overlayView.visibility = View.GONE
+                            binding.progressOverlayView.visibility = View.GONE
                             InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
                         }
                     }
@@ -724,7 +722,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                 bundle.putBoolean( Keys.kEditMode.value, false )
                 sharedViewModel.currentConfiguration?.value?.let { config ->
 
-                    binding.mapOverlayView.visibility = View.VISIBLE
+                    binding.progressOverlayView.visibility = View.VISIBLE
 
                     viewLifecycleOwner.lifecycleScope.launch {
                         withContext(Dispatchers.IO)
@@ -733,7 +731,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                         }
 
                         // back on the main thread...
-                        binding.mapOverlayView.visibility = View.GONE
+                        binding.progressOverlayView.visibility = View.GONE
 
                         if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
                         {

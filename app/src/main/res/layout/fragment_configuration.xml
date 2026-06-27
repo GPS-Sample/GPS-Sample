@@ -760,7 +760,7 @@
         </LinearLayout>
 
         <FrameLayout
-            android:id="@+id/overlay_view"
+            android:id="@+id/progress_overlay_view"
             android:visibility="gone"
             android:background="@color/clear"
             android:layout_width="match_parent"
