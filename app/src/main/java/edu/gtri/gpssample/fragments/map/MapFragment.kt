@@ -88,8 +88,6 @@ class MapFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
-
         binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner

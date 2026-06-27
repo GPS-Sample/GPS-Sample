@@ -142,17 +142,6 @@ class EnumAreaDAO(private var dao: DAO)
         return enumAreas
     }
 
-    fun loadLazyLocations( enumArea: EnumArea )
-    {
-        for (location in enumArea.locations)
-        {
-            if (location.enumerationItems.isEmpty())
-            {
-                location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
-            }
-        }
-    }
-
     data class EnumAreaSummary(
         val uuid: String,
         val name: String,

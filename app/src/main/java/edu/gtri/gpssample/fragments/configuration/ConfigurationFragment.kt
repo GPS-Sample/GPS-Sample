@@ -109,8 +109,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
             return
         }
 
-        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
-
         binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner

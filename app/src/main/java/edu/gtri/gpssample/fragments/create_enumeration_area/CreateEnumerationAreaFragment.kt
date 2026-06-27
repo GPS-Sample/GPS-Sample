@@ -146,8 +146,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
-
         if (sharedViewModel.currentZoomLevel?.value == null)
         {
             sharedViewModel.setCurrentZoomLevel( 16.0 )

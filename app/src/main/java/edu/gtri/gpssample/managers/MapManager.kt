@@ -111,6 +111,11 @@ import io.github.dellisd.spatialk.geojson.dsl.feature
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonPrimitive
 import org.json.JSONArray
@@ -136,19 +141,17 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class MapManager
 {
-    interface MapManagerDelegate
-    {
-        fun onMarkerTapped( location: Location )
-        fun onZoomLevelChanged( zoomLevel: Double )
-    }
+    private val _markerTapped = MutableSharedFlow<Location>( extraBufferCapacity = 1 )
+    val markerTapped = _markerTapped.asSharedFlow()
+
+    private val _zoomLevel = MutableStateFlow(0.0)
+    val zoomLevel = _zoomLevel.asStateFlow()
 
     class MapboxPolygon
     {
         var polygonAnnotation: PolygonAnnotation? = null
         var polylineAnnotation: PolylineAnnotation? = null
     }
-
-    var delegate: MapManagerDelegate? = null
 
     private val MIN_ZOOM = 8
     private val MAX_ZOOM = 18
@@ -180,10 +183,8 @@ class MapManager
         }
     }
 
-    fun selectMap( activity: Activity, config: Config, osmMapView: org.osmdroid.views.MapView, mapBoxMapView: com.mapbox.maps.MapView, northUpImageView: ImageView, enumArea: EnumArea?, zoom: Double, delegate: MapManagerDelegate? = null, completion: ((mapView: View)->Unit) )
+    fun selectMap( activity: Activity, config: Config, osmMapView: org.osmdroid.views.MapView, mapBoxMapView: com.mapbox.maps.MapView, northUpImageView: ImageView, enumArea: EnumArea?, zoom: Double, completion: ((mapView: View)->Unit) )
     {
-        this.delegate = delegate
-
         val sharedPreferences: SharedPreferences = activity.getSharedPreferences("default", 0)
         val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
 
@@ -218,6 +219,7 @@ class MapManager
         mapView.maxZoomLevel = 24.0
         mapView.setMultiTouchControls( true )
         mapView.setBuiltInZoomControls(false)
+        createOsmMapListener( mapView, northUpImageView )
 
         var tileSource = TileSourceFactory.MAPNIK
 
@@ -249,20 +251,18 @@ class MapManager
             mapView.overlays.add(customOverlay)
         }
 
-        delegate?.let {
-            mapView.setMapListener(object : org.osmdroid.events.MapListener {
-                override fun onScroll(event: org.osmdroid.events.ScrollEvent?): Boolean {
-                    return true // You can handle scroll events here if needed
-                }
+        mapView.setMapListener(object : org.osmdroid.events.MapListener {
+            override fun onScroll(event: org.osmdroid.events.ScrollEvent?): Boolean {
+                return true // You can handle scroll events here if needed
+            }
 
-                override fun onZoom(event: org.osmdroid.events.ZoomEvent?): Boolean {
-                    event?.let {
-                        delegate?.onZoomLevelChanged( it.zoomLevel )
-                    }
-                    return true
+            override fun onZoom(event: org.osmdroid.events.ZoomEvent?): Boolean {
+                event?.let {
+                    _zoomLevel.value = it.zoomLevel
                 }
-            })
-        }
+                return true
+            }
+        })
 
         // --- Rotation overlay ---
         val rotationGestureOverlay = RotationGestureOverlay(mapView)
@@ -272,14 +272,20 @@ class MapManager
         completion()
     }
 
-    fun createOsmMapListener( mapView: org.osmdroid.views.MapView, northUpImageView: ImageView ) : MapListener
+    private var osmMapListener: MapListener? = null
+
+    private fun createOsmMapListener( mapView: org.osmdroid.views.MapView, northUpImageView: ImageView )
     {
+        osmMapListener?.let {
+            mapView.removeMapListener( it )
+        }
+
         northUpImageView.setOnClickListener {
             mapView.mapOrientation = 0f
             northUpImageView.visibility = View.GONE
         }
 
-        val mapListener = object : MapListener {
+        osmMapListener = object : MapListener {
             override fun onScroll(event: ScrollEvent?): Boolean {
                 northUpImageView.visibility = if (mapView.mapOrientation != 0f) View.VISIBLE else View.GONE
                 return false
@@ -291,9 +297,7 @@ class MapManager
             }
         }
 
-        mapView.addMapListener(mapListener)
-
-        return mapListener
+        mapView.addMapListener(osmMapListener)
     }
 
     private fun initializeMapboxMap( mapView: com.mapbox.maps.MapView, style: String, enumArea: EnumArea?, zoom: Double, completion: (()->Unit))
@@ -344,7 +348,7 @@ class MapManager
                     }
 
                     mapView.getMapboxMap().addOnCameraChangeListener { cameraChangedEventData ->
-                        delegate?.onZoomLevelChanged( mapView.getMapboxMap().cameraState.zoom )
+                        _zoomLevel.value = mapView.getMapboxMap().cameraState.zoom
                     }
 
                     completion()
@@ -505,7 +509,7 @@ class MapManager
                             jsonObject.get("uuid")?.asString?.let { uuid ->
                                 DAO.locationDAO.getLocation( uuid )?.let {
                                     retVal = true
-                                    delegate?.onMarkerTapped( it )
+                                    _markerTapped.tryEmit(it )
                                 }
                             }
                         }
@@ -848,7 +852,7 @@ class MapManager
             mapView.invalidate()
 
             marker.setOnMarkerClickListener { clickedMarker, mapView ->
-                delegate?.onMarkerTapped( location )
+                _markerTapped.tryEmit(location )
                 true
             }
         }
@@ -1079,11 +1083,9 @@ class MapManager
                 marker.icon = ContextCompat.getDrawable(context, markerProperty.resourceId)
                 marker.title = markerProperty.title
 
-                delegate?.let { delegate ->
-                    marker.setOnMarkerClickListener { clickedMarker, mapView ->
-                        delegate.onMarkerTapped( markerProperty.location )
-                        true
-                    }
+                marker.setOnMarkerClickListener { clickedMarker, mapView ->
+                    _markerTapped.tryEmit(markerProperty.location )
+                    true
                 }
 
                 clusterer.add(marker)
@@ -1234,7 +1236,7 @@ class MapManager
                             if (title.isEmpty() && locationUuid.isNotEmpty())
                             {
                                 DAO.locationDAO.getLocation(locationUuid)?.let {
-                                    delegate?.onMarkerTapped(it)
+                                    _markerTapped.tryEmit(it )
                                 }
                             }
                             else
@@ -1248,7 +1250,7 @@ class MapManager
                                         currentPopup!!.visibility = View.GONE
                                         currentPopup = null
                                         DAO.locationDAO.getLocation(locationUuid)?.let {
-                                            delegate?.onMarkerTapped(it)
+                                            _markerTapped.tryEmit(it )
                                         }
                                     }
                                 }
@@ -1639,9 +1641,7 @@ class MapManager
 
     fun onFragmentDestroyed( mapView: org.osmdroid.views.MapView, mapListener: MapListener )
     {
-        mapView.removeMapListener( mapListener )
-
-        delegate = null
+//        delegate = null
 
         mapboxPolygonAnnotationManager?.deleteAll()
         mapboxPolylineAnnotationManager?.deleteAll()

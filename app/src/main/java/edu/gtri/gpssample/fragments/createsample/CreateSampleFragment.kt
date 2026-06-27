@@ -10,6 +10,7 @@ package edu.gtri.gpssample.fragments.createsample
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -39,19 +40,28 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.gms.maps.model.LatLng
+import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.MapEngine
+import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
+import edu.gtri.gpssample.dialogs.ExcludeLocationDialog
 import org.osmdroid.events.MapListener
 
-class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
+class CreateSampleFragment : Fragment()
 {
     private lateinit var study: Study
     private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
-
     private var mapView: View? = null
-    private var osmMapListener: MapListener? = null
+    private var sampleHasDuplicates = false
+    private var sampleHasGeofenceViolations = false
+    private var duplicateLocations = ArrayList<Location>()
+    private var geofenceViolations = ArrayList<Location>()
+    private var isHandlingTapEvent = false
 
     var _binding: FragmentCreateSampleBinding? = null
     val binding get() = _binding!!
@@ -66,10 +76,12 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
         sharedViewModel.currentFragment = this
 
         samplingViewModel = samplingVm
-        samplingViewModel.currentFragment = this
         samplingViewModel.currentConfig = sharedViewModel.currentConfiguration
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
         samplingViewModel.currentEnumArea = sharedViewModel.enumAreaViewModel.currentEnumArea
+
+        samplingViewModel.setSampleState( SamplingViewModel.SampleState.Idle )
+        samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.PreviewPage )
 
         setHasOptionsMenu(true)
     }
@@ -95,8 +107,6 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-
-        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
             this.config = config
@@ -131,173 +141,467 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
             withContext(Dispatchers.IO) {
                 if (study.samplingMethod == SamplingMethod.SimpleRandom)
                 {
-                    for (enumArea in config.enumAreas)
-                    {
-                        DAO.enumAreaDAO.loadLazyLocations( enumArea )
-                    }
-                }
-                else
-                {
-                    DAO.enumAreaDAO.loadLazyLocations( enumArea )
+                    config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
                 }
             }
+
+            sampleHasDuplicates = doesSampleHaveDuplicates(config.enumAreas )
+            sampleHasGeofenceViolations = doesSampleHaveGeofenceViolations(config.enumAreas )
 
             // back on the main thread...
             binding.progressOverlayView.visibility = View.GONE
+        }
 
-            binding.legendTextView.setOnClickListener {
-                MapLegendDialog( activity!! )
+        binding.legendTextView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
+        binding.legendImageView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
+        when(study.samplingMethod)
+        {
+            SamplingMethod.SimpleRandom-> binding.titleTextView.text = resources.getString(R.string.simple_random)
+            SamplingMethod.Cluster -> binding.titleTextView.text = resources.getString(R.string.cluster_sampling)
+            SamplingMethod.Subsets -> binding.titleTextView.text = resources.getString(R.string.subset_overlap)
+            SamplingMethod.Strata -> binding.titleTextView.text = resources.getString(R.string.strata_exclusive)
+            SamplingMethod.None -> TODO()
+        }
+
+        if (enumArea.mbTilesPath.isNotEmpty())
+        {
+            TileServer.startServer( enumArea.mbTilesPath )
+        }
+
+        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
+            this@CreateSampleFragment.mapView = mapView
+
+            binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
+
+            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                MapManager.instance().centerMap( enumArea.vertices, currentZoomLevel, mapView )
             }
 
-            binding.legendImageView.setOnClickListener {
-                MapLegendDialog( activity!! )
-            }
 
-            when(study.samplingMethod)
+            samplingViewModel.refreshMap.observe(viewLifecycleOwner)
             {
-                SamplingMethod.SimpleRandom-> binding.titleTextView.text = resources.getString(R.string.simple_random)
-                SamplingMethod.Cluster -> binding.titleTextView.text = resources.getString(R.string.cluster_sampling)
-                SamplingMethod.Subsets -> binding.titleTextView.text = resources.getString(R.string.subset_overlap)
-                SamplingMethod.Strata -> binding.titleTextView.text = resources.getString(R.string.strata_exclusive)
-                SamplingMethod.None -> TODO()
-            }
-
-            if (enumArea.mbTilesPath.isNotEmpty())
-            {
-                TileServer.startServer( enumArea.mbTilesPath )
-            }
-
-            val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-            MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this@CreateSampleFragment ) { mapView ->
-                this@CreateSampleFragment.mapView = mapView
-
-                binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
-
-                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                    MapManager.instance().centerMap( enumArea.vertices, currentZoomLevel, mapView )
-                }
-
-
-                samplingViewModel.refreshMap.observe(viewLifecycleOwner)
-                {
-                    refreshMap()
-                }
-
                 refreshMap()
             }
 
-            binding.infoButton.setOnClickListener{
-                findNavController().navigate(R.id.action_navigate_to_SamplingInfoDialogFragment)
-            }
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    val mapManager = MapManager.instance()
 
-            if (study.samplingMethod == SamplingMethod.SimpleRandom)
+                    launch {
+                        mapManager.zoomLevel.collect { zoomLevel ->
+                            sharedViewModel.setCurrentZoomLevel(zoomLevel)
+                        }
+                    }
+
+                    launch {
+                        mapManager.markerTapped.collect { location ->
+                            if (!isHandlingTapEvent)
+                            {
+                                if ((samplingViewModel.samplePageState.value == SamplingViewModel.SamplePageState.DuplicatePage)
+                                    || (samplingViewModel.samplePageState.value == SamplingViewModel.SamplePageState.GeofenceViolationPage))
+                                {
+                                    sharedViewModel.currentLocationUuid = location.uuid
+                                    sharedViewModel.currentEnumerationItemUuid = location.enumerationItems.first().uuid
+
+                                    isHandlingTapEvent = true
+
+                                    ExcludeLocationDialog(requireContext(),location.enumerationItems ) { buttonPress ->
+                                        isHandlingTapEvent = false
+
+                                        when (buttonPress)
+                                        {
+                                            ExcludeLocationDialog.ButtonPress.Cancel -> {
+                                            }
+                                            ExcludeLocationDialog.ButtonPress.Save -> {
+                                                for (enumerationItem in location.enumerationItems)
+                                                {
+                                                    DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem,enumerationItem.version )
+                                                }
+                                            }
+                                            ExcludeLocationDialog.ButtonPress.Info -> {
+                                                val bundle = Bundle()
+                                                bundle.putBoolean( Keys.kEditMode.value, false )
+                                                if (location.enumerationItems.size > 1)
+                                                {
+                                                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle )
+                                                }
+                                                else
+                                                {
+                                                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        binding.infoButton.setOnClickListener{
+            findNavController().navigate(R.id.action_navigate_to_SamplingInfoDialogFragment)
+        }
+
+        var sampleAlreadyGenerated = false
+
+        if (study.samplingMethod == SamplingMethod.SimpleRandom)
+        {
+            for (enumArea in config.enumAreas)
             {
-                for (enumArea in config.enumAreas)
+                for (location in enumArea.locations)
                 {
-                    if (enumArea.collectionTeams.isNotEmpty())
+                    for (enumerationItem in location.enumerationItems)
                     {
-                        binding.sampleButton.visibility = View.GONE
-                        binding.nextButton.setText( resources.getString( R.string.next ))
+                        if (enumerationItem.samplingState == SamplingState.Sampled)
+                        {
+                            sampleAlreadyGenerated = true
+                            break
+                        }
+                    }
+                    if (sampleHasDuplicates) break
+                }
+                if (sampleHasDuplicates) break
+            }
+        }
+        else if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata)
+        {
+            for (location in enumArea.locations)
+            {
+                for (enumerationItem in location.enumerationItems)
+                {
+                    if (enumerationItem.samplingState == SamplingState.Sampled)
+                    {
+                        sampleAlreadyGenerated = true
                         break
                     }
                 }
-            }
-            else if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata)
-            {
-                if (enumArea.collectionTeams.isNotEmpty())
-                {
-                    binding.sampleButton.visibility = View.GONE
-                    binding.nextButton.setText( resources.getString( R.string.next ))
-                }
-            }
-
-            if (binding.sampleButton.isVisible)
-            {
-                // Clear the sample state from the unsaved enumeration items.
-                // SampleState may be set to Sampled if you generate
-                // a sample, then hit the back button, instead of the next button
-                for (ea in config.enumAreas)
-                {
-                    if (study.samplingMethod == SamplingMethod.SimpleRandom || (study.samplingMethod == SamplingMethod.Cluster && ea.uuid == enumArea.uuid))
-                    {
-                        for (location in ea.locations)
-                        {
-                            for (enumerationItem in location.enumerationItems)
-                            {
-                                enumerationItem.samplingState = SamplingState.NotSampled
-                            }
-                        }
-                    }
-                }
-            }
-
-            binding.nextButton.setOnClickListener {
-                if (binding.nextButton.text == resources.getString( R.string.save ))
-                {
-                    binding.progressOverlayView.visibility = View.VISIBLE
-
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        withContext(Dispatchers.IO) {
-                            DAO.instance().writableDatabase.beginTransaction()
-                            try
-                            {
-                                if (study.samplingMethod == SamplingMethod.SimpleRandom)
-                                {
-                                    for (enumArea in config.enumAreas)
-                                    {
-                                        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea,enumArea.version )
-                                    }
-                                }
-                                else
-                                {
-                                    sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-                                        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, enumArea.version )
-                                    }
-                                }
-
-                                DAO.instance().writableDatabase.setTransactionSuccessful()
-                            }
-                            finally
-                            {
-                                DAO.instance().writableDatabase.endTransaction()
-                            }
-                        }
-
-                        // back on the main thread...
-                        binding.progressOverlayView.visibility = View.GONE
-                        findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
-                    }
-                }
-                else
-                {
-                    findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
-                }
-            }
-
-            if (GeoUtils.isSelfIntersectingPolygon3( enumArea.vertices))
-            {
-                ConfirmationDialog( activity, resources.getString(R.string.oops), resources.getString(R.string.boundary_is_self_intersecting), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                    when( buttonPressed )
-                    {
-                        ConfirmationDialog.ButtonPress.Left -> {
-                        }
-                        ConfirmationDialog.ButtonPress.Right -> {
-                            redefineEnumerationAreaBoundary()
-                        }
-                        ConfirmationDialog.ButtonPress.None -> {
-                        }
-                    }
-                }
-
+                if (sampleHasDuplicates) break
             }
         }
+
+        if (sampleAlreadyGenerated)
+        {
+            binding.generateSampleButton.visibility = View.GONE
+            binding.beginReviewTextView.visibility = View.GONE
+            samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.SampleGeneratedPage )
+        }
+        else
+        {
+            viewLifecycleOwner.lifecycleScope.launch {
+                samplingViewModel.sampleState.collect { state ->
+                    when (state)
+                    {
+                        SamplingViewModel.SampleState.Idle -> {}
+
+                        SamplingViewModel.SampleState.SampleGenerated -> {
+                            binding.progressOverlayView.visibility = View.GONE
+                            samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.SaveSamplePage )
+                            refreshMap()
+                        }
+
+                        SamplingViewModel.SampleState.NoEligibleSamples -> {
+                            binding.progressOverlayView.visibility = View.GONE
+                        }
+                    }
+                }
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                samplingViewModel.samplePageState.collect { state ->
+                    updatePageForState( state )
+                }
+            }
+        }
+
+        binding.backButton.setOnClickListener {
+            handleBackButtonPress()
+        }
+
+        binding.generateSampleButton.setOnClickListener {
+            binding.progressOverlayView.visibility = View.VISIBLE
+
+            samplingViewModel.beginSampling()
+        }
+
+        binding.nextButton.setOnClickListener {
+            handleNextButtonPress()
+        }
+
+        if (GeoUtils.isSelfIntersectingPolygon3( enumArea.vertices))
+        {
+            ConfirmationDialog( activity, resources.getString(R.string.oops), resources.getString(R.string.boundary_is_self_intersecting), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        redefineEnumerationAreaBoundary()
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
+                }
+            }
+        }
+
+        refreshMap()
     }
 
     override fun onResume()
     {
         super.onResume()
+        isHandlingTapEvent = false
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateSampleFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    fun doesSampleHaveDuplicates( enumAreas: ArrayList<EnumArea> ) : Boolean
+    {
+        for (enumArea in enumAreas)
+        {
+            for (location1 in enumArea.locations)
+            {
+                for (location2 in enumArea.locations)
+                {
+                    if (location1 == location2) continue
+                    var distance = GeoUtils.distanceBetween( LatLng( location1.latitude, location1.longitude ), LatLng( location2.latitude, location2.longitude ))
+                    if (config.distanceFormat == DistanceFormat.Feet)
+                    {
+                        distance *= 0.3048
+                    }
+                    if (distance < config.proximityWarningValue)
+                    {
+                        duplicateLocations.add( location1 )
+                    }
+                }
+            }
+        }
+
+        return duplicateLocations.isNotEmpty()
+    }
+
+    fun doesSampleHaveGeofenceViolations( enumAreas: ArrayList<EnumArea> ) : Boolean
+    {
+        for (enumArea in enumAreas)
+        {
+            for (location in enumArea.locations)
+            {
+                val point = Point.fromLngLat( location.longitude, location.latitude, 0.0 )
+                var distance = GeoUtils.distance( point, enumArea )
+
+                if (config.distanceFormat == DistanceFormat.Feet)
+                {
+                    distance *= 0.3048
+                }
+
+                if (distance > config.geofenceBufferValue)
+                {
+                    geofenceViolations.add( location )
+                }
+            }
+        }
+
+        return geofenceViolations.isNotEmpty()
+    }
+
+    fun handleBackButtonPress()
+    {
+        when (samplingViewModel.samplePageState.value)
+        {
+            SamplingViewModel.SamplePageState.PreviewPage -> {
+                findNavController().popBackStack()
+            }
+            SamplingViewModel.SamplePageState.DuplicatePage -> {
+                samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.PreviewPage )
+            }
+            SamplingViewModel.SamplePageState.GeofenceViolationPage -> {
+                if (sampleHasDuplicates)
+                {
+                    samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.DuplicatePage )
+                }
+                else
+                {
+                    samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.PreviewPage )
+                }
+            }
+            SamplingViewModel.SamplePageState.GenerateSamplePage -> {
+                if (sampleHasGeofenceViolations)
+                {
+                    samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.GeofenceViolationPage )
+                }
+                else if (sampleHasDuplicates)
+                {
+                    samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.DuplicatePage )
+                }
+                else
+                {
+                    samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.PreviewPage )
+                }
+            }
+            SamplingViewModel.SamplePageState.SaveSamplePage -> {
+                samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.GenerateSamplePage )
+            }
+            SamplingViewModel.SamplePageState.SampleGeneratedPage -> {
+                findNavController().popBackStack()
+            }
+        }
+    }
+
+    fun handleNextButtonPress()
+    {
+        when (samplingViewModel.samplePageState.value)
+        {
+            SamplingViewModel.SamplePageState.PreviewPage -> {
+                if (sampleHasDuplicates)
+                {
+                    samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.DuplicatePage )
+                }
+                else if (sampleHasGeofenceViolations)
+                {
+                    samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.GeofenceViolationPage )
+                }
+                else
+                {
+                    samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.GenerateSamplePage )
+                }
+            }
+            SamplingViewModel.SamplePageState.DuplicatePage -> {
+                if (sampleHasGeofenceViolations)
+                {
+                    samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.GeofenceViolationPage )
+                }
+                else
+                {
+                    samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.GenerateSamplePage )
+                }
+            }
+            SamplingViewModel.SamplePageState.GeofenceViolationPage -> {
+                samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.GenerateSamplePage )
+            }
+            SamplingViewModel.SamplePageState.GenerateSamplePage -> {
+                samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.SaveSamplePage )
+            }
+            SamplingViewModel.SamplePageState.SaveSamplePage -> {
+                saveSample()
+            }
+            SamplingViewModel.SamplePageState.SampleGeneratedPage -> {
+                findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
+            }
+        }
+    }
+
+    fun updatePageForState( state: SamplingViewModel.SamplePageState )
+    {
+        when (state)
+        {
+            SamplingViewModel.SamplePageState.PreviewPage -> {
+                binding.nextButton.isEnabled = true
+                binding.titleTextView.text = resources.getString( R.string.review_sample )
+                binding.generateSampleButton.visibility = View.GONE
+                binding.beginReviewTextView.visibility = View.VISIBLE
+                binding.backButton.text = resources.getString(R.string.back )
+                binding.nextButton.text = resources.getString(R.string.next )
+                refreshMap()
+            }
+            SamplingViewModel.SamplePageState.DuplicatePage -> {
+                binding.nextButton.isEnabled = true
+                binding.titleTextView.text = resources.getString( R.string.review_possible_duplicates )
+                binding.generateSampleButton.visibility = View.GONE
+                binding.beginReviewTextView.visibility = View.GONE
+                binding.backButton.text = resources.getString(R.string.back )
+                binding.nextButton.text = resources.getString(R.string.next )
+                showMap( duplicateLocations )
+            }
+            SamplingViewModel.SamplePageState.GeofenceViolationPage -> {
+                binding.nextButton.isEnabled = true
+                binding.titleTextView.text = resources.getString( R.string.review_booudary_violations )
+                binding.generateSampleButton.visibility = View.GONE
+                binding.beginReviewTextView.visibility = View.GONE
+                binding.backButton.text = resources.getString(R.string.back )
+                binding.nextButton.text = resources.getString(R.string.next )
+                showMap(geofenceViolations )
+            }
+            SamplingViewModel.SamplePageState.GenerateSamplePage -> {
+                binding.nextButton.isEnabled = false
+                binding.titleTextView.text = resources.getString( R.string.generate_sample )
+                binding.generateSampleButton.visibility = View.VISIBLE
+                binding.beginReviewTextView.visibility = View.GONE
+                binding.backButton.text = resources.getString(R.string.back )
+                binding.nextButton.text = resources.getString(R.string.next )
+                clearSample()
+                refreshMap()
+            }
+            SamplingViewModel.SamplePageState.SaveSamplePage -> {
+                binding.nextButton.isEnabled = true
+                binding.titleTextView.text = resources.getString( R.string.save_sample )
+                binding.generateSampleButton.visibility = View.GONE
+                binding.beginReviewTextView.visibility = View.GONE
+                binding.backButton.text = resources.getString(R.string.back )
+                binding.nextButton.text = resources.getString(R.string.save )
+            }
+            SamplingViewModel.SamplePageState.SampleGeneratedPage -> {
+            }
+        }
+    }
+
+    fun clearSample()
+    {
+        for (ea in config.enumAreas)
+        {
+            if (study.samplingMethod == SamplingMethod.SimpleRandom || ea.uuid == enumArea.uuid)
+            {
+                for (location in ea.locations)
+                {
+                    for (enumerationItem in location.enumerationItems)
+                    {
+                        enumerationItem.samplingState = SamplingState.NotSampled
+                    }
+                }
+            }
+        }
+    }
+
+    fun saveSample()
+    {
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                DAO.instance().writableDatabase.beginTransaction()
+                try
+                {
+                    if (study.samplingMethod == SamplingMethod.SimpleRandom)
+                    {
+                        for (enumArea in config.enumAreas)
+                        {
+                            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea,enumArea.version )
+                        }
+                    }
+                    else
+                    {
+                        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+                            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, enumArea.version )
+                        }
+                    }
+
+                    DAO.instance().writableDatabase.setTransactionSuccessful()
+                }
+                finally
+                {
+                    DAO.instance().writableDatabase.endTransaction()
+                }
+            }
+
+            // back on the main thread...
+            binding.progressOverlayView.visibility = View.GONE
+            findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
+        }
     }
 
     fun refreshMap()
@@ -334,13 +638,18 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
             {
                 if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
-                    var resourceId: Int
-                    var title = ""
+                    val currentPage = samplingViewModel.samplePageState.value
+                    val generateSamplePage = SamplingViewModel.SamplePageState.GenerateSamplePage
+                    val saveSamplePage = SamplingViewModel.SamplePageState.SaveSamplePage
+                    val sampleGeneratedPage = SamplingViewModel.SamplePageState.SampleGeneratedPage
 
-                    if (location.enumerationItems.isNotEmpty())
+                    if (location.enumerationItems.first().isExcluded && (currentPage == generateSamplePage || currentPage == saveSamplePage || currentPage == sampleGeneratedPage))
                     {
-                        title = location.enumerationItems[0].subAddress
+                        continue
                     }
+
+                    var resourceId: Int
+                    val title = location.enumerationItems[0].subAddress
 
                     if (location.enumerationItems.size == 1)
                     {
@@ -382,9 +691,81 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
         }
     }
 
-    fun sampleGenerated()
+    fun showMap( locations: ArrayList<Location> )
     {
-        binding.sampleButton.visibility = View.GONE
+        MapManager.instance().clearMap( mapView!! )
+
+        val points = java.util.ArrayList<Point>()
+        val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+
+        enumArea.vertices.map {
+            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+        }
+
+        pointList.add( points )
+
+        if (pointList.isNotEmpty())
+        {
+            MapManager.instance().createPolygon( mapView!!, pointList, Color.BLACK, 0x40 )
+        }
+
+        val markerProperties = ArrayList<MapManager.MarkerProperty>()
+
+        for (enumArea in config.enumAreas)
+        {
+            if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata)
+            {
+                if (enumArea.uuid != config.selectedEnumAreaUuid)
+                {
+                    continue
+                }
+            }
+
+            for (location in locations)
+            {
+                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                {
+                    var resourceId: Int
+                    val title = location.enumerationItems[0].subAddress
+
+                    if (location.enumerationItems.size == 1)
+                    {
+                        val sampledItem = location.enumerationItems[0]
+
+                        if (sampledItem.enumerationState == EnumerationState.Enumerated)
+                        {
+                            resourceId = R.drawable.home_green
+
+                            if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
+                            {
+                                resourceId = R.drawable.home_light_blue
+                            }
+
+                            markerProperties.add( MapManager.MarkerProperty( location, resourceId, title ))
+                        }
+                    }
+                    else
+                    {
+                        resourceId = R.drawable.multi_home_green
+
+                        for (sampledItem in location.enumerationItems)
+                        {
+                            if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
+                            {
+                                resourceId = R.drawable.multi_home_light_blue
+                            }
+                        }
+
+                        markerProperties.add( MapManager.MarkerProperty( location, resourceId, title ))
+                    }
+                }
+            }
+        }
+
+        if (markerProperties.isNotEmpty())
+        {
+            MapManager.instance().loadMarkers( activity!!, mapView!!, markerProperties, false )
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -407,7 +788,7 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
 
                 val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
                     refreshMap()
                 }
             }
@@ -421,7 +802,7 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
 
                 val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
                     refreshMap()
                 }
             }
@@ -461,27 +842,8 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
         }
     }
 
-    override fun onMarkerTapped( location: Location )
-    {
-    }
-
-    override fun onZoomLevelChanged( zoomLevel: Double )
-    {
-        sharedViewModel.setCurrentZoomLevel( zoomLevel )
-    }
-
     override fun onDestroyView()
     {
-        osmMapListener?.let {
-            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
-            osmMapListener = null
-        }
-
-        samplingViewModel.currentFragment = null
-        samplingViewModel.currentConfig = null
-        samplingViewModel.currentStudy = null
-        samplingViewModel.currentEnumArea = null
-
         mapView = null
         _binding = null
 

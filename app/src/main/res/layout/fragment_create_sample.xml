@@ -41,15 +41,13 @@
                 android:text="@string/create_sample"
                 android:textColor="@color/primary_textcolor"
                 android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_alignParentTop="true" />
+                android:textStyle="bold"/>
 
             <FrameLayout
                 android:id="@+id/sampling_method"
                 android:layout_marginBottom="2dp"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_below="@+id/title">
+                android:layout_height="50dp">
 
                 <TextView
                     android:id="@+id/title_text_view"
@@ -149,29 +147,55 @@
                 </LinearLayout>
             </FrameLayout>
 
+            <TextView
+                android:id="@+id/begin_review_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="@string/begin_sample_review"
+                android:textAlignment="center"
+                android:textSize="22sp" />
+
             <Button
-                android:id="@+id/sample_button"
+                android:id="@+id/generate_sample_button"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_gravity="bottom"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:layout_above="@+id/next_button"
-                android:onClick="@{(v) -> sampleViewModel.beginSampling(v)}"
                 android:text="@string/generate_sample" />
 
-            <Button
-                android:id="@+id/next_button"
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="20dp"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_gravity="bottom"
-                android:layout_margin="20dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:layout_alignParentBottom="true"
-                android:text="@string/save" />
+                android:layout_height="50dp">
+
+                <Button
+                    android:id="@+id/back_button"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="@string/back" />
+
+                <Button
+                    android:id="@+id/next_button"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="20dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="@string/next" />
+            </LinearLayout>
         </LinearLayout>
 
         <FrameLayout

@@ -418,6 +418,14 @@
         tools:layout="@layout/fragment_create_sample">
 
         <action
+            android:id="@+id/action_navigate_to_AddHouseholdFragment"
+            app:destination="@id/AddHouseholdFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_AddMultiHouseholdFragment"
+            app:destination="@id/AddMultiHouseholdFragment"/>
+
+        <action
             android:id="@+id/action_navigate_to_ManageCollectionTeamsFragment"
             app:destination="@id/ManageCollectionTeamsFragment" />
 

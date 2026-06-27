@@ -27,6 +27,9 @@ import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ENUMERA
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ENUMERATION_NOTES
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_EXCLUSION_NOTES
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_EXCLUSION_REASON
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_IS_EXCLUDED
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_SAMPLING_STATE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_SUBSET_SAMPLING_STATE
@@ -100,6 +103,9 @@ class EnumerationItemDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_DATE, enumerationItem.collectionDate )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON, enumerationItem.collectionIncompleteReason )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES, enumerationItem.collectionNotes )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_IS_EXCLUDED, enumerationItem.isExcluded )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_EXCLUSION_REASON, enumerationItem.exclusionReason )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_EXCLUSION_NOTES, enumerationItem.exclusionNotes )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI, enumerationItem.odkRecordUri )
     }
 
@@ -124,6 +130,9 @@ class EnumerationItemDAO(private var dao: DAO)
         val collectionDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_DATE))
         val collectionIncompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON))
         val collectionNotes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES))
+        val isExcluded = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_IS_EXCLUDED)).toBoolean()
+        val exclusionReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_EXCLUSION_REASON))
+        val exclusionNotes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_EXCLUSION_NOTES))
         val odkInstanceUri = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI))
 
         val fieldDataList = ArrayList<FieldData>()
@@ -149,6 +158,9 @@ class EnumerationItemDAO(private var dao: DAO)
             collectionDate,
             collectionIncompleteReason,
             collectionNotes,
+            isExcluded,
+            exclusionReason,
+            exclusionNotes,
             fieldDataList,
             locationUuid,
             odkInstanceUri,
@@ -233,6 +245,9 @@ class EnumerationItemDAO(private var dao: DAO)
             ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_COLLECTION_DATE,"INTEGER",EnumerationItem::collectionDate ),
             ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON,"TEXT",EnumerationItem::collectionIncompleteReason ),
             ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES,"TEXT",EnumerationItem::collectionNotes ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_IS_EXCLUDED,"INTEGER",EnumerationItem::isExcluded ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_EXCLUSION_REASON,"TEXT",EnumerationItem::exclusionReason ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_EXCLUSION_NOTES,"TEXT",EnumerationItem::exclusionNotes ),
             ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI,"TEXT",EnumerationItem::odkRecordUri ),
         )
     }

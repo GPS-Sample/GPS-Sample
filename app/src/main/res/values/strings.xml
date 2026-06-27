@@ -492,6 +492,19 @@
     <string name="enter_the_geofence_buffer_value">Enter the geofence buffer value</string>
     <string name="geofence_hint">"Placeholder for GeoFence Hint"</string>
     <string name="geofence_error">"You are currently outside of the Geofence"</string>
+    <string name="begin_sample_review">Begin Sample Review</string>
+    <string name="review_sample">Review Sample</string>
+    <string name="review_possible_duplicates">Review Possible Duplicates</string>
+    <string name="review_booudary_violations">Review Boundary Violations</string>
+    <string name="save_sample">Save Sample</string>
+    <string name="duplicate">Duplicate</string>
+    <string name="outside_boundary">Outside Boundary</string>
+    <string name="reason_is_rquired">You must select a Reason for the exclusion.</string>
+    <string name="location">Location</string>
+    <string name="keep_or_exclude_this_location">Keep or Exclude this location?</string>
+    <string name="keep_this_location">Keep this location</string>
+    <string name="exclude_this_location">Exclude this location</string>
+    <string name="reason">Reason</string>
 
     <string-array name="collection_apps">
         <item>"ODK Collect"</item>

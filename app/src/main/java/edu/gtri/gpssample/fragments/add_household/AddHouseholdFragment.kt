@@ -53,7 +53,6 @@ class AddHouseholdFragment : Fragment(),
     private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
-
     private var editMode = true
     private var collectionMode = false
     private var isMultiHousehold = false

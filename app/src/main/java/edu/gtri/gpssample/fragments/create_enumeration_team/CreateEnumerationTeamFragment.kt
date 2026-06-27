@@ -23,6 +23,9 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.mapbox.geojson.Point
 import com.mapbox.maps.Style
@@ -37,21 +40,19 @@ import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import kotlinx.coroutines.launch
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import org.osmdroid.events.MapListener
 import java.util.*
 
-class CreateEnumerationTeamFragment : Fragment(),
-    OnTouchListener,
-    MapManager.MapManagerDelegate
+class CreateEnumerationTeamFragment : Fragment(), OnTouchListener
 {
     private lateinit var study: Study
     private lateinit var mapView: View
     private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private lateinit var sharedViewModel : ConfigurationViewModel
-    private var osmMapListener: MapListener? = null
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
     private val binding get() = _binding!!
     private var createMode = false
@@ -88,8 +89,6 @@ class CreateEnumerationTeamFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
-
         sharedViewModel.currentConfiguration?.value?.let { _config ->
             config = _config
         }
@@ -109,13 +108,31 @@ class CreateEnumerationTeamFragment : Fragment(),
 
         val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
             this.mapView = mapView
 
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
 
             sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                 MapManager.instance().centerMap( enumArea, currentZoomLevel, mapView )
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    val mapManager = MapManager.instance()
+
+                    launch {
+                        mapManager.zoomLevel.collect { zoomLevel ->
+                            sharedViewModel.setCurrentZoomLevel(zoomLevel)
+                        }
+                    }
+
+                    launch {
+                        mapManager.markerTapped.collect { location ->
+                            // Handle tap
+                        }
+                    }
+                }
             }
 
             refreshMap()
@@ -487,7 +504,7 @@ class CreateEnumerationTeamFragment : Fragment(),
 
                 val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
                     refreshMap()
                 }
             }
@@ -501,7 +518,7 @@ class CreateEnumerationTeamFragment : Fragment(),
 
                 val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
                     refreshMap()
                 }
             }
@@ -510,22 +527,8 @@ class CreateEnumerationTeamFragment : Fragment(),
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onMarkerTapped( location: Location )
-    {
-    }
-
-    override fun onZoomLevelChanged( zoomLevel: Double )
-    {
-        sharedViewModel.setCurrentZoomLevel( zoomLevel )
-    }
-
     override fun onDestroyView()
     {
-        osmMapListener?.let {
-            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
-            osmMapListener = null
-        }
-
         _binding = null
 
         super.onDestroyView()

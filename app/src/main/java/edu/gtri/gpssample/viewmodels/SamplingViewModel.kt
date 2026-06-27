@@ -19,7 +19,11 @@ import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.fragments.createsample.CreateSampleFragment
+import edu.gtri.gpssample.managers.NearbySessionState
 import edu.gtri.gpssample.utils.DateUtils
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.lang.Integer.min
 import java.util.*
 import kotlin.math.roundToInt
@@ -34,7 +38,27 @@ class SamplingViewModel : ViewModel()
     private val _refreshMap = MutableLiveData<Unit>()
     val refreshMap: LiveData<Unit> = _refreshMap
 
-    var currentFragment : Fragment? = null
+    sealed interface SampleState
+    {
+        object Idle : SampleState
+        object NoEligibleSamples : SampleState
+        object SampleGenerated : SampleState
+    }
+
+    sealed interface SamplePageState
+    {
+        object PreviewPage : SamplePageState
+        object DuplicatePage : SamplePageState
+        object GeofenceViolationPage : SamplePageState
+        object GenerateSamplePage : SamplePageState
+        object SaveSamplePage : SamplePageState
+        object SampleGeneratedPage : SamplePageState
+    }
+
+    private val _sampleState = MutableStateFlow<SampleState>(SampleState.Idle )
+    val sampleState: StateFlow<SampleState> = _sampleState.asStateFlow()
+    private val _samplePageState = MutableStateFlow<SamplePageState>(SamplePageState.PreviewPage )
+    val samplePageState: StateFlow<SamplePageState> = _samplePageState.asStateFlow()
 
     var currentConfig : LiveData<Config>?
         get(){
@@ -61,6 +85,16 @@ class SamplingViewModel : ViewModel()
         }
 
     val fieldCache = HashMap<String, Field>()
+
+    fun setSampleState( state: SampleState )
+    {
+        _sampleState.value = state
+    }
+
+    fun setSamplePageState( state: SamplePageState )
+    {
+        _samplePageState.value = state
+    }
 
     fun loadFieldCache()
     {
@@ -308,22 +342,10 @@ class SamplingViewModel : ViewModel()
         return validRule
     }
 
-    fun beginSampling(view : View)
+    fun beginSampling()
     {
-        val fragment = currentFragment as? CreateSampleFragment
-        fragment?.binding?.progressOverlayView?.visibility = View.VISIBLE
+        _sampleState.value = SampleState.Idle
 
-        Thread {
-            handleBeginSampling( view )
-            currentFragment?.requireActivity()?.runOnUiThread {
-                _refreshMap.value = Unit
-                fragment?.binding?.progressOverlayView?.visibility = View.GONE
-            }
-        }.start()
-    }
-
-    fun handleBeginSampling(view : View)
-    {
         loadFieldCache()
 
         currentStudy?.value?.let { study ->
@@ -342,7 +364,7 @@ class SamplingViewModel : ViewModel()
                                 {
                                     for (enumerationItem in location.enumerationItems)
                                     {
-                                        if (!_currentSampledItemsForSampling.contains(enumerationItem))
+                                        if (!enumerationItem.isExcluded && !_currentSampledItemsForSampling.contains(enumerationItem))
                                         {
                                             _currentSampledItemsForSampling.add(enumerationItem)
                                         }
@@ -480,12 +502,7 @@ class SamplingViewModel : ViewModel()
 
             if (sampleSize == 0)
             {
-                currentFragment?.requireActivity()?.runOnUiThread {
-                    val fragment = currentFragment as? CreateSampleFragment
-                    fragment?.let { fragment ->
-                        Toast.makeText( fragment.activity!!.applicationContext, "${fragment.activity!!.getString(R.string.no_eligible_households)}", Toast.LENGTH_SHORT).show()
-                    }
-                }
+                _sampleState.value = SampleState.NoEligibleSamples
             }
             else
             {
@@ -505,10 +522,7 @@ class SamplingViewModel : ViewModel()
                     validSamples[rnds].version = UUID.randomUUID().toString()
                 }
 
-                currentFragment?.requireActivity()?.runOnUiThread {
-                    val fragment = currentFragment as? CreateSampleFragment
-                    fragment?.sampleGenerated()
-                }
+                _sampleState.value = SampleState.SampleGenerated
             }
         }
     }
@@ -645,10 +659,7 @@ class SamplingViewModel : ViewModel()
                     validSamples[rnds].subsetSamplingState = SamplingState.Sampled
                 }
 
-                currentFragment?.requireActivity()?.runOnUiThread {
-                    val fragment = currentFragment as? CreateSampleFragment
-                    fragment?.sampleGenerated()
-                }
+                _sampleState.value = SampleState.SampleGenerated
             }
         }
     }
@@ -665,7 +676,7 @@ class SamplingViewModel : ViewModel()
                 {
                     for (sampledItem in location.enumerationItems)
                     {
-                        if(!_currentSampledItemsForSampling.contains(sampledItem))
+                        if(!sampledItem.isExcluded && !_currentSampledItemsForSampling.contains(sampledItem))
                         {
                             _currentSampledItemsForSampling.add(sampledItem)
                         }
@@ -692,7 +703,7 @@ class SamplingViewModel : ViewModel()
                 {
                     for (sampledItem in location.enumerationItems)
                     {
-                        if(!_currentSampledItemsForSampling.contains(sampledItem))
+                        if(!sampledItem.isExcluded && !_currentSampledItemsForSampling.contains(sampledItem))
                         {
                             _currentSampledItemsForSampling.add(sampledItem)
                         }

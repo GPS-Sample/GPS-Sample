@@ -29,6 +29,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -50,20 +53,17 @@ import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import kotlinx.coroutines.launch
 import org.osmdroid.events.MapListener
 import java.util.*
 
-class WalkEnumerationAreaFragment : Fragment(),
-    View.OnTouchListener,
-    MapManager.MapManagerDelegate
+class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
 {
     private lateinit var mapView: View
     private lateinit var config: Config
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var defaultColorList : ColorStateList
     private lateinit var fusedLocationClient : FusedLocationProviderClient
-
-    private var osmMapListener: MapListener? = null
     private var inputDialog: InputDialog? = null
     private var isRecording = false
     private val binding get() = _binding!!
@@ -93,8 +93,6 @@ class WalkEnumerationAreaFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-
-        osmMapListener = MapManager.instance().createOsmMapListener( binding.osmMapView, binding.northUpImageView )
 
         binding.apply {
             // Specify the fragment as the lifecycle owner
@@ -139,7 +137,7 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom,this ) { mapView ->
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom ) { mapView ->
             this.mapView = mapView
 
             MapManager.instance().enableLocationUpdates( activity!!, mapView )
@@ -173,6 +171,24 @@ class WalkEnumerationAreaFragment : Fragment(),
 //                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
 //                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
 //                }
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    val mapManager = MapManager.instance()
+
+                    launch {
+                        mapManager.zoomLevel.collect { zoomLevel ->
+                            sharedViewModel.setCurrentZoomLevel(zoomLevel)
+                        }
+                    }
+
+                    launch {
+                        mapManager.markerTapped.collect { location ->
+                            // Handle tap
+                        }
+                    }
+                }
             }
 
             refreshMap()
@@ -614,7 +630,7 @@ class WalkEnumerationAreaFragment : Fragment(),
 
                 val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom,this ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom ) { mapView ->
                     refreshMap()
                 }
             }
@@ -628,7 +644,7 @@ class WalkEnumerationAreaFragment : Fragment(),
 
                 val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom,this ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom ) { mapView ->
                     refreshMap()
                 }
             }
@@ -663,22 +679,8 @@ class WalkEnumerationAreaFragment : Fragment(),
         }
     }
 
-    override fun onMarkerTapped( location: Location )
-    {
-    }
-
-    override fun onZoomLevelChanged( zoomLevel: Double )
-    {
-        sharedViewModel.setCurrentZoomLevel( zoomLevel )
-    }
-
     override fun onDestroyView()
     {
-        osmMapListener?.let {
-            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
-            osmMapListener = null
-        }
-
         fusedLocationClient.removeLocationUpdates( locationCallback )
 
         _binding = null

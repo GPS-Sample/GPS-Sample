@@ -900,6 +900,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_ENUMERATION_ITEM_COLLECTION_DATE = "enumeration_item_collection_date"
         const val COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON = "enumeration_item_collection_incomplete_reason"
         const val COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES = "enumeration_item_collection_notes"
+        const val COLUMN_ENUMERATION_ITEM_IS_EXCLUDED = "enumeration_item_is_excluded"
+        const val COLUMN_ENUMERATION_ITEM_EXCLUSION_REASON = "enumeration_item_exclusion_reason"
+        const val COLUMN_ENUMERATION_ITEM_EXCLUSION_NOTES = "enumeration_item_exclusion_notes"
         const val COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI = "enumeration_item_odk_record_uri"
 
         const val TABLE_FIELD_DATA = "field_data"
@@ -1094,6 +1097,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             Log.d( "xxx", msg )
         }
 
-        const val DATABASE_VERSION = 324
+        const val DATABASE_VERSION = 325
     }
 }
