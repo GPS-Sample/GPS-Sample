@@ -58,8 +58,6 @@ class MapFragment : Fragment(),
 {
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
-
-    private var osmMapListener: MapListener? = null
     private lateinit var mapView: View
     private var centerOnLocation = true
     private var defineMapRegion = false
@@ -511,11 +509,6 @@ class MapFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        osmMapListener?.let {
-            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
-            osmMapListener = null
-        }
-
         _binding = null
 
         super.onDestroyView()

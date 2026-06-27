@@ -71,7 +71,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
     private var nearbySessionHostManager: NearbySessionHostManager? = null
     private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private var nearbySessionClientManager: NearbySessionClientManager? = null
-    private var osmMapListener: MapListener? = null
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
     private var includeConfig = false
@@ -743,11 +742,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
     override fun onDestroyView()
     {
         binding.mapOverlayView.setOnTouchListener(null)
-
-        osmMapListener?.let {
-            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
-            osmMapListener = null
-        }
 
         nearbySessionStatusDialog?.dismiss()
         nearbySessionStatusDialog = null

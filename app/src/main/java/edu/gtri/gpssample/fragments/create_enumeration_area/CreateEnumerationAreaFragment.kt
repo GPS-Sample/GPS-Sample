@@ -87,8 +87,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     private lateinit var mapboxManager: MapboxManager
     private lateinit var defaultColorList : ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
-
-    private var osmMapListener: MapListener? = null
     private var editMode = false
     private val binding get() = _binding!!
     private var showCurrentLocation = false
@@ -1555,11 +1553,6 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        osmMapListener?.let {
-            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
-            osmMapListener = null
-        }
-
         binding.mapboxMapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapboxMapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
         binding.mapboxMapView.gestures.removeOnMoveListener(onMoveListener)

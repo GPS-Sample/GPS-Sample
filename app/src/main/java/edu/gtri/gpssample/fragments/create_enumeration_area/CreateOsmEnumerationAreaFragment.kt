@@ -76,8 +76,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     private lateinit var config: Config
     private lateinit var defaultColorList : ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
-
-    private var osmMapListener: MapListener? = null
     private var editMode = false
     private var radius: Double = 0.0
     private val binding get() = _binding!!
@@ -1530,11 +1528,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        osmMapListener?.let {
-            MapManager.instance().onFragmentDestroyed( binding.osmMapView, it )
-            osmMapListener = null
-        }
-
         _binding = null
 
         super.onDestroyView()

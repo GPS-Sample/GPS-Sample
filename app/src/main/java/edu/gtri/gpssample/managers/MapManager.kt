@@ -137,29 +137,29 @@ import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
+import java.lang.ref.WeakReference
 import java.util.concurrent.atomic.AtomicInteger
 
 class MapManager
 {
-    private val _markerTapped = MutableSharedFlow<Location>( extraBufferCapacity = 1 )
-    val markerTapped = _markerTapped.asSharedFlow()
-
-    private val _zoomLevel = MutableStateFlow(0.0)
-    val zoomLevel = _zoomLevel.asStateFlow()
-
     class MapboxPolygon
     {
         var polygonAnnotation: PolygonAnnotation? = null
         var polylineAnnotation: PolylineAnnotation? = null
     }
 
+    private val _markerTapped = MutableSharedFlow<Location>( extraBufferCapacity = 1 )
+    val markerTapped = _markerTapped.asSharedFlow()
+
+    private val _zoomLevel = MutableStateFlow(0.0)
+    val zoomLevel = _zoomLevel.asStateFlow()
+
     private val MIN_ZOOM = 8
     private val MAX_ZOOM = 18
-
-    var mapboxBreadcrumbAnnotationManager: PointAnnotationManager? = null
-    var mapboxPointAnnotationManager: PointAnnotationManager? = null
-    var mapboxPolygonAnnotationManager: PolygonAnnotationManager? = null
-    var mapboxPolylineAnnotationManager: PolylineAnnotationManager?= null
+    private var mapboxBreadcrumbAnnotationManager: PointAnnotationManager? = null
+    private var mapboxPointAnnotationManager: PointAnnotationManager? = null
+    private var mapboxPolygonAnnotationManager: PolygonAnnotationManager? = null
+    private var mapboxPolylineAnnotationManager: PolylineAnnotationManager?= null
 
     // public functions
 
@@ -496,6 +496,9 @@ class MapManager
 
     fun createMapboxPointAnnotationManager( mapView: MapView )
     {
+        mapboxPointAnnotationManager?.deleteAll()
+        mapboxPointAnnotationManager = null
+
         mapboxPointAnnotationManager = mapView.annotations.createPointAnnotationManager(
             AnnotationConfig(layerId = "markers")
         )
@@ -525,6 +528,9 @@ class MapManager
 
     fun createMapboxBreadcrumbAnnotationManager( mapView: MapView )
     {
+        mapboxBreadcrumbAnnotationManager?.deleteAll()
+        mapboxBreadcrumbAnnotationManager = null
+
         mapboxBreadcrumbAnnotationManager = mapView.annotations.createPointAnnotationManager(
             AnnotationConfig(layerId = "breadcrumbs")
         )
@@ -532,11 +538,17 @@ class MapManager
 
     fun createMapboxPolylineAnnotationManager( mapView: MapView )
     {
+        mapboxPolylineAnnotationManager?.deleteAll()
+        mapboxPolylineAnnotationManager = null
+
         mapboxPolylineAnnotationManager = mapView.annotations.createPolylineAnnotationManager(AnnotationConfig(layerId = "polylines"))
     }
 
     fun createMapboxPolygonAnnotationManager( mapView: MapView )
     {
+        mapboxPolygonAnnotationManager?.deleteAll()
+        mapboxPolygonAnnotationManager = null
+
         mapboxPolygonAnnotationManager = mapView.annotations.createPolygonAnnotationManager(AnnotationConfig(layerId = "polygons"))
     }
 
@@ -761,9 +773,7 @@ class MapManager
     {
         if (mapView is org.osmdroid.views.MapView)
         {
-            val x = (polyline as Polyline).points
             (polyline as Polyline).addPoint( GeoPoint( point.latitude(), point.longitude()))
-            val y = (polyline as Polyline).points
             mapView.invalidate()
         }
         else if (mapView is com.mapbox.maps.MapView)
@@ -1195,7 +1205,7 @@ class MapManager
             mapView.gestures.addOnMapClickListener { point ->
 
                 currentPopup?.let {
-                    currentPopup!!.visibility = View.GONE
+                    currentPopup?.get()?.visibility = View.GONE
                     currentPopup = null
                 }
 
@@ -1247,7 +1257,7 @@ class MapManager
 
                                     showHHPopup( mapView, screen, title, isHH && showDetailButton )
                                     {
-                                        currentPopup!!.visibility = View.GONE
+                                        currentPopup?.get()?.visibility = View.GONE
                                         currentPopup = null
                                         DAO.locationDAO.getLocation(locationUuid)?.let {
                                             _markerTapped.tryEmit(it )
@@ -1269,7 +1279,7 @@ class MapManager
         }
     }
 
-    private var currentPopup : View? = null
+    private var currentPopup : WeakReference<View>? = null
 
     fun showHHPopup( mapView: MapView, screenPoint: ScreenCoordinate, title: String, showDetailButton: Boolean, onNavigate: () -> Unit)
     {
@@ -1277,7 +1287,7 @@ class MapManager
             val textView = popup.findViewById<TextView>(R.id.title)
             val button = popup.findViewById<Button>(R.id.details_button)
 
-            currentPopup = popup
+            currentPopup = WeakReference(popup )
             textView.text = title
 
             if (!showDetailButton) {
@@ -1461,10 +1471,7 @@ class MapManager
         {
             val constantState = sourceDrawable.constantState ?: return null
             val drawable = constantState.newDrawable().mutate()
-            val bitmap: Bitmap = Bitmap.createBitmap(
-                drawable.intrinsicWidth, drawable.intrinsicHeight,
-                Bitmap.Config.ARGB_8888
-            )
+            val bitmap: Bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
             drawable.setBounds(0, 0, canvas.width, canvas.height)
             drawable.draw(canvas)
@@ -1637,21 +1644,6 @@ class MapManager
     {
         fun tilePacksLoaded( error: String )
         fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
-    }
-
-    fun onFragmentDestroyed( mapView: org.osmdroid.views.MapView, mapListener: MapListener )
-    {
-//        delegate = null
-
-        mapboxPolygonAnnotationManager?.deleteAll()
-        mapboxPolylineAnnotationManager?.deleteAll()
-        mapboxPointAnnotationManager?.deleteAll()
-        mapboxBreadcrumbAnnotationManager?.deleteAll()
-
-        mapboxPolygonAnnotationManager = null
-        mapboxPolylineAnnotationManager = null
-        mapboxPointAnnotationManager = null
-        mapboxBreadcrumbAnnotationManager = null
     }
 
     companion object
