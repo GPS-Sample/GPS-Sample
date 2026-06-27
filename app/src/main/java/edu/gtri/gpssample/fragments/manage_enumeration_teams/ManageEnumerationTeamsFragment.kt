@@ -107,6 +107,15 @@ class ManageEnumerationTeamsFragment : Fragment()
         enumArea.selectedEnumerationTeamUuid = enumerationTeam.uuid
         sharedViewModel.currentEnumerationTeamUuid = enumerationTeam.uuid
 
+        enumArea.locations.clear()
+
+        for (uuid in enumerationTeam.locationUuids)
+        {
+            DAO.locationDAO.getLocation( uuid )?.let {
+                enumArea.locations.add( it )
+            }
+        }
+
         findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
     }
 

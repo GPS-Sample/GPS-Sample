@@ -195,12 +195,8 @@ class PerformCollectionFragment : Fragment(),
         }
 
         enumArea.collectionTeams.find { it.uuid == sharedViewModel.currentCollectionTeamUuid }?.let { collectionTeam ->
-            this@PerformCollectionFragment.collectionTeam = collectionTeam
+            this.collectionTeam = collectionTeam
         }
-
-//        DAO.collectionTeamDAO.getCollectionTeam( enumArea.selectedCollectionTeamUuid )?.let {
-//            collectionTeam = it
-//        }
 
         sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
             if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
@@ -264,7 +260,7 @@ class PerformCollectionFragment : Fragment(),
         performCollectionAdapter = PerformCollectionAdapter( ArrayList<EnumerationItem>(), ArrayList<Location>(), enumArea.name )
         performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
 
-        performCollectionAdapter.didSelectItem = this@PerformCollectionFragment::didSelectItem
+        performCollectionAdapter.didSelectItem = this::didSelectItem
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = performCollectionAdapter
@@ -411,7 +407,7 @@ class PerformCollectionFragment : Fragment(),
             views.add( showView.toString())
         }
 
-        binding.showSpinner.adapter = ArrayAdapter<String>(this@PerformCollectionFragment.requireContext(), android.R.layout.simple_spinner_dropdown_item, views )
+        binding.showSpinner.adapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, views )
 
         binding.showSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
         {

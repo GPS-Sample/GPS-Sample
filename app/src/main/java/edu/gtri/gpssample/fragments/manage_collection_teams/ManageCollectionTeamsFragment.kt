@@ -124,6 +124,15 @@ class ManageCollectionTeamsFragment : Fragment()
         enumArea.selectedCollectionTeamUuid = collectionTeam.uuid
         sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
 
+        enumArea.locations.clear()
+
+        for (uuid in collectionTeam.locationUuids)
+        {
+            DAO.locationDAO.getLocation( uuid )?.let {
+                enumArea.locations.add( it )
+            }
+        }
+
         findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
     }
 
