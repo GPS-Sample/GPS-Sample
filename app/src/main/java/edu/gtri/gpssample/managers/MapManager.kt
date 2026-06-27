@@ -152,7 +152,7 @@ class MapManager
     private val _markerTapped = MutableSharedFlow<Location>( extraBufferCapacity = 1 )
     val markerTapped = _markerTapped.asSharedFlow()
 
-    private val _zoomLevel = MutableStateFlow(0.0)
+    private val _zoomLevel = MutableStateFlow(16.0)
     val zoomLevel = _zoomLevel.asStateFlow()
 
     private val MIN_ZOOM = 8
