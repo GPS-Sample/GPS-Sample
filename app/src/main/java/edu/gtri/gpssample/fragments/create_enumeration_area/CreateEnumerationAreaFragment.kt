@@ -341,6 +341,8 @@ class CreateEnumerationAreaFragment : Fragment(),
             else if (currentTapType == TapType.CreateEnumAreaBoundary)
             {
                 currentTapType = TapType.None
+                binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
+                binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
 
                 if (droppedPointAnnotations.size > 2)
                 {
@@ -353,8 +355,6 @@ class CreateEnumerationAreaFragment : Fragment(),
                         }
 
                         droppedPointAnnotations.clear()
-                        binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
-                        binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
 
                         Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_SHORT).show()
                     }
@@ -387,8 +387,6 @@ class CreateEnumerationAreaFragment : Fragment(),
                     }
 
                     droppedPointAnnotations.clear()
-                    binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
-                    binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
                 }
             }
         }
