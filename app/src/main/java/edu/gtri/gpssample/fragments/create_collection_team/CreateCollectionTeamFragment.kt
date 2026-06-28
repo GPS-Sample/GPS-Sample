@@ -114,34 +114,12 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
             TileServer.startServer( enumArea.mbTilesPath )
         }
 
-        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-        MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
+        MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
             this.mapView = mapView
 
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
 
-            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                MapManager.instance().centerMap( enumArea, currentZoomLevel, mapView )
-            }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    val mapManager = MapManager.instance()
-
-                    launch {
-                        mapManager.zoomLevel.collect { zoomLevel ->
-                            sharedViewModel.setCurrentZoomLevel(zoomLevel)
-                        }
-                    }
-
-                    launch {
-                        mapManager.markerTapped.collect { location ->
-                            // Handle tap
-                        }
-                    }
-                }
-            }
+            MapManager.instance().centerMap( enumArea, mapView )
 
             refreshMap()
         }
@@ -554,9 +532,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }
@@ -568,9 +544,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }

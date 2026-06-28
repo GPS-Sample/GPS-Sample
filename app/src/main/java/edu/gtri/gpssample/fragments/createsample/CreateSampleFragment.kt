@@ -125,19 +125,17 @@ class CreateSampleFragment : Fragment()
             this.enumArea = enumArea
         }
 
-        sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-            if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
-            {
-                binding.osmMapView.visibility = View.VISIBLE
-                binding.mapboxMapView.visibility = View.GONE
-                MapManager.instance().centerMap(enumArea.vertices, currentZoomLevel, binding.osmMapView )
-            }
-            else
-            {
-                binding.osmMapView.visibility = View.GONE
-                binding.mapboxMapView.visibility = View.VISIBLE
-                MapManager.instance().centerMap(enumArea.vertices, currentZoomLevel, binding.mapboxMapView )
-            }
+        if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
+        {
+            binding.osmMapView.visibility = View.VISIBLE
+            binding.mapboxMapView.visibility = View.GONE
+            MapManager.instance().centerMap(enumArea.vertices, binding.osmMapView )
+        }
+        else
+        {
+            binding.osmMapView.visibility = View.GONE
+            binding.mapboxMapView.visibility = View.VISIBLE
+            MapManager.instance().centerMap(enumArea.vertices, binding.mapboxMapView )
         }
 
         binding.progressOverlayView.visibility = View.VISIBLE
@@ -188,17 +186,12 @@ class CreateSampleFragment : Fragment()
             samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.SampleGeneratedPage )
         }
 
-        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
-            this@CreateSampleFragment.mapView = mapView
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+            this.mapView = mapView
 
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
 
-            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                MapManager.instance().centerMap( enumArea.vertices, currentZoomLevel, mapView )
-            }
-
+            MapManager.instance().centerMap( enumArea.vertices, mapView )
 
             samplingViewModel.refreshMap.observe(viewLifecycleOwner)
             {
@@ -236,12 +229,6 @@ class CreateSampleFragment : Fragment()
                     }
 
                     val mapManager = MapManager.instance()
-
-                    launch {
-                        mapManager.zoomLevel.collect { zoomLevel ->
-                            sharedViewModel.setCurrentZoomLevel(zoomLevel)
-                        }
-                    }
 
                     launch {
                         mapManager.markerTapped.collect { location ->
@@ -825,9 +812,7 @@ class CreateSampleFragment : Fragment()
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }
@@ -839,9 +824,7 @@ class CreateSampleFragment : Fragment()
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }

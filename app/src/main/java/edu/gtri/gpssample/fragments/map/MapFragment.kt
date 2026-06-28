@@ -96,9 +96,7 @@ class MapFragment : Fragment(),
         binding.northUpImageView.visibility = View.GONE
         binding.mapboxMapView.visibility = View.VISIBLE
 
-        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-        MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null, zoom ) { mapView ->
+        MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null ) { mapView ->
             this.mapView = mapView
 
             if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
@@ -109,12 +107,10 @@ class MapFragment : Fragment(),
                     if (location != null)
                     {
                         val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
-                        sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                            MapManager.instance().centerMap( point, currentZoomLevel, mapView )
-                            MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                            MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                            binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                        }
+                        MapManager.instance().centerMap( point, mapView )
+                        MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                     }
                 }
             }
@@ -328,9 +324,7 @@ class MapFragment : Fragment(),
 
                 if (binding.mapboxMapView.visibility == View.VISIBLE)
                 {
-                    val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null, zoom ) { mapView ->
+                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null ) { mapView ->
                         this.mapView = mapView
                         if (centerOnLocation)
                         {
@@ -356,12 +350,10 @@ class MapFragment : Fragment(),
                                     if (location != null)
                                     {
                                         val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
-                                        sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                                            MapManager.instance().centerMap( point, currentZoomLevel, mapView )
-                                            MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                                            MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                                            binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                                        }
+                                        MapManager.instance().centerMap( point, mapView )
+                                        MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                                        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                                     }
                                 }
                             }
@@ -378,9 +370,7 @@ class MapFragment : Fragment(),
 
                 if (binding.mapboxMapView.visibility == View.VISIBLE)
                 {
-                    val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null, zoom ) { mapView ->
+                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null ) { mapView ->
                         this.mapView = mapView
                         if (centerOnLocation)
                         {
@@ -406,12 +396,10 @@ class MapFragment : Fragment(),
                                     if (location != null)
                                     {
                                         val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
-                                        sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                                            MapManager.instance().centerMap( point, currentZoomLevel, mapView )
-                                            MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                                            MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                                            binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                                        }
+                                        MapManager.instance().centerMap( point, mapView )
+                                        MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                                        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                                     }
                                 }
                             }
@@ -456,12 +444,10 @@ class MapFragment : Fragment(),
                                 if (location != null)
                                 {
                                     val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
-                                    sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                                        MapManager.instance().centerMap( point, currentZoomLevel, mapView )
-                                        MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                                        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                                    }
+                                    MapManager.instance().centerMap( point, mapView )
+                                    MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                                    binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                                 }
                             }
                         }
@@ -472,15 +458,12 @@ class MapFragment : Fragment(),
                     binding.osmMapView.visibility = View.GONE
                     binding.northUpImageView.visibility = View.GONE
                     binding.mapboxMapView.visibility = View.VISIBLE
-                    val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null, zoom ) { mapView ->
+                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null ) { mapView ->
                         this.mapView = mapView
                         MapManager.instance().enableLocationUpdates( activity!!, mapView )
                         MapManager.instance().startCenteringOnLocation( activity!!, mapView )
                         binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                        sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                            MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
-                        }
+                        MapManager.instance().setMapZoomLevel( mapView, MapManager.zoomLevel())
                     }
                 }
                 ConfirmationDialog.ButtonPress.None -> {

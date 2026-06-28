@@ -66,30 +66,7 @@ class ConfigurationViewModel : ViewModel()
     val minimumGpsPrecisionFormats = arrayOf( "", "" )
 
     private var _centerOnCurrentLocation : MutableLiveData<Boolean>? = null
-
-    private var _currentCenterPoint : MutableLiveData<Point>? = null
-    private var _currentZoomLevel : MutableLiveData<Double>? = null
-
-    var currentZoomLevel : LiveData<Double>? = _currentZoomLevel
-    var currentCenterPoint : LiveData<Point>? = _currentCenterPoint
     var centerOnCurrentLocation : LiveData<Boolean>? = _centerOnCurrentLocation
-
-    fun setCurrentZoomLevel( zoomLevel: Double )
-    {
-        _currentZoomLevel = MutableLiveData(zoomLevel)
-        currentZoomLevel = _currentZoomLevel
-
-        val sharedPreferences: SharedPreferences = MainApplication.getContext().getSharedPreferences("default", 0)
-        val editor = sharedPreferences.edit()
-        editor.putInt(Keys.kZoomLevel.value, zoomLevel.toInt())
-        editor.commit()
-    }
-
-    fun setCurrentCenterPoint( point: Point? )
-    {
-        _currentCenterPoint = MutableLiveData(point)
-        currentCenterPoint = _currentCenterPoint
-    }
 
     fun setCenterOnCurrentLocation( value: Boolean )
     {

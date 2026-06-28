@@ -87,6 +87,7 @@ class PerformEnumerationFragment : Fragment(),
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
     private lateinit var mapboxMapClickListener: OnMapClickListener
+    private var lastCenterPoint: Point? = null
     private var isHandlingTapEvent = false
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
@@ -111,8 +112,6 @@ class PerformEnumerationFragment : Fragment(),
 
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
-
-        sharedViewModel.setCurrentCenterPoint( null )
 
         setHasOptionsMenu(true)
     }
@@ -155,31 +154,22 @@ class PerformEnumerationFragment : Fragment(),
             this.enumerationTeam = enumerationTeam
         }
 
-        sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-            if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
-            {
-                binding.osmMapView.visibility = View.VISIBLE
-                binding.mapboxMapView.visibility = View.GONE
-                MapManager.instance().centerMap( enumerationTeam.polygon, currentZoomLevel, binding.osmMapView )
-            }
-            else
-            {
-                binding.osmMapView.visibility = View.GONE
-                binding.mapboxMapView.visibility = View.VISIBLE
-                MapManager.instance().centerMap( enumerationTeam.polygon, currentZoomLevel, binding.mapboxMapView )
-            }
+        if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
+        {
+            binding.osmMapView.visibility = View.VISIBLE
+            binding.mapboxMapView.visibility = View.GONE
+            MapManager.instance().centerMap( enumerationTeam.polygon, binding.osmMapView )
+        }
+        else
+        {
+            binding.osmMapView.visibility = View.GONE
+            binding.mapboxMapView.visibility = View.VISIBLE
+            MapManager.instance().centerMap( enumerationTeam.polygon, binding.mapboxMapView )
         }
 
         binding.progressOverlayView.visibility = View.VISIBLE
 
         binding.progressOverlayView.visibility = View.GONE
-
-        if (sharedViewModel.currentCenterPoint?.value == null)
-        {
-            val latLngBounds = GeoUtils.findGeobounds(enumerationTeam.polygon)
-            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-            sharedViewModel.setCurrentCenterPoint( point )
-        }
 
         enumerationTeamLocations.clear()
 
@@ -232,17 +222,17 @@ class PerformEnumerationFragment : Fragment(),
             TileServer.startServer( enumArea.mbTilesPath )
         }
 
-        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom) { mapView ->
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
             this.mapView = mapView
 
             MapManager.instance().enableLocationUpdates( activity!!, mapView )
 
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
 
-            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                MapManager.instance().centerMap( enumerationTeam.polygon, currentZoomLevel, mapView )
+            lastCenterPoint?.let {
+                MapManager.instance().centerMap( it, mapView )
+            } ?: run {
+                MapManager.instance().centerMap( enumerationTeam.polygon, mapView )
             }
 
             sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
@@ -261,12 +251,6 @@ class PerformEnumerationFragment : Fragment(),
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     val mapManager = MapManager.instance()
-
-                    launch {
-                        mapManager.zoomLevel.collect { zoomLevel ->
-                            sharedViewModel.setCurrentZoomLevel(zoomLevel)
-                        }
-                    }
 
                     launch {
                         mapManager.markerTapped.collect { location ->
@@ -1458,9 +1442,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     MapManager.instance().clearMap( mapView )
 
-                    val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
+                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                         refreshMap()
                     }
                 }
@@ -1473,9 +1455,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     MapManager.instance().clearMap( mapView )
 
-                    val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom ) { mapView ->
+                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                         refreshMap()
                     }
                 }
@@ -1698,6 +1678,7 @@ class PerformEnumerationFragment : Fragment(),
 
     override fun onDestroyView()
     {
+        lastCenterPoint = MapManager.instance().getCenter( mapView )
         binding.mapboxMapView.gestures.removeOnMapClickListener(mapboxMapClickListener )
         binding.recyclerView.adapter = null
 

@@ -144,11 +144,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        if (sharedViewModel.currentZoomLevel?.value == null)
-        {
-            sharedViewModel.setCurrentZoomLevel( 16.0 )
-        }
-
         binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
@@ -180,15 +175,13 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         binding.mapboxMapView.gestures.addOnMapClickListener(this )
 
-        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-        MapManager.instance().centerMap( GEORGIA_TECH, zoom, binding.mapboxMapView )
+        MapManager.instance().centerMap( GEORGIA_TECH, binding.mapboxMapView )
 
         if (config.enumAreas.isNotEmpty())
         {
             val enumArea = config.enumAreas[0]
 
-            MapboxManager.centerMap( enumArea, sharedViewModel.currentZoomLevel?.value, binding.mapboxMapView.getMapboxMap())
+            MapboxManager.centerMap( enumArea, MapManager.zoomLevel(), binding.mapboxMapView.getMapboxMap())
 
             if (enumArea.mbTilesPath.isNotEmpty())
             {
@@ -1223,12 +1216,10 @@ class CreateEnumerationAreaFragment : Fragment(),
                         {
                             hasBeenCentered = true
                             activity!!.runOnUiThread {
-                                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                                    MapManager.instance().stopCenteringOnLocation( binding.mapboxMapView )
-                                    binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
-                                    MapManager.instance().centerMap( enumArea, currentZoomLevel, binding.mapboxMapView )
-                                    refreshMap()
-                                }
+                                MapManager.instance().stopCenteringOnLocation( binding.mapboxMapView )
+                                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                                MapManager.instance().centerMap( enumArea, binding.mapboxMapView )
+                                refreshMap()
                             }
                         }
 
@@ -1460,7 +1451,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun onCameraChanged(eventData: CameraChangedEventData)
     {
-        sharedViewModel.setCurrentZoomLevel( binding.mapboxMapView.getMapboxMap().cameraState.zoom )
+        MapManager.setZoomLevel( binding.mapboxMapView.getMapboxMap().cameraState.zoom )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -1520,14 +1511,14 @@ class CreateEnumerationAreaFragment : Fragment(),
             {
                 TileServer.startServer( activity!!, null, filePath, binding.mapboxMapView.getMapboxMap()) {
                     refreshMap()
-                    TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                    TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
                 }
             }
             else
             {
                 TileServer.startServer( activity!!, uri, "", binding.mapboxMapView.getMapboxMap()) {
                     refreshMap()
-                    TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                    TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
                 }
             }
 
@@ -1545,7 +1536,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
             refreshMap()
-            TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+            TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
         }
     }
 

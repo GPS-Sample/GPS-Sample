@@ -140,6 +140,7 @@ import org.osmdroid.util.BoundingBox
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import java.lang.ref.WeakReference
 import java.util.concurrent.atomic.AtomicInteger
+import androidx.core.content.edit
 
 class MapManager
 {
@@ -151,10 +152,6 @@ class MapManager
 
     private val _markerTapped = MutableSharedFlow<Location>( extraBufferCapacity = 1 )
     val markerTapped = _markerTapped.asSharedFlow()
-
-    private val _zoomLevel = MutableStateFlow(16.0)
-    val zoomLevel = _zoomLevel.asStateFlow()
-
     private val MIN_ZOOM = 8
     private val MAX_ZOOM = 18
     private var mapboxBreadcrumbAnnotationManager: PointAnnotationManager? = null
@@ -174,17 +171,17 @@ class MapManager
         }
     }
 
-    fun selectMapboxMap( activity: Activity, mapboxMapView: com.mapbox.maps.MapView, enumArea: EnumArea?, zoom: Double, completion: ((mapView: View)->Unit) )
+    fun selectMapboxMap( activity: Activity, mapboxMapView: com.mapbox.maps.MapView, enumArea: EnumArea?, completion: ((mapView: View)->Unit) )
     {
         val sharedPreferences: SharedPreferences = activity.getSharedPreferences("default", 0)
         val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
 
-        initializeMapboxMap( mapboxMapView, mapStyle!!, enumArea, zoom ) {
+        initializeMapboxMap( mapboxMapView, mapStyle!!, enumArea ) {
             completion( mapboxMapView )
         }
     }
 
-    fun selectMap( activity: Activity, config: Config, osmMapView: org.osmdroid.views.MapView, mapBoxMapView: com.mapbox.maps.MapView, northUpImageView: ImageView, enumArea: EnumArea?, zoom: Double, completion: ((mapView: View)->Unit) )
+    fun selectMap( activity: Activity, config: Config, osmMapView: org.osmdroid.views.MapView, mapBoxMapView: com.mapbox.maps.MapView, northUpImageView: ImageView, enumArea: EnumArea?, completion: ((mapView: View)->Unit) )
     {
         val sharedPreferences: SharedPreferences = activity.getSharedPreferences("default", 0)
         val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
@@ -203,7 +200,7 @@ class MapManager
             mapBoxMapView.visibility = View.VISIBLE
             osmMapView.visibility = View.GONE
 
-            initializeMapboxMap( mapBoxMapView, mapStyle!!, enumArea, zoom ) {
+            initializeMapboxMap( mapBoxMapView, mapStyle!!, enumArea ) {
                 completion( mapBoxMapView )
             }
         }
@@ -259,7 +256,7 @@ class MapManager
 
             override fun onZoom(event: org.osmdroid.events.ZoomEvent?): Boolean {
                 event?.let {
-                    _zoomLevel.value = it.zoomLevel
+                    setZoomLevel( it.zoomLevel )
                 }
                 return true
             }
@@ -301,17 +298,17 @@ class MapManager
         mapView.addMapListener(osmMapListener)
     }
 
-    private fun initializeMapboxMap( mapView: com.mapbox.maps.MapView, style: String, enumArea: EnumArea?, zoom: Double, completion: (()->Unit))
+    private fun initializeMapboxMap( mapView: com.mapbox.maps.MapView, style: String, enumArea: EnumArea?, completion: (()->Unit))
     {
         mapView.compass.marginTop = 50.0f
 
         if (enumArea == null)
         {
-            centerMap( GEORGIA_TECH, zoom, mapView )
+            centerMap( GEORGIA_TECH, mapView )
         }
         else
         {
-            centerMap( enumArea,zoom, mapView )
+            centerMap( enumArea, mapView )
         }
 
         mapView.getMapboxMap().loadStyle(
@@ -349,7 +346,7 @@ class MapManager
                     }
 
                     mapView.getMapboxMap().addOnCameraChangeListener { cameraChangedEventData ->
-                        _zoomLevel.value = mapView.getMapboxMap().cameraState.zoom
+                        setZoomLevel( mapView.getMapboxMap().cameraState.zoom )
                     }
 
                     completion()
@@ -1367,7 +1364,7 @@ class MapManager
         }
     }
 
-    fun setZoomLevel( mapView: View, zoomLevel: Double )
+    fun setMapZoomLevel( mapView: View, zoomLevel: Double )
     {
         if (mapView is org.osmdroid.views.MapView)
         {
@@ -1383,20 +1380,20 @@ class MapManager
         }
     }
 
-    fun centerMap( polygon: ArrayList<LatLon>, zoomLevel: Double, mapView: View )
+    fun centerMap( polygon: ArrayList<LatLon>, mapView: View )
     {
         val latLngBounds = GeoUtils.findGeobounds(polygon)
 
         if (mapView is org.osmdroid.views.MapView)
         {
-            mapView.controller.setZoom( zoomLevel )
+            mapView.controller.setZoom( zoomLevel() )
             mapView.controller.setCenter( org.osmdroid.util.GeoPoint( latLngBounds.center.latitude, latLngBounds.center.longitude, 0.0 ))
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
             val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
             val cameraPosition = CameraOptions.Builder()
-                .zoom( zoomLevel )
+                .zoom( zoomLevel() )
                 .center(point)
                 .build()
 
@@ -1404,20 +1401,20 @@ class MapManager
         }
     }
 
-    fun centerMap( enumArea: EnumArea, zoomLevel: Double, mapView: View )
+    fun centerMap( enumArea: EnumArea, mapView: View )
     {
         val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
 
         if (mapView is org.osmdroid.views.MapView)
         {
-            mapView.controller.setZoom( zoomLevel )
+            mapView.controller.setZoom( zoomLevel() )
             mapView.controller.setCenter( org.osmdroid.util.GeoPoint( latLngBounds.center.latitude, latLngBounds.center.longitude, 0.0 ))
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
             val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
             val cameraPosition = CameraOptions.Builder()
-                .zoom( zoomLevel )
+                .zoom( zoomLevel() )
                 .center(point)
                 .build()
 
@@ -1425,17 +1422,30 @@ class MapManager
         }
     }
 
-    fun centerMap( point: Point, zoomLevel: Double, mapView: View )
+    fun getCenter( mapView: View ) : Point
     {
         if (mapView is org.osmdroid.views.MapView)
         {
-            mapView.controller.setZoom( zoomLevel )
+            return Point.fromLngLat( mapView.mapCenter.longitude, mapView.mapCenter.latitude )
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            return mapView.mapboxMap.cameraState.center
+        }
+        else return Point.fromLngLat(0.0, 0.0 )
+    }
+
+    fun centerMap( point: Point, mapView: View )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            mapView.controller.setZoom( zoomLevel() )
             mapView.controller.setCenter( org.osmdroid.util.GeoPoint( point.latitude(), point.longitude(), point.altitude() ))
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
             val cameraPosition = CameraOptions.Builder()
-                .zoom( zoomLevel )
+                .zoom( zoomLevel() )
                 .center(point)
                 .build()
 
@@ -1657,6 +1667,32 @@ class MapManager
     companion object
     {
         val GEORGIA_TECH = Point.fromLngLat(-84.39801338134015, 33.778349807286304 )
+
+        fun zoomLevel() : Double
+        {
+            val sharedPreferences: SharedPreferences = MainApplication.getContext().getSharedPreferences("default", 0)
+            try
+            {
+                return sharedPreferences.getFloat( Keys.kZoomLevel.value, 16f ).toDouble()
+            }
+            catch( ex: Exception )
+            {
+                val level = sharedPreferences.getInt( Keys.kZoomLevel.value, 16 ).toDouble()
+                setZoomLevel( level )
+                return level
+            }
+        }
+
+        fun setZoomLevel( level: Double )
+        {
+            if (level > 0f)
+            {
+                val sharedPreferences: SharedPreferences = MainApplication.getContext().getSharedPreferences("default", 0)
+                sharedPreferences.edit(commit = true) {
+                    putFloat(Keys.kZoomLevel.value, level.toFloat())
+                }
+            }
+        }
 
         private var _instance: MapManager? = null
 

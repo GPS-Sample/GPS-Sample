@@ -135,9 +135,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
 
         binding.mapOverlayView.visibility = View.GONE
 
-        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom ) { mapView ->
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
             this.mapView = mapView
 
             MapManager.instance().enableLocationUpdates( activity!!, mapView )
@@ -146,9 +144,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
             if (config.enumAreas.isNotEmpty())
             {
 //                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
-                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                    MapManager.instance().centerMap( config.enumAreas[0], currentZoomLevel, mapView )
-                }
+                MapManager.instance().centerMap( config.enumAreas[0], mapView )
             }
             else
             {
@@ -160,9 +156,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                         if (location != null)
                         {
                             val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
-                            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                                MapManager.instance().centerMap( point, currentZoomLevel, mapView )
-                            }
+                            MapManager.instance().centerMap( point, mapView )
                         }
                     }
                 }
@@ -171,24 +165,6 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
 //                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
 //                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
 //                }
-            }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    val mapManager = MapManager.instance()
-
-                    launch {
-                        mapManager.zoomLevel.collect { zoomLevel ->
-                            sharedViewModel.setCurrentZoomLevel(zoomLevel)
-                        }
-                    }
-
-                    launch {
-                        mapManager.markerTapped.collect { location ->
-                            // Handle tap
-                        }
-                    }
-                }
             }
 
             refreshMap()
@@ -628,9 +604,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
                     refreshMap()
                 }
             }
@@ -642,9 +616,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
                     refreshMap()
                 }
             }

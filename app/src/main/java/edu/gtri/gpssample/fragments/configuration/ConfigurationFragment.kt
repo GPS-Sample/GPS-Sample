@@ -307,9 +307,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
 
-            val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-
-            MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom ) { mapView ->
+            MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
 
                 binding.osmLabel.visibility = if (mapView is MapView) View.VISIBLE else View.GONE
 
@@ -321,9 +319,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                         if (location != null)
                         {
                             val point = Point.fromLngLat( location.longitude, location.latitude )
-                            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                                MapManager.instance().centerMap( point, currentZoomLevel, mapView )
-                            }
+                            MapManager.instance().centerMap( point, mapView )
                         }
                     }
                 }

@@ -36,6 +36,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentMainBinding
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import androidx.core.content.edit
 
 class MainFragment : Fragment()
 {
@@ -47,16 +48,12 @@ class MainFragment : Fragment()
         super.onCreate(savedInstanceState)
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        val zoomLevel = sharedPreferences.getInt( Keys.kZoomLevel.value, 16 )
-
-        val sharedViewModel : ConfigurationViewModel by activityViewModels()
-        sharedViewModel.setCurrentZoomLevel( zoomLevel.toDouble())
 
         if (sharedPreferences.getString( Keys.kMapStyle.value, null ) == null)
         {
-            val editor = sharedPreferences.edit()
-            editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
-            editor.commit()
+            sharedPreferences.edit(commit = true) {
+                putString(Keys.kMapStyle.value, Style.MAPBOX_STREETS)
+            }
         }
     }
 

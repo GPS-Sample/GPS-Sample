@@ -133,8 +133,7 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
                 // Note! OnItemSelected fires automatically when the fragment is created
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     config.mapEngineIndex = position
-                    val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
-                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom ) { mapView ->
+                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
                         binding.osmLabel.visibility = if (mapView is MapView) View.VISIBLE else View.GONE
 
                         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
@@ -145,9 +144,7 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
                                 if (location != null)
                                 {
                                     val point = Point.fromLngLat( location.longitude, location.latitude )
-                                    sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                                        MapManager.instance().centerMap( point, currentZoomLevel, mapView )
-                                    }
+                                    MapManager.instance().centerMap( point, mapView )
                                 }
                             }
                         }

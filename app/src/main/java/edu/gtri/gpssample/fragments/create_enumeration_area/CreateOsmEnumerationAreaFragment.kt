@@ -126,11 +126,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        if (sharedViewModel.currentZoomLevel?.value == null)
-        {
-            sharedViewModel.setCurrentZoomLevel( 16.0 )
-        }
-
         binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
@@ -173,7 +168,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             defaultColorList = it
         }
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, 0.0 ) { mapView ->
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
             this.mapView = mapView
 
             MapManager.instance().enableLocationUpdates( activity!!, mapView )
@@ -182,9 +177,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             if (config.enumAreas.isNotEmpty())
             {
                 binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
-                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                    MapManager.instance().centerMap( config.enumAreas[0], currentZoomLevel, mapView )
-                }
+                MapManager.instance().centerMap( config.enumAreas[0], mapView )
             }
             else
             {
@@ -196,27 +189,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                         if (location != null)
                         {
                             val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
-                            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                                MapManager.instance().centerMap( point, currentZoomLevel, mapView )
-                            }
-                        }
-                    }
-                }
-            }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    val mapManager = MapManager.instance()
-
-                    launch {
-                        mapManager.zoomLevel.collect { zoomLevel ->
-                            sharedViewModel.setCurrentZoomLevel(zoomLevel)
-                        }
-                    }
-
-                    launch {
-                        mapManager.markerTapped.collect { location ->
-                            // Handle tap
+                            MapManager.instance().centerMap( point, mapView )
                         }
                     }
                 }
@@ -1218,11 +1191,9 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                         }
 
                         activity!!.runOnUiThread {
-                            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                                MapManager.instance().stopCenteringOnLocation( mapView )
-                                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
-                                MapManager.instance().centerMap( enumArea, currentZoomLevel, mapView )
-                            }
+                            MapManager.instance().stopCenteringOnLocation( mapView )
+                            binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                            MapManager.instance().centerMap( enumArea, mapView )
                         }
 
                         unsavedEnumAreas.add(enumArea)
@@ -1449,7 +1420,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, mapStyle )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, 0.0 ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
                     refreshMap()
                 }
             }
@@ -1462,7 +1433,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, mapStyle )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, 0.0 ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
                     refreshMap()
                 }
             }
@@ -1489,14 +1460,14 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             {
                 TileServer.startServer( activity!!, null, filePath, binding.mapboxMapView.getMapboxMap()) {
 //                    refreshMap()
-                    TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                    TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
                 }
             }
             else
             {
                 TileServer.startServer( activity!!, uri, "", binding.mapboxMapView.getMapboxMap()) {
 //                    refreshMap()
-                    TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                    TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
                 }
             }
 
@@ -1521,7 +1492,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
         TileServer.startServer( mbTilesPath )
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, 0.0 ) { mapView ->
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
             refreshMap()
         }
     }
