@@ -40,6 +40,7 @@ import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentReviewEnumerationBinding
 import edu.gtri.gpssample.dialogs.*
@@ -104,6 +105,7 @@ class ReviewEnumerationFragment : Fragment()
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
             enumArea = it
+            enumArea.locations = DAO.locationDAO.getLocations( enumArea )
         }
 
         (activity!!.application as? MainApplication)?.user?.let {

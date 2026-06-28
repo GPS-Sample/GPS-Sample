@@ -103,6 +103,7 @@ class ReviewCollectionFragment : Fragment()
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
             enumArea = it
+            enumArea.locations = DAO.locationDAO.getLocations( enumArea )
         }
 
         val _user = (activity!!.application as? MainApplication)?.user
