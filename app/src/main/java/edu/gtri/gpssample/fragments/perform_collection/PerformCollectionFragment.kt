@@ -26,6 +26,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
@@ -398,6 +399,12 @@ class PerformCollectionFragment : Fragment(),
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
             {
                 // Note! OnItemSelected fires automatically when the fragment is created
+
+                val sharedPreferences: SharedPreferences = MainApplication.getContext().getSharedPreferences("default", 0)
+                sharedPreferences.edit(commit = true) {
+                    putInt(Keys.kViewPreference.value, position )
+                }
+
                 when( position )
                 {
                     0-> { // nothing
@@ -415,6 +422,12 @@ class PerformCollectionFragment : Fragment(),
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
+        view.post {
+            val sharedPreferences: SharedPreferences = MainApplication.getContext().getSharedPreferences("default", 0)
+            val position = sharedPreferences.getInt( Keys.kViewPreference.value, 0 )
+            binding.showSpinner.setSelection( position )
         }
 
         val items = ArrayList<String>()
