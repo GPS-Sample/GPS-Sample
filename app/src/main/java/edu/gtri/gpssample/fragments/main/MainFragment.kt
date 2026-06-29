@@ -9,7 +9,6 @@ package edu.gtri.gpssample.fragments.main
 
 import android.Manifest
 import android.content.*
-import android.content.pm.PackageManager
 import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
@@ -19,11 +18,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.mapbox.maps.Style
 import edu.gtri.gpssample.BuildConfig
@@ -35,13 +32,21 @@ import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentMainBinding
 import edu.gtri.gpssample.dialogs.NotificationDialog
-import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import androidx.core.content.edit
 
 class MainFragment : Fragment()
 {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
+    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+        val key = "IsFirstRun"
+        val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", Context.MODE_PRIVATE)
+        if (sharedPreferences.getBoolean(key, true ))
+        {
+            sharedPreferences.edit(commit = true) { putBoolean(key, false) }
+            NotificationDialog(requireActivity(), resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement))
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -68,7 +73,7 @@ class MainFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        activity!!.setTitle( "GPSSample" )
+        requireActivity().setTitle( "GPSSample" )
 
         binding.appVersionTextView.text = resources.getString(R.string.app_version) + " " + BuildConfig.VERSION_NAME
         binding.dbVersionTextView.text = resources.getString(R.string.db_version) + " #" + DAO.DATABASE_VERSION
@@ -304,27 +309,7 @@ class MainFragment : Fragment()
             }
         }
 
-        val key = "IsFirstRun"
-
-        view.post {
-            if (sharedPreferences.getBoolean(key, true ))
-            {
-                val editor = sharedPreferences.edit()
-                editor.putBoolean( key, false )
-                editor.commit()
-                view.post {
-                    if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                    {
-                        NotificationDialog(requireActivity(), resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement))
-                    }
-                }
-            }
-        }
-
-        if (!allRuntimePermissionsGranted())
-        {
-            getRuntimePermissions()
-        }
+        permissionLauncher.launch( REQUIRED_RUNTIME_PERMISSIONS )
     }
 
     override fun onResume()
@@ -332,48 +317,6 @@ class MainFragment : Fragment()
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.MainFragment.value.toString() + ": " + this.javaClass.simpleName
-    }
-
-    private fun allRuntimePermissionsGranted(): Boolean {
-        for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
-            if (!isPermissionGranted(activity as AppCompatActivity, permission)) {
-                return false
-            }
-        }
-        return true
-    }
-
-    private fun getRuntimePermissions() {
-        val permissionsToRequest = ArrayList<String>()
-        for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
-            if (!isPermissionGranted(activity as AppCompatActivity, permission)) {
-                permissionsToRequest.add(permission)
-            }
-        }
-
-        if (permissionsToRequest.isNotEmpty())
-        {
-            requestPermissions( permissionsToRequest.toTypedArray(), REQUEST_CODE)
-        }
-
-        if (isPermissionGranted( activity as AppCompatActivity, Manifest.permission.ACCESS_FINE_LOCATION)
-            && !isPermissionGranted( activity as AppCompatActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION))
-        {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-            {
-                requestPermissions( arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION), 1001 )
-            }
-        }
-    }
-
-    private fun isPermissionGranted(context: Context, permission: String): Boolean
-    {
-        if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
-        {
-            return true
-        }
-
-        return false
     }
 
     override fun onDestroyView()
@@ -385,18 +328,11 @@ class MainFragment : Fragment()
 
     companion object
     {
-        private const val REQUEST_CODE = 1
-
         private val REQUIRED_RUNTIME_PERMISSIONS: Array<String> =
             buildList {
-
                 add(Manifest.permission.CAMERA)
-
                 add(Manifest.permission.ACCESS_FINE_LOCATION)
                 add(Manifest.permission.ACCESS_COARSE_LOCATION)
-
-                add(Manifest.permission.ACCESS_NETWORK_STATE)
-                add(Manifest.permission.CHANGE_NETWORK_STATE)
 
                 // Android 12+ (API 31)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -417,32 +353,5 @@ class MainFragment : Fragment()
                 }
 
             }.toTypedArray()
-
-        private val REQUIRED_RUNTIME_PERMISSIONS_XXX: Array<String> =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                arrayOf(
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_NETWORK_STATE,
-                    Manifest.permission.CHANGE_NETWORK_STATE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.NEARBY_WIFI_DEVICES,
-                    Manifest.permission.BLUETOOTH_SCAN,
-                    Manifest.permission.BLUETOOTH_CONNECT,
-                    Manifest.permission.BLUETOOTH_ADVERTISE,
-                )
-            } else {
-                arrayOf(
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_NETWORK_STATE,
-                    Manifest.permission.CHANGE_NETWORK_STATE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                )
-            }
     }
 }
