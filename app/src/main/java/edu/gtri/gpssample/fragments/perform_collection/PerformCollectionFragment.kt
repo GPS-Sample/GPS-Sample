@@ -394,6 +394,10 @@ class PerformCollectionFragment : Fragment(),
 
         binding.showSpinner.adapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, views )
 
+        val sharedPreferences: SharedPreferences = MainApplication.getContext().getSharedPreferences("default", 0)
+        val position = sharedPreferences.getInt( Keys.kViewPreference.value, 0 )
+        binding.showSpinner.setSelection( position )
+
         binding.showSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
         {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
@@ -422,12 +426,6 @@ class PerformCollectionFragment : Fragment(),
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
-
-        view.post {
-            val sharedPreferences: SharedPreferences = MainApplication.getContext().getSharedPreferences("default", 0)
-            val position = sharedPreferences.getInt( Keys.kViewPreference.value, 0 )
-            binding.showSpinner.setSelection( position )
         }
 
         val items = ArrayList<String>()
