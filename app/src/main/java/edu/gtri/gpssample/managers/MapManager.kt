@@ -494,8 +494,10 @@ class MapManager
 
     fun createMapboxPointAnnotationManager( mapView: MapView )
     {
-        mapboxPointAnnotationManager?.deleteAll()
-        mapboxPointAnnotationManager = null
+        mapboxPointAnnotationManager?.let {
+		    it.deleteAll()
+            mapView.annotations.removeAnnotationManager(it )
+        }
 
         mapboxPointAnnotationManager = mapView.annotations.createPointAnnotationManager(
             AnnotationConfig(layerId = "markers")
@@ -526,8 +528,10 @@ class MapManager
 
     fun createMapboxBreadcrumbAnnotationManager( mapView: MapView )
     {
-        mapboxBreadcrumbAnnotationManager?.deleteAll()
-        mapboxBreadcrumbAnnotationManager = null
+        mapboxBreadcrumbAnnotationManager?.let {
+		    it.deleteAll()
+            mapView.annotations.removeAnnotationManager(it )
+        }
 
         mapboxBreadcrumbAnnotationManager = mapView.annotations.createPointAnnotationManager(
             AnnotationConfig(layerId = "breadcrumbs")
@@ -536,17 +540,20 @@ class MapManager
 
     fun createMapboxPolylineAnnotationManager( mapView: MapView )
     {
-        mapboxPolylineAnnotationManager?.deleteAll()
-        mapboxPolylineAnnotationManager = null
+        mapboxPolylineAnnotationManager?.let {
+		    it.deleteAll()
+            mapView.annotations.removeAnnotationManager(it )
+        }
 
         mapboxPolylineAnnotationManager = mapView.annotations.createPolylineAnnotationManager(AnnotationConfig(layerId = "polylines"))
     }
 
     fun createMapboxPolygonAnnotationManager( mapView: MapView )
     {
-        mapboxPolygonAnnotationManager?.deleteAll()
-        mapboxPolygonAnnotationManager = null
-
+        mapboxPolygonAnnotationManager?.let {
+		    it.deleteAll()
+            mapView.annotations.removeAnnotationManager(it )
+        }
         mapboxPolygonAnnotationManager = mapView.annotations.createPolygonAnnotationManager(AnnotationConfig(layerId = "polygons"))
     }
 
