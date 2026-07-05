@@ -491,6 +491,7 @@
     <string-array name="collection_apps">
         <item>"ODK Collect"</item>
         <item>"Kobo Collect"</item>
+        <item>"Ona"</item>
     </string-array>
 
     <string-array name="forgot_pin_questions">

@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.extensions.toLocalizedDateTimeString
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -64,7 +65,7 @@ class StudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<StudiesAd
         val study = studies!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( study.name )
-        holder.dateTextView.setText( Date( study.creationDate ).toString())
+        holder.dateTextView.setText( Date(study.creationDate).toLocalizedDateTimeString())
 
         holder.itemView.setOnClickListener {
             for (holder in allHolders)
