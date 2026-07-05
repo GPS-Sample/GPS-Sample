@@ -522,9 +522,11 @@ class ConfigurationFragment : Fragment(),
                                 {
                                     DAO.configDAO.createOrUpdateConfig( config )
 
-                                    sharedViewModel.setCurrentConfig( config )
-                                    updateOverview()
-                                    enumerationAreasAdapter.updateEnumAreas( config.enumAreas )
+                                    DAO.configDAO.getConfig( config.uuid )?.let {
+                                        sharedViewModel.setCurrentConfig(it)
+                                        updateOverview()
+                                        enumerationAreasAdapter.updateEnumAreas(it.enumAreas)
+                                    }
 
                                     binding.overlayView.visibility = View.GONE
                                     InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
