@@ -330,7 +330,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
 
                     DAO.configDAO.createOrUpdateConfig( config, config.version )
 
-                    sharedViewModel?.setCurrentConfig( config )
+                    DAO.configDAO.getConfig( config.uuid )?.let {
+                        sharedViewModel?.setCurrentConfig(it)
+                    }
 
                     fetchImages( config, socket )
 

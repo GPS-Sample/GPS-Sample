@@ -673,9 +673,10 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                                 {
                                     DAO.configDAO.createOrUpdateConfig( config,config.version )
 
-                                    sharedViewModel.setCurrentConfig( config )
-
-                                    refreshView( config )
+                                    DAO.configDAO.getConfig( config.uuid )?.let {
+                                        sharedViewModel.setCurrentConfig( it )
+                                    	refreshView( it )
+                                    }
 
                                     NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded))
                                 }
