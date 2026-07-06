@@ -10,6 +10,7 @@ package edu.gtri.gpssample.database.models
 
 import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.EnumerationState
+import edu.gtri.gpssample.constants.ReviewStatus
 import edu.gtri.gpssample.constants.SamplingState
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -42,7 +43,7 @@ data class EnumerationItem(
     var collectionDate: Long,
     var collectionIncompleteReason : String,
     var collectionNotes : String,
-    var isExcluded : Boolean,
+    var reviewStatus : ReviewStatus,
     var exclusionReason : String,
     var exclusionNotes : String,
     var fieldDataList : ArrayList<FieldData>,
@@ -71,7 +72,7 @@ data class EnumerationItem(
         0,
         "",
         "",
-        false,
+        ReviewStatus.Ignore,
         "",
         "",
         ArrayList<FieldData>(),

@@ -19,15 +19,6 @@
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-
-        <ImageView
-            android:id="@+id/info_image_view"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="10dp"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end"
-            app:srcCompat="@drawable/info3"/>
     </FrameLayout>
 
     <TextView

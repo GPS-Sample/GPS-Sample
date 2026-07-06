@@ -364,7 +364,7 @@ class SamplingViewModel : ViewModel()
                                 {
                                     for (enumerationItem in location.enumerationItems)
                                     {
-                                        if (!enumerationItem.isExcluded && !_currentSampledItemsForSampling.contains(enumerationItem))
+                                        if (enumerationItem.reviewStatus != ReviewStatus.Exclude && !_currentSampledItemsForSampling.contains(enumerationItem))
                                         {
                                             _currentSampledItemsForSampling.add(enumerationItem)
                                         }
@@ -676,7 +676,7 @@ class SamplingViewModel : ViewModel()
                 {
                     for (sampledItem in location.enumerationItems)
                     {
-                        if(!sampledItem.isExcluded && !_currentSampledItemsForSampling.contains(sampledItem))
+                        if(sampledItem.reviewStatus != ReviewStatus.Exclude && !_currentSampledItemsForSampling.contains(sampledItem))
                         {
                             _currentSampledItemsForSampling.add(sampledItem)
                         }
@@ -703,7 +703,7 @@ class SamplingViewModel : ViewModel()
                 {
                     for (sampledItem in location.enumerationItems)
                     {
-                        if(!sampledItem.isExcluded && !_currentSampledItemsForSampling.contains(sampledItem))
+                        if(sampledItem.reviewStatus != ReviewStatus.Exclude && !_currentSampledItemsForSampling.contains(sampledItem))
                         {
                             _currentSampledItemsForSampling.add(sampledItem)
                         }

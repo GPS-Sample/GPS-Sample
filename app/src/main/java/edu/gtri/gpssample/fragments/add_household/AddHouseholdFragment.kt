@@ -43,7 +43,6 @@ class AddHouseholdFragment : Fragment(),
 {
     private var _binding: FragmentAddHouseholdBinding? = null
     private val binding get() = _binding!!
-
     private lateinit var study: Study
     private lateinit var config: Config
     private lateinit var location: Location
@@ -55,8 +54,10 @@ class AddHouseholdFragment : Fragment(),
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
     private var editMode = true
     private var collectionMode = false
+    private var reviewDuplicate = false
     private var isMultiHousehold = false
     private var fragmentResultListener = ""
+    private var reviewFenceViolation = false
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -84,6 +85,14 @@ class AddHouseholdFragment : Fragment(),
 
         arguments?.getBoolean( Keys.kEditMode.value)?.let { editMode ->
             this.editMode = editMode
+        }
+
+        arguments?.getBoolean( Keys.kReviewDuplicate.value)?.let {
+            this.reviewDuplicate = it
+        }
+
+        arguments?.getBoolean( Keys.kReviewFenceViolation.value)?.let {
+            this.reviewFenceViolation = it
         }
 
         arguments?.getString( Keys.kFragmentResultListener.value)?.let { fragmentResultListener ->
@@ -124,6 +133,11 @@ class AddHouseholdFragment : Fragment(),
             this.location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
                 this.enumerationItem = enumerationItem
             }
+        }
+
+        if (reviewDuplicate || reviewFenceViolation)
+        {
+            binding.cancelButton.text = resources.getString(R.string.keep_or_exclude_this_location )
         }
 
         if (!editMode)
@@ -432,14 +446,51 @@ class AddHouseholdFragment : Fragment(),
         }
 
         binding.cancelButton.setOnClickListener {
-            if (fragmentResultListener.isNotEmpty())
+            if (reviewDuplicate || reviewFenceViolation)
             {
-                val bundle = Bundle()
-                bundle.putString( Keys.kRequest.value, Keys.kAdditionalInfoRequest.value)
-                setFragmentResult( fragmentResultListener, bundle )
-            }
+                ExcludeLocationDialog(requireContext(),location.enumerationItems ) { buttonPress ->
 
-            findNavController().popBackStack()
+                    when (buttonPress)
+                    {
+                        ExcludeLocationDialog.ButtonPress.Cancel -> {
+                            findNavController().popBackStack()
+                        }
+                        ExcludeLocationDialog.ButtonPress.Save -> {
+
+                            for (enumerationItem in location.enumerationItems)
+                            {
+                                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem,enumerationItem.version )
+                            }
+
+                            if (reviewDuplicate)
+                            {
+                                findNavController().popBackStack()
+//                                duplicateLocations.removeIf{ it.uuid == location.uuid }
+//                                duplicateLocations.add( location )
+//                                showMap( duplicateLocations )
+                            }
+                            else if (reviewFenceViolation)
+                            {
+                                findNavController().popBackStack()
+//                                geofenceViolations.removeIf{ it.uuid == location.uuid }
+//                                geofenceViolations.add( location )
+//                                showMap(geofenceViolations )
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (fragmentResultListener.isNotEmpty())
+                {
+                    val bundle = Bundle()
+                    bundle.putString( Keys.kRequest.value, Keys.kAdditionalInfoRequest.value)
+                    setFragmentResult( fragmentResultListener, bundle )
+                }
+
+                findNavController().popBackStack()
+            }
         }
 
         binding.launchSurveyButton.setOnClickListener {

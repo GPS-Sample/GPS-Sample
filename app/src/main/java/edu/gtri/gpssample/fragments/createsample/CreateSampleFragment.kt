@@ -39,7 +39,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.maps.model.LatLng
@@ -47,9 +46,7 @@ import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.MapEngine
-import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
-import edu.gtri.gpssample.dialogs.ExcludeLocationDialog
-import org.osmdroid.events.MapListener
+import edu.gtri.gpssample.constants.ReviewStatus
 
 class CreateSampleFragment : Fragment()
 {
@@ -242,46 +239,24 @@ class CreateSampleFragment : Fragment()
 
                                     isHandlingTapEvent = true
 
-                                    ExcludeLocationDialog(requireContext(),location.enumerationItems ) { buttonPress ->
-                                        isHandlingTapEvent = false
+                                    val bundle = Bundle()
 
-                                        when (buttonPress)
-                                        {
-                                            ExcludeLocationDialog.ButtonPress.Cancel -> {
-                                            }
-                                            ExcludeLocationDialog.ButtonPress.Save -> {
+                                    if (samplingViewModel.samplePageState.value == SamplingViewModel.SamplePageState.DuplicatePage)
+                                    {
+                                        bundle.putBoolean( Keys.kReviewDuplicate.value, true )
+                                    }
+                                    else if (samplingViewModel.samplePageState.value == SamplingViewModel.SamplePageState.GeofenceViolationPage)
+                                    {
+                                        bundle.putBoolean( Keys.kReviewFenceViolation.value, true )
+                                    }
 
-                                                for (enumerationItem in location.enumerationItems)
-                                                {
-                                                    DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem,enumerationItem.version )
-                                                }
-
-                                                if (samplingViewModel.samplePageState.value == SamplingViewModel.SamplePageState.DuplicatePage)
-                                                {
-                                                    duplicateLocations.removeIf{ it.uuid == location.uuid }
-                                                    duplicateLocations.add( location )
-                                                    showMap( duplicateLocations )
-                                                }
-                                                else if (samplingViewModel.samplePageState.value == SamplingViewModel.SamplePageState.GeofenceViolationPage)
-                                                {
-                                                    geofenceViolations.removeIf{ it.uuid == location.uuid }
-                                                    geofenceViolations.add( location )
-                                                    showMap(geofenceViolations )
-                                                }
-                                            }
-                                            ExcludeLocationDialog.ButtonPress.Info -> {
-                                                val bundle = Bundle()
-                                                bundle.putBoolean( Keys.kEditMode.value, false )
-                                                if (location.enumerationItems.size > 1)
-                                                {
-                                                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle )
-                                                }
-                                                else
-                                                {
-                                                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle )
-                                                }
-                                            }
-                                        }
+                                    if (location.enumerationItems.size > 1)
+                                    {
+                                        findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle )
+                                    }
+                                    else
+                                    {
+                                        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle )
                                     }
                                 }
                             }
@@ -380,7 +355,7 @@ class CreateSampleFragment : Fragment()
             {
                 for (location2 in enumArea.locations)
                 {
-                    if (location1 == location2) continue
+                    if (location1.uuid == location2.uuid) continue
                     var distance = GeoUtils.distanceBetween( LatLng( location1.latitude, location1.longitude ), LatLng( location2.latitude, location2.longitude ))
                     if (config.distanceFormat == DistanceFormat.Feet)
                     {
@@ -649,7 +624,7 @@ class CreateSampleFragment : Fragment()
             {
                 if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
-                    if (location.enumerationItems.first().isExcluded && !showExclusions)
+                    if (location.enumerationItems.first().reviewStatus == ReviewStatus.Exclude && !showExclusions)
                     {
                         continue
                     }
@@ -659,7 +634,7 @@ class CreateSampleFragment : Fragment()
                     val saveSamplePage = SamplingViewModel.SamplePageState.SaveSamplePage
                     val sampleGeneratedPage = SamplingViewModel.SamplePageState.SampleGeneratedPage
 
-                    if (location.enumerationItems.first().isExcluded && (currentPage == generateSamplePage || currentPage == saveSamplePage || currentPage == sampleGeneratedPage))
+                    if (location.enumerationItems.first().reviewStatus == ReviewStatus.Exclude && (currentPage == generateSamplePage || currentPage == saveSamplePage || currentPage == sampleGeneratedPage))
                     {
                         continue
                     }
@@ -754,13 +729,13 @@ class CreateSampleFragment : Fragment()
                         {
                             resourceId = R.drawable.home_green
 
-                            if (sampledItem.isExcluded)
+                            if (sampledItem.reviewStatus == ReviewStatus.Exclude)
                             {
                                 resourceId = R.drawable.home_red
                             }
-                            else if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
+                            else if (sampledItem.reviewStatus == ReviewStatus.Keep)
                             {
-                                resourceId = R.drawable.home_light_blue
+                                resourceId = R.drawable.home_purple
                             }
 
                             markerProperties.add( MapManager.MarkerProperty( location, resourceId, title ))
@@ -772,13 +747,15 @@ class CreateSampleFragment : Fragment()
 
                         for (sampledItem in location.enumerationItems)
                         {
-                            if (sampledItem.isExcluded)
+                            if (sampledItem.reviewStatus == ReviewStatus.Exclude)
                             {
                                 resourceId = R.drawable.multi_home_red
+                                break
                             }
-                            else if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
+                            else if (sampledItem.reviewStatus == ReviewStatus.Keep)
                             {
-                                resourceId = R.drawable.multi_home_light_blue
+                                resourceId = R.drawable.multi_home_purple
+                                break
                             }
                         }
 

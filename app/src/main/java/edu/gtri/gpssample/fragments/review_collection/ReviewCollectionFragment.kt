@@ -138,7 +138,7 @@ class ReviewCollectionFragment : Fragment()
         val filteredLocations = ArrayList<Location>()
         for (location in enumArea.locations)
         {
-            if (location.enumerationItems.isNotEmpty() && !location.enumerationItems.first().isExcluded)
+            if (location.enumerationItems.isNotEmpty() && location.enumerationItems.first().reviewStatus != ReviewStatus.Exclude)
             {
                 filteredLocations.add( location )
             }
