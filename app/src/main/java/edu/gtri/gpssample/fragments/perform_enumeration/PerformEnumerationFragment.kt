@@ -636,7 +636,7 @@ class PerformEnumerationFragment : Fragment(),
         binding.listItemEnumArea.numberSampledTextView.text = "$sampledCount"
         binding.listItemEnumArea.numberSurveyedTextView.text = "$surveyedCount"
 
-        trimToolbarToFit( binding.toolbar )
+//        trimToolbarToFit( binding.toolbar )
 
         if (isRecordingBreadcrumbs)
         {
