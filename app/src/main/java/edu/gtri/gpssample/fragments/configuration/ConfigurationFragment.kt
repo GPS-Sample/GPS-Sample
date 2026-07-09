@@ -40,6 +40,7 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.EnumAreaDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
@@ -469,20 +470,29 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                 nearbySessionClientManager?.connect( sessionId ) { config ->
                     nearbySessionStatusDialog?.setStatus( "Saving Configuration..." )
 
+                    var enumAreaSummaries : List<EnumAreaDAO.EnumAreaSummary>? = null
+
                     viewLifecycleOwner.lifecycleScope.launch {
                         withContext(Dispatchers.IO)
                         {
                             DAO.configDAO.createOrUpdateConfig( config,config.version )
+
+                            enumAreaSummaries = DAO.enumAreaDAO.getEnumAreaSummary(config.uuid )
 
                             // TODO!!! re-fetch the config from the db
                         }
 
                         // back on the main thread...
 
+                        enumAreaSummaries?.let {
+                            enumerationAreasAdapter.updateEnumAreas(it )
+                        }
+
                         nearbySessionStatusDialog?.dismiss()
                         nearbySessionStatusDialog = null
 
                         sharedViewModel.setCurrentConfig( config )
+
 
                         refreshView( config )
 

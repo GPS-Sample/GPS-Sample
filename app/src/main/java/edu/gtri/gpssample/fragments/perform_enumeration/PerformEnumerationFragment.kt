@@ -53,6 +53,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.*
@@ -107,6 +108,9 @@ class PerformEnumerationFragment : Fragment(),
     private var nearbySessionHostManager: NearbySessionHostManager? = null
     private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
+    private var debugPressCount = 0
+    private var shouldAutoSurveyLocations = false
+    private var timeOfLastPress : Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -700,6 +704,11 @@ class PerformEnumerationFragment : Fragment(),
         binding.listItemEnumArea.numberSampledTextView.text = "$sampledCount"
         binding.listItemEnumArea.numberSurveyedTextView.text = "$surveyedCount"
 
+        if (enumerationCount == 0)
+        {
+            addAutoEnumerateListener()
+        }
+
         trimToolbarToFit( binding.toolbar )
 
         if (isRecordingBreadcrumbs)
@@ -759,6 +768,129 @@ class PerformEnumerationFragment : Fragment(),
         isHandlingTapEvent = false
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    var subAddress = 0
+
+    fun addAutoEnumerateListener()
+    {
+        binding.titleTextView.setOnClickListener {
+            if (!shouldAutoSurveyLocations)
+            {
+                val timeSpan = Date().time - timeOfLastPress
+
+                if (timeSpan > 2000)
+                {
+                    debugPressCount = 0
+                }
+                else
+                {
+                    debugPressCount += 1
+                    if (debugPressCount == 6)
+                    {
+                        shouldAutoSurveyLocations = true
+                        binding.progressOverlayView.visibility = View.VISIBLE
+
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            withContext(Dispatchers.IO )
+                            {
+                                autoEnumerateLocations()
+                            }
+
+                            // back on the main thread...
+
+                            binding.progressOverlayView.visibility = View.GONE
+                            Toast.makeText(activity!!.applicationContext,  "Auto Survey Complete.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+
+                timeOfLastPress = Date().time
+            }
+        }
+    }
+
+    fun autoEnumerateLocations()
+    {
+        lateinit var config : Config
+
+        sharedViewModel.currentConfiguration?.value?.let {
+            config = it
+        }
+
+        DAO.instance().writableDatabase.beginTransaction()
+
+        for (location in enumerationTeamLocations)
+        {
+            if (!location.isLandmark)
+            {
+                subAddress+= 1
+
+                ImageDAO.instance().createImage( edu.gtri.gpssample.database.models.Image( location.uuid, TestImage.imageData.replace( "\n", "" )))?.let { image ->
+                    location.imageUuid = image.uuid
+                }
+
+                val enumerationItem = EnumerationItem()
+
+                enumerationItem.uuid = UUID.randomUUID().toString()
+                enumerationItem.version = UUID.randomUUID().toString()
+                enumerationItem.enumerationIncompleteReason = ""
+                enumerationItem.enumerationState = EnumerationState.Enumerated
+                enumerationItem.enumerationNotes = ""
+                enumerationItem.enumerationDate = Date().time
+                enumerationItem.subAddress = subAddress.toString()
+                enumerationItem.locationUuid = location.uuid
+
+                var creationDate = Date().time
+
+                for (field in config.studies[0].fields)
+                {
+                    val fieldData = FieldData(creationDate++, field.uuid, enumerationItem.uuid )
+
+                    if (field.type == FieldType.Note)
+                    {
+                        fieldData.textValue = "Some Note"
+                    }
+
+                    if (field.type == FieldType.Text)
+                    {
+                        fieldData.textValue = "Some Text"
+                    }
+
+                    if (field.type == FieldType.Number)
+                    {
+                        fieldData.numberValue= 999.0
+                    }
+
+                    if (field.type == FieldType.Date)
+                    {
+                        fieldData.dateValue = Date().time
+                    }
+
+                    if (field.type == FieldType.Checkbox)
+                    {
+                        fieldData.fieldDataOptions.add( FieldDataOption( "CB 1", true ))
+                        fieldData.fieldDataOptions.add( FieldDataOption( "CB 2", false ))
+                        fieldData.fieldDataOptions.add( FieldDataOption( "CB 3", true ))
+                    }
+
+                    if (field.type == FieldType.Dropdown)
+                    {
+                        fieldData.dropdownIndex = 1
+                        fieldData.fieldDataOptions.add( FieldDataOption( "DD 1", false ))
+                        fieldData.fieldDataOptions.add( FieldDataOption( "DD 2", false ))
+                        fieldData.fieldDataOptions.add( FieldDataOption( "DD 3", false ))
+                    }
+
+                    enumerationItem.fieldDataList.add( fieldData )
+                }
+
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, enumerationItem.version )
+            }
+        }
+
+        DAO.instance().writableDatabase.setTransactionSuccessful()
+        DAO.instance().writableDatabase.endTransaction()
     }
 
     private fun addHouseholdButtonPress()

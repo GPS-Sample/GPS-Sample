@@ -314,7 +314,8 @@
     <FrameLayout
         android:id="@+id/progress_overlay_view"
         android:visibility="gone"
-        android:background="@color/clear"
+        android:background="@color/black"
+        android:alpha="0.5"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

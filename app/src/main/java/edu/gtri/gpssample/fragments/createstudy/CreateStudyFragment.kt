@@ -15,16 +15,25 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.constants.SamplingMethod
+import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.FieldOption
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Date
 import java.util.UUID
 
 enum class DeleteMode(val value : Int)
@@ -38,7 +47,9 @@ class CreateStudyFragment : Fragment()
     private var _binding: FragmentCreateStudyBinding? = null
     private val binding get() = _binding!!
     private lateinit var sharedViewModel : ConfigurationViewModel
-
+    private var debugPressCount = 0
+    private var timeOfLastPress : Long = 0
+    private var shouldAutoCreateStudy = false
     private var expandableListState: SparseArray<Parcelable>? = null
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -104,6 +115,60 @@ class CreateStudyFragment : Fragment()
                 }
             }
         })
+
+        binding.titleBarLayout.setOnClickListener {
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                if (config.studies.isEmpty())
+                {
+                    if (!shouldAutoCreateStudy)
+                    {
+                        val timeSpan = Date().time - timeOfLastPress
+
+                        if (timeSpan > 2000)
+                        {
+                            debugPressCount = 0
+                        }
+                        else
+                        {
+                            debugPressCount += 1
+                            if (debugPressCount == 6)
+                            {
+                                val study = Study( "Study", SamplingMethod.Cluster, 10000, SampleType.NumberHouseholds )
+
+                                val noteField = Field( null, 1, "Note", FieldType.Note, false, false, false, false, false, false, null, null,study.uuid)
+                                val textField = Field( null, 2, "Text", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid)
+                                val numberField = Field( null, 3, "Number", FieldType.Number, false, false, true, false, false, false, null, null,study.uuid)
+                                val dateField = Field( null, 4, "Date", FieldType.Date, false, false, false, false, true, false, null, null,study.uuid)
+                                val checkBoxField = Field( null, 5, "Checkbox", FieldType.Checkbox, false, false, false, false, false, false, null, null,study.uuid)
+                                val dropDownField = Field( null, 6, "Dropdown", FieldType.Dropdown, false, false, false, false, false, false, null, null,study.uuid)
+
+                                checkBoxField.fieldOptions.add( FieldOption("CB 1" ))
+                                checkBoxField.fieldOptions.add( FieldOption("CB 2" ))
+                                checkBoxField.fieldOptions.add( FieldOption("CB 3" ))
+
+                                dropDownField.fieldOptions.add( FieldOption("DD 1" ))
+                                dropDownField.fieldOptions.add( FieldOption("DD 2" ))
+                                dropDownField.fieldOptions.add( FieldOption("DD 3" ))
+
+                                study.fields.add( noteField )
+                                study.fields.add( textField )
+                                study.fields.add( numberField )
+                                study.fields.add( dateField )
+                                study.fields.add( checkBoxField )
+                                study.fields.add( dropDownField )
+
+                                config.studies.add( study )
+
+                                shouldAutoCreateStudy = false
+                                Toast.makeText(activity!!.applicationContext,  "Auto Survey Complete.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        timeOfLastPress = Date().time
+                    }
+                }
+            }
+        }
 
         binding.samplingMethodTip.setOnClickListener {
             NotificationDialog( requireActivity(), "", resources.getString(R.string.sampling_hint))

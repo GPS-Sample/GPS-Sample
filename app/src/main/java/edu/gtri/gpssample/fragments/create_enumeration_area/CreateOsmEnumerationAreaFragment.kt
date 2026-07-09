@@ -89,7 +89,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var droppedPoints = ArrayList<com.mapbox.geojson.Point>()
     private var _binding: FragmentCreateEnumerationAreaBinding? = null
-
     private val kEnumAreaNameTag: Int = 0
     private val kEnumAreaLengthTag: Int = 1
 
@@ -100,7 +99,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         AddHousehold,
         CreateEnumAreaBoundary
     }
-
     private var currentTapType = TapType.None
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -117,10 +115,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         _binding = FragmentCreateEnumerationAreaBinding.inflate( inflater, container, false)
         return binding.root
     }
-
-    private var debugPressCount = 0
-    private var shouldAutoEnumerateLocations = false
-    private var timeOfLastPress : Long = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
@@ -411,29 +405,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             }
 
             findNavController().popBackStack()
-        }
-
-        binding.toolbarTitle.setOnClickListener {
-            if (!shouldAutoEnumerateLocations)
-            {
-                val timeSpan = Date().time - timeOfLastPress
-
-                if (timeSpan > 2000)
-                {
-                    debugPressCount = 0
-                }
-                else
-                {
-                    debugPressCount += 1
-                    if (debugPressCount == 6)
-                    {
-                        shouldAutoEnumerateLocations = true
-                        Toast.makeText(activity!!.applicationContext,  "Imported locations will be Auto Enumerated!", Toast.LENGTH_SHORT).show()
-                    }
-                }
-
-                timeOfLastPress = Date().time
-            }
         }
     }
 
@@ -1279,11 +1250,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
                 val location = Location( timeZone, -1, point.point.coordinates.latitude, point.point.coordinates.longitude, altitude, false, "", point.property )
 
-                if (shouldAutoEnumerateLocations)
-                {
-                    autoEnumerate( location )
-                }
-
                 val enumArea = findEnumAreaOfLocation( allEnumAreas, LatLng( point.point.coordinates.latitude, point.point.coordinates.longitude ))?.let { enumArea ->
                     enumArea.locations.add( location )
                 }
@@ -1298,105 +1264,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         lifecycleScope.launch {
             refreshMap()
         }
-    }
-
-    var subAddress = 0
-
-    fun autoEnumerate( location: Location )
-    {
-        subAddress+= 1
-
-        ImageDAO.instance().createImage( edu.gtri.gpssample.database.models.Image( location.uuid, TestImage.imageData.replace( "\n", "" )))?.let { image ->
-            location.imageUuid = image.uuid
-        }
-
-        val enumerationItem = EnumerationItem()
-
-        enumerationItem.uuid = UUID.randomUUID().toString()
-        enumerationItem.version = UUID.randomUUID().toString()
-        enumerationItem.enumerationIncompleteReason = ""
-        enumerationItem.enumerationState = EnumerationState.Enumerated
-        enumerationItem.enumerationNotes = ""
-        enumerationItem.enumerationDate = Date().time
-        enumerationItem.subAddress = subAddress.toString()
-        enumerationItem.locationUuid = location.uuid
-
-        if (config.studies.isEmpty())
-        {
-            config.studies.add( Study( "Study", SamplingMethod.Cluster, 10000, SampleType.NumberHouseholds ))
-        }
-
-        if (config.studies[0].fields.isEmpty())
-        {
-            val study = config.studies[0]
-            val noteField = Field( null, 1, "Note", FieldType.Note, false, false, false, false, false, false, null, null,study.uuid)
-            val textField = Field( null, 2, "Text", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid)
-            val numberField = Field( null, 3, "Number", FieldType.Number, false, false, true, false, false, false, null, null,study.uuid)
-            val dateField = Field( null, 4, "Date", FieldType.Date, false, false, false, false, true, false, null, null,study.uuid)
-            val checkBoxField = Field( null, 5, "Checkbox", FieldType.Checkbox, false, false, false, false, false, false, null, null,study.uuid)
-            val dropDownField = Field( null, 6, "Dropdown", FieldType.Dropdown, false, false, false, false, false, false, null, null,study.uuid)
-
-            checkBoxField.fieldOptions.add( FieldOption("CB 1" ))
-            checkBoxField.fieldOptions.add( FieldOption("CB 2" ))
-            checkBoxField.fieldOptions.add( FieldOption("CB 3" ))
-
-            dropDownField.fieldOptions.add( FieldOption("DD 1" ))
-            dropDownField.fieldOptions.add( FieldOption("DD 2" ))
-            dropDownField.fieldOptions.add( FieldOption("DD 3" ))
-
-            config.studies[0].fields.add( noteField )
-            config.studies[0].fields.add( textField )
-            config.studies[0].fields.add( numberField )
-            config.studies[0].fields.add( dateField )
-            config.studies[0].fields.add( checkBoxField )
-            config.studies[0].fields.add( dropDownField )
-        }
-
-        var creationDate = Date().time
-
-        for (field in config.studies[0].fields)
-        {
-            val fieldData = FieldData(creationDate++, field.uuid, enumerationItem.uuid )
-
-            if (field.type == FieldType.Note)
-            {
-                fieldData.textValue = "Some Note"
-            }
-
-            if (field.type == FieldType.Text)
-            {
-                fieldData.textValue = "Some Text"
-            }
-
-            if (field.type == FieldType.Number)
-            {
-                fieldData.numberValue= 999.0
-            }
-
-            if (field.type == FieldType.Date)
-            {
-                fieldData.dateValue = Date().time
-            }
-
-            if (field.type == FieldType.Checkbox)
-            {
-                fieldData.fieldDataOptions.add( FieldDataOption( "CB 1", true ))
-                fieldData.fieldDataOptions.add( FieldDataOption( "CB 2", false ))
-                fieldData.fieldDataOptions.add( FieldDataOption( "CB 3", true ))
-            }
-
-            if (field.type == FieldType.Dropdown)
-            {
-                fieldData.dropdownIndex = 1
-                fieldData.fieldDataOptions.add( FieldDataOption( "DD 1", false ))
-                fieldData.fieldDataOptions.add( FieldDataOption( "DD 2", false ))
-                fieldData.fieldDataOptions.add( FieldDataOption( "DD 3", false ))
-            }
-
-            enumerationItem.fieldDataList.add( fieldData )
-        }
-
-        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, enumerationItem.version )
     }
 
     data class PointWithProperty( var point: Point, var property: String )

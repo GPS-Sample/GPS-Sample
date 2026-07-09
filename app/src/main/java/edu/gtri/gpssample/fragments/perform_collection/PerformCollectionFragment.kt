@@ -105,6 +105,9 @@ class PerformCollectionFragment : Fragment(),
     private var nearbySessionHostManager: NearbySessionHostManager? = null
     private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
+    private var debugPressCount = 0
+    private var shouldAutoSurveyLocations = false
+    private var timeOfLastPress : Long = 0
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?)
@@ -211,8 +214,6 @@ class PerformCollectionFragment : Fragment(),
             MapManager.instance().centerMap( collectionTeam.polygon, binding.mapboxMapView )
         }
 
-        binding.progressOverlayView.visibility = View.VISIBLE
-
         binding.progressOverlayView.visibility = View.GONE
 
         val _user = (activity!!.application as? MainApplication)?.user
@@ -260,6 +261,42 @@ class PerformCollectionFragment : Fragment(),
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
             binding.titleTextView.text =  enumArea.name + " (" + collectionTeam.name + " " + resources.getString(R.string.team) + ")"
+
+            binding.titleTextView.setOnClickListener {
+                if (!shouldAutoSurveyLocations)
+                {
+                    val timeSpan = Date().time - timeOfLastPress
+
+                    if (timeSpan > 2000)
+                    {
+                        debugPressCount = 0
+                    }
+                    else
+                    {
+                        debugPressCount += 1
+                        if (debugPressCount == 6)
+                        {
+                            shouldAutoSurveyLocations = true
+                            binding.progressOverlayView.visibility = View.VISIBLE
+
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                withContext(Dispatchers.IO )
+                                {
+                                    autoSurveyLocations()
+                                }
+
+                                // back on the main thread...
+
+                                shouldAutoSurveyLocations = false
+                                binding.progressOverlayView.visibility = View.GONE
+                                Toast.makeText(activity!!.applicationContext,  "Auto Survey Complete.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+
+                    timeOfLastPress = Date().time
+                }
+            }
         }
 
         binding.mapTileCacheButton.backgroundTintList?.let {
@@ -774,6 +811,47 @@ class PerformCollectionFragment : Fragment(),
         }
 
         updateSummaryInfo()
+    }
+
+    fun autoSurveyLocations()
+    {
+        DAO.instance().writableDatabase.beginTransaction()
+
+        for (location in collectionTeamLocations)
+        {
+            if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+            {
+                if (location.enumerationItems.size == 1)
+                {
+                    val sampledItem = location.enumerationItems[0]
+                    if (sampledItem.samplingState == SamplingState.Sampled)
+                    {
+                        sampledItem.collectionState = CollectionState.Complete
+                        DAO.enumerationItemDAO.createOrUpdateEnumerationItem(sampledItem,UUID.randomUUID().toString())
+                    }
+                }
+                else
+                {
+                    for (sampledItem in location.enumerationItems)
+                    {
+                        if (sampledItem.samplingState == SamplingState.Sampled)
+                        {
+                            sampledItem.collectionDate = Date().time
+                            sampledItem.collectionState = CollectionState.Complete
+
+                            (activity!!.application as MainApplication).user?.let { user ->
+                                sampledItem.collectorName = user.name
+                            }
+
+                            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem,UUID.randomUUID().toString() )
+                        }
+                    }
+                }
+            }
+        }
+
+        DAO.instance().writableDatabase.setTransactionSuccessful()
+        DAO.instance().writableDatabase.endTransaction()
     }
 
     fun getFileName() : String

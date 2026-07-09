@@ -23,6 +23,7 @@
         android:layout_height="match_parent">
 
         <FrameLayout
+            android:id="@+id/titleBarLayout"
             android:background="@color/primary"
             android:layout_width="match_parent"
             android:layout_height="50dp">
