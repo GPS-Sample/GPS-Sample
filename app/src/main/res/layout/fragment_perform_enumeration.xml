@@ -249,102 +249,108 @@
             android:textSize="17sp"
             android:textStyle="bold" />
 
-        <LinearLayout
-            android:id="@+id/toolbar"
-            android:orientation="horizontal"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+        <HorizontalScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:fillViewport="true">
 
-            <Button
-                android:id="@+id/map_tile_cache_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="5dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:background="@drawable/cache2" />
+            <LinearLayout
+                android:id="@+id/toolbar"
+                android:orientation="horizontal"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <Button
-                android:id="@+id/center_on_location_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="5dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:background="@drawable/location_bubble_primary" />
+                <Button
+                    android:id="@+id/map_tile_cache_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="5dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:background="@drawable/cache2" />
 
-            <Button
-                android:id="@+id/add_household_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="5dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:background="@drawable/add_house_blue" />
+                <Button
+                    android:id="@+id/center_on_location_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="5dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:background="@drawable/location_bubble_primary" />
 
-            <Button
-                android:id="@+id/add_landmark_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="5dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:background="@drawable/add_location_blue" />
+                <Button
+                    android:id="@+id/add_household_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="5dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:background="@drawable/add_house_blue" />
 
-            <Button
-                android:id="@+id/export_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="5dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:background="@drawable/export_blue" />
+                <Button
+                    android:id="@+id/add_landmark_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="5dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:background="@drawable/add_location_blue" />
 
-            <Button
-                android:id="@+id/record_breadcrumbs_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="5dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:background="@drawable/record" />
+                <Button
+                    android:id="@+id/export_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="5dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:background="@drawable/export_blue" />
 
-            <Button
-                android:id="@+id/show_breadcrumbs_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="5dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:background="@drawable/navigate2" />
+                <Button
+                    android:id="@+id/record_breadcrumbs_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="5dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:background="@drawable/record" />
 
-            <Button
-                android:id="@+id/delete_breadcrumbs_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="5dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:background="@drawable/delete_blue" />
+                <Button
+                    android:id="@+id/show_breadcrumbs_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="5dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:background="@drawable/navigate2" />
 
-            <Space
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="50dp"/>
+                <Button
+                    android:id="@+id/delete_breadcrumbs_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="5dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:background="@drawable/delete_blue" />
 
-            <Button
-                android:id="@+id/help_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="5dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:background="@drawable/help" />
-        </LinearLayout>
+                <Space
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"/>
+
+                <Button
+                    android:id="@+id/help_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="5dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:background="@drawable/help" />
+            </LinearLayout>
+        </HorizontalScrollView>
     </LinearLayout>
 
     <FrameLayout
