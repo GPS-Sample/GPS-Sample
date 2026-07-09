@@ -201,7 +201,7 @@ class ZipUtils()
 
                 val resolver = activity.contentResolver
                 val values = ContentValues().apply {
-                    put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, fileName + ".zip" )
                     put(MediaStore.MediaColumns.MIME_TYPE, "application/zip")
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -217,7 +217,7 @@ class ZipUtils()
                             dir.mkdirs()
                         }
 
-                        val file = File(dir, fileName)
+                        val file = File(dir, fileName + ".zip" )
                         put(MediaStore.MediaColumns.DATA, file.absolutePath)
                     }
                 }
