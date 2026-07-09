@@ -709,7 +709,7 @@ class PerformEnumerationFragment : Fragment(),
             addAutoEnumerateListener()
         }
 
-        trimToolbarToFit( binding.toolbar )
+//        trimToolbarToFit( binding.toolbar )
 
         if (isRecordingBreadcrumbs)
         {
