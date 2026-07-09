@@ -43,7 +43,7 @@ class FilterDAO(private var dao: DAO)
 
         deleteAllFilterOperators(filter)
 
-        dao.upsert( DAO.TABLE_RULE, values )
+        dao.upsert( DAO.TABLE_FILTER, values )
 
         filter.rule?.let{ rule ->
             rule.filterOperator?.let{ filterOperator ->
