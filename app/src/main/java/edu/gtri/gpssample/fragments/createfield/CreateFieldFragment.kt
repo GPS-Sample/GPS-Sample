@@ -47,7 +47,6 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
 {
     private var _binding: FragmentCreateFieldBinding? = null
     private val binding get() = _binding!!
-
     private lateinit var field: Field
     private lateinit var study: Study
     private lateinit var checkboxLayout: LinearLayout
@@ -433,12 +432,26 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
             {
                 field.studyUuid = study.uuid
 
-                minimumNumberEditText.text.toString().toDoubleOrNull()?.let {
-                    field.minimum = it
+                if (minimumNumberCheckBox.isChecked)
+                {
+                    minimumNumberEditText.text.toString().toDoubleOrNull()?.let {
+                        field.minimum = it
+                    }
+                }
+                else
+                {
+                    field.minimum = null
                 }
 
-                maximumNumberEditText.text.toString().toDoubleOrNull()?.let {
-                    field.maximum = it
+                if (maximumNumberCheckBox.isChecked)
+                {
+                    maximumNumberEditText.text.toString().toDoubleOrNull()?.let {
+                        field.maximum = it
+                    }
+                }
+                else
+                {
+                    field.maximum = null
                 }
 
                 if (minimumDateEditText.tag is Double)
