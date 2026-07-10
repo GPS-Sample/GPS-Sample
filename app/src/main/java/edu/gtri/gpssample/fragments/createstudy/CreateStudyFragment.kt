@@ -49,7 +49,6 @@ class CreateStudyFragment : Fragment()
     private lateinit var sharedViewModel : ConfigurationViewModel
     private var debugPressCount = 0
     private var timeOfLastPress : Long = 0
-    private var shouldAutoCreateStudy = false
     private var expandableListState: SparseArray<Parcelable>? = null
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -120,7 +119,7 @@ class CreateStudyFragment : Fragment()
             sharedViewModel.currentConfiguration?.value?.let { config ->
                 if (config.studies.isEmpty())
                 {
-                    if (!shouldAutoCreateStudy)
+                    if (debugPressCount < 6)
                     {
                         val timeSpan = Date().time - timeOfLastPress
 
@@ -133,34 +132,42 @@ class CreateStudyFragment : Fragment()
                             debugPressCount += 1
                             if (debugPressCount == 6)
                             {
-                                val study = Study( "Study", SamplingMethod.Cluster, 10000, SampleType.NumberHouseholds )
+                                ConfirmationDialog(activity, resources.getString(R.string.please_confirm), "Auto create the study?", resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
+                                    when( buttonPressed )
+                                    {
+                                        ConfirmationDialog.ButtonPress.None -> {}
+                                        ConfirmationDialog.ButtonPress.Left -> {}
+                                        ConfirmationDialog.ButtonPress.Right -> {
+                                            val study = Study( "Study", SamplingMethod.Cluster, 10000, SampleType.NumberHouseholds )
 
-                                val noteField = Field( null, 1, "Note", FieldType.Note, false, false, false, false, false, false, null, null,study.uuid)
-                                val textField = Field( null, 2, "Text", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid)
-                                val numberField = Field( null, 3, "Number", FieldType.Number, false, false, true, false, false, false, null, null,study.uuid)
-                                val dateField = Field( null, 4, "Date", FieldType.Date, false, false, false, false, true, false, null, null,study.uuid)
-                                val checkBoxField = Field( null, 5, "Checkbox", FieldType.Checkbox, false, false, false, false, false, false, null, null,study.uuid)
-                                val dropDownField = Field( null, 6, "Dropdown", FieldType.Dropdown, false, false, false, false, false, false, null, null,study.uuid)
+                                            val noteField = Field( null, 1, "Note", FieldType.Note, false, false, false, false, false, false, null, null,study.uuid)
+                                            val textField = Field( null, 2, "Text", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid)
+                                            val numberField = Field( null, 3, "Number", FieldType.Number, false, false, true, false, false, false, null, null,study.uuid)
+                                            val dateField = Field( null, 4, "Date", FieldType.Date, false, false, false, false, true, false, null, null,study.uuid)
+                                            val checkBoxField = Field( null, 5, "Checkbox", FieldType.Checkbox, false, false, false, false, false, false, null, null,study.uuid)
+                                            val dropDownField = Field( null, 6, "Dropdown", FieldType.Dropdown, false, false, false, false, false, false, null, null,study.uuid)
 
-                                checkBoxField.fieldOptions.add( FieldOption("CB 1" ))
-                                checkBoxField.fieldOptions.add( FieldOption("CB 2" ))
-                                checkBoxField.fieldOptions.add( FieldOption("CB 3" ))
+                                            checkBoxField.fieldOptions.add( FieldOption("CB 1" ))
+                                            checkBoxField.fieldOptions.add( FieldOption("CB 2" ))
+                                            checkBoxField.fieldOptions.add( FieldOption("CB 3" ))
 
-                                dropDownField.fieldOptions.add( FieldOption("DD 1" ))
-                                dropDownField.fieldOptions.add( FieldOption("DD 2" ))
-                                dropDownField.fieldOptions.add( FieldOption("DD 3" ))
+                                            dropDownField.fieldOptions.add( FieldOption("DD 1" ))
+                                            dropDownField.fieldOptions.add( FieldOption("DD 2" ))
+                                            dropDownField.fieldOptions.add( FieldOption("DD 3" ))
 
-                                study.fields.add( noteField )
-                                study.fields.add( textField )
-                                study.fields.add( numberField )
-                                study.fields.add( dateField )
-                                study.fields.add( checkBoxField )
-                                study.fields.add( dropDownField )
+                                            study.fields.add( noteField )
+                                            study.fields.add( textField )
+                                            study.fields.add( numberField )
+                                            study.fields.add( dateField )
+                                            study.fields.add( checkBoxField )
+                                            study.fields.add( dropDownField )
 
-                                config.studies.add( study )
+                                            config.studies.add( study )
 
-                                shouldAutoCreateStudy = false
-                                Toast.makeText(activity!!.applicationContext,  "Auto Survey Complete.", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(activity!!.applicationContext,  "Auto Survey Complete.", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }
                             }
                         }
 
