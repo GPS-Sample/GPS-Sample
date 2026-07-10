@@ -194,7 +194,7 @@ class StrataSampleFragment : Fragment()
 
     override fun onDestroyView()
     {
-        binding.expandableListView.adapter = null
+//        binding.expandableListView.adapter = null
         _binding = null
 
         super.onDestroyView()
