@@ -270,7 +270,6 @@ class NearbySessionHostManager( private val context: Context, private val config
         transferMutex.withLock {
             val output = PipedOutputStream()
             val input = PipedInputStream(output, 64 * 1024)
-
             client.sendPayload(endpointId, Payload.fromStream(input))
 
             try {
@@ -279,7 +278,6 @@ class NearbySessionHostManager( private val context: Context, private val config
                     _state.value = NearbySessionState.Message("Sending EnumArea 1/1" )
                     val jsonLine = json.encodeToString(EnumArea.serializer(),config.enumAreas.first())
                     output.write(jsonLine.toByteArray())
-                    output.write('\n'.code)
                 }
                 else
                 {
@@ -290,19 +288,29 @@ class NearbySessionHostManager( private val context: Context, private val config
                         val numItems = cursor.count
                         var count = 1
 
-                        while (cursor.moveToNext())
-                        {
-                            _state.value = NearbySessionState.Message("Sending EnumArea ${count++}/${numItems}" )
-                            val uuid = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_UUID))
-                            DAO.enumAreaDAO.getEnumArea(uuid)?.let { enumArea ->
-                                val jsonLine = json.encodeToString(EnumArea.serializer(), enumArea)
-                                output.write(jsonLine.toByteArray())
-                                output.write('\n'.code)
+                        if (numItems > 0) {
+                            while (cursor.moveToNext()) {
+                                _state.value =
+                                    NearbySessionState.Message("Sending EnumArea ${count++}/${numItems}")
+                                val uuid =
+                                    cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_UUID))
+                                DAO.enumAreaDAO.getEnumArea(uuid)?.let { enumArea ->
+                                    val jsonLine = json.encodeToString(EnumArea.serializer(), enumArea)
+                                    output.write(jsonLine.toByteArray())
+                                }
                             }
                         }
                     }
                 }
-            } catch( ex: Exception ) {} finally { try { output.close() } catch( ex: Exception ) {}}
+            } catch( ex: Exception ) {
+            } finally {
+                try {
+                    output.write('\n'.code)
+                    output.close()
+                }
+                catch( ex: Exception ) {
+                }
+            }
         }
 
     // -------------------------------------------------------------------------
