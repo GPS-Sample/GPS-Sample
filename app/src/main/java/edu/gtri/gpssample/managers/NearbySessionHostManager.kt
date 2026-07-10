@@ -290,10 +290,8 @@ class NearbySessionHostManager( private val context: Context, private val config
 
                         if (numItems > 0) {
                             while (cursor.moveToNext()) {
-                                _state.value =
-                                    NearbySessionState.Message("Sending EnumArea ${count++}/${numItems}")
-                                val uuid =
-                                    cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_UUID))
+                                _state.value = NearbySessionState.Message("Sending EnumArea ${count++}/${numItems}")
+                                val uuid = cursor.getString(cursor.getColumnIndexOrThrow(DAO.COLUMN_UUID))
                                 DAO.enumAreaDAO.getEnumArea(uuid)?.let { enumArea ->
                                     val jsonLine = json.encodeToString(EnumArea.serializer(), enumArea)
                                     output.write(jsonLine.toByteArray())
