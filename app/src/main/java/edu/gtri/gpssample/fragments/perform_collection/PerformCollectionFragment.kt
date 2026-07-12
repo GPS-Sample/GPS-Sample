@@ -9,6 +9,7 @@ package edu.gtri.gpssample.fragments.perform_collection
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -56,6 +57,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.dialogs.*
+import edu.gtri.gpssample.fragments.createstudy.DeleteMode
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionHostManager
 import edu.gtri.gpssample.managers.PerformanceManager
@@ -105,9 +107,6 @@ class PerformCollectionFragment : Fragment(),
     private var nearbySessionHostManager: NearbySessionHostManager? = null
     private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
-    private var debugPressCount = 0
-    private var shouldAutoSurveyLocations = false
-    private var timeOfLastPress : Long = 0
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?)
@@ -261,42 +260,6 @@ class PerformCollectionFragment : Fragment(),
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
             binding.titleTextView.text =  enumArea.name + " (" + collectionTeam.name + " " + resources.getString(R.string.team) + ")"
-
-            binding.titleTextView.setOnClickListener {
-                if (!shouldAutoSurveyLocations)
-                {
-                    val timeSpan = Date().time - timeOfLastPress
-
-                    if (timeSpan > 2000)
-                    {
-                        debugPressCount = 0
-                    }
-                    else
-                    {
-                        debugPressCount += 1
-                        if (debugPressCount == 6)
-                        {
-                            shouldAutoSurveyLocations = true
-                            binding.progressOverlayView.visibility = View.VISIBLE
-
-                            viewLifecycleOwner.lifecycleScope.launch {
-                                withContext(Dispatchers.IO )
-                                {
-                                    autoSurveyLocations()
-                                }
-
-                                // back on the main thread...
-
-                                shouldAutoSurveyLocations = false
-                                binding.progressOverlayView.visibility = View.GONE
-                                Toast.makeText(activity!!.applicationContext,  "Auto Survey Complete.", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
-
-                    timeOfLastPress = Date().time
-                }
-            }
         }
 
         binding.mapTileCacheButton.backgroundTintList?.let {
@@ -1370,6 +1333,13 @@ class PerformCollectionFragment : Fragment(),
         super.onCreateOptionsMenu(menu, inflater)
 
         inflater.inflate(R.menu.menu_map_style_min, menu)
+
+        val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", Context.MODE_PRIVATE)
+
+        if (sharedPreferences.getBoolean( Keys.kDeveloperMode.value, false ))
+        {
+            menu.findItem(R.id.action_auto_survey).isVisible = true
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
@@ -1382,6 +1352,36 @@ class PerformCollectionFragment : Fragment(),
 
         when (item.itemId)
         {
+            R.id.action_auto_survey ->
+            {
+                ConfirmationDialog(activity, resources.getString(R.string.please_confirm), "Auto survey these locations?", resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
+                    when (buttonPressed) {
+                        ConfirmationDialog.ButtonPress.None -> {}
+                        ConfirmationDialog.ButtonPress.Left -> {}
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            binding.progressOverlayView.visibility = View.VISIBLE
+
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                withContext(Dispatchers.IO )
+                                {
+                                    autoSurveyLocations()
+                                }
+
+                                // back on the main thread...
+
+                                binding.progressOverlayView.visibility = View.GONE
+
+                                refreshMap()
+                                updateSummaryInfo()
+                                performCollectionAdapter.updateItems( performCollectionAdapter.enumerationItems, performCollectionAdapter.locations )
+
+                                Toast.makeText(activity!!.applicationContext,  "Auto Survey Complete.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+            }
+
             R.id.mapbox_streets ->
             {
                 val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)

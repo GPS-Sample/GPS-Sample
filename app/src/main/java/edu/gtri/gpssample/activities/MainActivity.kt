@@ -15,6 +15,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -22,11 +23,15 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.gms.security.ProviderInstaller
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.databinding.ActivityMainBinding
 import edu.gtri.gpssample.dialogs.InfoDialog
+import edu.gtri.gpssample.fragments.about_fragment.AboutFragment
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.util.Date
 
 class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, ProviderInstaller.ProviderInstallListener
 {
@@ -62,7 +67,53 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, Provide
 
         binding.toolbar.setOnClickListener {
             (this.application as? MainApplication)?.currentFragment?.let {
-                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                if (it.contains("AboutFragment" ))
+                {
+                    handleDebugPress()
+                }
+                else
+                {
+                    Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private var debugPressCount = 0
+    private var timeOfLastPress : Long = 0
+
+    fun handleDebugPress()
+    {
+        if (debugPressCount < 6)
+        {
+            val timeSpan = Date().time - timeOfLastPress
+            timeOfLastPress = Date().time
+
+            if (timeSpan > 2000)
+            {
+                debugPressCount = 0
+            }
+            else
+            {
+                debugPressCount += 1
+
+                if (debugPressCount == 6)
+                {
+                    val sharedPreferences: SharedPreferences = getSharedPreferences("default", Context.MODE_PRIVATE)
+                    val developerMode = !sharedPreferences.getBoolean( Keys.kDeveloperMode.value, false )
+                    sharedPreferences.edit(commit = true) { putBoolean(Keys.kDeveloperMode.value, developerMode ) }
+
+                    if (developerMode)
+                    {
+                        Toast.makeText( this, "Developer Mode is ENABLED", Toast.LENGTH_SHORT).show()
+                    }
+                    else
+                    {
+                        Toast.makeText( this, "Developer Mode is DISABLED", Toast.LENGTH_SHORT).show()
+                    }
+
+                    debugPressCount = 0
+                }
             }
         }
     }

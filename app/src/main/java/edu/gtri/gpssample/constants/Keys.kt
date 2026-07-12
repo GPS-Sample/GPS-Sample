@@ -22,6 +22,7 @@ enum class Keys( val value: String ) {
     kIsSubsetRule("IsSubsetRule"),
     kIsOnBoarding("IsOnBoarding"),
     kTermsAccepted("TermsAccepted"),
+    kDeveloperMode( "DeveloperMode"),
     kViewPreference("ViewPreference"),
     kCollectionMode("CollectionMode"),
     kReviewDuplicate("ReviewDuplicate"),

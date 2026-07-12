@@ -57,6 +57,7 @@ import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.*
+import edu.gtri.gpssample.fragments.createstudy.DeleteMode
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionHostManager
 import edu.gtri.gpssample.managers.PerformanceManager
@@ -108,9 +109,6 @@ class PerformEnumerationFragment : Fragment(),
     private var nearbySessionHostManager: NearbySessionHostManager? = null
     private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
-    private var debugPressCount = 0
-    private var shouldAutoSurveyLocations = false
-    private var timeOfLastPress : Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -645,29 +643,6 @@ class PerformEnumerationFragment : Fragment(),
             }
         }
 
-        var sampledCount = 0
-        var surveyedCount = 0
-        var enumerationCount = 0
-
-        for (location in enumerationTeamLocations)
-        {
-            for (enumItem in location.enumerationItems)
-            {
-                if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
-                {
-                    enumerationCount += 1
-                }
-                if (enumItem.samplingState == SamplingState.Sampled || enumItem.subsetSamplingState == SamplingState.Sampled)
-                {
-                    sampledCount += 1
-                }
-                if (enumItem.collectionState == CollectionState.Complete)
-                {
-                    surveyedCount += 1
-                }
-            }
-        }
-
         for (location in enumArea.locations)
         {
             for (enumItem in location.enumerationItems)
@@ -683,6 +658,8 @@ class PerformEnumerationFragment : Fragment(),
                 }
             }
         }
+
+        val enumerationCount = updateSummaryInfo()
 
         if (enumerationCount == 0)
         {
@@ -700,16 +677,6 @@ class PerformEnumerationFragment : Fragment(),
         }
 
         binding.listItemEnumArea.titleLayout.visibility = View.GONE
-        binding.listItemEnumArea.numberEnumeratedTextView.text = "$enumerationCount"
-        binding.listItemEnumArea.numberSampledTextView.text = "$sampledCount"
-        binding.listItemEnumArea.numberSurveyedTextView.text = "$surveyedCount"
-
-        if (enumerationCount == 0)
-        {
-            addAutoEnumerateListener()
-        }
-
-//        trimToolbarToFit( binding.toolbar )
 
         if (isRecordingBreadcrumbs)
         {
@@ -761,6 +728,38 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
+    fun updateSummaryInfo() : Int
+    {
+        var sampledCount = 0
+        var surveyedCount = 0
+        var enumerationCount = 0
+
+        for (location in enumerationTeamLocations)
+        {
+            for (enumItem in location.enumerationItems)
+            {
+                if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
+                {
+                    enumerationCount += 1
+                }
+                if (enumItem.samplingState == SamplingState.Sampled || enumItem.subsetSamplingState == SamplingState.Sampled)
+                {
+                    sampledCount += 1
+                }
+                if (enumItem.collectionState == CollectionState.Complete)
+                {
+                    surveyedCount += 1
+                }
+            }
+        }
+
+        binding.listItemEnumArea.numberEnumeratedTextView.text = "$enumerationCount"
+        binding.listItemEnumArea.numberSampledTextView.text = "$sampledCount"
+        binding.listItemEnumArea.numberSurveyedTextView.text = "$surveyedCount"
+
+        return enumerationCount
+    }
+
     override fun onResume()
     {
         super.onResume()
@@ -772,57 +771,15 @@ class PerformEnumerationFragment : Fragment(),
 
     var subAddress = 0
 
-    fun addAutoEnumerateListener()
-    {
-        binding.titleTextView.setOnClickListener {
-            if (!shouldAutoSurveyLocations)
-            {
-                val timeSpan = Date().time - timeOfLastPress
-
-                if (timeSpan > 2000)
-                {
-                    debugPressCount = 0
-                }
-                else
-                {
-                    debugPressCount += 1
-                    if (debugPressCount == 6)
-                    {
-                        shouldAutoSurveyLocations = true
-                        binding.progressOverlayView.visibility = View.VISIBLE
-
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            withContext(Dispatchers.IO )
-                            {
-                                autoEnumerateLocations()
-                            }
-
-                            // back on the main thread...
-
-                            binding.progressOverlayView.visibility = View.GONE
-                            Toast.makeText(activity!!.applicationContext,  "Auto Survey Complete.", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-
-                timeOfLastPress = Date().time
-            }
-        }
-    }
-
     fun autoEnumerateLocations()
     {
-        lateinit var config : Config
-
-        sharedViewModel.currentConfiguration?.value?.let {
-            config = it
-        }
+        val config = sharedViewModel.currentConfiguration!!.value!!
 
         DAO.instance().writableDatabase.beginTransaction()
 
         for (location in enumerationTeamLocations)
         {
-            if (!location.isLandmark)
+            if (!location.isLandmark && location.enumerationItems.isEmpty())
             {
                 subAddress+= 1
 
@@ -886,6 +843,8 @@ class PerformEnumerationFragment : Fragment(),
                 }
 
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, enumerationItem.version )
+
+                location.enumerationItems.add( enumerationItem )
             }
         }
 
@@ -1556,6 +1515,13 @@ class PerformEnumerationFragment : Fragment(),
         super.onCreateOptionsMenu(menu, inflater)
 
         inflater.inflate(R.menu.menu_set_subaddress, menu)
+
+        val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", Context.MODE_PRIVATE)
+
+        if (sharedPreferences.getBoolean( Keys.kDeveloperMode.value, false ))
+        {
+            menu.findItem(R.id.action_auto_enumerate).isVisible = true
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
@@ -1563,6 +1529,35 @@ class PerformEnumerationFragment : Fragment(),
         sharedViewModel.currentConfiguration?.value?.let { config ->
             when (item.itemId)
             {
+                R.id.action_auto_enumerate ->
+                {
+                    ConfirmationDialog(activity, resources.getString(R.string.please_confirm), "Auto enumerate these locations?", resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
+                        when (buttonPressed) {
+                            ConfirmationDialog.ButtonPress.None -> {}
+                            ConfirmationDialog.ButtonPress.Left -> {}
+                            ConfirmationDialog.ButtonPress.Right -> {
+                                binding.progressOverlayView.visibility = View.VISIBLE
+
+                                viewLifecycleOwner.lifecycleScope.launch {
+                                    withContext(Dispatchers.IO )
+                                    {
+                                        autoEnumerateLocations()
+                                    }
+
+                                    // back on the main thread...
+
+                                    binding.progressOverlayView.visibility = View.GONE
+
+                                    refreshMap()
+                                    updateSummaryInfo()
+                                    performEnumerationAdapter.updateLocations( performEnumerationAdapter.locations )
+                                    Toast.makeText(activity!!.applicationContext,  "Auto Enumeration Complete.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
+                }
+
                 R.id.set_subaddress ->
                 {
                     InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, false, true )  { action, text, tag ->

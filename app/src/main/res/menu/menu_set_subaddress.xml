@@ -17,4 +17,10 @@
         android:id="@+id/satellite_streets"
         android:title="Satellite Streets"
         app:showAsAction="never"/>
+
+    <item
+        android:visible="false"
+        android:id="@+id/action_auto_enumerate"
+        android:title="Auto Enumerate"
+        app:showAsAction="never" />
 </menu>
