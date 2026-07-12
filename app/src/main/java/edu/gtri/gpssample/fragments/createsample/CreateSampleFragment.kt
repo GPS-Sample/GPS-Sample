@@ -507,7 +507,7 @@ class CreateSampleFragment : Fragment()
             }
             SamplingViewModel.SamplePageState.GeofenceViolationPage -> {
                 binding.nextButton.isEnabled = true
-                binding.titleTextView.text = resources.getString( R.string.review_booudary_violations )
+                binding.titleTextView.text = resources.getString( R.string.review_boundary_violations )
                 binding.generateSampleButton.visibility = View.GONE
                 binding.beginReviewTextView.visibility = View.GONE
                 binding.backButton.text = resources.getString(R.string.back )

@@ -91,7 +91,7 @@ class ExcludeLocationDialog
         saveButton.setOnClickListener {
             if (excludeButton.isChecked && duplicateButton.isChecked == false && outsideButton.isChecked == false && otherButton.isChecked == false)
             {
-                Toast.makeText( context, context.resources.getString(R.string.reason_is_rquired), Toast.LENGTH_SHORT).show()
+                Toast.makeText( context, context.resources.getString(R.string.reason_is_required), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

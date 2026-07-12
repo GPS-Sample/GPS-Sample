@@ -473,44 +473,38 @@
     <string name="role_hint">""GPSSample is a free Android app for field-based household listing, sampling, and navigation. Select your role to get started, or visit gpssample.org to learn more. Note: Once you register a role on this device, only that role and roles below it will be available.""</string>
     <string name="sampling_hint">"Method descriptions:\n\nSimple Random Sample:\nEach household has an equal chance of being selected.\n\nCluster Sample (# of households):\nSelect a fixed number of households from each cluster.\n\nCluster Sample (% of households):\nSelect a percentage of households from each cluster."</string>
     <string name="enter_forgot_pin_question">"Enter the forgot PIN question"</string>
-    <string name="distance">Distance</string>
-    <string name="collection_app">Collection App</string>
-    <string name="clone_configuration">Clone Configuration</string>
-    <string name="confirm_clone_configuration">Are you sure you want to Clone this Configuration?</string>
-    <string name="collector_import_error">This configuration does not have an collection team associated with it.</string>
-    <string name="missing_enumeration_area">This configuration does not have an Enumeration Area associated with it.</string>
-    <string name="missing_study">This configuration does not have a Study associated with it.</string>
-    <string name="missing_enumeration_team">This configuration does not have an Enumeration Team associated with it.</string>
-    <string name="missing_collection_team">This configuration does not have a Collection Team associated with it.</string>
-    <string name="edit_enumeration_area">Edit Enumeration Area</string>
-    <string name="delete_all_enumeration_areas">Delete all Enumeration Areas</string>
+    <string name="collection_app">"Collection App"</string>
+    <string name="clone_configuration">"Clone Configuration"</string>
+    <string name="confirm_clone_configuration">"Are you sure you want to Clone this Configuration?"</string>
+    <string name="collector_import_error">"This configuration does not have an collection team associated with it."</string>
+    <string name="missing_enumeration_area">"This configuration does not have an Enumeration Area associated with it."</string>
+    <string name="missing_study">"This configuration does not have a Study associated with it."</string>
+    <string name="missing_enumeration_team">"This configuration does not have an Enumeration Team associated with it."</string>
+    <string name="missing_collection_team">"This configuration does not have a Collection Team associated with it."</string>
+    <string name="edit_enumeration_area">"Edit Enumeration Area"</string>
+    <string name="delete_all_enumeration_areas">"Delete all Enumeration Areas"</string>
     <string name="delete_all_enumeration_areas_message">"Are you sure you want to permanently delete all Enumeration Areas?"</string>
-    <string name="delete_location_message">"Would you also like to permanently delete this location?"</string>
-    <string name="draw_boundary">Draw the team boundary on the map</string>
-    <string name="tap_boundary">Tap the team boundary points on the map</string>
-    <string name="enforce_geofence_boundary">Enforce Geofence Boundary</string>
-    <string name="enter_the_geofence_buffer_value">Enter the geofence buffer value</string>
+    <string name="draw_boundary">"Draw the team boundary on the map"</string>
+    <string name="tap_boundary">"Tap the team boundary points on the map"</string>
+    <string name="distance">"Distance"</string>
+    <string name="enforce_geofence_boundary">"Enforce Geofence Boundary"</string>
+    <string name="enter_the_geofence_buffer_value">"Enter the geofence buffer value"</string>
     <string name="geofence_hint">"Placeholder for GeoFence Hint"</string>
     <string name="geofence_error">"You are currently outside of the Geofence"</string>
-    <string name="begin_sample_review">Begin Sample Review</string>
-    <string name="review_sample">Review Sample</string>
-    <string name="review_possible_duplicates">Review Possible Duplicates</string>
-    <string name="review_booudary_violations">Review Boundary Violations</string>
-    <string name="save_sample">Save Sample</string>
-    <string name="duplicate">Duplicate</string>
-    <string name="outside_boundary">Outside Boundary</string>
-    <string name="reason_is_rquired">You must select a Reason for the exclusion.</string>
-    <string name="location">Location</string>
-    <string name="keep_or_exclude_this_location">Keep or Exclude this location?</string>
-    <string name="keep_this_location">Keep this location</string>
-    <string name="exclude_this_location">Exclude this location</string>
-    <string name="reason">Reason</string>
-
-    <string-array name="collection_apps">
-        <item>"ODK Collect"</item>
-        <item>"Kobo Collect"</item>
-        <item>"Ona"</item>
-    </string-array>
+    <string name="begin_sample_review">"Begin Sample Review"</string>
+    <string name="review_sample">"Review Sample"</string>
+    <string name="review_possible_duplicates">"Review Possible Duplicates"</string>
+    <string name="review_boundary_violations">"Review Boundary Violations"</string>
+    <string name="save_sample">"Save Sample"</string>
+    <string name="duplicate">"Duplicate"</string>
+    <string name="outside_boundary">"Outside Boundary"</string>
+    <string name="reason_is_required">"You must select a Reason for the exclusion."</string>
+    <string name="location">"Location"</string>
+    <string name="keep_or_exclude_this_location">"Keep or Exclude this location?"</string>
+    <string name="keep_this_location">"Keep this location"</string>
+    <string name="exclude_this_location">"Exclude this location"</string>
+    <string name="reason">"Reason"</string>
+    <string name="delete_location_message">"Would you also like to permanently delete this location?"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
@@ -574,5 +568,10 @@
         <item>"Default view"</item>
         <item>"Map Only"</item>
         <item>"List Only"</item>
+    </string-array>
+    <string-array name="collection_apps">
+        <item>"ODK Collect"</item>
+        <item>"Kobo Collect"</item>
+        <item>"Ona"</item>
     </string-array>
 </resources>
