@@ -56,7 +56,6 @@ class CreateStudyFragment : Fragment()
         super.onCreate(savedInstanceState)
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
-        sharedViewModel.createStudyModel.fragment = this
 
         val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", Context.MODE_PRIVATE)
         if (sharedPreferences.getBoolean( Keys.kDeveloperMode.value, false ))
@@ -238,8 +237,6 @@ class CreateStudyFragment : Fragment()
 
     override fun onDestroyView()
     {
-        sharedViewModel.createStudyModel.fragment = null
-
         _binding = null
 
         super.onDestroyView()

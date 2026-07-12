@@ -5,12 +5,13 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.viewmodels.models
+package edu.gtri.gpssample.viewmodels
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.OperatorConverter
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Rule
@@ -37,24 +38,20 @@ class CreateRuleModel {
     val operators : Array<String>
         get(){
             val englishArray = OperatorConverter.array
-            fragment?.let { fragment ->
-
-                val array: Array<String> = Array(englishArray.size)
-                { i ->
-                    when (i) {
-                        0 -> fragment.getString(R.string.equal)
-                        1 -> fragment.getString(R.string.not_equal)
-                        2 -> fragment.getString(R.string.less_than)
-                        3 -> fragment.getString(R.string.greater_than)
-                        4 -> fragment.getString(R.string.less_than_equal)
-                        5 -> fragment.getString(R.string.greater_than_equal)
-                        6 -> fragment.getString(R.string.contains)
-                        else -> String()
-                    }
+            val array: Array<String> = Array(englishArray.size)
+            { i ->
+                when (i) {
+                    0 -> MainApplication.getContext().getString(R.string.equal)
+                    1 -> MainApplication.getContext().getString(R.string.not_equal)
+                    2 -> MainApplication.getContext().getString(R.string.less_than)
+                    3 -> MainApplication.getContext().getString(R.string.greater_than)
+                    4 -> MainApplication.getContext().getString(R.string.less_than_equal)
+                    5 -> MainApplication.getContext().getString(R.string.greater_than_equal)
+                    6 -> MainApplication.getContext().getString(R.string.contains)
+                    else -> String()
                 }
-                return array
             }
-            return englishArray
+            return array
         }
 
     fun addPrimaryRule( study : Study )

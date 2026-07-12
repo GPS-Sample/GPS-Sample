@@ -7,45 +7,29 @@
 
 package edu.gtri.gpssample.viewmodels
 
-import android.content.SharedPreferences
 import android.view.View
 import android.widget.AdapterView
-import androidx.camera.core.CameraEffect
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.mapbox.geojson.Point
-import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.*
-import edu.gtri.gpssample.viewmodels.models.*
 import java.util.*
 
 class ConfigurationViewModel : ViewModel()
 {
     private val unavailable = "Unavailable"
-
     private var _distanceFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _timeFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _dateFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
-
-    // live data for each screen being controlled by the view model
     private var _currentConfiguration : MutableLiveData<Config>? = null
-    private var _actualConfig : Config? = null
-    // Since we are utilizing a main view model per "section" of the app, i.e. the set up of a
-    // configuration with enumerations, studies, fields, rules and filters, each with its own
-    // fragment, we employ what we call "fragment models" that control each fragment data, but
-    // are commonly available across all fragments, since they share data between themselves.
 
     val createFilterModel : CreateFilterModel = CreateFilterModel()
     val createStudyModel : CreateStudyModel = CreateStudyModel()
     val createFieldModel : CreateFieldModel = CreateFieldModel()
     val createRuleModel : CreateRuleModel = CreateRuleModel()
     val enumAreaViewModel : EnumAreaViewModel = EnumAreaViewModel()
-    val locationViewModel : LocationViewModel = LocationViewModel()
-    var teamViewModel : TeamViewModel = TeamViewModel()
     val createFilterRuleModel : CreateFilterRuleModel = CreateFilterRuleModel()
 
     // Exposed LiveData each screen being controlled by the view model
@@ -173,13 +157,6 @@ class ConfigurationViewModel : ViewModel()
                 }
             }
             return unavailable
-        }
-
-    private var _currentFragment : Fragment? = null
-    var currentFragment : Fragment?
-        get() = _currentFragment
-        set(value){
-            _currentFragment = value
         }
 
     fun onDistanceFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)

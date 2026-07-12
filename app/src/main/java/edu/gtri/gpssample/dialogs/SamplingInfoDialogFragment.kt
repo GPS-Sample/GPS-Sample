@@ -19,7 +19,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import edu.gtri.gpssample.databinding.DialogSamplingInfoBinding
 
-import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 
 class SamplingInfoDialogFragment : DialogFragment() {

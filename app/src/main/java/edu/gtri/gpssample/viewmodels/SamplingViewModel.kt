@@ -8,18 +8,12 @@
 package edu.gtri.gpssample.viewmodels
 
 import android.util.Log
-import android.view.View
-import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
-import edu.gtri.gpssample.fragments.createsample.CreateSampleFragment
-import edu.gtri.gpssample.managers.NearbySessionState
 import edu.gtri.gpssample.utils.DateUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

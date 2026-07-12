@@ -5,7 +5,7 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.viewmodels.models
+package edu.gtri.gpssample.viewmodels
 
 import android.view.View
 import android.widget.AdapterView

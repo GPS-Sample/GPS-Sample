@@ -5,11 +5,10 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.viewmodels.models
+package edu.gtri.gpssample.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 
 class EnumAreaViewModel

@@ -83,8 +83,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
         val vm: ConfigurationViewModel by activityViewModels()
 
         sharedViewModel = vm
-
-        sharedViewModel.currentFragment = this
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -768,7 +766,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
         nearbySessionHostManager?.stopHosting()
         nearbySessionClientManager?.cancel()
 
-        sharedViewModel.currentFragment = null
         binding.enumAreasRecycler.adapter = null
         binding.studiesRecycler.adapter = null
 

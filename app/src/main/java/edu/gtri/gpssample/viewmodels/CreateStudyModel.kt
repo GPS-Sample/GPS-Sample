@@ -5,20 +5,16 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.viewmodels.models
+package edu.gtri.gpssample.viewmodels
 
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.widget.AdapterView
-import androidx.databinding.Bindable
-import androidx.databinding.BindingAdapter
 import androidx.databinding.ObservableArrayList
 import androidx.databinding.ObservableBoolean
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
@@ -26,20 +22,17 @@ import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Study
 import java.util.*
 
-class CreateStudyModel {
+class CreateStudyModel
+{
     private var _samplingMethodPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _samplingTypePosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _currentStudy : MutableLiveData<Study>? = null
     private var _samplingTypes : ObservableArrayList<String> = ObservableArrayList()
-    private var _samplingTypesVisible : Boolean = false
     private var _samplingMethod: MutableLiveData<SamplingMethod> = MutableLiveData( SamplingMethod.SimpleRandom )
 
     var samplingMethod : LiveData<SamplingMethod> = _samplingMethod
-
-    var fragment : Fragment? = null
     var sampleTypesVisibility : ObservableBoolean = ObservableBoolean(true)
     var strataVisibility : ObservableBoolean = ObservableBoolean(false)
-
     val samplingMethodPosition : MutableLiveData<Int>
         get() = _samplingMethodPosition
     val samplingTypePosition : MutableLiveData<Int>
@@ -48,41 +41,32 @@ class CreateStudyModel {
     val samplingMethods : Array<String>
         get(){
             val englishArray = SamplingMethodConverter.array
-            fragment?.let { fragment ->
+            val array: Array<String> = Array(englishArray.size)
+            { i ->
+                when (i) {
 
-                val array: Array<String> = Array(englishArray.size)
-                { i ->
-                    when (i) {
-
-                        0 -> fragment.getString(R.string.cluster_sampling)
-                        1 -> fragment.getString(R.string.simple_random)
-                        2 -> fragment.getString(R.string.strata_exclusive)
-                        else -> String()
-                    }
+                    0 -> MainApplication.getContext().getString(R.string.cluster_sampling)
+                    1 -> MainApplication.getContext().getString(R.string.simple_random)
+                    2 -> MainApplication.getContext().getString(R.string.strata_exclusive)
+                    else -> String()
                 }
-                return array
             }
-            return englishArray
-
+            return array
         }
 
     val sampleTypes : Array<String>
         get(){
             val englishArray = SampleTypeConverter.array
-            fragment?.let { fragment ->
+            val array: Array<String> = Array(englishArray.size)
+            { i ->
+                when (i) {
 
-                val array: Array<String> = Array(englishArray.size)
-                { i ->
-                    when (i) {
-
-                        0 -> fragment.getString(R.string.numberhouseholds)
-                        1 -> fragment.getString(R.string.percenthouseholds)
-                        else -> String()
-                    }
+                    0 -> MainApplication.getContext().getString(R.string.numberhouseholds)
+                    1 -> MainApplication.getContext().getString(R.string.percenthouseholds)
+                    else -> String()
                 }
-                return array
             }
-            return englishArray
+            return array
         }
 
     val fieldNameList : Array<String>
@@ -92,26 +76,6 @@ class CreateStudyModel {
         get() = getFields()
 
     var currentStudy : LiveData<Study>? = _currentStudy
-
-//    var currentSampleSize : MutableLiveData<String> = MutableLiveData("")
-//        set(value)
-//        {
-//            currentStudy?.value?.let{study ->
-//
-//                value.value?.toIntOrNull()?.let {size ->
-//                    if(size > 0)
-//                    {
-//                        study.sampleSize = size
-//                        field = value
-//                    }else
-//                    {
-//                        currentSampleSize.postValue("1")
-//                    }
-//                } ?: run{ study.sampleSize = 0
-//                }
-//            }
-//
-//        }
 
     var  currentSampleSize : String
         get(){
@@ -178,32 +142,6 @@ class CreateStudyModel {
         }
 
         return fieldList.toTypedArray()
-    }
-
-    private fun getPrimaryRules() : Array<String>
-    {
-        val ruleList = ArrayList<String>()
-        _currentStudy?.value?.primaryRules?.let { rules ->
-            for (rule in rules)
-            {
-                ruleList.add( rule.name )
-            }
-        }
-
-        return ruleList.toTypedArray()
-    }
-
-    private fun getSubsetRules() : Array<String>
-    {
-        val ruleList = ArrayList<String>()
-        _currentStudy?.value?.subsetRules?.let { rules ->
-            for (rule in rules)
-            {
-                ruleList.add( rule.name )
-            }
-        }
-
-        return ruleList.toTypedArray()
     }
 
     fun onSamplingMethodSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
@@ -275,9 +213,7 @@ class CreateStudyModel {
                 if(!config.studies.contains(study))
                 {
                     config.studies.add(study)
-
                 }
-               // DAO.studyDAO.createOrUpdateStudy(study)
             }
         }
     }
@@ -287,7 +223,6 @@ class CreateStudyModel {
         study?.let { study ->
             configuration?.let{config ->
                 config.studies.remove(study)
-
             }
             DAO.studyDAO.deleteStudy(study)
         }

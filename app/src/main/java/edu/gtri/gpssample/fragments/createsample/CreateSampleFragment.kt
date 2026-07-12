@@ -73,7 +73,6 @@ class CreateSampleFragment : Fragment()
         val samplingVm : SamplingViewModel by activityViewModels()
 
         sharedViewModel = vm
-        sharedViewModel.currentFragment = this
 
         samplingViewModel = samplingVm
         samplingViewModel.currentConfig = sharedViewModel.currentConfiguration

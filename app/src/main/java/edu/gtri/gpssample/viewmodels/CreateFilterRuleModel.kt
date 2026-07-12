@@ -5,7 +5,7 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.viewmodels.models
+package edu.gtri.gpssample.viewmodels
 
 import android.view.View
 import android.widget.AdapterView
@@ -28,23 +28,15 @@ class CreateFilterRuleModel {
     private var _currentRule : MutableLiveData<Rule>? = null
     private var _secondRule : MutableLiveData<Rule>? = null
     private var currentConnector : Connector = Connector.NONE
-
     private var _currentFilter : MutableLiveData<Filter>? = null
-//    private var _currentFilterRule : MutableLiveData<FilterRule>? = null
     private var _ruleFieldPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _secondRuleFieldPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _ruleConditionPosition : MutableLiveData<Int> = MutableLiveData(0)
-
     private var _createFilterAdapter : CreateFilterAdapter? = null
-
     private var _firstStringRuleList : MutableLiveData<ArrayList<String>> = MutableLiveData(ArrayList<String>())
-
     private var allRules = ArrayList<String>()
-   // private var secondRules = ArrayList<String>()
 
-    //private var _stringRuleList : MutableLiveData<ArrayList>
-
-    var currentRule : LiveData<Rule>? = null
+    val currentRule : LiveData<Rule>?
             get() = _currentRule
 
     var createFilterAdapter : CreateFilterAdapter?
@@ -54,7 +46,6 @@ class CreateFilterRuleModel {
             _createFilterAdapter = value
         }
 
-//    var currentFilterRule : LiveData<FilterRule>? = _currentFilterRule
     var filterHasRules : ObservableBoolean = ObservableBoolean(false)
         get (){
             _currentFilter?.value?.let{filter->
@@ -80,17 +71,12 @@ class CreateFilterRuleModel {
         get() = _ruleFieldPosition
     val secondRuleFieldPosition : MutableLiveData<Int>
         get() = _secondRuleFieldPosition
-
     val ruleConditionPosition : MutableLiveData<Int>
         get() = _ruleConditionPosition
 
     var connectors = ArrayList<String>()
 
     private lateinit var ruleList : Array<Rule>
-       // get() = getRules()
-
-//    val secondRuleList : Array<Rule>
-//        get() = getSecondRules()
 
     val firstStringRuleList : MutableLiveData<ArrayList<String>>
         get(){
@@ -110,8 +96,6 @@ class CreateFilterRuleModel {
 
     private fun createNewFilterRule( filter : Filter, study : Study, isSubsetRule: Boolean )
     {
-//        _createFilterAdapter?.updateRules(null)
-
         _currentFilter?.let{ filterObservable->
             filterObservable.value = filter
             filterObservable.postValue(filter)
@@ -298,24 +282,8 @@ class CreateFilterRuleModel {
         return ruleList.toTypedArray()
     }
 
-//    private fun getSecondRules() : Array<Rule>
-//    {
-//        val ruleList = ArrayList<Rule>()
-//        _currentStudy?.value?.rules?.let { rules ->
-//            _currentRule?.value?.let{currentRule->
-//                for (rule in rules)
-//                {
-//                    ruleList.add( rule )
-//                }
-//            }
-//        }
-//
-//        return ruleList.toTypedArray()
-//    }
-//
     fun onFilterConnectorFieldSelected (parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         currentConnector = ConnectorConverter.fromString(ConnectorConverter.array[position])
-
     }
 }
