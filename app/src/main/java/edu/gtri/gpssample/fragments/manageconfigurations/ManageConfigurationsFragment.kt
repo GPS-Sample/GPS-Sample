@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.*
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -40,7 +41,9 @@ import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import edu.gtri.gpssample.viewmodels.models.NetworkClientModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.util.Date
 import java.util.UUID
@@ -614,28 +617,36 @@ class ManageConfigurationsFragment : Fragment(),
                         val config = result.first
                         val errorCode = result.second
 
-                        if (config == null)
-                        {
-                            binding.overlayView.visibility = View.GONE
-                            val message = if (errorCode == Config.ErrorCode.PasswordError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
-                            InfoDialog( activity!!, resources.getString(R.string.error), message, resources.getString(R.string.ok), null, null)
-                        }
-                        else
-                        {
-                            DAO.configDAO.createOrUpdateConfig( config )
-
-                            sharedViewModel.setCurrentConfig( config )
-
-                            configurations.find { it.uuid == config.uuid } ?.let {
-                                configurations.remove(it )
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            withContext(Dispatchers.IO) {
+                                if (config != null)
+                                {
+                                    DAO.configDAO.createOrUpdateConfig( config )
+                                }
                             }
 
-                            configurations.add( config )
-                            manageConfigurationsAdapter.updateConfigurations( configurations )
+                            // back on the main thread...
 
                             binding.overlayView.visibility = View.GONE
 
-                            didReceiveConfiguration(Config.ErrorCode.None )
+                            if (config == null)
+                            {
+                                val message = if (errorCode == Config.ErrorCode.PasswordError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
+                                InfoDialog( activity!!, resources.getString(R.string.error), message, resources.getString(R.string.ok), null, null)
+                            }
+                            else
+                            {
+                                sharedViewModel.setCurrentConfig( config )
+
+                                configurations.find { it.uuid == config.uuid } ?.let {
+                                    configurations.remove(it )
+                                }
+
+                                configurations.add( config )
+                                manageConfigurationsAdapter.updateConfigurations( configurations )
+
+                                didReceiveConfiguration(Config.ErrorCode.None )
+                            }
                         }
                     }
                 }
