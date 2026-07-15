@@ -72,6 +72,7 @@ import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
 import org.osmdroid.events.MapListener
+import org.osmdroid.util.GeoPoint
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -770,6 +771,7 @@ class PerformEnumerationFragment : Fragment(),
     }
 
     var subAddress = 0
+    var lastLocation : Location? = null
 
     fun autoEnumerateLocations()
     {
@@ -779,6 +781,23 @@ class PerformEnumerationFragment : Fragment(),
 
         for (location in enumerationTeamLocations)
         {
+            if (lastLocation == null)
+            {
+                lastLocation = location
+            }
+            else
+            {
+                val breadcrumbs = generatePoints( lastLocation!!, location )
+
+                for (breadcrumb in breadcrumbs)
+                {
+                    DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breadcrumb, breadcrumb.version )
+                }
+
+                enumArea.breadcrumbs.addAll( breadcrumbs )
+                lastLocation = location
+            }
+
             if (!location.isLandmark && location.enumerationItems.isEmpty())
             {
                 subAddress+= 1
@@ -850,6 +869,46 @@ class PerformEnumerationFragment : Fragment(),
 
         DAO.instance().writableDatabase.setTransactionSuccessful()
         DAO.instance().writableDatabase.endTransaction()
+    }
+
+    fun generatePoints( location1: Location, location2: Location ): ArrayList<Breadcrumb>
+    {
+        val spacingMeters: Double = 10.0
+        val breadcrumbs = ArrayList<Breadcrumb>()
+
+        val start = GeoPoint(location1.latitude, location1.longitude )
+        val end = GeoPoint(location2.latitude, location2.longitude )
+        val distance = start.distanceToAsDouble(end )
+
+        if (distance <= spacingMeters)
+        {
+            val breadcrumb1 = Breadcrumb( enumArea.uuid, enumerationTeam.name, start.latitude, start.longitude, "0" )
+            val breadcrumb2 = Breadcrumb( enumArea.uuid, enumerationTeam.name, end.latitude, end.longitude, "0" )
+            breadcrumbs.add( breadcrumb1 )
+            breadcrumbs.add( breadcrumb2 )
+            return breadcrumbs
+        }
+
+        val bearing = start.bearingTo(end)
+        val points = mutableListOf<GeoPoint>()
+
+        var traveled = 0.0
+
+        while (traveled < distance)
+        {
+            points.add(start.destinationPoint(traveled, bearing))
+            traveled += spacingMeters
+        }
+
+        points.add(end)
+
+        for (point in points)
+        {
+            val breadcrumb = Breadcrumb( enumArea.uuid, enumerationTeam.name, point.latitude, point.longitude, "0" )
+            breadcrumbs.add( breadcrumb )
+        }
+
+        return breadcrumbs
     }
 
     private fun addHouseholdButtonPress()
