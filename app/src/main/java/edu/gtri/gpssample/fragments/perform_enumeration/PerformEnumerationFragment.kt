@@ -775,6 +775,7 @@ class PerformEnumerationFragment : Fragment(),
 
     fun autoEnumerateLocations()
     {
+        var creationDate = Date().time
         val config = sharedViewModel.currentConfiguration!!.value!!
 
         DAO.instance().writableDatabase.beginTransaction()
@@ -787,10 +788,11 @@ class PerformEnumerationFragment : Fragment(),
             }
             else
             {
-                val breadcrumbs = generatePoints( lastLocation!!, location )
+                val breadcrumbs = generateBreadcrumbs(lastLocation!!, location )
 
                 for (breadcrumb in breadcrumbs)
                 {
+                    breadcrumb.creationDate = creationDate++
                     DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breadcrumb, breadcrumb.version )
                 }
 
@@ -871,7 +873,7 @@ class PerformEnumerationFragment : Fragment(),
         DAO.instance().writableDatabase.endTransaction()
     }
 
-    fun generatePoints( location1: Location, location2: Location ): ArrayList<Breadcrumb>
+    fun generateBreadcrumbs( location1: Location, location2: Location ): ArrayList<Breadcrumb>
     {
         val spacingMeters: Double = 10.0
         val breadcrumbs = ArrayList<Breadcrumb>()
