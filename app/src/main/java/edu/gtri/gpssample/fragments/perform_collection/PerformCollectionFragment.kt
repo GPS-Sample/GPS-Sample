@@ -93,7 +93,7 @@ class PerformCollectionFragment : Fragment(),
     private var lastCenterPoint: Point? = null
     private var isHandlingTapEvent = false
     private val binding get() = _binding!!
-    private var isShowingBreadcrumbs = true
+    private var isShowingBreadcrumbs = false
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
     private var landmarkLocations = ArrayList<Location>()
@@ -227,11 +227,16 @@ class PerformCollectionFragment : Fragment(),
         for (teamLocationUuid in collectionTeam.locationUuids)
         {
             enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
-                collectionTeamLocations.add( location )
+                var locationAdded = false
                 for (enumurationItem in location.enumerationItems)
                 {
                     if (enumurationItem.samplingState == SamplingState.Sampled || enumurationItem.subsetSamplingState == SamplingState.Sampled)
                     {
+                        if (!locationAdded)
+                        {
+                            locationAdded = true
+                            collectionTeamLocations.add( location )
+                        }
                         enumerationItems.add( enumurationItem )
                     }
                 }
@@ -1454,14 +1459,13 @@ class PerformCollectionFragment : Fragment(),
 
                 for (enumerationItem in performCollectionAdapter.enumerationItems)
                 {
-                    DAO.locationDAO.getLocation( enumerationItem.locationUuid )?.let {
+                    enumArea.locations.find { it.uuid == enumerationItem.locationUuid }?.let { location: Location ->
                         val currentLatLng = LatLng( point.latitude(), point.longitude())
-                        val itemLatLng = LatLng( it.latitude, it.longitude )
+                        val itemLatLng = LatLng( location.latitude, location.longitude )
                         val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
                         var (distanceValue, distanceUnits) = formatDistance( config, distance )
                         enumerationItem.distance = distanceValue
                         enumerationItem.distanceUnits = distanceUnits
-
                     }
                 }
 
