@@ -69,7 +69,6 @@ import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.osmdroid.events.MapListener
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -93,7 +92,6 @@ class PerformCollectionFragment : Fragment(),
     private var lastCenterPoint: Point? = null
     private var isHandlingTapEvent = false
     private val binding get() = _binding!!
-    private var isShowingBreadcrumbs = false
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
     private var landmarkLocations = ArrayList<Location>()
@@ -107,6 +105,14 @@ class PerformCollectionFragment : Fragment(),
     private var nearbySessionHostManager: NearbySessionHostManager? = null
     private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
+
+    enum class BreadcrumbState(val format : String) {
+        Gone("Gone"),
+        Crumbs("Crumbs"),
+        Trails("Trails"),
+    }
+
+    private var breadcrumbState = BreadcrumbState.Gone
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?)
@@ -271,14 +277,22 @@ class PerformCollectionFragment : Fragment(),
             defaultColorList = it
         }
 
-        if (isShowingBreadcrumbs)
+        when (breadcrumbState)
         {
-            binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            BreadcrumbState.Gone -> {
+                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+            }
+            BreadcrumbState.Crumbs -> {
+                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+            BreadcrumbState.Trails -> {
+                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate3)
+                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
         }
-        else
-        {
-            binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
-        }
+
 
         val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
         if (centerOnCurrentLocation == null)
@@ -764,15 +778,23 @@ class PerformCollectionFragment : Fragment(),
         }
 
         binding.showBreadcrumbsButton.setOnClickListener {
-            if (!isShowingBreadcrumbs)
+            if (breadcrumbState == BreadcrumbState.Gone)
             {
-                isShowingBreadcrumbs = true
+                breadcrumbState = BreadcrumbState.Crumbs
+                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+            else if (breadcrumbState == BreadcrumbState.Crumbs)
+            {
+                breadcrumbState = BreadcrumbState.Trails
+                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate3)
                 binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
             {
-                isShowingBreadcrumbs = false
-                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+                breadcrumbState = BreadcrumbState.Gone
+                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList)
             }
 
             refreshMap()
@@ -921,64 +943,9 @@ class PerformCollectionFragment : Fragment(),
         {
             MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20, Color.RED, enumArea.name )
 
-            if (isShowingBreadcrumbs && enumArea.breadcrumbs.isNotEmpty())
+            if (breadcrumbState == BreadcrumbState.Trails && enumArea.breadcrumbs.isNotEmpty())
             {
-                var numPaths = 1
-                var groupId: String = ""
-                var path = ArrayList<Breadcrumb>()
-                val paths = ArrayList<ArrayList<Breadcrumb>>()
-
-                for (breadcrumb in enumArea.breadcrumbs)
-                {
-                    if (groupId.isEmpty())
-                    {
-                        groupId = breadcrumb.groupId
-                        path.add( breadcrumb )
-                    }
-                    else if (breadcrumb.groupId == groupId)
-                    {
-                        path.add( breadcrumb )
-                    }
-                    else
-                    {
-                        numPaths += 1
-                        paths.add( path )
-                        groupId = breadcrumb.groupId
-                        path = ArrayList<Breadcrumb>()
-                        path.add( breadcrumb )
-                    }
-                }
-
-                // add the last path to the list
-                if (paths.size < numPaths)
-                {
-                    paths.add( path )
-                }
-
-                for (path in paths)
-                {
-                    if (path.size == 1)
-                    {
-                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
-                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
-                    }
-                    else if (path.size > 1)
-                    {
-                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
-                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
-                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.end_breadcrumb, "")
-                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.breadcrumb, "")
-                    }
-                    for (breadcrumb in path)
-                    {
-                        if (breadcrumb != path.first() && breadcrumb != path.last())
-                        {
-                            MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
-                        }
-                    }
-                }
-
-                groupId = ""
+                var groupId = ""
                 val breadcrumbs = ArrayList<Breadcrumb>()
 
                 for (breadcrumb in enumArea.breadcrumbs)
@@ -1085,6 +1052,10 @@ class PerformCollectionFragment : Fragment(),
             if (markerProperties.isNotEmpty())
             {
                 MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, mapboxMapClickListener )
+            }
+
+            if (breadcrumbState != BreadcrumbState.Gone && enumArea.breadcrumbs.isNotEmpty()) {
+                MapManager.instance().loadBreadcrumbs(requireContext(), mapView, enumArea.breadcrumbs, collectionTeam.name )
             }
         }
     }

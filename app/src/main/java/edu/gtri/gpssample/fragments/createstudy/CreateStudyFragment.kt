@@ -197,7 +197,8 @@ class CreateStudyFragment : Fragment()
                                 ConfirmationDialog.ButtonPress.None -> {}
                                 ConfirmationDialog.ButtonPress.Left -> {}
                                 ConfirmationDialog.ButtonPress.Right -> {
-                                    val study = Study( "Study", SamplingMethod.Cluster, 10000, SampleType.NumberHouseholds )
+                                    val studyName = "AutoGenStudy"
+                                    val study = Study( studyName, SamplingMethod.Cluster, 10000, SampleType.NumberHouseholds )
 
                                     val noteField = Field( null, 1, "Note", FieldType.Note, false, false, false, false, false, false, null, null,study.uuid)
                                     val textField = Field( null, 2, "Text", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid)
@@ -223,7 +224,7 @@ class CreateStudyFragment : Fragment()
 
                                     config.studies.add( study )
 
-                                    Toast.makeText(activity!!.applicationContext,  "Auto Survey Complete.", Toast.LENGTH_SHORT).show()
+                                    findNavController().popBackStack()
                                 }
                             }
                         }

@@ -21,13 +21,8 @@ import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.Space
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.content.res.AppCompatResources.getDrawable
-import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
@@ -40,7 +35,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.model.*
@@ -68,15 +62,10 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.locationtech.jts.geom.Coordinate
-import org.locationtech.jts.geom.Geometry
-import org.locationtech.jts.geom.GeometryFactory
-import org.osmdroid.events.MapListener
 import org.osmdroid.util.GeoPoint
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.math.cos
 
 class PerformEnumerationFragment : Fragment(),
     View.OnTouchListener,
@@ -98,7 +87,6 @@ class PerformEnumerationFragment : Fragment(),
     private val binding get() = _binding!!
     private var lastBreadcrumbGroupId = ""
     private var dropMode = false
-    private var isShowingBreadcrumbs = false
     private var isRecordingBreadcrumbs = false
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
@@ -110,6 +98,14 @@ class PerformEnumerationFragment : Fragment(),
     private var nearbySessionHostManager: NearbySessionHostManager? = null
     private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
+
+    enum class BreadcrumbState(val format : String) {
+        Gone("Gone"),
+        Crumbs("Crumbs"),
+        Trails("Trails"),
+    }
+
+    private var breadcrumbState = BreadcrumbState.Gone
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -685,19 +681,31 @@ class PerformEnumerationFragment : Fragment(),
             binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
         }
 
-        if (isShowingBreadcrumbs)
+        when (breadcrumbState)
         {
-            binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            BreadcrumbState.Gone -> {
+                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+            }
+            BreadcrumbState.Crumbs -> {
+                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+            BreadcrumbState.Trails -> {
+                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate3)
+                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
         }
 
         binding.recordBreadcrumbsButton.setOnClickListener {
             if (!isRecordingBreadcrumbs)
             {
-                isShowingBreadcrumbs = true
+                breadcrumbState = BreadcrumbState.Crumbs
                 isRecordingBreadcrumbs = true
                 lastBreadcrumbGroupId = UUID.randomUUID().toString()
                 binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.pause )
                 binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
                 binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
@@ -714,15 +722,23 @@ class PerformEnumerationFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            if (!isShowingBreadcrumbs)
+            if (breadcrumbState == BreadcrumbState.Gone)
             {
-                isShowingBreadcrumbs = true
+                breadcrumbState = BreadcrumbState.Crumbs
+                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+            else if (breadcrumbState == BreadcrumbState.Crumbs)
+            {
+                breadcrumbState = BreadcrumbState.Trails
+                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate3)
                 binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
             {
-                isShowingBreadcrumbs = false
-                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+                breadcrumbState = BreadcrumbState.Gone
+                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList)
             }
 
             refreshMap()
@@ -992,145 +1008,6 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
-    fun trimToolbarToFit(toolbar: LinearLayout)
-    {
-        toolbar.post {
-            val displayMetrics = toolbar.resources.displayMetrics
-            val screenWidthPx = displayMetrics.widthPixels
-            val density = displayMetrics.density
-            val screenWidthDp = screenWidthPx / density
-
-            val moreButtonWidthDp = 60f // 50dp button + 5dp margin start + 5dp margin end
-            val minSpaceWidthDp = 50f
-
-            val allButtons = mutableListOf<View>()
-
-            // Collect only the buttons
-            for (i in 0 until toolbar.childCount) {
-                val child = toolbar.getChildAt(i)
-                if (child is Button) {
-                    allButtons.add(child)
-                }
-            }
-
-            var usedWidthDp = 0f
-            val visibleButtons = mutableListOf<View>()
-            val overflowButtons = mutableListOf<View>()
-
-            // Measure button width in dp (assuming fixed 50dp width and 5dp margins each side)
-            allButtons.forEach { button ->
-                val lp = button.layoutParams as? ViewGroup.MarginLayoutParams
-                val widthDp = 50f + ((lp?.marginStart ?: 0) + (lp?.marginEnd ?: 0)) / density
-
-                if (usedWidthDp + widthDp + moreButtonWidthDp > screenWidthDp) {
-                    overflowButtons.add(button)
-                } else {
-                    usedWidthDp += widthDp
-                    visibleButtons.add(button)
-                }
-            }
-
-            if (overflowButtons.isNotEmpty())
-            {
-                allButtons.clear()
-
-                for (i in 0 until toolbar.childCount) {
-                    val child = toolbar.getChildAt(i)
-                    allButtons.add(child)
-                }
-
-                // Remove everything from layout
-                allButtons.forEach { toolbar.removeView(it) }
-
-                // Add visible buttons back
-                visibleButtons.forEach { toolbar.addView(it) }
-                val space = Space(toolbar.context).apply {
-                    layoutParams = LinearLayout.LayoutParams(
-                        0,
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        1f // stretchable
-                    ).apply {
-                        val minWidthPx = (minSpaceWidthDp * density).toInt()
-                        this.width = minWidthPx
-                    }
-                }
-
-                toolbar.addView(space)
-
-                val moreButton = Button(toolbar.context).apply {
-                    layoutParams = LinearLayout.LayoutParams(
-                        dpToPx(50),
-                        dpToPx(50)
-                    ).apply {
-                        marginStart = dpToPx(5)
-                        marginEnd = dpToPx(5)
-                    }
-                    background = getDrawable(context, R.drawable.more_button)
-                    setOnClickListener {
-                        showMoreMenu(context, it, overflowButtons)
-                    }
-                }
-
-                toolbar.addView(moreButton)
-            }
-        }
-    }
-
-    fun dpToPx(dp: Int): Int
-    {
-        return (dp * resources.displayMetrics.density).toInt()
-    }
-
-    fun showMoreMenu(context: Context, anchorView: View, overflowButtons: List<View>)
-    {
-        val popupMenu = PopupMenu(context, anchorView)
-
-        overflowButtons.forEachIndexed { index, view ->
-            when (view.id)
-            {
-                R.id.export_button -> popupMenu.menu.add(0, view.id, index, resources.getString(R.string.export_configuration ))
-                R.id.record_breadcrumbs_button ->
-                {
-                    if (isRecordingBreadcrumbs)
-                    {
-                        popupMenu.menu.add(0, view.id, index, resources.getString(R.string.stop_recording ))
-                    }
-                    else
-                    {
-                        popupMenu.menu.add(0, view.id, index, resources.getString(R.string.record_breadcrumbs ))
-                    }
-                }
-                R.id.show_breadcrumbs_button ->
-                {
-                    if (isShowingBreadcrumbs)
-                    {
-                        popupMenu.menu.add(0, view.id, index, resources.getString(R.string.hide_breadcrumbs ))
-                    }
-                    else
-                    {
-                        popupMenu.menu.add(0, view.id, index, resources.getString(R.string.show_breadcrumbs ))
-                    }
-                }
-                R.id.delete_breadcrumbs_button -> popupMenu.menu.add(0, view.id, index, resources.getString(R.string.delete_breadcrumbs ))
-                R.id.help_button -> popupMenu.menu.add(0, view.id, index, resources.getString(R.string.help_button ))
-            }
-        }
-
-        popupMenu.setOnMenuItemClickListener { item ->
-            when (item.itemId)
-            {
-                R.id.export_button -> binding.exportButton.performClick()
-                R.id.record_breadcrumbs_button -> binding.recordBreadcrumbsButton.performClick()
-                R.id.show_breadcrumbs_button -> binding.showBreadcrumbsButton.performClick()
-                R.id.delete_breadcrumbs_button -> binding.deleteBreadcrumbsButton.performClick()
-                R.id.help_button -> binding.helpButton.performClick()
-            }
-            true
-        }
-
-        popupMenu.show()
-    }
-
     private fun gpsAccuracyIsGood(): Boolean
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -1181,68 +1058,9 @@ class PerformEnumerationFragment : Fragment(),
         {
             MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20, Color.RED, enumArea.name )
 
-            if (isShowingBreadcrumbs && enumArea.breadcrumbs.isNotEmpty())
+            if (breadcrumbState == BreadcrumbState.Trails && enumArea.breadcrumbs.isNotEmpty())
             {
-                var numPaths = 1
-                var groupId: String = ""
-                var path = ArrayList<Breadcrumb>()
-                val paths = ArrayList<ArrayList<Breadcrumb>>()
-
-                for (breadcrumb in enumArea.breadcrumbs)
-                {
-                    if (breadcrumb.enumTeamName == enumerationTeam.name)
-                    {
-                        if (groupId.isEmpty())
-                        {
-                            groupId = breadcrumb.groupId
-                            path.add( breadcrumb )
-                        }
-                        else if (breadcrumb.groupId == groupId)
-                        {
-                            path.add( breadcrumb )
-                        }
-                        else
-                        {
-                            numPaths += 1
-                            paths.add( path )
-                            groupId = breadcrumb.groupId
-                            path = ArrayList<Breadcrumb>()
-                            path.add( breadcrumb )
-                        }
-                    }
-                }
-
-                // add the last path to the list
-                if (paths.size < numPaths)
-                {
-                    paths.add( path )
-                }
-
-                for (path in paths)
-                {
-                    if (path.size == 1)
-                    {
-                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
-                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
-                    }
-                    else if (path.size > 1)
-                    {
-                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
-                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
-                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.end_breadcrumb, "")
-                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.breadcrumb, "")
-                    }
-
-                    for (breadcrumb in path)
-                    {
-                        if (breadcrumb != path.first() && breadcrumb != path.last())
-                        {
-                            MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
-                        }
-                    }
-                }
-
-                groupId = ""
+                var groupId = ""
 
                 val breadcrumbs = ArrayList<Breadcrumb>()
 
@@ -1328,6 +1146,10 @@ class PerformEnumerationFragment : Fragment(),
             if (markerProperties.isNotEmpty())
             {
                 MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, mapboxMapClickListener )
+            }
+
+            if (breadcrumbState != BreadcrumbState.Gone && enumArea.breadcrumbs.isNotEmpty()) {
+                MapManager.instance().loadBreadcrumbs(requireContext(), mapView, enumArea.breadcrumbs, enumerationTeam.name)
             }
         }
     }
