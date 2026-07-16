@@ -1699,7 +1699,11 @@ class PerformEnumerationFragment : Fragment(),
 
     override fun onDestroyView()
     {
-        lastCenterPoint = MapManager.instance().getCenter( mapView )
+        if (this::mapView.isInitialized)
+        {
+            lastCenterPoint = MapManager.instance().getCenter( mapView )
+        }
+
         binding.mapboxMapView.gestures.removeOnMapClickListener(mapboxMapClickListener )
         binding.recyclerView.adapter = null
 
