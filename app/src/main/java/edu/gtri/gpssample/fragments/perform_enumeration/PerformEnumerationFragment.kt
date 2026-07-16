@@ -879,9 +879,8 @@ class PerformEnumerationFragment : Fragment(),
                     enumerationItem.fieldDataList.add( fieldData )
                 }
 
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, enumerationItem.version )
-
                 location.enumerationItems.add( enumerationItem )
+                DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
             }
         }
 
