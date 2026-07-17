@@ -20,6 +20,8 @@ import org.locationtech.jts.geom.GeometryFactory
 import org.locationtech.jts.geom.Polygon
 import java.util.ArrayList
 import kotlin.math.*
+import android.location.Location
+import kotlin.random.Random
 
 data class HaversineCheck(val distance : Double, var withinBounds : Boolean, val start : LatLng, val end : LatLng)
 {
@@ -274,6 +276,87 @@ object GeoUtils {
         else
         {
             return xyPolygon.distance(xyPoint )
+        }
+    }
+
+    class RandomLocationGenerator(
+        private val center: com.mapbox.geojson.Point,
+        private val widthMeters: Double,
+        private val heightMeters: Double,
+        private val minDistanceMeters: Double = 10.0
+    ) {
+        private data class XYPoint(val x: Double, val y: Double)
+        private data class Cell(val x: Int, val y: Int)
+        private val cellSize = minDistanceMeters
+        private val minDistanceSquared = minDistanceMeters * minDistanceMeters
+
+        fun generate(count: Int): List<com.mapbox.geojson.Point>
+        {
+            val grid = HashMap<Cell, MutableList<XYPoint>>()
+            val accepted = ArrayList<XYPoint>(count)
+
+            var attempts = 0
+            val maxAttempts = count * 100
+
+            while (accepted.size < count)
+            {
+                if (++attempts > maxAttempts)
+                {
+                    break
+                }
+
+                val candidate = XYPoint(
+                    x = Random.nextDouble(-widthMeters / 2, widthMeters / 2),
+                    y = Random.nextDouble(-heightMeters / 2, heightMeters / 2)
+                )
+
+                val cell = Cell(
+                    floor(candidate.x / cellSize).toInt(),
+                    floor(candidate.y / cellSize).toInt()
+                )
+
+                var valid = true
+
+                outer@ for (dx in -1..1)
+                {
+                    for (dy in -1..1)
+                    {
+                        val neighbors = grid[Cell(cell.x + dx, cell.y + dy)] ?: continue
+
+                        for (p in neighbors)
+                        {
+                            val x = candidate.x - p.x
+                            val y = candidate.y - p.y
+
+                            if (x * x + y * y < minDistanceSquared)
+                            {
+                                valid = false
+                                break@outer
+                            }
+                        }
+                    }
+                }
+
+                if (valid)
+                {
+                    accepted.add(candidate)
+                    grid.getOrPut(cell) { ArrayList() }.add(candidate)
+                }
+            }
+
+            return accepted.map(::toPoint)
+        }
+
+        /**
+         * Converts local meter coordinates to WGS84.
+         * Accurate to much better than 1 meter over a 10 km area.
+         */
+        private fun toPoint(point: XYPoint): com.mapbox.geojson.Point
+        {
+            val lat = center.latitude() + point.y / 111320.0
+            val lon = center.longitude() + point.x / (111320.0 * cos(Math.toRadians(center.latitude())))
+
+            return com.mapbox.geojson.Point.fromLngLat(lon, lat )
         }
     }
 }

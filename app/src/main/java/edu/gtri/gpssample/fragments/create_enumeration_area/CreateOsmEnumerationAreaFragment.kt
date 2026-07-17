@@ -9,6 +9,7 @@ package edu.gtri.gpssample.fragments.create_enumeration_area
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -37,6 +38,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.*
 import com.mapbox.maps.*
+import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -97,7 +99,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         EditEnumArea,
         CreateEnumAreaLocation,
         AddHousehold,
-        CreateEnumAreaBoundary
+        CreateEnumAreaBoundary,
+        AutoCreateEnumArea,
     }
     private var currentTapType = TapType.None
 
@@ -638,6 +641,31 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
                 when( currentTapType )
                 {
+                    TapType.AutoCreateEnumArea ->
+                    {
+                        currentTapType = TapType.None
+                        binding.mapOverlayView.visibility = View.GONE
+
+                        AutoCreateEaDialog( requireContext()) { result ->
+                            if (!result.didCancel)
+                            {
+                                radius = result.width * 1000
+                                val enumArea = createEnumAreaLocation( point, result.name )
+
+                                val randomLocationGenerator = GeoUtils.RandomLocationGenerator(point, result.width * 1000, result.width * 1000, 10.0 )
+                                val points = randomLocationGenerator.generate( result.numLocations )
+
+                                for (point in points)
+                                {
+                                    val location = Location( point.latitude(), point.longitude(), 0.0 )
+                                    enumArea.locations.add( location )
+                                }
+
+                                refreshMap()
+                            }
+                        }
+                    }
+
                     TapType.EditEnumArea -> {
                         findEnumAreaOfLocation(
                             getAllEnumAreas(),
@@ -769,52 +797,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         else if (tapType == TapType.CreateEnumAreaLocation)
         {
             centerPoint?.let { centerPoint ->
-                val r_earth = 6378000.0
-                var creationDate = Date().time
-
-                var latitude  = centerPoint.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
-                var longitude = centerPoint.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                var northEast = LatLon( creationDate++, latitude, longitude )
-
-                latitude  = centerPoint.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
-                longitude = centerPoint.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                var southWest = LatLon( creationDate++, latitude, longitude )
-
-                val vertices = ArrayList<LatLon>()
-
-                vertices.add( LatLon( creationDate++, southWest.latitude, southWest.longitude ))
-                vertices.add( LatLon( creationDate++, northEast.latitude, southWest.longitude ))
-                vertices.add( LatLon( creationDate++, northEast.latitude, northEast.longitude ))
-                vertices.add( LatLon( creationDate++, southWest.latitude, northEast.longitude ))
-
-                val points = ArrayList<com.mapbox.geojson.Point>()
-                val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
-
-                vertices.map {
-                    points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
-                }
-
-                pointList.add( points )
-
-                val latLngBounds = GeoUtils.findGeobounds(vertices)
-                northEast = LatLon( creationDate++, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-                southWest = LatLon( creationDate++, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-
-                val mapTileRegion = MapTileRegion( northEast, southWest, "" )
-
-                if (name.isEmpty())
-                {
-                    selectedEnumArea = EnumArea( config.uuid, "", "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
-                    unsavedEnumAreas.add( selectedEnumArea!! )
-                }
-                else
-                {
-                    selectedEnumArea = EnumArea( config.uuid, "", name, "", 0, vertices, mapTileRegion )
-                    unsavedEnumAreas.add( selectedEnumArea!! )
-                }
-
-                mapTileRegion.enumAreaUuid = selectedEnumArea!!.uuid
-                refreshMap()
+                createEnumAreaLocation( centerPoint, name )
             }
         }
 
@@ -828,6 +811,59 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         {
             presentMBTilesDialog()
         }
+    }
+
+    fun createEnumAreaLocation( centerPoint: com.mapbox.geojson.Point, name: String ) : EnumArea
+    {
+        val r_earth = 6378000.0
+        var creationDate = Date().time
+
+        var latitude  = centerPoint.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
+        var longitude = centerPoint.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+        var northEast = LatLon( creationDate++, latitude, longitude )
+
+        latitude  = centerPoint.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
+        longitude = centerPoint.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+        var southWest = LatLon( creationDate++, latitude, longitude )
+
+        val vertices = ArrayList<LatLon>()
+
+        vertices.add( LatLon( creationDate++, southWest.latitude, southWest.longitude ))
+        vertices.add( LatLon( creationDate++, northEast.latitude, southWest.longitude ))
+        vertices.add( LatLon( creationDate++, northEast.latitude, northEast.longitude ))
+        vertices.add( LatLon( creationDate++, southWest.latitude, northEast.longitude ))
+
+        val points = ArrayList<com.mapbox.geojson.Point>()
+        val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
+
+        vertices.map {
+            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+        }
+
+        pointList.add( points )
+
+        val latLngBounds = GeoUtils.findGeobounds(vertices)
+        northEast = LatLon( creationDate++, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+        southWest = LatLon( creationDate++, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+
+        val mapTileRegion = MapTileRegion( northEast, southWest, "" )
+
+        if (name.isEmpty())
+        {
+            selectedEnumArea = EnumArea( config.uuid, "", "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
+            unsavedEnumAreas.add( selectedEnumArea!! )
+        }
+        else
+        {
+            selectedEnumArea = EnumArea( config.uuid, "", name, "", 0, vertices, mapTileRegion )
+            unsavedEnumAreas.add( selectedEnumArea!! )
+        }
+
+        mapTileRegion.enumAreaUuid = selectedEnumArea!!.uuid
+
+        refreshMap()
+
+        return selectedEnumArea!!
     }
 
     fun presentMBTilesDialog()
@@ -1272,13 +1308,30 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
+
         inflater.inflate(R.menu.menu_map_style, menu)
+
+        val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", Context.MODE_PRIVATE)
+
+        if (sharedPreferences.getBoolean( Keys.kDeveloperMode.value, false ))
+        {
+            menu.findItem(R.id.auto_create_ea).isVisible = true
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
+        binding.mapOverlayView.visibility = View.GONE
+
         when (item.itemId)
         {
+            R.id.auto_create_ea ->
+            {
+                binding.mapOverlayView.visibility = View.VISIBLE
+                currentTapType = TapType.AutoCreateEnumArea
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.tap_the_map), Toast.LENGTH_SHORT).show()
+            }
+
             R.id.mapbox_streets ->
             {
                 mapStyle = Style.MAPBOX_STREETS

@@ -798,31 +798,31 @@ class PerformEnumerationFragment : Fragment(),
 
         for (location in enumerationTeamLocations)
         {
-            if (lastLocation == null)
-            {
-                lastLocation = location
-            }
-            else
-            {
-                val breadcrumbs = generateBreadcrumbs(lastLocation!!, location )
-
-                for (breadcrumb in breadcrumbs)
-                {
-                    breadcrumb.creationDate = creationDate++
-                    DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breadcrumb, breadcrumb.version )
-                }
-
-                enumArea.breadcrumbs.addAll( breadcrumbs )
-                lastLocation = location
-            }
+//            if (lastLocation == null)
+//            {
+//                lastLocation = location
+//            }
+//            else
+//            {
+//                val breadcrumbs = generateBreadcrumbs(lastLocation!!, location )
+//
+//                for (breadcrumb in breadcrumbs)
+//                {
+//                    breadcrumb.creationDate = creationDate++
+//                    DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breadcrumb, breadcrumb.version )
+//                }
+//
+//                enumArea.breadcrumbs.addAll( breadcrumbs )
+//                lastLocation = location
+//            }
 
             if (!location.isLandmark && location.enumerationItems.isEmpty())
             {
                 subAddress+= 1
 
-                ImageDAO.instance().createImage( edu.gtri.gpssample.database.models.Image( location.uuid, TestImage.imageData.replace( "\n", "" )))?.let { image ->
-                    location.imageUuid = image.uuid
-                }
+//                ImageDAO.instance().createImage( edu.gtri.gpssample.database.models.Image( location.uuid, TestImage.imageData.replace( "\n", "" )))?.let { image ->
+//                    location.imageUuid = image.uuid
+//                }
 
                 val enumerationItem = EnumerationItem()
 
