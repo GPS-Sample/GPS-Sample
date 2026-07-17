@@ -556,6 +556,8 @@ class CreateSampleFragment : Fragment()
 
     fun saveSample()
     {
+        binding.progressOverlayView.visibility = View.VISIBLE
+
         viewLifecycleOwner.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 DAO.instance().writableDatabase.beginTransaction()
@@ -585,6 +587,7 @@ class CreateSampleFragment : Fragment()
 
             // back on the main thread...
             binding.progressOverlayView.visibility = View.GONE
+
             findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
         }
     }

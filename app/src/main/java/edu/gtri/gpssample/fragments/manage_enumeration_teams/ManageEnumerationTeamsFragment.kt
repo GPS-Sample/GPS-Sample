@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +31,9 @@ import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.fragments.manage_collection_teams.ManageCollectionTeamsAdapter
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ManageEnumerationTeamsFragment : Fragment()
 {
@@ -109,14 +113,24 @@ class ManageEnumerationTeamsFragment : Fragment()
 
         enumArea.locations.clear()
 
-        for (uuid in enumerationTeam.locationUuids)
-        {
-            DAO.locationDAO.getLocation( uuid )?.let {
-                enumArea.locations.add( it )
-            }
-        }
+        binding.progressOverlayView.visibility = View.VISIBLE
 
-        findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO)
+            {
+                for (uuid in enumerationTeam.locationUuids)
+                {
+                    DAO.locationDAO.getLocation( uuid )?.let {
+                        enumArea.locations.add( it )
+                    }
+                }
+            }
+
+            // back on the main thread...
+            binding.progressOverlayView.visibility = View.GONE
+
+            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+        }
     }
 
     private fun shouldDeleteTeam(enumerationTeam: EnumerationTeam)

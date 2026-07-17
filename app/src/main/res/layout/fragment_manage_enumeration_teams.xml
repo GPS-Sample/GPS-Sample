@@ -62,4 +62,19 @@
             android:insetBottom="0dp"
             android:text="@string/review_all_teams" />
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/progress_overlay_view"
+        android:visibility="gone"
+        android:background="@color/clear"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/device_progress_bar"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center" />
+    </FrameLayout>
 </FrameLayout>
