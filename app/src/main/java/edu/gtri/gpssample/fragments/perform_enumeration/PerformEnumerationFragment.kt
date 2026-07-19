@@ -786,148 +786,6 @@ class PerformEnumerationFragment : Fragment(),
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    var subAddress = 0
-    var lastLocation : Location? = null
-
-    fun autoEnumerateLocations()
-    {
-        var creationDate = Date().time
-        val config = sharedViewModel.currentConfiguration!!.value!!
-
-        DAO.instance().writableDatabase.beginTransaction()
-
-        for (location in enumerationTeamLocations)
-        {
-//            if (lastLocation == null)
-//            {
-//                lastLocation = location
-//            }
-//            else
-//            {
-//                val breadcrumbs = generateBreadcrumbs(lastLocation!!, location )
-//
-//                for (breadcrumb in breadcrumbs)
-//                {
-//                    breadcrumb.creationDate = creationDate++
-//                    DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breadcrumb, breadcrumb.version )
-//                }
-//
-//                enumArea.breadcrumbs.addAll( breadcrumbs )
-//                lastLocation = location
-//            }
-
-            if (!location.isLandmark && location.enumerationItems.isEmpty())
-            {
-                subAddress+= 1
-
-//                ImageDAO.instance().createImage( edu.gtri.gpssample.database.models.Image( location.uuid, TestImage.imageData.replace( "\n", "" )))?.let { image ->
-//                    location.imageUuid = image.uuid
-//                }
-
-                val enumerationItem = EnumerationItem()
-
-                enumerationItem.uuid = UUID.randomUUID().toString()
-                enumerationItem.version = UUID.randomUUID().toString()
-                enumerationItem.enumerationIncompleteReason = ""
-                enumerationItem.enumerationState = EnumerationState.Enumerated
-                enumerationItem.enumerationNotes = ""
-                enumerationItem.enumerationDate = Date().time
-                enumerationItem.subAddress = subAddress.toString()
-                enumerationItem.locationUuid = location.uuid
-
-                var creationDate = Date().time
-
-                for (field in config.studies[0].fields)
-                {
-                    val fieldData = FieldData(creationDate++, field.uuid, enumerationItem.uuid )
-
-                    if (field.type == FieldType.Note)
-                    {
-                        fieldData.textValue = "Some Note"
-                    }
-
-                    if (field.type == FieldType.Text)
-                    {
-                        fieldData.textValue = "Some Text"
-                    }
-
-                    if (field.type == FieldType.Number)
-                    {
-                        fieldData.numberValue= 999.0
-                    }
-
-                    if (field.type == FieldType.Date)
-                    {
-                        fieldData.dateValue = Date().time
-                    }
-
-                    if (field.type == FieldType.Checkbox)
-                    {
-                        fieldData.fieldDataOptions.add( FieldDataOption( "CB 1", true ))
-                        fieldData.fieldDataOptions.add( FieldDataOption( "CB 2", false ))
-                        fieldData.fieldDataOptions.add( FieldDataOption( "CB 3", true ))
-                    }
-
-                    if (field.type == FieldType.Dropdown)
-                    {
-                        fieldData.dropdownIndex = 1
-                        fieldData.fieldDataOptions.add( FieldDataOption( "DD 1", false ))
-                        fieldData.fieldDataOptions.add( FieldDataOption( "DD 2", false ))
-                        fieldData.fieldDataOptions.add( FieldDataOption( "DD 3", false ))
-                    }
-
-                    enumerationItem.fieldDataList.add( fieldData )
-                }
-
-                location.enumerationItems.add( enumerationItem )
-                DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
-            }
-        }
-
-        DAO.instance().writableDatabase.setTransactionSuccessful()
-        DAO.instance().writableDatabase.endTransaction()
-    }
-
-    fun generateBreadcrumbs( location1: Location, location2: Location ): ArrayList<Breadcrumb>
-    {
-        val spacingMeters: Double = 10.0
-        val breadcrumbs = ArrayList<Breadcrumb>()
-
-        val start = GeoPoint(location1.latitude, location1.longitude )
-        val end = GeoPoint(location2.latitude, location2.longitude )
-        val distance = start.distanceToAsDouble(end )
-
-        if (distance <= spacingMeters)
-        {
-            val breadcrumb1 = Breadcrumb( enumArea.uuid, enumerationTeam.name, start.latitude, start.longitude, "0" )
-            val breadcrumb2 = Breadcrumb( enumArea.uuid, enumerationTeam.name, end.latitude, end.longitude, "0" )
-            breadcrumbs.add( breadcrumb1 )
-            breadcrumbs.add( breadcrumb2 )
-            return breadcrumbs
-        }
-
-        val bearing = start.bearingTo(end)
-        val points = mutableListOf<GeoPoint>()
-
-        var traveled = 0.0
-
-        while (traveled < distance)
-        {
-            points.add(start.destinationPoint(traveled, bearing))
-            traveled += spacingMeters
-        }
-
-        points.add(end)
-
-        for (point in points)
-        {
-            val breadcrumb = Breadcrumb( enumArea.uuid, enumerationTeam.name, point.latitude, point.longitude, "0" )
-            breadcrumbs.add( breadcrumb )
-        }
-
-        return breadcrumbs
-    }
-
     private fun addHouseholdButtonPress()
     {
         currentGPSLocation?.let { point ->
@@ -1392,6 +1250,179 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
+    var subAddress = 0
+
+    fun autoEnumerateLocations()
+    {
+        val config = sharedViewModel.currentConfiguration!!.value!!
+
+        DAO.instance().writableDatabase.beginTransaction()
+
+        for (location in enumerationTeamLocations)
+        {
+            if (!location.isLandmark && location.enumerationItems.isEmpty())
+            {
+                subAddress+= 1
+
+                val enumerationItem = EnumerationItem()
+
+                enumerationItem.uuid = UUID.randomUUID().toString()
+                enumerationItem.version = UUID.randomUUID().toString()
+                enumerationItem.enumerationIncompleteReason = ""
+                enumerationItem.enumerationState = EnumerationState.Enumerated
+                enumerationItem.enumerationNotes = ""
+                enumerationItem.enumerationDate = Date().time
+                enumerationItem.subAddress = subAddress.toString()
+                enumerationItem.locationUuid = location.uuid
+
+                var creationDate = Date().time
+
+                for (field in config.studies[0].fields)
+                {
+                    val fieldData = FieldData(creationDate++, field.uuid, enumerationItem.uuid )
+
+                    if (field.type == FieldType.Note)
+                    {
+                        fieldData.textValue = "Some Note"
+                    }
+
+                    if (field.type == FieldType.Text)
+                    {
+                        fieldData.textValue = "Some Text"
+                    }
+
+                    if (field.type == FieldType.Number)
+                    {
+                        fieldData.numberValue= 999.0
+                    }
+
+                    if (field.type == FieldType.Date)
+                    {
+                        fieldData.dateValue = Date().time
+                    }
+
+                    if (field.type == FieldType.Checkbox)
+                    {
+                        fieldData.fieldDataOptions.add( FieldDataOption( "CB 1", true ))
+                        fieldData.fieldDataOptions.add( FieldDataOption( "CB 2", false ))
+                        fieldData.fieldDataOptions.add( FieldDataOption( "CB 3", true ))
+                    }
+
+                    if (field.type == FieldType.Dropdown)
+                    {
+                        fieldData.dropdownIndex = 1
+                        fieldData.fieldDataOptions.add( FieldDataOption( "DD 1", false ))
+                        fieldData.fieldDataOptions.add( FieldDataOption( "DD 2", false ))
+                        fieldData.fieldDataOptions.add( FieldDataOption( "DD 3", false ))
+                    }
+
+                    enumerationItem.fieldDataList.add( fieldData )
+                }
+
+                location.enumerationItems.add( enumerationItem )
+                DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
+            }
+        }
+
+        DAO.instance().writableDatabase.setTransactionSuccessful()
+        DAO.instance().writableDatabase.endTransaction()
+    }
+
+    fun autoGenerateImages()
+    {
+        DAO.instance().writableDatabase.beginTransaction()
+
+        for (location in enumerationTeamLocations)
+        {
+            if (!location.isLandmark && location.imageUuid.isEmpty())
+            {
+                subAddress += 1
+                val testImage = TestImage.imageData.replace("\n", "" )
+                val image = Image(location.uuid,testImage )
+                ImageDAO.instance().createImage( image )?.let { image ->
+                    location.imageUuid = image.uuid
+                    DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
+                }
+            }
+        }
+
+        DAO.instance().writableDatabase.setTransactionSuccessful()
+        DAO.instance().writableDatabase.endTransaction()
+    }
+
+    var lastLocation : Location? = null
+
+    fun autoGenerateBreadcrumbs()
+    {
+        var creationDate = Date().time
+
+        DAO.instance().writableDatabase.beginTransaction()
+
+        for (location in enumerationTeamLocations)
+        {
+            if (lastLocation == null)
+            {
+                lastLocation = location
+            }
+            else
+            {
+                val breadcrumbs = generateRandomBreadcrumbs(lastLocation!!, location )
+
+                for (breadcrumb in breadcrumbs)
+                {
+                    breadcrumb.creationDate = creationDate++
+                    DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breadcrumb, breadcrumb.version )
+                }
+
+                enumArea.breadcrumbs.addAll( breadcrumbs )
+                lastLocation = location
+            }
+        }
+
+        DAO.instance().writableDatabase.setTransactionSuccessful()
+        DAO.instance().writableDatabase.endTransaction()
+    }
+
+    fun generateRandomBreadcrumbs( location1: Location, location2: Location ): ArrayList<Breadcrumb>
+    {
+        val spacingMeters: Double = 10.0
+        val breadcrumbs = ArrayList<Breadcrumb>()
+
+        val start = GeoPoint(location1.latitude, location1.longitude )
+        val end = GeoPoint(location2.latitude, location2.longitude )
+        val distance = start.distanceToAsDouble(end )
+
+        if (distance <= spacingMeters)
+        {
+            val breadcrumb1 = Breadcrumb( enumArea.uuid, enumerationTeam.name, start.latitude, start.longitude, "0" )
+            val breadcrumb2 = Breadcrumb( enumArea.uuid, enumerationTeam.name, end.latitude, end.longitude, "0" )
+            breadcrumbs.add( breadcrumb1 )
+            breadcrumbs.add( breadcrumb2 )
+            return breadcrumbs
+        }
+
+        val bearing = start.bearingTo(end)
+        val points = mutableListOf<GeoPoint>()
+
+        var traveled = 0.0
+
+        while (traveled < distance)
+        {
+            points.add(start.destinationPoint(traveled, bearing))
+            traveled += spacingMeters
+        }
+
+        points.add(end)
+
+        for (point in points)
+        {
+            val breadcrumb = Breadcrumb( enumArea.uuid, enumerationTeam.name, point.latitude, point.longitude, "0" )
+            breadcrumbs.add( breadcrumb )
+        }
+
+        return breadcrumbs
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
     {
         super.onCreateOptionsMenu(menu, inflater)
@@ -1403,6 +1434,8 @@ class PerformEnumerationFragment : Fragment(),
         if (sharedPreferences.getBoolean( Keys.kDeveloperMode.value, false ))
         {
             menu.findItem(R.id.action_auto_enumerate).isVisible = true
+            menu.findItem(R.id.action_add_images).isVisible = true
+            menu.findItem(R.id.action_add_breadcrumbs).isVisible = true
         }
     }
 
@@ -1434,6 +1467,60 @@ class PerformEnumerationFragment : Fragment(),
                                     updateSummaryInfo()
                                     performEnumerationAdapter.updateLocations( performEnumerationAdapter.locations )
                                     Toast.makeText(activity!!.applicationContext,  "Auto Enumeration Complete.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                R.id.action_add_images ->
+                {
+                    ConfirmationDialog(activity, resources.getString(R.string.please_confirm), "Auto generate Images?", resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
+                        when (buttonPressed) {
+                            ConfirmationDialog.ButtonPress.None -> {}
+                            ConfirmationDialog.ButtonPress.Left -> {}
+                            ConfirmationDialog.ButtonPress.Right -> {
+                                binding.progressOverlayView.visibility = View.VISIBLE
+
+                                viewLifecycleOwner.lifecycleScope.launch {
+                                    withContext(Dispatchers.IO )
+                                    {
+                                        autoGenerateImages()
+                                    }
+
+                                    // back on the main thread...
+
+                                    binding.progressOverlayView.visibility = View.GONE
+
+                                    refreshMap()
+                                    Toast.makeText(activity!!.applicationContext,  "Auto Image Generation Complete.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                R.id.action_add_breadcrumbs ->
+                {
+                    ConfirmationDialog(activity, resources.getString(R.string.please_confirm), "Auto generate Breadcrumbs?", resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
+                        when (buttonPressed) {
+                            ConfirmationDialog.ButtonPress.None -> {}
+                            ConfirmationDialog.ButtonPress.Left -> {}
+                            ConfirmationDialog.ButtonPress.Right -> {
+                                binding.progressOverlayView.visibility = View.VISIBLE
+
+                                viewLifecycleOwner.lifecycleScope.launch {
+                                    withContext(Dispatchers.IO )
+                                    {
+                                        autoGenerateBreadcrumbs()
+                                    }
+
+                                    // back on the main thread...
+
+                                    binding.progressOverlayView.visibility = View.GONE
+
+                                    refreshMap()
+                                    Toast.makeText(activity!!.applicationContext,  "Auto Breadcrumb Generation Complete.", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }
