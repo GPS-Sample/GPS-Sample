@@ -16,6 +16,6 @@
     <item
         android:visible="false"
         android:id="@+id/action_auto_survey"
-        android:title="Auto Survey"
+        android:title="Auto +Survey"
         app:showAsAction="never" />
 </menu>

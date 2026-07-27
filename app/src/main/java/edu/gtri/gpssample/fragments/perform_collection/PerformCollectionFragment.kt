@@ -105,14 +105,17 @@ class PerformCollectionFragment : Fragment(),
     private var nearbySessionHostManager: NearbySessionHostManager? = null
     private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
+    private val selectedTeamNames = ArrayList<String>()
+    private val selectedBreadcrumbs = ArrayList<Breadcrumb>()
 
-    enum class BreadcrumbState(val format : String) {
-        Gone("Gone"),
-        Crumbs("Crumbs"),
-        Trails("Trails"),
+    enum class BreadcrumbState
+    {
+        OFF,
+        CRUMBS,
+        TRAILS,
     }
 
-    private var breadcrumbState = BreadcrumbState.Gone
+    private var breadcrumbState = BreadcrumbState.OFF
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?)
@@ -279,15 +282,15 @@ class PerformCollectionFragment : Fragment(),
 
         when (breadcrumbState)
         {
-            BreadcrumbState.Gone -> {
+            BreadcrumbState.OFF -> {
                 binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
                 binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
             }
-            BreadcrumbState.Crumbs -> {
+            BreadcrumbState.CRUMBS -> {
                 binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
                 binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
-            BreadcrumbState.Trails -> {
+            BreadcrumbState.TRAILS -> {
                 binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate3)
                 binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
@@ -778,26 +781,63 @@ class PerformCollectionFragment : Fragment(),
         }
 
         binding.showBreadcrumbsButton.setOnClickListener {
-            if (breadcrumbState == BreadcrumbState.Gone)
+            when( breadcrumbState )
             {
-                breadcrumbState = BreadcrumbState.Crumbs
-                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
-                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            }
-            else if (breadcrumbState == BreadcrumbState.Crumbs)
-            {
-                breadcrumbState = BreadcrumbState.Trails
-                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate3)
-                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            }
-            else
-            {
-                breadcrumbState = BreadcrumbState.Gone
-                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
-                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList)
-            }
+                BreadcrumbState.OFF -> {
+                    val choices = ArrayList<String>()
 
-            refreshMap()
+                    for (team in enumArea.enumerationTeams)
+                    {
+                        choices.add( team.name )
+                    }
+
+                    CheckboxDialog( activity!!, "Select Enumeration Teams", choices) { selections ->
+                        if (selections.isNotEmpty())
+                        {
+                            selectedTeamNames.clear()
+                            selectedBreadcrumbs.clear()
+
+                            for (selection in selections)
+                            {
+                                for (team in enumArea.enumerationTeams)
+                                {
+                                    if (team.name == selection)
+                                    {
+                                        selectedTeamNames.add( team.name )
+
+                                        for (breadcrumb in enumArea.breadcrumbs)
+                                        {
+                                            if (breadcrumb.enumTeamName == team.name)
+                                            {
+                                                selectedBreadcrumbs.add( breadcrumb )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            breadcrumbState = BreadcrumbState.CRUMBS
+                            binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                            binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                            refreshMap()
+                        }
+                    }
+                }
+
+                BreadcrumbState.CRUMBS -> {
+                    breadcrumbState = BreadcrumbState.TRAILS
+                    binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate3)
+                    binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                    refreshMap()
+                }
+
+                BreadcrumbState.TRAILS -> {
+                    breadcrumbState = BreadcrumbState.OFF
+                    binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                    binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList)
+                    refreshMap()
+                }
+            }
         }
 
         updateSummaryInfo()
@@ -943,12 +983,12 @@ class PerformCollectionFragment : Fragment(),
         {
             MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20, Color.RED, enumArea.name )
 
-            if (breadcrumbState == BreadcrumbState.Trails && enumArea.breadcrumbs.isNotEmpty())
+            if (breadcrumbState == BreadcrumbState.TRAILS && selectedBreadcrumbs.isNotEmpty())
             {
                 var groupId = ""
                 val breadcrumbs = ArrayList<Breadcrumb>()
 
-                for (breadcrumb in enumArea.breadcrumbs)
+                for (breadcrumb in selectedBreadcrumbs)
                 {
                     if (breadcrumbs.isEmpty())
                     {
@@ -1054,8 +1094,8 @@ class PerformCollectionFragment : Fragment(),
                 MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, mapboxMapClickListener )
             }
 
-            if (breadcrumbState != BreadcrumbState.Gone && enumArea.breadcrumbs.isNotEmpty()) {
-                MapManager.instance().loadBreadcrumbs(requireContext(), mapView, enumArea.breadcrumbs, collectionTeam.name )
+            if (breadcrumbState != BreadcrumbState.OFF && selectedBreadcrumbs.isNotEmpty()) {
+                MapManager.instance().loadBreadcrumbs(requireContext(), mapView, selectedBreadcrumbs, selectedTeamNames )
             }
         }
     }

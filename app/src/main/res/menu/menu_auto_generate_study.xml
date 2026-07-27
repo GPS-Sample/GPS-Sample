@@ -2,6 +2,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_autogen_study"
-        android:title="Autogen Study"
+        android:title="Auto +Study"
         app:showAsAction="never" />
 </menu>

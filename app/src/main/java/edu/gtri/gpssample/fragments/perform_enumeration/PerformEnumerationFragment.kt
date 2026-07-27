@@ -52,6 +52,8 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.fragments.createstudy.DeleteMode
+import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment
+import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment.BreadcrumbState
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionHostManager
 import edu.gtri.gpssample.managers.PerformanceManager
@@ -87,7 +89,6 @@ class PerformEnumerationFragment : Fragment(),
     private val binding get() = _binding!!
     private var lastBreadcrumbGroupId = ""
     private var dropMode = false
-    private var isRecordingBreadcrumbs = false
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
     private val enumerationTeamLocations = ArrayList<Location>()
@@ -98,14 +99,23 @@ class PerformEnumerationFragment : Fragment(),
     private var nearbySessionHostManager: NearbySessionHostManager? = null
     private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
+    private val selectedTeamNames = ArrayList<String>()
+    private val selectedBreadcrumbs = ArrayList<Breadcrumb>()
 
-    enum class BreadcrumbState(val format : String) {
-        Gone("Gone"),
-        Crumbs("Crumbs"),
-        Trails("Trails"),
+    enum class BreadcrumbRecordingState
+    {
+        OFF,
+        RECORDING,
+        PAUSE,
     }
-
-    private var breadcrumbState = BreadcrumbState.Gone
+    private var breadcrumbRecordingState = BreadcrumbRecordingState.OFF
+    enum class BreadcrumbVisibilityState
+    {
+        OFF,
+        CRUMBS,
+        TRAILS,
+    }
+    private var breadcrumbVisibilityState = BreadcrumbVisibilityState.OFF
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -447,9 +457,17 @@ class PerformEnumerationFragment : Fragment(),
         binding.deleteBreadcrumbsButton.setOnClickListener {
             if (enumArea.breadcrumbs.isNotEmpty())
             {
-                val breadcrumb = enumArea.breadcrumbs.last()
-                DAO.breadcrumbDAO.delete( breadcrumb )
+                var breadcrumb = enumArea.breadcrumbs.last()
+
+                if (selectedBreadcrumbs.isNotEmpty())
+                {
+                    breadcrumb = selectedBreadcrumbs.last()
+                }
+
+                selectedBreadcrumbs.remove( breadcrumb )
                 enumArea.breadcrumbs.remove( breadcrumb )
+                DAO.breadcrumbDAO.delete( breadcrumb )
+
                 refreshMap()
             }
         }
@@ -675,70 +693,128 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.listItemEnumArea.titleLayout.visibility = View.GONE
 
-        if (isRecordingBreadcrumbs)
-        {
-            binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.pause )
-            binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-        }
+        // show the current breadcrumb state
 
-        when (breadcrumbState)
+        when (breadcrumbRecordingState)
         {
-            BreadcrumbState.Gone -> {
-                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
-                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+            BreadcrumbRecordingState.OFF -> {
+                binding.recordBreadcrumbsButton.setBackgroundResource(R.drawable.record)
+                binding.recordBreadcrumbsButton.setBackgroundTintList(defaultColorList);
             }
-            BreadcrumbState.Crumbs -> {
-                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
-                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            }
-            BreadcrumbState.Trails -> {
-                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate3)
-                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            }
-        }
-
-        binding.recordBreadcrumbsButton.setOnClickListener {
-            if (!isRecordingBreadcrumbs)
-            {
-                breadcrumbState = BreadcrumbState.Crumbs
-                isRecordingBreadcrumbs = true
-                lastBreadcrumbGroupId = UUID.randomUUID().toString()
-                binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.pause )
+            BreadcrumbRecordingState.RECORDING -> {
+                binding.recordBreadcrumbsButton.setBackgroundResource(R.drawable.record)
                 binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
-                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
-            else
-            {
-                isRecordingBreadcrumbs = false
-                binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.record )
+            BreadcrumbRecordingState.PAUSE -> {
+                binding.recordBreadcrumbsButton.setBackgroundResource(R.drawable.pause)
                 binding.recordBreadcrumbsButton.setBackgroundTintList(defaultColorList);
             }
         }
 
-        binding.showBreadcrumbsButton.setOnClickListener {
-            if (isRecordingBreadcrumbs)
+        binding.recordBreadcrumbsButton.setOnClickListener {
+            if (breadcrumbRecordingState == BreadcrumbRecordingState.OFF)
             {
-                return@setOnClickListener
+                breadcrumbRecordingState = BreadcrumbRecordingState.RECORDING
+                breadcrumbVisibilityState = BreadcrumbVisibilityState.CRUMBS
+
+                lastBreadcrumbGroupId = UUID.randomUUID().toString()
+                binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.record )
+                binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                binding.showBreadcrumbsButton.setBackgroundResource( R.drawable.navigate2 )
+                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)))
+            }
+            else if (breadcrumbRecordingState == BreadcrumbRecordingState.RECORDING)
+            {
+                breadcrumbRecordingState = BreadcrumbRecordingState.PAUSE
+                breadcrumbVisibilityState = BreadcrumbVisibilityState.CRUMBS
+
+                binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.pause )
+                binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+            else if (breadcrumbRecordingState == BreadcrumbRecordingState.PAUSE)
+            {
+                breadcrumbRecordingState = BreadcrumbRecordingState.OFF
+                breadcrumbVisibilityState = BreadcrumbVisibilityState.OFF
+
+                binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.record )
+                binding.recordBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+                binding.showBreadcrumbsButton.setBackgroundResource( R.drawable.navigate2 )
+                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
             }
 
-            if (breadcrumbState == BreadcrumbState.Gone)
-            {
-                breadcrumbState = BreadcrumbState.Crumbs
+            refreshMap()
+        }
+
+        when( breadcrumbVisibilityState )
+        {
+            BreadcrumbVisibilityState.OFF -> {
                 binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
-                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
             }
-            else if (breadcrumbState == BreadcrumbState.Crumbs)
-            {
-                breadcrumbState = BreadcrumbState.Trails
-                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate3)
-                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            BreadcrumbVisibilityState.CRUMBS -> {
+                binding.showBreadcrumbsButton.setBackgroundResource( R.drawable.navigate2 )
+                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)))
             }
-            else
+            BreadcrumbVisibilityState.TRAILS -> {
+                binding.showBreadcrumbsButton.setBackgroundResource( R.drawable.navigate3 )
+                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)))
+            }
+        }
+
+        binding.showBreadcrumbsButton.setOnClickListener {
+
+            when( breadcrumbVisibilityState )
             {
-                breadcrumbState = BreadcrumbState.Gone
-                binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
-                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList)
+                BreadcrumbVisibilityState.OFF -> {
+                    val choices = ArrayList<String>()
+
+                    for (team in enumArea.enumerationTeams)
+                    {
+                        choices.add( team.name )
+                    }
+
+                    CheckboxDialog( activity!!, "Select Enumeration Teams", choices) { selected_team_names ->
+                        if (selected_team_names.isNotEmpty())
+                        {
+                            selectedTeamNames.clear()
+                            selectedBreadcrumbs.clear()
+
+                            for (selectedTeamName in selected_team_names)
+                            {
+                                for (team in enumArea.enumerationTeams)
+                                {
+                                    if (team.name == selectedTeamName)
+                                    {
+                                        selectedTeamNames.add( team.name )
+
+                                        for (breadcrumb in enumArea.breadcrumbs)
+                                        {
+                                            if (breadcrumb.enumTeamName == team.name)
+                                            {
+                                                selectedBreadcrumbs.add( breadcrumb )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            breadcrumbVisibilityState = BreadcrumbVisibilityState.CRUMBS
+                            binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                            binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)))
+                            refreshMap()
+                        }
+                    }
+                }
+                BreadcrumbVisibilityState.CRUMBS -> {
+                    breadcrumbVisibilityState = BreadcrumbVisibilityState.TRAILS
+                    binding.showBreadcrumbsButton.setBackgroundResource( R.drawable.navigate3 )
+                    binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)))
+                }
+                BreadcrumbVisibilityState.TRAILS -> {
+                    breadcrumbVisibilityState = BreadcrumbVisibilityState.OFF
+                    binding.showBreadcrumbsButton.setBackgroundResource( R.drawable.navigate2 )
+                    binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList)
+                }
             }
 
             refreshMap()
@@ -915,38 +991,48 @@ class PerformEnumerationFragment : Fragment(),
         {
             MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20, Color.RED, enumArea.name )
 
-            if (breadcrumbState == BreadcrumbState.Trails && enumArea.breadcrumbs.isNotEmpty())
+            if (breadcrumbRecordingState == BreadcrumbRecordingState.RECORDING)
+            {
+                selectedTeamNames.clear()
+                selectedBreadcrumbs.addAll( enumArea.breadcrumbs )
+                selectedTeamNames.add( enumerationTeam.name )
+            }
+
+            if (breadcrumbVisibilityState == BreadcrumbVisibilityState.TRAILS && selectedBreadcrumbs.isNotEmpty())
             {
                 var groupId = ""
 
                 val breadcrumbs = ArrayList<Breadcrumb>()
 
-                for (breadcrumb in enumArea.breadcrumbs)
+                for (teamName in selectedTeamNames)
                 {
-                    if (breadcrumb.enumTeamName == enumerationTeam.name)
+                    for (breadcrumb in selectedBreadcrumbs)
                     {
-                        if (breadcrumbs.isEmpty())
+                        if (breadcrumb.enumTeamName == teamName)
                         {
-                            groupId = breadcrumb.groupId
-                        }
+                            if (breadcrumbs.isEmpty())
+                            {
+                                groupId = breadcrumb.groupId
+                            }
 
-                        if (breadcrumb.groupId == groupId)
-                        {
-                            breadcrumbs.add( breadcrumb )
-                        }
-                        else
-                        {
-                            MapManager.instance().createPolyline( mapView, breadcrumbs )
-                            groupId = breadcrumb.groupId
-                            breadcrumbs.clear()
-                            breadcrumbs.add( breadcrumb )
+                            if (breadcrumb.groupId == groupId)
+                            {
+                                breadcrumbs.add( breadcrumb )
+                            }
+                            else
+                            {
+                                MapManager.instance().createPolyline( mapView, breadcrumbs )
+                                groupId = breadcrumb.groupId
+                                breadcrumbs.clear()
+                                breadcrumbs.add( breadcrumb )
+                            }
                         }
                     }
-                }
 
-                if (breadcrumbs.isNotEmpty())
-                {
-                    MapManager.instance().createPolyline( mapView, breadcrumbs )
+                    if (breadcrumbs.isNotEmpty())
+                    {
+                        MapManager.instance().createPolyline( mapView, breadcrumbs )
+                    }
                 }
             }
 
@@ -1005,8 +1091,8 @@ class PerformEnumerationFragment : Fragment(),
                 MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, mapboxMapClickListener )
             }
 
-            if (breadcrumbState != BreadcrumbState.Gone && enumArea.breadcrumbs.isNotEmpty()) {
-                MapManager.instance().loadBreadcrumbs(requireContext(), mapView, enumArea.breadcrumbs, enumerationTeam.name)
+            if (breadcrumbVisibilityState != BreadcrumbVisibilityState.OFF && selectedBreadcrumbs.isNotEmpty()) {
+                MapManager.instance().loadBreadcrumbs(requireContext(), mapView, selectedBreadcrumbs, selectedTeamNames )
             }
         }
     }
@@ -1024,7 +1110,7 @@ class PerformEnumerationFragment : Fragment(),
             {
                 if (gpsLocationIsGood( location ))
                 {
-                    if (isRecordingBreadcrumbs && enumArea.breadcrumbs.isNotEmpty())
+                    if (breadcrumbRecordingState == BreadcrumbRecordingState.RECORDING && enumArea.breadcrumbs.isNotEmpty())
                     {
                         enumArea.breadcrumbs.add(Breadcrumb(enumArea.uuid, enumerationTeam.name, location.latitude, location.longitude, enumArea.breadcrumbs.last().groupId))
                     }
@@ -1614,16 +1700,23 @@ class PerformEnumerationFragment : Fragment(),
                 {
                     lastLocationUpdateTime = Date().time
 
-                    if (isRecordingBreadcrumbs)
+                    if (breadcrumbRecordingState == BreadcrumbRecordingState.RECORDING)
                     {
                         var distance = 10.1;
                         val currentLatLng = LatLng( point.latitude(), point.longitude())
 
-                        if (!enumArea.breadcrumbs.isEmpty())
+                        if (enumArea.breadcrumbs.isNotEmpty())
                         {
                             val lastBreadcrumb = enumArea.breadcrumbs.last()
                             val lastLatLng = LatLng( lastBreadcrumb.latitude, lastBreadcrumb.longitude )
                             distance = GeoUtils.distanceBetween( currentLatLng, lastLatLng )
+                        }
+
+                        Log.d( "xxx", "distance = ${distance}")
+
+                        for (breadcrumb in enumArea.breadcrumbs)
+                        {
+                            DAO.breadcrumbDAO.delete( breadcrumb )
                         }
 
                         if (distance > MIN_BREADCRUMB_METERS)
@@ -1634,6 +1727,7 @@ class PerformEnumerationFragment : Fragment(),
                             DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breadcrumb, breadcrumb.version )
                             enumArea.breadcrumbs.add( breadcrumb )
 
+                            Log.d( "xxx", "Created breadcrumb" )
                             refreshMap()
                         }
                     }

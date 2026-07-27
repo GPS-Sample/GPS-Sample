@@ -191,13 +191,13 @@ class CreateStudyFragment : Fragment()
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     if (config.studies.isEmpty())
                     {
-                        ConfirmationDialog(activity, resources.getString(R.string.please_confirm), "Auto create the study?", resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
+                        ConfirmationDialog(activity, resources.getString(R.string.please_confirm), "Auto generate the study?", resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
                             when( buttonPressed )
                             {
                                 ConfirmationDialog.ButtonPress.None -> {}
                                 ConfirmationDialog.ButtonPress.Left -> {}
                                 ConfirmationDialog.ButtonPress.Right -> {
-                                    val studyName = "AutoGenStudy"
+                                    val studyName = "Test-Study"
                                     val study = Study( studyName, SamplingMethod.Cluster, 10000, SampleType.NumberHouseholds )
 
                                     val noteField = Field( null, 1, "Note", FieldType.Note, false, false, false, false, false, false, null, null,study.uuid)

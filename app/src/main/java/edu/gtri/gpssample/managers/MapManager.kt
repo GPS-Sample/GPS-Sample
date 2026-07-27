@@ -986,33 +986,36 @@ class MapManager
         }
     }
 
-    private fun getBreadcrumbPaths( breadcrumbs: ArrayList<Breadcrumb>, teamName: String ) : ArrayList<ArrayList<Breadcrumb>>
+    private fun getBreadcrumbPaths( breadcrumbs: ArrayList<Breadcrumb>, teamNames: ArrayList<String> ) : ArrayList<ArrayList<Breadcrumb>>
     {
         var numPaths = 1
         var groupId: String = ""
         var path = ArrayList<Breadcrumb>()
         val paths = ArrayList<ArrayList<Breadcrumb>>()
 
-        for (breadcrumb in breadcrumbs)
+        for (teamName in teamNames)
         {
-            if (breadcrumb.enumTeamName == teamName)
+            for (breadcrumb in breadcrumbs)
             {
-                if (groupId.isEmpty())
+                if (breadcrumb.enumTeamName == teamName)
                 {
-                    groupId = breadcrumb.groupId
-                    path.add( breadcrumb )
-                }
-                else if (breadcrumb.groupId == groupId)
-                {
-                    path.add( breadcrumb )
-                }
-                else
-                {
-                    numPaths += 1
-                    paths.add( path )
-                    groupId = breadcrumb.groupId
-                    path = ArrayList<Breadcrumb>()
-                    path.add( breadcrumb )
+                    if (groupId.isEmpty())
+                    {
+                        groupId = breadcrumb.groupId
+                        path.add( breadcrumb )
+                    }
+                    else if (breadcrumb.groupId == groupId)
+                    {
+                        path.add( breadcrumb )
+                    }
+                    else
+                    {
+                        numPaths += 1
+                        paths.add( path )
+                        groupId = breadcrumb.groupId
+                        path = ArrayList<Breadcrumb>()
+                        path.add( breadcrumb )
+                    }
                 }
             }
         }
@@ -1037,7 +1040,7 @@ class MapManager
         clusterer.add(marker)
     }
 
-    fun loadBreadcrumbs( context: Context, mapView: View, breadcrumbs: ArrayList<Breadcrumb>, teamName: String )
+    fun loadBreadcrumbs( context: Context, mapView: View, breadcrumbs: ArrayList<Breadcrumb>, teamNames: ArrayList<String> )
     {
         if (mapView is org.osmdroid.views.MapView)
         {
@@ -1046,11 +1049,16 @@ class MapManager
             val icon = BitmapFactory.decodeResource(context.resources, context.resources.getIdentifier("breadcrumb", "drawable", context.packageName))
             clusterer.setIcon( icon )
 
-            val paths = getBreadcrumbPaths( breadcrumbs, teamName )
+            val paths = getBreadcrumbPaths( breadcrumbs, teamNames )
 
             for (path in paths)
             {
-                if (path.size > 1)
+                if (path.size == 1)
+                {
+                    addBreadcrumb( context, mapView, clusterer, path.first(), R.drawable.start_breadcrumb )
+                    addBreadcrumb( context, mapView, clusterer, path.first(), R.drawable.breadcrumb )
+                }
+                else if (path.size > 1)
                 {
                     addBreadcrumb( context, mapView, clusterer, path.first(), R.drawable.start_breadcrumb )
                     addBreadcrumb( context, mapView, clusterer, path.first(), R.drawable.breadcrumb )
@@ -1086,7 +1094,7 @@ class MapManager
 
             val features = JSONArray()
 
-            val paths = getBreadcrumbPaths( breadcrumbs, teamName )
+            val paths = getBreadcrumbPaths( breadcrumbs, teamNames )
 
             for (path in paths)
             {
