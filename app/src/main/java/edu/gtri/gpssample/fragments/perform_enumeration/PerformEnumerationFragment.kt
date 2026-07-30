@@ -1462,6 +1462,11 @@ class PerformEnumerationFragment : Fragment(),
 
                 enumArea.breadcrumbs.addAll( breadcrumbs )
                 lastLocation = location
+
+                if (enumArea.breadcrumbs.count() > 50000)
+                {
+                    break
+                }
             }
         }
 

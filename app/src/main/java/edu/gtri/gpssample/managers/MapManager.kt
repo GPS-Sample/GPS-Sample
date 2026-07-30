@@ -147,6 +147,7 @@ import com.mapbox.maps.extension.style.layers.addLayerBelow
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.getSource
 import java.util.ArrayList
+import kotlin.math.roundToInt
 
 class MapManager
 {
@@ -1040,11 +1041,29 @@ class MapManager
         clusterer.add(marker)
     }
 
+    class BreadcrumbRadiusMarkerClusterer(context: Context) : RadiusMarkerClusterer(context)
+    {
+        private var lastZoom = -1
+
+        override fun draw(canvas: Canvas, mapView: org.osmdroid.views.MapView, shadow: Boolean)
+        {
+            val zoom = mapView.zoomLevelDouble.roundToInt()
+
+            if (zoom != lastZoom) {
+                Log.d( "xxx", zoom.toString())
+                clusterer(mapView)
+                lastZoom = zoom
+            }
+
+            super.draw(canvas, mapView, shadow)
+        }
+    }
+
     fun loadBreadcrumbs( context: Context, mapView: View, breadcrumbs: ArrayList<Breadcrumb>, teamNames: ArrayList<String> )
     {
         if (mapView is org.osmdroid.views.MapView)
         {
-            val clusterer = RadiusMarkerClusterer(context)
+            val clusterer = BreadcrumbRadiusMarkerClusterer(context)
             clusterer.textPaint.color = Color.TRANSPARENT
             val icon = BitmapFactory.decodeResource(context.resources, context.resources.getIdentifier("breadcrumb", "drawable", context.packageName))
             clusterer.setIcon( icon )
