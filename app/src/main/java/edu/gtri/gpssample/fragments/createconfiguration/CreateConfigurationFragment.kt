@@ -286,13 +286,29 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kEditMode.value, true )
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
-                    {
-                        findNavController().navigate(R.id.action_navigate_to_CreateOsmEnumerationAreaFragment, bundle)
-                    }
-                    else if (config.mapEngineIndex == MapEngine.MapBox.value)
-                    {
-                        findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+
+                        binding.mapOverlayView.visibility = View.VISIBLE
+
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            withContext(Dispatchers.IO)
+                            {
+                                config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+                            }
+
+                            // back on the main thread...
+                            binding.mapOverlayView.visibility = View.GONE
+
+                            if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
+                            {
+                                findNavController().navigate(R.id.action_navigate_to_CreateOsmEnumerationAreaFragment, bundle)
+                            }
+                            else if (config.mapEngineIndex == MapEngine.MapBox.value)
+                            {
+                                findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+                            }
+                        }
                     }
                 }
             }
