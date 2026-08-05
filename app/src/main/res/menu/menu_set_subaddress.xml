@@ -20,8 +20,14 @@
 
     <item
         android:visible="false"
+        android:id="@+id/action_auto_generate_locations"
+        android:title="Auto +Locations"
+        app:showAsAction="never" />
+
+    <item
+        android:visible="false"
         android:id="@+id/action_auto_enumerate"
-        android:title="Auto Enumerate"
+        android:title="Auto +Enumerate"
         app:showAsAction="never" />
 
     <item

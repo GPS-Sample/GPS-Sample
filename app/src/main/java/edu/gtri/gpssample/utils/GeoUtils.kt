@@ -21,7 +21,11 @@ import org.locationtech.jts.geom.Polygon
 import java.util.ArrayList
 import kotlin.math.*
 import android.location.Location
+import kotlin.div
 import kotlin.random.Random
+import kotlin.text.compareTo
+import kotlin.times
+import kotlin.unaryMinus
 
 data class HaversineCheck(val distance : Double, var withinBounds : Boolean, val start : LatLng, val end : LatLng)
 {
@@ -279,13 +283,14 @@ object GeoUtils {
         }
     }
 
+    private data class XYPoint(val x: Double, val y: Double)
+
     class RandomLocationGenerator(
         private val center: com.mapbox.geojson.Point,
         private val widthMeters: Double,
         private val heightMeters: Double,
         private val minDistanceMeters: Double = 10.0
     ) {
-        private data class XYPoint(val x: Double, val y: Double)
         private data class Cell(val x: Int, val y: Int)
         private val cellSize = minDistanceMeters
         private val minDistanceSquared = minDistanceMeters * minDistanceMeters
@@ -357,6 +362,110 @@ object GeoUtils {
             val lon = center.longitude() + point.x / (111320.0 * cos(Math.toRadians(center.latitude())))
 
             return com.mapbox.geojson.Point.fromLngLat(lon, lat )
+        }
+    }
+
+    class RandomLocationGenerator2( polygon: List<LatLon>, private val minDistanceMeters: Double = 10.0 ) {
+        private data class Cell(val x: Int, val y: Int)
+        private val cellSize = minDistanceMeters
+        private val minDistanceSquared = minDistanceMeters * minDistanceMeters
+        private data class XYPoint(val x: Double, val y: Double)
+        private val origin = Point.fromLngLat(polygon.first().longitude, polygon.first().latitude)
+        private val polygonXY = polygon.map(::toXY)
+        val minX = polygonXY.minOf { it.x }
+        val maxX = polygonXY.maxOf { it.x }
+        val minY = polygonXY.minOf { it.y }
+        val maxY = polygonXY.maxOf { it.y }
+
+        fun generate( count: Int, reportProgress: (point: Point, count: Int)->Unit ): List<com.mapbox.geojson.Point>
+        {
+            val grid = HashMap<Cell, MutableList<XYPoint>>()
+            val accepted = ArrayList<XYPoint>(count)
+
+            var attempts = 0
+            val maxAttempts = count * 100
+
+            while (accepted.size < count)
+            {
+                if (++attempts > maxAttempts)
+                {
+                    break
+                }
+
+                val candidate = XYPoint(Random.nextDouble(minX, maxX), Random.nextDouble(minY, maxY))
+
+                if (!insidePolygon(candidate, polygonXY))
+                    continue
+
+                val cell = Cell(floor(candidate.x / cellSize).toInt(), floor(candidate.y / cellSize).toInt())
+
+                var valid = true
+
+                outer@ for (dx in -1..1)
+                {
+                    for (dy in -1..1)
+                    {
+                        val neighbors = grid[Cell(cell.x + dx, cell.y + dy)] ?: continue
+
+                        for (p in neighbors)
+                        {
+                            val x = candidate.x - p.x
+                            val y = candidate.y - p.y
+
+                            if (x * x + y * y < minDistanceSquared)
+                            {
+                                valid = false
+                                break@outer
+                            }
+                        }
+                    }
+                }
+
+                if (valid)
+                {
+                    accepted.add( candidate )
+                    grid.getOrPut(cell) { ArrayList() }.add( candidate )
+                    reportProgress( toPoint(candidate ), accepted.size )
+                }
+            }
+
+            return accepted.map(::toPoint)
+        }
+
+        private fun toXY(latLon: LatLon): XYPoint
+        {
+            val point = Point.fromLngLat( latLon.longitude, latLon.latitude )
+            val lat0 = Math.toRadians(origin.latitude())
+            val x = (point.longitude() - origin.longitude()) * 111320.0 * cos(lat0)
+            val y = (point.latitude() - origin.latitude()) * 110540.0
+            return XYPoint(x, y)
+        }
+
+        private fun toPoint(xy: XYPoint): Point
+        {
+            val lat0 = Math.toRadians(origin.latitude())
+            return Point.fromLngLat(origin.longitude() + xy.x / (111320.0 * cos(lat0)), origin.latitude() + xy.y / 110540.0)
+        }
+
+        private fun insidePolygon( point: XYPoint, polygon: List<XYPoint> ): Boolean
+        {
+            var inside = false
+            var j = polygon.lastIndex
+
+            for (i in polygon.indices)
+            {
+                val pi = polygon[i]
+                val pj = polygon[j]
+
+                if ((pi.y > point.y) != (pj.y > point.y) && point.x < (pj.x - pi.x) * (point.y - pi.y) / (pj.y - pi.y) + pi.x)
+                {
+                    inside = !inside
+                }
+
+                j = i
+            }
+
+            return inside
         }
     }
 }

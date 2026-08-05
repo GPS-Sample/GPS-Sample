@@ -297,7 +297,7 @@ class PerformEnumerationFragment : Fragment(),
             {
                 LocationService.locationCallback = locationCallback
                 val intent = Intent(activity!!, LocationService::class.java)
-                ContextCompat.startForegroundService(activity!!, intent)
+                ContextCompat.startForegroundService(activity!!, intent )
             }
         }
 
@@ -1338,6 +1338,57 @@ class PerformEnumerationFragment : Fragment(),
 
     var subAddress = 0
 
+    fun autoGenerateLocations()
+    {
+        InputDialog(activity!!, false, "Enter the number of HH's to create", "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, false, true) { action, text, tag ->
+            when (action)
+            {
+                InputDialog.Action.DidCancel -> {}
+                InputDialog.Action.DidPressQRButton -> {}
+                InputDialog.Action.DidEnterText -> {
+                    text.toIntOrNull()?.let { numLocations ->
+
+                        isAcceptingLocationUpdates = false
+                        busyIndicatorDialog = BusyIndicatorDialog(activity!!, "Generating Locations...", this )
+
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            withContext(Dispatchers.IO)
+                            {
+                                DAO.instance().writableDatabase.beginTransaction()
+
+                                val randomLocationGenerator = GeoUtils.RandomLocationGenerator2(enumerationTeam.polygon, 10.0)
+                                randomLocationGenerator.generate(numLocations ) { point, count ->
+                                    busyIndicatorDialog?.let {
+                                        requireActivity().runOnUiThread {
+                                            it.updateProgress("Generated Location ${count}/${numLocations}")
+                                        }
+                                    }
+                                    val location = Location(point.latitude(), point.longitude(), 0.0)
+                                    DAO.locationDAO.createOrUpdateLocation(location, enumArea, location.version)
+                                    enumArea.locations.add(location)
+                                    sharedViewModel.currentLocationUuid = location.uuid
+                                    enumerationTeamLocations.add(location)
+                                    enumerationTeam.locationUuids.add(location.uuid)
+                                    DAO.enumerationTeamDAO.updateConnectorTable(enumerationTeam)
+                                }
+
+                                DAO.instance().writableDatabase.setTransactionSuccessful()
+                                DAO.instance().writableDatabase.endTransaction()
+                            }
+
+                            // back on the main thread...
+
+                            isAcceptingLocationUpdates = true
+                            busyIndicatorDialog?.alertDialog?.cancel()
+
+                            refreshMap()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     fun autoEnumerateLocations()
     {
         val config = sharedViewModel.currentConfiguration!!.value!!
@@ -1417,6 +1468,7 @@ class PerformEnumerationFragment : Fragment(),
     fun autoGenerateImages()
     {
         DAO.instance().writableDatabase.beginTransaction()
+        ImageDAO.instance().writableDatabase.beginTransaction()
 
         for (location in enumerationTeamLocations)
         {
@@ -1433,7 +1485,10 @@ class PerformEnumerationFragment : Fragment(),
         }
 
         DAO.instance().writableDatabase.setTransactionSuccessful()
+        ImageDAO.instance().writableDatabase.setTransactionSuccessful()
+
         DAO.instance().writableDatabase.endTransaction()
+        ImageDAO.instance().writableDatabase.endTransaction()
     }
 
     var lastLocation : Location? = null
@@ -1522,8 +1577,9 @@ class PerformEnumerationFragment : Fragment(),
 
         val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", Context.MODE_PRIVATE)
 
-        if (sharedPreferences.getBoolean( Keys.kDeveloperMode.value, false ))
+        if (sharedPreferences.getBoolean(Keys.kDeveloperMode.value, false ))
         {
+            menu.findItem(R.id.action_auto_generate_locations).isVisible = true
             menu.findItem(R.id.action_auto_enumerate).isVisible = true
             menu.findItem(R.id.action_add_images).isVisible = true
             menu.findItem(R.id.action_add_breadcrumbs).isVisible = true
@@ -1535,6 +1591,11 @@ class PerformEnumerationFragment : Fragment(),
         sharedViewModel.currentConfiguration?.value?.let { config ->
             when (item.itemId)
             {
+                R.id.action_auto_generate_locations ->
+                {
+                    autoGenerateLocations()
+                }
+
                 R.id.action_auto_enumerate ->
                 {
                     ConfirmationDialog(activity, resources.getString(R.string.please_confirm), "Auto enumerate these locations?", resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
@@ -1668,11 +1729,17 @@ class PerformEnumerationFragment : Fragment(),
 
     private var lastLocationUpdateTime: Long = 0
     private var MIN_BREADCRUMB_METERS: Double = 10.0
+    private var isAcceptingLocationUpdates = true
 
     private val locationCallback = object : LocationCallback()
     {
         override fun onLocationResult(locationResult: LocationResult)
         {
+            if (!isAcceptingLocationUpdates)
+            {
+                return
+            }
+
             val location = locationResult.locations.last()
             val accuracy = location.accuracy.toInt() // in meters
             val altitude = if (location.altitude.isNaN()) 0.0 else location.altitude
