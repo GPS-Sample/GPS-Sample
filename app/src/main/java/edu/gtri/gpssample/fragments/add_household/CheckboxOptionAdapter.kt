@@ -67,7 +67,7 @@ class CheckboxOptionAdapter( val editMode: Boolean, var fieldDataOptions: List<F
         {
             holder.checkbox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
             {
-                override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+                override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
                 {
                     fieldDataOption.value = isChecked
                     fieldDataOption.version = UUID.randomUUID().toString()

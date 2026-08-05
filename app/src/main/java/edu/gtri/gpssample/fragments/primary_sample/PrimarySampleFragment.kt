@@ -108,7 +108,7 @@ class PrimarySampleFragment : Fragment()
 
         binding.enableSubsetCheckbox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
             {
                 binding.subsetSampleButton.visibility = if (isChecked) View.VISIBLE else View.GONE
             }
