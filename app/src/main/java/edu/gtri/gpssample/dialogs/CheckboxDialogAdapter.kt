@@ -60,7 +60,7 @@ class CheckboxDialogAdapter(var items: List<String>, var isChecked: Boolean = fa
 
         holder.checkBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
             {
                 if (isChecked)
                 {

@@ -58,7 +58,7 @@ class AdditionalInfoDialog
 
         completeCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
             {
                 if (isChecked)
                 {
@@ -71,7 +71,7 @@ class AdditionalInfoDialog
 
         incompleteCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
             {
                 nobodyHomeButton.isChecked = false
                 doesNotExistButton.isChecked = false

@@ -137,7 +137,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
 
         binding.fieldBlockContainerCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
             {
                 if (isChecked)
                 {
@@ -184,7 +184,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
 
         minimumNumberCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
             {
                 if (isChecked)
                 {
@@ -199,7 +199,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
 
         maximumNumberCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
             {
                 if (isChecked)
                 {
@@ -225,7 +225,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
 
         dateCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
             {
                 minimumDateEditText.setText("")
                 maximumDateEditText.setText("")
@@ -249,7 +249,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
 
         minimumDateCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
             {
                 if (isChecked)
                 {
@@ -264,7 +264,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
 
         maximumDateCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
             {
                 if (isChecked)
                 {
