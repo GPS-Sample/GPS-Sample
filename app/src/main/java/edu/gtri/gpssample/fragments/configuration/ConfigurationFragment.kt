@@ -732,6 +732,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
                     viewLifecycleOwner.lifecycleScope.launch {
                         withContext(Dispatchers.IO)
                         {
+                            // TODO: Performance Inprovement: Check to see if each EnumArea really needs to be re-loaded
                             config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
                         }
 
