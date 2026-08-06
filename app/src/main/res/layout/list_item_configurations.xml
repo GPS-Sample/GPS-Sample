@@ -57,6 +57,7 @@
 
             <ImageView
                 android:id="@+id/clone_image_view"
+                android:visibility="gone"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_width="50dp"

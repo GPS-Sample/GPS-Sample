@@ -505,6 +505,10 @@
     <string name="exclude_this_location">"Exclude this location"</string>
     <string name="reason">"Reason"</string>
     <string name="delete_location_message">"Would you also like to permanently delete this location?"</string>
+    <string name="open">Open</string>
+    <string name="edit">Edit</string>
+    <string name="clone">Clone</string>
+    <string name="configuration">"Configuration"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

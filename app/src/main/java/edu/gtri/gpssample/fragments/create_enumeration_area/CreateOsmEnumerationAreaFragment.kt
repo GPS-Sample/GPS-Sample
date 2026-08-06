@@ -71,8 +71,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     MapManager.MapTileCacheDelegate,
     CheckboxDialog.CheckboxDialogDelegate,
     SelectionDialog.SelectionDialogDelegate,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate,
-    MultiConfirmationDialog.MulitConfirmationDialogDelegate
+    BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private lateinit var mapView: View
     private lateinit var config: Config
@@ -667,10 +666,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                     }
 
                     TapType.EditEnumArea -> {
-                        findEnumAreaOfLocation(
-                            getAllEnumAreas(),
-                            LatLng(point.latitude(), point.longitude())
-                        )?.let { enumArea ->
+                        findEnumAreaOfLocation(getAllEnumAreas(), LatLng(point.latitude(), point.longitude()))?.let { enumArea ->
                             currentTapType = TapType.None
                             binding.mapOverlayView.visibility = View.GONE
                             binding.editLocationButton.backgroundTintList = defaultColorList
@@ -686,12 +682,46 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                                 items.add(resources.getString(R.string.select_strata))
                             }
 
-                            MultiConfirmationDialog(
-                                activity, resources.getString(R.string.select_task),
-                                "", items, enumArea, this
-                            )
+                            MultiConfirmationDialog(requireActivity(), resources.getString(R.string.select_task), "", items, enumArea ) { selection, tag ->
+                                val enumArea = tag as EnumArea
+
+                                when (selection) {
+                                    resources.getString(R.string.rename) -> {
+                                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), enumArea.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, false ) { action, text, tag ->
+                                            when (action) {
+                                                InputDialog.Action.DidCancel -> {}
+                                                InputDialog.Action.DidEnterText -> {
+                                                    (tag as EnumArea).name = text
+                                                    refreshMap()
+                                                }
+                                                InputDialog.Action.DidPressQRButton -> {}
+                                            }
+                                        }
+
+                                    }
+                                    resources.getString(R.string.delete) -> {
+                                        unsavedEnumAreas.remove( tag )
+                                        config.enumAreas.remove( tag )
+                                        DAO.enumAreaDAO.delete( tag )
+                                        refreshMap()
+                                    }
+                                    resources.getString(R.string.attach_mbtiles) -> {
+                                        selectedEnumArea = enumArea
+                                        filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+                                    }
+                                    resources.getString(R.string.detach_mbtiles) -> {
+                                        enumArea.mbTilesSize = 0
+                                        enumArea.mbTilesPath = ""
+                                    }
+                                    resources.getString(R.string.select_strata) -> {
+                                        presentStrataSelectionDialog( enumArea )
+                                    }
+                                    else -> {}
+                                }
+                            }
                         }
                     }
+
                     TapType.AddHousehold -> {
                         currentTapType = TapType.None
                         binding.mapOverlayView.visibility = View.GONE
@@ -699,10 +729,12 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                         createLocation(point.latitude(), point.longitude(), point.altitude())
                         refreshMap()
                     }
+
                     TapType.CreateEnumAreaBoundary -> {
                         droppedPoints.add( point )
                         MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.location_blue, "" )
                     }
+
                     TapType.CreateEnumAreaLocation -> {
                         centerPoint = MapManager.instance().getLocationFromPixelPoint(mapView, p1)
                         binding.mapOverlayView.visibility = View.GONE
@@ -889,45 +921,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 ConfirmationDialog.ButtonPress.None -> {
                 }
             }
-        }
-    }
-
-    override fun didSelectMultiButton( selection: String, tag: Any? )
-    {
-        val enumArea = tag as EnumArea
-
-        when (selection) {
-            resources.getString(R.string.rename) -> {
-                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), enumArea.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, false ) { action, text, tag ->
-                    when (action) {
-                        InputDialog.Action.DidCancel -> {}
-                        InputDialog.Action.DidEnterText -> {
-                            (tag as EnumArea).name = text
-                            refreshMap()
-                        }
-                        InputDialog.Action.DidPressQRButton -> {}
-                    }
-                }
-
-            }
-            resources.getString(R.string.delete) -> {
-                unsavedEnumAreas.remove( tag )
-                config.enumAreas.remove( tag )
-                DAO.enumAreaDAO.delete( tag )
-                refreshMap()
-            }
-            resources.getString(R.string.attach_mbtiles) -> {
-                selectedEnumArea = enumArea
-                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-            }
-            resources.getString(R.string.detach_mbtiles) -> {
-                enumArea.mbTilesSize = 0
-                enumArea.mbTilesPath = ""
-            }
-            resources.getString(R.string.select_strata) -> {
-                presentStrataSelectionDialog( enumArea )
-            }
-            else -> {}
         }
     }
 

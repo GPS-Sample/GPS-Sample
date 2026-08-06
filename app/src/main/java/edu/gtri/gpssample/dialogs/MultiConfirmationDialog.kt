@@ -18,16 +18,7 @@ import edu.gtri.gpssample.R
 
 class MultiConfirmationDialog
 {
-    interface MulitConfirmationDialogDelegate
-    {
-        fun didSelectMultiButton( selection: String, tag: Any? )
-    }
-
-    constructor()
-    {
-    }
-
-    constructor( context: Context?, title: String?, message: String?, items: List<String>, tag: Any?, delegate: MulitConfirmationDialogDelegate )
+    constructor( context: Context?, title: String?, message: String?, items: List<String>, tag: Any?, completion: (selection: String, tag: Any?) -> Unit )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -52,49 +43,72 @@ class MultiConfirmationDialog
             textView.visibility = View.GONE
         }
 
-        val firstButton: Button
-        val secondButton: Button
-        val thirdButton: Button
-        val fourthButton: Button
-
         if (items.size > 4)
         {
             val fifthButton = view.findViewById<Button>(R.id.fifth_button)
             fifthButton.visibility = View.VISIBLE
             fifthButton.setOnClickListener {
-                delegate.didSelectMultiButton(items[4], tag)
+                completion(items[4], tag)
                 alertDialog.dismiss()
             }
         }
 
-        firstButton = view.findViewById<Button>(R.id.first_button)
-        secondButton = view.findViewById<Button>(R.id.second_button)
-        thirdButton = view.findViewById<Button>(R.id.third_button)
-        fourthButton = view.findViewById<Button>(R.id.fourth_button)
+        val firstButton = view.findViewById<Button>(R.id.first_button)
+        val secondButton = view.findViewById<Button>(R.id.second_button)
+        val thirdButton = view.findViewById<Button>(R.id.third_button)
+        val fourthButton = view.findViewById<Button>(R.id.fourth_button)
+        val fifthButton = view.findViewById<Button>(R.id.fifth_button)
 
-        firstButton.text = items[0]
-        secondButton.text = items[1]
-        thirdButton.text = items[2]
-        fourthButton.text = items[3]
+        firstButton.visibility = View.GONE
+        secondButton.visibility = View.GONE
+        thirdButton.visibility = View.GONE
+        fourthButton.visibility = View.GONE
+        fifthButton.visibility = View.GONE
 
-        firstButton.setOnClickListener {
-            delegate.didSelectMultiButton(items[0], tag)
-            alertDialog.dismiss()
-        }
-
-        secondButton.setOnClickListener {
-            delegate.didSelectMultiButton(items[1], tag)
-            alertDialog.dismiss()
-        }
-
-        thirdButton.setOnClickListener {
-            delegate.didSelectMultiButton(items[2], tag)
-            alertDialog.dismiss()
-        }
-
-        fourthButton.setOnClickListener {
-            delegate.didSelectMultiButton(items[3], tag)
-            alertDialog.dismiss()
+        if (items.size >= 1)
+        {
+            firstButton.text = items[0]
+            firstButton.visibility = View.VISIBLE
+            firstButton.setOnClickListener {
+                completion(items[0], tag)
+                alertDialog.dismiss()
+            }
+            if (items.size >= 2)
+            {
+                secondButton.text = items[1]
+                secondButton.visibility = View.VISIBLE
+                secondButton.setOnClickListener {
+                    completion(items[1], tag)
+                    alertDialog.dismiss()
+                }
+                if (items.size >= 3)
+                {
+                    thirdButton.text = items[2]
+                    thirdButton.visibility = View.VISIBLE
+                    thirdButton.setOnClickListener {
+                        completion(items[2], tag)
+                        alertDialog.dismiss()
+                    }
+                    if (items.size >= 4)
+                    {
+                        fourthButton.text = items[3]
+                        fourthButton.visibility = View.VISIBLE
+                        fourthButton.setOnClickListener {
+                            completion(items[3], tag)
+                            alertDialog.dismiss()
+                        }
+                        if (items.size >= 5)
+                        {
+                            fifthButton.text = items[4]
+                            fifthButton.visibility = View.VISIBLE
+                            fifthButton.setOnClickListener {
+                                completion(items[4], tag)
+                                alertDialog.dismiss()
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

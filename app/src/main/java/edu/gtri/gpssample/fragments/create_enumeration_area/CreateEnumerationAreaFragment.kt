@@ -80,8 +80,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     MapManager.MapTileCacheDelegate,
     CheckboxDialog.CheckboxDialogDelegate,
     SelectionDialog.SelectionDialogDelegate,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate,
-    MultiConfirmationDialog.MulitConfirmationDialogDelegate
+    BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private lateinit var config: Config
     private lateinit var mapboxManager: MapboxManager
@@ -785,10 +784,47 @@ class CreateEnumerationAreaFragment : Fragment(),
                                 items.add(resources.getString(R.string.select_strata))
                             }
 
-                            MultiConfirmationDialog(
-                                activity, resources.getString(R.string.select_task),
-                                "", items, enumArea, this
-                            )
+                            MultiConfirmationDialog(activity, resources.getString(R.string.select_task), "", items, enumArea,) { selection, tag ->
+                                val enumArea = tag as EnumArea
+                                when (selection) {
+                                    resources.getString(R.string.rename) -> {
+                                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), enumArea.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, false ) { action, text, tag ->
+                                            when (action) {
+                                                InputDialog.Action.DidCancel -> {}
+                                                InputDialog.Action.DidEnterText -> {
+                                                    mapboxManager.removeViewAnnotation( binding.mapboxMapView.viewAnnotationManager, (tag as EnumArea).name, )
+                                                    (tag as EnumArea).name = text // handles re-name
+                                                    refreshMap()
+                                                }
+                                                InputDialog.Action.DidPressQRButton -> {
+                                                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                                    getResult.launch(intent)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    resources.getString(R.string.delete) -> {
+                                        mapboxManager.removeViewAnnotation( binding.mapboxMapView.viewAnnotationManager, tag.name, )
+                                        unsavedEnumAreas.remove( tag )
+                                        config.enumAreas.remove( tag )
+                                        DAO.enumAreaDAO.delete( tag )
+
+                                        refreshMap()
+                                    }
+                                    resources.getString(R.string.attach_mbtiles) -> {
+                                        selectedEnumArea = enumArea
+                                        filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+                                    }
+                                    resources.getString(R.string.detach_mbtiles) -> {
+                                        enumArea.mbTilesSize = 0
+                                        enumArea.mbTilesPath = ""
+                                    }
+                                    resources.getString(R.string.select_strata) -> {
+                                        presentStrataSelectionDialog( enumArea )
+                                    }
+                                    else -> {}
+                                }
+                            }
                         }
                     }
                     else -> {}
@@ -881,49 +917,6 @@ class CreateEnumerationAreaFragment : Fragment(),
                 ConfirmationDialog.ButtonPress.None -> {
                 }
             }
-        }
-    }
-
-    override fun didSelectMultiButton( selection: String, tag: Any? )
-    {
-        val enumArea = tag as EnumArea
-        when (selection) {
-            resources.getString(R.string.rename) -> {
-                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), enumArea.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, false ) { action, text, tag ->
-                    when (action) {
-                        InputDialog.Action.DidCancel -> {}
-                        InputDialog.Action.DidEnterText -> {
-                            mapboxManager.removeViewAnnotation( binding.mapboxMapView.viewAnnotationManager, (tag as EnumArea).name, )
-                            (tag as EnumArea).name = text // handles re-name
-                            refreshMap()
-                        }
-                        InputDialog.Action.DidPressQRButton -> {
-                            val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                            getResult.launch(intent)
-                        }
-                    }
-                }
-            }
-            resources.getString(R.string.delete) -> {
-                mapboxManager.removeViewAnnotation( binding.mapboxMapView.viewAnnotationManager, tag.name, )
-                unsavedEnumAreas.remove( tag )
-                config.enumAreas.remove( tag )
-                DAO.enumAreaDAO.delete( tag )
-
-                refreshMap()
-            }
-            resources.getString(R.string.attach_mbtiles) -> {
-                selectedEnumArea = enumArea
-                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-            }
-            resources.getString(R.string.detach_mbtiles) -> {
-                enumArea.mbTilesSize = 0
-                enumArea.mbTilesPath = ""
-            }
-            resources.getString(R.string.select_strata) -> {
-                presentStrataSelectionDialog( enumArea )
-            }
-            else -> {}
         }
     }
 

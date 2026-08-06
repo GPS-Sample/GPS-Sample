@@ -35,6 +35,7 @@ import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.dialogs.MultiConfirmationDialog
 import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.managers.NearbySessionClientManager
@@ -415,7 +416,85 @@ class ManageConfigurationsFragment : Fragment()
 
     private fun didSelectConfig( config: Config )
     {
-        navigateBasedOnRole(config )
+        val items = ArrayList<String>()
+
+        if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
+        {
+            items.add(resources.getString(R.string.open))
+            items.add(resources.getString(R.string.edit))
+            items.add(resources.getString(R.string.clone))
+            items.add(resources.getString(R.string.delete))
+        }
+        else
+        {
+            items.add(resources.getString(R.string.open))
+            items.add(resources.getString(R.string.delete))
+        }
+
+
+        if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
+        {
+            items.add(resources.getString(R.string.select_strata))
+        }
+
+        MultiConfirmationDialog( requireActivity(),config.name, "", items, null ) { selection, tag ->
+            if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
+            {
+                when (selection)
+                {
+                    items[0] -> { navigateBasedOnRole( config ) }
+                    items[1] -> { editConfig( config ) }
+                    items[2] -> { cloneConfig( config ) }
+                    items[3] -> { deleteConfig( config ) }
+                }
+            }
+            else
+            {
+                when (selection)
+                {
+                    items[0] -> { navigateBasedOnRole( config ) }
+                    items[1] -> { deleteConfig( config ) }
+                }
+            }
+        }
+    }
+
+    fun editConfig( config: Config )
+    {
+        sharedViewModel.setCurrentConfig( config )
+
+        if (config.studies.isEmpty())
+        {
+            config.studies = DAO.studyDAO.getStudies( config )
+        }
+
+        if (config.studies.count() > 0)
+        {
+            sharedViewModel.createStudyModel.setCurrentStudy(config.studies[0])
+        }
+
+        if (config.enumAreas.isEmpty())
+        {
+            config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+        }
+
+        findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
+    }
+
+    fun deleteConfig( config: Config )
+    {
+        ConfirmationDialog( activity, resources.getString(R.string.delete_config), resources.getString(R.string.delete_configuration_message), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+            when( buttonPressed )
+            {
+                ConfirmationDialog.ButtonPress.Left -> {}
+                ConfirmationDialog.ButtonPress.None -> {}
+                ConfirmationDialog.ButtonPress.Right -> {
+                    minimalConfigurations.remove( config )
+                    DAO.configDAO.deleteConfig( config )
+                    manageConfigurationsAdapter.updateConfigurations(minimalConfigurations)
+                }
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -510,7 +589,7 @@ class ManageConfigurationsFragment : Fragment()
 
             if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
             {
-                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
+                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment )
             }
             else
             {
@@ -550,7 +629,7 @@ class ManageConfigurationsFragment : Fragment()
                             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                             samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
 
-                            findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
+                            findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment )
                         }
                         else if (enumTeams.isNotEmpty())
                         {
@@ -560,7 +639,7 @@ class ManageConfigurationsFragment : Fragment()
                             sharedViewModel.currentEnumerationTeamUuid = enumTeam.uuid
                             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
 
-                            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+                            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment )
                         }
                     }
                 }
@@ -595,7 +674,7 @@ class ManageConfigurationsFragment : Fragment()
                             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                             samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
 
-                            findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
+                            findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment )
                         }
                     }
                 }
