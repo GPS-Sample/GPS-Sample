@@ -57,12 +57,10 @@ class ManageConfigurationsFragment : Fragment()
     private var encryptionPassword = ""
     private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private var nearbySessionClientManager: NearbySessionClientManager? = null
-
     private lateinit var user: User
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var samplingViewModel: SamplingViewModel
-
     private val REQUEST_CONFIGURATION   = 1001
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -183,7 +181,7 @@ class ManageConfigurationsFragment : Fragment()
                     }
                 }
 
-                if ((minimalConfigurations.size == 1) && ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())))
+                if (false) //((minimalConfigurations.size == 1) && ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())))
                 {
                     ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
                         when( buttonPressed )
@@ -472,11 +470,6 @@ class ManageConfigurationsFragment : Fragment()
                 }
             }
         }
-    }
-
-    fun usedMB(): Long {
-        val runtime = Runtime.getRuntime()
-        return (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024
     }
 
     fun didReceiveConfiguration( config: Config )

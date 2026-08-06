@@ -1499,6 +1499,8 @@ class PerformEnumerationFragment : Fragment(),
 
         DAO.instance().writableDatabase.beginTransaction()
 
+        var count = 0
+
         for (location in enumerationTeamLocations)
         {
             if (lastLocation == null)
@@ -1509,6 +1511,8 @@ class PerformEnumerationFragment : Fragment(),
             {
                 val breadcrumbs = generateRandomBreadcrumbs(lastLocation!!, location )
 
+                count += breadcrumbs.size
+
                 for (breadcrumb in breadcrumbs)
                 {
                     breadcrumb.creationDate = creationDate++
@@ -1518,12 +1522,15 @@ class PerformEnumerationFragment : Fragment(),
                 enumArea.breadcrumbs.addAll( breadcrumbs )
                 lastLocation = location
 
-                if (enumArea.breadcrumbs.count() > 50000)
+                if (enumArea.breadcrumbs.count() > 25000)
                 {
                     break
                 }
             }
         }
+
+        Log.d( "xxx", "Generated ${count} breadcrumbs" )
+
 
         DAO.instance().writableDatabase.setTransactionSuccessful()
         DAO.instance().writableDatabase.endTransaction()
@@ -1531,7 +1538,7 @@ class PerformEnumerationFragment : Fragment(),
 
     fun generateRandomBreadcrumbs( location1: Location, location2: Location ): ArrayList<Breadcrumb>
     {
-        val spacingMeters: Double = 10.0
+        val spacingMeters: Double = 100.0
         val breadcrumbs = ArrayList<Breadcrumb>()
 
         val start = GeoPoint(location1.latitude, location1.longitude )
