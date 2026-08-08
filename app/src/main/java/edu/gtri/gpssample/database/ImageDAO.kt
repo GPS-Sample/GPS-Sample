@@ -7,11 +7,8 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import edu.gtri.gpssample.database.DAO.Companion.TABLE_CONFIG
 import edu.gtri.gpssample.database.models.Image
 import edu.gtri.gpssample.database.models.Location
-import edu.gtri.gpssample.database.models.MapTileRegion
-import edu.gtri.gpssample.utils.CameraUtils
 
 class ImageDAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
     : SQLiteOpenHelper( context, DATABASE_NAME, factory, DATABASE_VERSION )
