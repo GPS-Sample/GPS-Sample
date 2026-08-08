@@ -273,7 +273,11 @@ class NearbySessionHostManager( private val context: Context, private val config
             client.sendPayload(endpointId, Payload.fromStream(input))
 
             try {
-                if (config.enumAreas.size == 1)
+                if (config.enumAreas.isEmpty())
+                {
+                    output.write('\n'.code )
+                }
+                else if (config.enumAreas.size == 1)
                 {
                     _state.value = NearbySessionState.Message("Sending EnumArea 1/1" )
                     val jsonLine = json.encodeToString(EnumArea.serializer(),config.enumAreas.first()) + "\n"
@@ -301,11 +305,13 @@ class NearbySessionHostManager( private val context: Context, private val config
                     }
                 }
             } catch( ex: Exception ) {
+                Log.d( "xxx", "xxx" )
             } finally {
                 try {
                     output.close()
                 }
                 catch( ex: Exception ) {
+                    Log.d( "xxx", "xxx" )
                 }
             }
         }
