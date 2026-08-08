@@ -63,7 +63,7 @@ class ReviewCollectionFragment : Fragment()
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performCollectionAdapter: PerformEnumerationAdapter
     private lateinit var mapboxMapClickListener: OnMapClickListener
-    private var isShowingBreadcrumbs = true
+    private var isShowingBreadcrumbs = false
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null

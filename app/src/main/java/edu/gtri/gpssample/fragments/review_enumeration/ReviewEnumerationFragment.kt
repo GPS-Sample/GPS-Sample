@@ -67,7 +67,7 @@ class ReviewEnumerationFragment : Fragment()
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
-    private var isShowingBreadcrumbs = true
+    private var isShowingBreadcrumbs = false
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
