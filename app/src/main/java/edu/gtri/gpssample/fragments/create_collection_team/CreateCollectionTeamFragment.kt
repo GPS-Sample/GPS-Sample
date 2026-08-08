@@ -33,10 +33,13 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
+import edu.gtri.gpssample.databinding.FragmentCreateCollectionTeamBinding
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationTeamBinding
+import edu.gtri.gpssample.dialogs.MultiConfirmationDialog
 import edu.gtri.gpssample.fragments.create_enumeration_team.CreateEnumerationTeamFragment
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
@@ -59,7 +62,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
     private var fingerPolyline: Any? = null
-    private var _binding: FragmentCreateEnumerationTeamBinding? = null
+    private var _binding: FragmentCreateCollectionTeamBinding? = null
     private val binding get() = _binding!!
     private var intersectionPolygon: Any? = null
     private val locationUuids = ArrayList<String>()
@@ -89,7 +92,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentCreateEnumerationTeamBinding.inflate(inflater, container, false)
+        _binding = FragmentCreateCollectionTeamBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -184,6 +187,35 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
                 binding.tapPolygonButton.setBackgroundResource( R.drawable.save_blue )
 
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.tap_boundary), Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.selectPolygonButton.setOnClickListener {
+            val items = ArrayList<String>()
+
+            for (team in enumArea.enumerationTeams)
+            {
+                items.add( team.name )
+            }
+
+            MultiConfirmationDialog( requireActivity(), "Select an existing Team", "", items, null ) { selection, tag ->
+                polyLinePoints.clear()
+
+                for (team in enumArea.enumerationTeams)
+                {
+                    if (selection == team.name)
+                    {
+                        for (latLon in team.polygon)
+                        {
+                            polyLinePoints.add( Point.fromLngLat(latLon.longitude, latLon.latitude ))
+                        }
+
+                        binding.teamNameEditText.setText( team.name )
+                        createIntersectionPolygon()
+
+                        break
+                    }
+                }
             }
         }
 
