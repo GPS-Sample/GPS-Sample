@@ -62,27 +62,6 @@ class EnumerationItemDAO(private var dao: DAO)
         }
     }
 
-    fun createOrUpdateEnumerationItems( enumerationItems: List<EnumerationItem> )
-    {
-        val start = Date().time / 1000L
-
-        DAO.instance().writableDatabase.beginTransaction()
-
-        for (enumerationItem in enumerationItems)
-        {
-            createOrUpdateEnumerationItem( enumerationItem, enumerationItem.version )
-        }
-
-        DAO.instance().writableDatabase.setTransactionSuccessful()
-        DAO.instance().writableDatabase.endTransaction()
-
-        val duration= Date().time / 1000L - start
-        val minutes = duration / 60
-        val seconds = duration % 60
-
-        Log.d("xxx", "EnumerationItem update time: %d:%02d".format(minutes, seconds))
-    }
-
     fun putEnumerationItem( enumerationItem: EnumerationItem, locationUuid : String, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, enumerationItem.uuid )
