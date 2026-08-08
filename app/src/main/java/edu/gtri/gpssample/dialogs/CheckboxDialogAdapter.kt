@@ -17,7 +17,7 @@ import android.widget.CompoundButton
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 
-class CheckboxDialogAdapter(var items: List<String>, var isChecked: Boolean = false ) : RecyclerView.Adapter<CheckboxDialogAdapter.ViewHolder>()
+class CheckboxDialogAdapter( var items: List<String>, var isChecked: ArrayList<Boolean> = ArrayList<Boolean>()) : RecyclerView.Adapter<CheckboxDialogAdapter.ViewHolder>()
 {
     override fun getItemCount() = items.size
 
@@ -51,11 +51,19 @@ class CheckboxDialogAdapter(var items: List<String>, var isChecked: Boolean = fa
         val item = items.get(holder.adapterPosition)
 
         holder.checkBox.text = item
-        holder.checkBox.isChecked = isChecked
 
-        if (isChecked)
+        if (isChecked.isEmpty())
+        {
+            holder.checkBox.isChecked = true
+        }
+        else if (isChecked[position])
         {
             selections[position] = item
+            holder.checkBox.isChecked = true
+        }
+        else
+        {
+            holder.checkBox.isChecked = false
         }
 
         holder.checkBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener

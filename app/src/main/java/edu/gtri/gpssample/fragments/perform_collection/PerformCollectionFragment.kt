@@ -785,13 +785,15 @@ class PerformCollectionFragment : Fragment(),
             {
                 BreadcrumbState.OFF -> {
                     val choices = ArrayList<String>()
+                    val isChecked = ArrayList<Boolean>()
 
                     for (team in enumArea.enumerationTeams)
                     {
                         choices.add( team.name )
+                        isChecked.add( if (team.name == collectionTeam.name) true else false )
                     }
 
-                    CheckboxDialog( activity!!, "Select Enumeration Teams", choices) { selections ->
+                    CheckboxDialog( activity!!, "Select Enumeration Teams", choices, isChecked ) { selections ->
                         if (selections.isNotEmpty())
                         {
                             selectedTeamNames.clear()

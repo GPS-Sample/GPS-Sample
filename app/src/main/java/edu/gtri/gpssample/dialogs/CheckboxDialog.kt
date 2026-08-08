@@ -31,13 +31,13 @@ class CheckboxDialog
     {
     }
 
-    constructor( context: Context?, title: String?, items: List<String>, completion: (( selections: ArrayList<String> )->Unit) )
+    constructor( context: Context?, title: String?, items: List<String>, isChecked: ArrayList<Boolean> = ArrayList<Boolean>(), completion: (( selections: ArrayList<String> )->Unit) )
     {
         val inflater = LayoutInflater.from(context)
 
         val view = inflater.inflate(R.layout.dialog_checkbox, null)
 
-        val checkboxDialogAdapter = CheckboxDialogAdapter( items, true )
+        val checkboxDialogAdapter = CheckboxDialogAdapter( items, isChecked )
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
 

@@ -767,13 +767,15 @@ class PerformEnumerationFragment : Fragment(),
             {
                 BreadcrumbVisibilityState.OFF -> {
                     val choices = ArrayList<String>()
+                    val isChecked = ArrayList<Boolean>()
 
                     for (team in enumArea.enumerationTeams)
                     {
                         choices.add( team.name )
+                        isChecked.add( if (team.name == enumerationTeam.name) true else false )
                     }
 
-                    CheckboxDialog( activity!!, "Select Enumeration Teams", choices) { selected_team_names ->
+                    CheckboxDialog( activity!!, "Select Enumeration Teams", choices, isChecked ) { selected_team_names ->
                         if (selected_team_names.isNotEmpty())
                         {
                             selectedTeamNames.clear()
