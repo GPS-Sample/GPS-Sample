@@ -70,40 +70,40 @@ class MultiConfirmationDialog
             firstButton.text = items[0]
             firstButton.visibility = View.VISIBLE
             firstButton.setOnClickListener {
-                completion(items[0], tag)
                 alertDialog.dismiss()
+                completion(items[0], tag)
             }
             if (items.size >= 2)
             {
                 secondButton.text = items[1]
                 secondButton.visibility = View.VISIBLE
                 secondButton.setOnClickListener {
-                    completion(items[1], tag)
                     alertDialog.dismiss()
+                    completion(items[1], tag)
                 }
                 if (items.size >= 3)
                 {
                     thirdButton.text = items[2]
                     thirdButton.visibility = View.VISIBLE
                     thirdButton.setOnClickListener {
-                        completion(items[2], tag)
                         alertDialog.dismiss()
+                        completion(items[2], tag)
                     }
                     if (items.size >= 4)
                     {
                         fourthButton.text = items[3]
                         fourthButton.visibility = View.VISIBLE
                         fourthButton.setOnClickListener {
-                            completion(items[3], tag)
                             alertDialog.dismiss()
+                            completion(items[3], tag)
                         }
                         if (items.size >= 5)
                         {
                             fifthButton.text = items[4]
                             fifthButton.visibility = View.VISIBLE
                             fifthButton.setOnClickListener {
-                                completion(items[4], tag)
                                 alertDialog.dismiss()
+                                completion(items[4], tag)
                             }
                         }
                     }
