@@ -54,6 +54,7 @@ class CheckboxDialogAdapter( var items: List<String>, var isChecked: ArrayList<B
 
         if (isChecked.isEmpty())
         {
+            selections[position] = item
             holder.checkBox.isChecked = true
         }
         else if (isChecked[position])
