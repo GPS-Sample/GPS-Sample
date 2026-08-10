@@ -53,6 +53,7 @@ import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
@@ -360,7 +361,7 @@ class PerformCollectionFragment : Fragment(),
                                         var index = 0
 
                                         location.enumerationItems.forEachIndexed { i, enumerationItem ->
-                                            if (enumerationItem.samplingState == SamplingState.Sampled)
+                                            if (enumerationItem.samplingState == SamplingState.Sampled || enumerationItem.subsetSamplingState == SamplingState.Sampled)
                                             {
                                                 count += 1
                                                 index = i
@@ -1266,7 +1267,7 @@ class PerformCollectionFragment : Fragment(),
                         collectionTeamLocations.add( location )
                         for (enumurationItem in location.enumerationItems)
                         {
-                            if (enumurationItem.samplingState == SamplingState.Sampled)
+                            if (enumurationItem.samplingState == SamplingState.Sampled || enumerationItem.subsetSamplingState == SamplingState.Sampled)
                             {
                                 enumerationItems.add( enumurationItem )
                             }
