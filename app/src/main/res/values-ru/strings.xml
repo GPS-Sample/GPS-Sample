@@ -418,12 +418,21 @@
     <string name="export_failed">"Экспорт не удался"</string>
     <string name="select_map_engine">"Выбрать движок карты"</string>
     <string name="import_failed">""Ошибка. Импорт не удался. Убедитесь, что версии GPSSample совпадают.""</string>
-    <string name="privacy_policy_statement">""GPSSample записывает ваш маршрут (хлебные крошки) во время поездок между домохозяйствами и нанесения их на карту.\n\nЗапись начинается только после нажатия кнопки RECORD в приложении и останавливается после нажатия кнопки STOP.\n\nМестоположение собирается непрерывно во время записи, даже если приложение находится в фоновом режиме или ваше устройство заблокировано.\n\nДанные о вашем местоположении надежно хранятся на вашем устройстве и экспортируются только по вашему желанию.\n\nВы можете в любой момент отменить доступ к фоновому местоположению в настройках Android.""</string>
-    <string name="accept_privacy_policy">"Включить фоновое местоположение:\nВСЕГДА РАЗРЕШАТЬ"</string>
-    <string name="decline_privacy_policy">"Не сейчас:\nфункция отслеживания не будет работать"</string>
+    <string name="privacy_policy_statement_1_5">"GPSSample записывает ваш маршрут (хлебные крошки) во время поездок между домохозяйствами и нанесения их на карту."</string>
+    <string name="privacy_policy_statement_2_5">"Запись начинается только после нажатия кнопки RECORD в приложении и останавливается после нажатия кнопки STOP."</string>
+    <string name="privacy_policy_statement_3_5">""Местоположение собирается непрерывно во время записи, даже если приложение находится в фоновом режиме или ваше устройство заблокировано.""</string>
+    <string name="privacy_policy_statement_4_5">"Данные о вашем местоположении надежно хранятся на вашем устройстве и экспортируются только по вашему желанию."</string>
+    <string name="privacy_policy_statement_5_5">"Вы можете в любой момент отменить доступ к фоновому местоположению в настройках Android."</string>
+    <string name="accept_privacy_policy_1_2">"Включить фоновое местоположение:"</string>
+    <string name="accept_privacy_policy_2_2">"ВСЕГДА РАЗРЕШАТЬ"</string>
+    <string name="decline_privacy_policy_1_2">"Не сейчас:"</string>
+    <string name="decline_privacy_policy_2_2">"функция отслеживания не будет работать"</string>
     <string name="background_location_permission">"Разрешение на фоновое местоположение"</string>
     <string name="enable_background_activity_title">"Включение фоновой активности"</string>
-    <string name="enable_background_activity_body">"1. Нажмите кнопку ОТКРЫТЬ НАСТРОЙКИ \n2. Найдите GPSSample в списке.\n3.Включите РАЗРЕШИТЬ ФОНОВУЮ АКТИВНОСТЬ.\n4. Вернитесь в это приложение."</string>
+    <string name="enable_background_activity_body_1_4">"1. Нажмите кнопку ОТКРЫТЬ НАСТРОЙКИ"</string>
+    <string name="enable_background_activity_body_2_4">"2. Найдите GPSSample в списке."</string>
+    <string name="enable_background_activity_body_3_4">"3.Включите РАЗРЕШИТЬ ФОНОВУЮ АКТИВНОСТЬ."</string>
+    <string name="enable_background_activity_body_4_4">"4. Вернитесь в это приложение."</string>
     <string name="open_settings">"Откройте настройки"</string>
     <string name="note">"Примечание"</string>
     <string name="edit_location">"Изменить местоположение"</string>
@@ -471,39 +480,28 @@
     <string name="enumerator_hint">"Интервьюер: наносит на карту и регистрирует домохозяйства в полевых условиях."</string>
     <string name="data_collector_hint">""Сборщик данных: находит домохозяйства, включенные в выборку, и проводит опрос.""</string>
     <string name="role_hint">""GPSSample — это бесплатное приложение для Android, предназначенное для составления списков домохозяйств, отбора проб и навигации в полевых условиях. Выберите свою роль, чтобы начать работу, или посетите сайт gpssample.org, чтобы узнать больше. Примечание: после регистрации роли на этом устройстве будут доступны только эта роль и роли, находящиеся ниже по иерархии.""</string>
-    <string name="sampling_hint">"Описание методов:\n\nПростая случайная выборка:\nКаждое домохозяйство имеет равные шансы быть отобранным.\n\nКластерная выборка (количество домохозяйств):\nИз каждого кластера отбирается фиксированное количество домохозяйств.\n\nКластерная выборка (процент домохозяйств):\nИз каждого кластера отбирается определенный процент домохозяйств."</string>
+    <string name="sampling_hint_1_7">"Описание методов:"</string>
+    <string name="sampling_hint_2_7">"Простая случайная выборка:"</string>
+    <string name="sampling_hint_3_7">"Каждое домохозяйство имеет равные шансы быть отобранным."</string>
+    <string name="sampling_hint_4_7">"Кластерная выборка (количество домохозяйств):"</string>
+    <string name="sampling_hint_5_7">"Из каждого кластера отбирается фиксированное количество домохозяйств."</string>
+    <string name="sampling_hint_6_7">"Кластерная выборка (процент домохозяйств):"</string>
+    <string name="sampling_hint_7_7">"Из каждого кластера отбирается определенный процент домохозяйств."</string>
     <string name="enter_forgot_pin_question">"Введите ответ на секретный вопрос"</string>
     <string name="collection_app">"Приложение для сбора данных"</string>
-    <string name="clone_configuration">"Клонирование конфигурации"</string>
+    <string name="clone_configuration">"Клонировать конфигурацию"</string>
     <string name="confirm_clone_configuration">"Вы действительно хотите клонировать эту конфигурацию?"</string>
     <string name="collector_import_error">"С этой конфигурацией не связана ни одна группа сбора данных."</string>
     <string name="missing_enumeration_area">"С этой конфигурацией не связана ни одна зона переписи."</string>
     <string name="missing_study">"С этой конфигурацией не связано ни одно исследование."</string>
     <string name="missing_enumeration_team">"С этой конфигурацией не связана ни одна группа переписи."</string>
     <string name="missing_collection_team">"С этой конфигурацией не связана ни одна группа сбора данных."</string>
-    <string name="edit_enumeration_area">"Редактировать область перечисления"</string>
-    <string name="delete_all_enumeration_areas">"Удалить все области перечисления"</string>
-    <string name="delete_all_enumeration_areas_message">"Вы действительно хотите окончательно удалить все области перечисления?"</string>
-    <string name="draw_boundary">"Начертите границы команды на карте"</string>
-    <string name="tap_boundary">"Нажмите на точки границ команды на карте"</string>
-    <string name="distance">""</string>
-    <string name="enforce_geofence_boundary">""</string>
-    <string name="enter_the_geofence_buffer_value">""</string>
-    <string name="geofence_hint">""</string>
-    <string name="geofence_error">""</string>
-    <string name="begin_sample_review">""</string>
-    <string name="review_sample">""</string>
-    <string name="review_possible_duplicates">""</string>
-    <string name="review_boundary_violations">""</string>
-    <string name="save_sample">""</string>
-    <string name="duplicate">""</string>
-    <string name="outside_boundary">""</string>
-    <string name="reason_is_required">""</string>
-    <string name="location">""</string>
-    <string name="keep_or_exclude_this_location">""</string>
-    <string name="keep_this_location">""</string>
-    <string name="exclude_this_location">""</string>
-    <string name="reason">""</string>
+    <string name="edit_enumeration_area">"Редактировать зону переписи"</string>
+    <string name="delete_all_enumeration_areas">"Удалить все зоны переписи"</string>
+    <string name="delete_all_enumeration_areas_message">"Вы действительно хотите окончательно удалить все зоны переписи?"</string>
+    <string name="draw_boundary">"Начертите границы группы на карте"</string>
+    <string name="tap_boundary">"Нажмите на точки границ группы на карте"</string>
+    <string name="distance">"Расстояние"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>
@@ -566,10 +564,5 @@
         <item>"вид по умолчанию"</item>
         <item>"Только карта"</item>
         <item>"Только список"</item>
-    </string-array>
-    <string-array name="collection_apps">
-        <item>""</item>
-        <item>""</item>
-        <item>""</item>
     </string-array>
 </resources>

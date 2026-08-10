@@ -36,9 +36,7 @@ import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.databinding.FragmentMainBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
@@ -335,7 +333,14 @@ class MainFragment : Fragment()
                 view.post {
                     if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)
                     {
-                        NotificationDialog(requireActivity(), resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement))
+                        var privacyPolicyStatement = resources.getString( R.string.privacy_policy_statement_1_5 ) + "\n"
+                        privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_2_5 ) + "\n"
+                        privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_3_5 ) + "\n"
+                        privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_4_5 ) + "\n"
+                        privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_5_5 ) + "\n"
+
+                        NotificationDialog(requireActivity(), resources.getString(R.string.background_location_permission), privacyPolicyStatement )
+
 //                        ConfirmationDialog( activity, resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement),
 //                            resources.getString(R.string.accept_privacy_policy), resources.getString(R.string.decline_privacy_policy), null, true, false ) { buttonPressed, tag ->
 //                            when( buttonPressed )

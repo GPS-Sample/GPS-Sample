@@ -418,12 +418,21 @@
     <string name="export_failed">"La exportación ha fallado"</string>
     <string name="select_map_engine">"Seleccionar motor de mapas"</string>
     <string name="import_failed">"Error. La importación ha fallado. Asegúrese de que las versiones de GPSSample sean las mismas."</string>
-    <string name="privacy_policy_statement">""GPSSample registra tu ruta (rastro de navegación) mientras te desplazas entre hogares y los mapeas.\n\nLa grabación solo comienza cuando pulsas el botón GRABAR en la aplicación y se detiene cuando pulsas el botón DETENER.\n\nLa ubicación se recopila de forma continua durante la grabación, incluso si la aplicación está en segundo plano o tu dispositivo está bloqueado.\n\nSus datos de ubicación se almacenan de forma segura en su dispositivo y solo se exportan si usted decide hacerlo.\n\nPuede revocar el acceso a la ubicación en segundo plano en cualquier momento en los ajustes de Android.""</string>
-    <string name="accept_privacy_policy">"Habilitar ubicación en segundo plano:\nPERMITIR SIEMPRE"</string>
-    <string name="decline_privacy_policy">"Ahora no:\nla función de seguimiento no funcionará"</string>
+    <string name="privacy_policy_statement_1_5">"GPSSample registra tu ruta (rastro de navegación) mientras te desplazas entre hogares y los mapeas."</string>
+    <string name="privacy_policy_statement_2_5">"La grabación solo comienza cuando pulsas el botón GRABAR en la aplicación y se detiene cuando pulsas el botón DETENER."</string>
+    <string name="privacy_policy_statement_3_5">""La ubicación se recopila de forma continua durante la grabación, incluso si la aplicación está en segundo plano o tu dispositivo está bloqueado.""</string>
+    <string name="privacy_policy_statement_4_5">"Sus datos de ubicación se almacenan de forma segura en su dispositivo y solo se exportan si usted decide hacerlo."</string>
+    <string name="privacy_policy_statement_5_5">"Puede revocar el acceso a la ubicación en segundo plano en cualquier momento en los ajustes de Android."</string>
+    <string name="accept_privacy_policy_1_2">"Habilitar ubicación en segundo plano:"</string>
+    <string name="accept_privacy_policy_2_2">"PERMITIR SIEMPRE"</string>
+    <string name="decline_privacy_policy_1_2">"Ahora no:"</string>
+    <string name="decline_privacy_policy_2_2">"la función de seguimiento no funcionará"</string>
     <string name="background_location_permission">"Permiso de ubicación en segundo plano"</string>
     <string name="enable_background_activity_title">"Enable Background Activity"</string>
-    <string name="enable_background_activity_body">"1. Pulse el botón ABRIR CONFIGURACIÓN\n2. Busque GPSSample en la lista.\n3.Habilite PERMITIR ACTIVIDAD EN SEGUNDO PLANO.\n4. Vuelva a esta aplicación."</string>
+    <string name="enable_background_activity_body_1_4">"1. Pulse el botón ABRIR CONFIGURACIÓN"</string>
+    <string name="enable_background_activity_body_2_4">"2. Busque GPSSample en la lista."</string>
+    <string name="enable_background_activity_body_3_4">"3.Habilite PERMITIR ACTIVIDAD EN SEGUNDO PLANO."</string>
+    <string name="enable_background_activity_body_4_4">"4. Vuelva a esta aplicación."</string>
     <string name="open_settings">"Abrir configuración"</string>
     <string name="note">"Nota"</string>
     <string name="edit_location">"Editar ubicación"</string>
@@ -471,39 +480,28 @@
     <string name="enumerator_hint">"Encuestador: localiza y registra los hogares sobre el terreno."</string>
     <string name="data_collector_hint">"Recopilador de datos: se desplaza hasta los hogares seleccionados y pone en marcha la encuesta."</string>
     <string name="role_hint">""GPSSample es una aplicación gratuita para Android destinada al registro de hogares, el muestreo y la navegación sobre el terreno. Selecciona tu función para empezar, o visita gpssample.org para obtener más información. Nota: Una vez que registres una función en este dispositivo, solo estarán disponibles esa función y las funciones subordinadas a ella.""</string>
-    <string name="sampling_hint">""Descripciones de los métodos: \n\nMuestra aleatoria simple:\nCada hogar tiene las mismas posibilidades de ser seleccionado.\n\nMuestra por conglomerados (n.º de hogares):\nSe selecciona un número fijo de hogares de cada conglomerado.\n\nMuestra por conglomerados (% de hogares):\nSe selecciona un porcentaje de hogares de cada conglomerado.""</string>
-    <string name="enter_forgot_pin_question">""Introduce la pregunta de recuperación de PIN ""</string>
-    <string name="collection_app">"Aplicación de recaudación"</string>
+    <string name="sampling_hint_1_7">"Descripciones de los métodos:"</string>
+    <string name="sampling_hint_2_7">"Muestra aleatoria simple:"</string>
+    <string name="sampling_hint_3_7">"Cada hogar tiene las mismas posibilidades de ser seleccionado."</string>
+    <string name="sampling_hint_4_7">"Muestra por conglomerados (n.º de hogares):"</string>
+    <string name="sampling_hint_5_7">"Se selecciona un número fijo de hogares de cada conglomerado."</string>
+    <string name="sampling_hint_6_7">"Muestra por conglomerados (% de hogares):"</string>
+    <string name="sampling_hint_7_7">"Se selecciona un porcentaje de hogares de cada conglomerado."</string>
+    <string name="enter_forgot_pin_question">"Introduce la pregunta de recuperación de PIN"</string>
+    <string name="collection_app">"Aplicación de recopilación"</string>
     <string name="clone_configuration">"Clonar configuración"</string>
     <string name="confirm_clone_configuration">"¿Estás seguro de que quieres clonar esta configuración?"</string>
-    <string name="collector_import_error">"Esta configuración no tiene ningún equipo de recaudación asociado."</string>
+    <string name="collector_import_error">"Esta configuración no tiene ningún equipo de recopilación asociado."</string>
     <string name="missing_enumeration_area">"Esta configuración no tiene ninguna zona de recuento asociada."</string>
     <string name="missing_study">"Esta configuración no tiene ningún estudio asociado."</string>
     <string name="missing_enumeration_team">"Esta configuración no tiene ningún equipo de recuento asociado."</string>
-    <string name="missing_collection_team">"Esta configuración no tiene ningún equipo de recogida asociado."</string>
-    <string name="edit_enumeration_area">"Editar área de enumeración"</string>
-    <string name="delete_all_enumeration_areas">"Eliminar todas las áreas de enumeración"</string>
-    <string name="delete_all_enumeration_areas_message">"¿Estás seguro de que quieres eliminar definitivamente todas las áreas de enumeración?"</string>
+    <string name="missing_collection_team">"Esta configuración no tiene ningún equipo de recopilación asociado."</string>
+    <string name="edit_enumeration_area">"Editar área de censo"</string>
+    <string name="delete_all_enumeration_areas">"Eliminar todas las áreas de censo"</string>
+    <string name="delete_all_enumeration_areas_message">"¿Estás seguro de que quieres eliminar definitivamente todas las áreas de censo?"</string>
     <string name="draw_boundary">"Dibuja los límites del equipo en el mapa"</string>
     <string name="tap_boundary">"Toca los puntos que delimitan el equipo en el mapa"</string>
-    <string name="distance">""</string>
-    <string name="enforce_geofence_boundary">""</string>
-    <string name="enter_the_geofence_buffer_value">""</string>
-    <string name="geofence_hint">""</string>
-    <string name="geofence_error">""</string>
-    <string name="begin_sample_review">""</string>
-    <string name="review_sample">""</string>
-    <string name="review_possible_duplicates">""</string>
-    <string name="review_boundary_violations">""</string>
-    <string name="save_sample">""</string>
-    <string name="duplicate">""</string>
-    <string name="outside_boundary">""</string>
-    <string name="reason_is_required">""</string>
-    <string name="location">""</string>
-    <string name="keep_or_exclude_this_location">""</string>
-    <string name="keep_this_location">""</string>
-    <string name="exclude_this_location">""</string>
-    <string name="reason">""</string>
+    <string name="distance">"Distancia"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>
@@ -566,10 +564,5 @@
         <item>"Vista Predeterminado"</item>
         <item>"Solo mapa"</item>
         <item>"Solo lista"</item>
-    </string-array>
-    <string-array name="collection_apps">
-        <item>""</item>
-        <item>""</item>
-        <item>""</item>
     </string-array>
 </resources>

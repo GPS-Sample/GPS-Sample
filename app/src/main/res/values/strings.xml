@@ -418,12 +418,21 @@
     <string name="export_failed">"The export failed"</string>
     <string name="select_map_engine">"Select Map Engine"</string>
     <string name="import_failed">"Error. The import failed. Ensure GPSSample versions are the same."</string>
-    <string name="privacy_policy_statement">""GPSSample records your route (breadcrumb trail) while you travel between households and map households.\n\nRecording starts only when you tap the RECORD button in the app and stops recording when you tap the STOP button.\n\nLocation is collected continuously while recording, even if the app is in the background or your device is locked.\n\nYour location data is stored securely on your device and is only exported if you choose to do so.\n\nYou can revoke background location access at any time in Android Settings.""</string>
-    <string name="accept_privacy_policy">"Enable Background Location:\nALLOW ALL THE TIME"</string>
-    <string name="decline_privacy_policy">"Not Now:\ntracking feature won't work"</string>
+    <string name="privacy_policy_statement_1_5">"GPSSample records your route (breadcrumb trail) while you travel between households and map households."</string>
+    <string name="privacy_policy_statement_2_5">"Recording starts only when you tap the RECORD button in the app and stops recording when you tap the STOP button."</string>
+    <string name="privacy_policy_statement_3_5">""Location is collected continuously while recording, even if the app is in the background or your device is locked.""</string>
+    <string name="privacy_policy_statement_4_5">"Your location data is stored securely on your device and is only exported if you choose to do so."</string>
+    <string name="privacy_policy_statement_5_5">"You can revoke background location access at any time in Android Settings."</string>
+    <string name="accept_privacy_policy_1_2">"Enable Background Location:"</string>
+    <string name="accept_privacy_policy_2_2">"ALLOW ALL THE TIME"</string>
+    <string name="decline_privacy_policy_1_2">"Not Now:"</string>
+    <string name="decline_privacy_policy_2_2">"tracking feature won't work"</string>
     <string name="background_location_permission">"Background Location Permission"</string>
     <string name="enable_background_activity_title">"Enable Background Activity"</string>
-    <string name="enable_background_activity_body">"1. Tap the OPEN SETTINGS button\n2. Find GPSSample in the list.\n3. Enable ALLOW BACKGROUND ACTIVITY.\n4. Return to this app."</string>
+    <string name="enable_background_activity_body_1_4">"1. Tap the OPEN SETTINGS button"</string>
+    <string name="enable_background_activity_body_2_4">"2. Find GPSSample in the list."</string>
+    <string name="enable_background_activity_body_3_4">"3. Enable ALLOW BACKGROUND ACTIVITY."</string>
+    <string name="enable_background_activity_body_4_4">"4. Return to this app."</string>
     <string name="open_settings">"Open Settings"</string>
     <string name="note">"Note"</string>
     <string name="edit_location">"Edit Location"</string>
@@ -471,7 +480,13 @@
     <string name="enumerator_hint">"Enumerator: Maps and lists households in the field."</string>
     <string name="data_collector_hint">"Data Collector: Navigates to sampled households and launches the survey."</string>
     <string name="role_hint">""GPSSample is a free Android app for field-based household listing, sampling, and navigation. Select your role to get started, or visit gpssample.org to learn more. Note: Once you register a role on this device, only that role and roles below it will be available.""</string>
-    <string name="sampling_hint">"Method descriptions:\n\nSimple Random Sample:\nEach household has an equal chance of being selected.\n\nCluster Sample (# of households):\nSelect a fixed number of households from each cluster.\n\nCluster Sample (% of households):\nSelect a percentage of households from each cluster."</string>
+    <string name="sampling_hint_1_7">"Method descriptions:"</string>
+    <string name="sampling_hint_2_7">"Simple Random Sample:"</string>
+    <string name="sampling_hint_3_7">"Each household has an equal chance of being selected."</string>
+    <string name="sampling_hint_4_7">"Cluster Sample (# of households):"</string>
+    <string name="sampling_hint_5_7">"Select a fixed number of households from each cluster."</string>
+    <string name="sampling_hint_6_7">"Cluster Sample (% of households):"</string>
+    <string name="sampling_hint_7_7">"Select a percentage of households from each cluster."</string>
     <string name="enter_forgot_pin_question">"Enter the forgot PIN question"</string>
     <string name="collection_app">"Collection App"</string>
     <string name="clone_configuration">"Clone Configuration"</string>
@@ -487,23 +502,6 @@
     <string name="draw_boundary">"Draw the team boundary on the map"</string>
     <string name="tap_boundary">"Tap the team boundary points on the map"</string>
     <string name="distance">"Distance"</string>
-    <string name="enforce_geofence_boundary">"Enforce Geofence Boundary"</string>
-    <string name="enter_the_geofence_buffer_value">"Enter the geofence buffer value"</string>
-    <string name="geofence_hint">"Placeholder for GeoFence Hint"</string>
-    <string name="geofence_error">"You are currently outside of the Geofence"</string>
-    <string name="begin_sample_review">"Begin Sample Review"</string>
-    <string name="review_sample">"Review Sample"</string>
-    <string name="review_possible_duplicates">"Review Possible Duplicates"</string>
-    <string name="review_boundary_violations">"Review Boundary Violations"</string>
-    <string name="save_sample">"Save Sample"</string>
-    <string name="duplicate">"Duplicate"</string>
-    <string name="outside_boundary">"Outside Boundary"</string>
-    <string name="reason_is_required">"You must select a Reason for the exclusion."</string>
-    <string name="location">"Location"</string>
-    <string name="keep_or_exclude_this_location">"Keep or Exclude this location?"</string>
-    <string name="keep_this_location">"Keep this location"</string>
-    <string name="exclude_this_location">"Exclude this location"</string>
-    <string name="reason">"Reason"</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
@@ -566,10 +564,5 @@
         <item>"Default view"</item>
         <item>"Map Only"</item>
         <item>"List Only"</item>
-    </string-array>
-    <string-array name="collection_apps">
-        <item>"ODK Collect"</item>
-        <item>"Kobo Collect"</item>
-        <item>"Ona"</item>
     </string-array>
 </resources>

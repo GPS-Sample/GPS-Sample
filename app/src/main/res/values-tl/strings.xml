@@ -418,12 +418,21 @@
     <string name="export_failed">"Nabigo ang pag-export"</string>
     <string name="select_map_engine">"Piliin ang Map Engine"</string>
     <string name="import_failed">"Error. Nabigo ang pag-import. Tiyaking pareho ang mga bersyon ng GPSSample."</string>
-    <string name="privacy_policy_statement">""Itinatala ng GPSSample ang iyong ruta (breadcrumb trail) habang naglalakbay ka sa pagitan ng mga sambahayan at mga sambahayan sa mapa.\n\nNagsisimula lamang ang pagre-record kapag pinindot mo ang RECORD button sa app at humihinto sa pagre-record kapag pinindot mo ang STOP button.\n\nPatuloy na kinokolekta ang lokasyon habang nagre-record, kahit na nasa background ang app o naka-lock ang iyong device.\n\nLigtas na nakaimbak ang data ng iyong lokasyon sa iyong device at ine-export lamang kung pipiliin mong gawin ito.\n\nMaaari mong bawiin ang access sa lokasyon sa background anumang oras sa Mga Setting ng Android.""</string>
-    <string name="accept_privacy_policy">"Paganahin ang Lokasyon sa Background:\nPAHINTUlutan SA LAHAT NG ORAS"</string>
-    <string name="decline_privacy_policy">"Hindi Ngayon:\nhindi gagana ang feature na pagsubaybay"</string>
+    <string name="privacy_policy_statement_1_5">"Itinatala ng GPSSample ang iyong ruta (breadcrumb trail) habang naglalakbay ka sa pagitan ng mga sambahayan at mga sambahayan sa mapa."</string>
+    <string name="privacy_policy_statement_2_5">"Nagsisimula lamang ang pagre-record kapag pinindot mo ang RECORD button sa app at humihinto sa pagre-record kapag pinindot mo ang STOP button."</string>
+    <string name="privacy_policy_statement_3_5">""Patuloy na kinokolekta ang lokasyon habang nagre-record, kahit na nasa background ang app o naka-lock ang iyong device.""</string>
+    <string name="privacy_policy_statement_4_5">"Ligtas na nakaimbak ang data ng iyong lokasyon sa iyong device at ine-export lamang kung pipiliin mong gawin ito."</string>
+    <string name="privacy_policy_statement_5_5">"Maaari mong bawiin ang access sa lokasyon sa background anumang oras sa Mga Setting ng Android."</string>
+    <string name="accept_privacy_policy_1_2">"Paganahin ang Lokasyon sa Background:"</string>
+    <string name="accept_privacy_policy_2_2">"PAHINTUlutan SA LAHAT NG ORAS"</string>
+    <string name="decline_privacy_policy_1_2">"Hindi Ngayon:"</string>
+    <string name="decline_privacy_policy_2_2">"hindi gagana ang feature na pagsubaybay"</string>
     <string name="background_location_permission">"Pahintulot sa Lokasyon sa Background"</string>
     <string name="enable_background_activity_title">"Paganahin ang Aktibidad sa Background"</string>
-    <string name="enable_background_activity_body">"1. Pindutin ang buton na BUKASIN ANG MGA SETTING\n2. Hanapin ang GPSSample sa listahan.\n3. Paganahin ang PAHINTULOT SA AKTIBIDAD SA BACKGROUND.\n4. Bumalik sa app na ito."</string>
+    <string name="enable_background_activity_body_1_4">"1. Pindutin ang buton na BUKASIN ANG MGA SETTING"</string>
+    <string name="enable_background_activity_body_2_4">"2. Hanapin ang GPSSample sa listahan."</string>
+    <string name="enable_background_activity_body_3_4">"3. Paganahin ang PAHINTULOT SA AKTIBIDAD SA BACKGROUND."</string>
+    <string name="enable_background_activity_body_4_4">"4. Bumalik sa app na ito."</string>
     <string name="open_settings">"Buksan ang Mga Setting"</string>
     <string name="note">"Paalala"</string>
     <string name="edit_location">"I-edit ang Lokasyon"</string>
@@ -471,39 +480,28 @@
     <string name="enumerator_hint">"Tagabilang: Nagmamapa at naglilista ng mga kabahayan sa field."</string>
     <string name="data_collector_hint">"Tagakolekta ng Datos: Nagna-navigate sa mga na-sample na kabahayan at naglulunsad ng survey."</string>
     <string name="role_hint">""Ang GPSSample ay isang libreng Android app para sa paglilista, pagkuha ng sample, at pag-navigate sa mga sambahayan na nakabatay sa field. Piliin ang iyong tungkulin upang makapagsimula, o bisitahin ang gpssample.org upang matuto nang higit pa. Paalala: Kapag nakapagrehistro ka na ng isang tungkulin sa device na ito, tanging ang tungkulin at mga tungkulin sa ibaba nito ang magiging available.""</string>
-    <string name="sampling_hint">"Mga paglalarawan ng pamamaraan:\n\nSimpleng Random na Sample:\nAng bawat sambahayan ay may pantay na pagkakataong mapili.\n\nCluster Sample (# ng mga sambahayan):\nPumili ng isang takdang bilang ng mga sambahayan mula sa bawat cluster.\n\nCluster Sample (% ng mga sambahayan):\nPumili ng porsyento ng mga sambahayan mula sa bawat cluster."</string>
+    <string name="sampling_hint_1_7">"Mga paglalarawan ng pamamaraan:"</string>
+    <string name="sampling_hint_2_7">"Simpleng Random na Sample:"</string>
+    <string name="sampling_hint_3_7">"Ang bawat sambahayan ay may pantay na pagkakataong mapili."</string>
+    <string name="sampling_hint_4_7">"Cluster Sample (# ng mga sambahayan):"</string>
+    <string name="sampling_hint_5_7">"Pumili ng isang takdang bilang ng mga sambahayan mula sa bawat cluster."</string>
+    <string name="sampling_hint_6_7">"Cluster Sample (% ng mga sambahayan):"</string>
+    <string name="sampling_hint_7_7">"Pumili ng porsyento ng mga sambahayan mula sa bawat cluster."</string>
     <string name="enter_forgot_pin_question">"Ilagay ang tanong tungkol sa nakalimutang PIN"</string>
     <string name="collection_app">"App ng Koleksyon"</string>
-    <string name="clone_configuration">"Pag-clone ng Configuration"</string>
+    <string name="clone_configuration">"Pag-configure ng I-clone"</string>
     <string name="confirm_clone_configuration">"Sigurado ka bang gusto mong i-clone ang Configuration na ito?"</string>
-    <string name="collector_import_error">"Ang configuration na ito ay walang collection team na nauugnay dito."</string>
-    <string name="missing_enumeration_area">"Ang configuration na ito ay walang Enumeration Area na nauugnay dito."</string>
-    <string name="missing_study">"Ang configuration na ito ay walang Study na nauugnay dito."</string>
-    <string name="missing_enumeration_team">"Ang configuration na ito ay walang Enumeration Team na nauugnay dito."</string>
-    <string name="missing_collection_team">"Ang configuration na ito ay walang Collection Team na nauugnay dito."</string>
+    <string name="collector_import_error">"Ang configuration na ito ay walang nauugnay na collection team."</string>
+    <string name="missing_enumeration_area">"Ang configuration na ito ay walang nauugnay na Enumeration Area."</string>
+    <string name="missing_study">"Ang configuration na ito ay walang nauugnay na Study."</string>
+    <string name="missing_enumeration_team">"Ang configuration na ito ay walang nauugnay na Enumeration Team."</string>
+    <string name="missing_collection_team">"Ang configuration na ito ay walang nauugnay na Collection Team."</string>
     <string name="edit_enumeration_area">"I-edit ang Enumeration Area"</string>
     <string name="delete_all_enumeration_areas">"Burahin ang lahat ng Enumeration Area"</string>
     <string name="delete_all_enumeration_areas_message">"Sigurado ka bang gusto mong permanenteng burahin ang lahat ng Enumeration Area?"</string>
     <string name="draw_boundary">"Iguhit ang hangganan ng team sa mapa"</string>
     <string name="tap_boundary">"I-tap ang mga punto ng hangganan ng team sa mapa"</string>
-    <string name="distance">""</string>
-    <string name="enforce_geofence_boundary">""</string>
-    <string name="enter_the_geofence_buffer_value">""</string>
-    <string name="geofence_hint">""</string>
-    <string name="geofence_error">""</string>
-    <string name="begin_sample_review">""</string>
-    <string name="review_sample">""</string>
-    <string name="review_possible_duplicates">""</string>
-    <string name="review_boundary_violations">""</string>
-    <string name="save_sample">""</string>
-    <string name="duplicate">""</string>
-    <string name="outside_boundary">""</string>
-    <string name="reason_is_required">""</string>
-    <string name="location">""</string>
-    <string name="keep_or_exclude_this_location">""</string>
-    <string name="keep_this_location">""</string>
-    <string name="exclude_this_location">""</string>
-    <string name="reason">""</string>
+    <string name="distance">"Distansya"</string>
     <string-array name="forgot_pin_questions">
         <item>"Panggitnang pangalan ng ama"</item>
         <item>"Pangalan ng dalaga ng ina"</item>
@@ -566,10 +564,5 @@
         <item>"Default na pagtingin"</item>
         <item>"Mapa Lamang"</item>
         <item>"Listahan Lamang"</item>
-    </string-array>
-    <string-array name="collection_apps">
-        <item>""</item>
-        <item>""</item>
-        <item>""</item>
     </string-array>
 </resources>

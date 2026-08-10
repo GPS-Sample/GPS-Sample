@@ -78,11 +78,11 @@ class CreateStudyFragment : Fragment()
             binding.samplingMethodSpinner.adapter = adapter
         }
 
-        ArrayAdapter.createFromResource(activity!!, R.array.collection_apps, android.R.layout.simple_spinner_item)
-            .also { adapter ->
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.collectionAppSpinner.adapter = adapter
-            }
+//        ArrayAdapter.createFromResource(activity!!, R.array.collection_apps, android.R.layout.simple_spinner_item)
+//            .also { adapter ->
+//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//                binding.collectionAppSpinner.adapter = adapter
+//            }
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
             this.study = study
@@ -105,7 +105,15 @@ class CreateStudyFragment : Fragment()
         })
 
         binding.samplingMethodTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.sampling_hint))
+            var samplingHint = resources.getString( R.string.sampling_hint_1_7 ) + "\n"
+            samplingHint += resources.getString( R.string.sampling_hint_2_7 ) + "\n"
+            samplingHint += resources.getString( R.string.sampling_hint_3_7 ) + "\n"
+            samplingHint += resources.getString( R.string.sampling_hint_4_7 ) + "\n"
+            samplingHint += resources.getString( R.string.sampling_hint_5_7 ) + "\n"
+            samplingHint += resources.getString( R.string.sampling_hint_6_7 ) + "\n"
+            samplingHint += resources.getString( R.string.sampling_hint_7_7 )
+
+            NotificationDialog( requireActivity(), "", samplingHint )
         }
 
         binding.deleteImageView.setOnClickListener {
