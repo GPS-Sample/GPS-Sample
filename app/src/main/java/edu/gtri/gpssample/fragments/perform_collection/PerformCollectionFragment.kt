@@ -17,7 +17,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.Looper
 import android.util.Log
 import android.view.*
@@ -60,7 +59,6 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import org.json.JSONObject
-import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -1148,7 +1146,7 @@ class PerformCollectionFragment : Fragment(),
                         collectionTeamLocations.add( location )
                         for (enumurationItem in location.enumerationItems)
                         {
-                            if (enumurationItem.samplingState == SamplingState.Sampled)
+                            if (enumurationItem.samplingState == SamplingState.Sampled || enumurationItem.subsetSamplingState == SamplingState.Sampled)
                             {
                                 enumerationItems.add( enumurationItem )
                             }
@@ -1414,42 +1412,35 @@ class PerformCollectionFragment : Fragment(),
         {
             sharedViewModel.currentLocationUuid = location.uuid
 
-            if (location.isLandmark)
+            if (location.enumerationItems.size > 1)
             {
-                findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-            }
-            else
-            {
-                if (location.enumerationItems.size > 1)
+                var count = 0
+                var index = 0
+
+                location.enumerationItems.forEachIndexed { i, enumerationItem ->
+                    if (enumerationItem.samplingState == SamplingState.Sampled || enumerationItem.subsetSamplingState == SamplingState.Sampled)
+                    {
+                        count += 1
+                        index = i
+                    }
+                }
+
+                if (count > 1)
                 {
-                    var count = 0
-                    var index = 0
+                    val bundle = Bundle()
+                    bundle.putBoolean( Keys.kGpsAccuracyIsGood.value, gpsAccuracyIsGood())
+                    bundle.putBoolean( Keys.kGpsLocationIsGood.value, gpsLocationIsGood( location ))
 
-                    location.enumerationItems.forEachIndexed { i, enumerationItem ->
-                        if (enumerationItem.samplingState == SamplingState.Sampled)
-                        {
-                            count += 1
-                            index = i
-                        }
-                    }
-
-                    if (count > 1)
-                    {
-                        val bundle = Bundle()
-                        bundle.putBoolean( Keys.kGpsAccuracyIsGood.value, gpsAccuracyIsGood())
-                        bundle.putBoolean( Keys.kGpsLocationIsGood.value, gpsLocationIsGood( location ))
-
-                        findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
-                    }
-                    else
-                    {
-                        didSelectItem( location.enumerationItems[index])
-                    }
+                    findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
                 }
                 else
                 {
-                    didSelectItem( location.enumerationItems[0])
+                    didSelectItem( location.enumerationItems[index])
                 }
+            }
+            else
+            {
+                didSelectItem( location.enumerationItems[0])
             }
         }
     }

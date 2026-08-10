@@ -12,7 +12,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +20,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.clearFragmentResultListener
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -35,12 +33,9 @@ import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
-import edu.gtri.gpssample.databinding.FragmentAddMultiHouseholdBinding
 import edu.gtri.gpssample.databinding.FragmentPerformMultiCollectionBinding
 import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
-import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
 import edu.gtri.gpssample.dialogs.SurveyLaunchNotificationDialog
-import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
@@ -137,7 +132,7 @@ class PerformMultiCollectionFragment : Fragment(),
 
         for (enumurationItem in location.enumerationItems)
         {
-            if (enumurationItem.samplingState == SamplingState.Sampled)
+            if (enumurationItem.samplingState == SamplingState.Sampled || enumurationItem.subsetSamplingState == SamplingState.Sampled)
             {
                 enumerationItems.add( enumurationItem )
             }
