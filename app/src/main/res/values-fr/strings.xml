@@ -418,12 +418,21 @@
     <string name="export_failed">"L'exportation a échoué"</string>
     <string name="select_map_engine">"Sélectionnez le moteur de carte"</string>
     <string name="import_failed">"Erreur. L'importation a échoué. Assurez-vous que les versions GPSSample sont identiques."</string>
-    <string name="privacy_policy_statement">""GPSSample enregistre votre itinéraire (fil d\'Ariane) lorsque vous vous déplacez entre les foyers et cartographiez les foyers.\n\nL\'enregistrement ne commence que lorsque vous appuyez sur le bouton ENREGISTRER dans l\'application et s\'arrête lorsque vous appuyez sur le bouton ARRÊTER.\n\nLa localisation est collectée en continu pendant l\'enregistrement, même si l\'application est en arrière-plan ou si votre appareil est verrouillé.\n\nVos données de localisation sont stockées en toute sécurité sur votre appareil et ne sont exportées que si vous le souhaitez.\n\nVous pouvez révoquer l\'accès à la localisation en arrière-plan à tout moment dans les paramètres Android.""</string>
-    <string name="accept_privacy_policy">"Activer la localisation en arrière-plan :\nTOUJOURS AUTORISER"</string>
-    <string name="decline_privacy_policy">"Pas maintenant : \nla fonction de suivi ne fonctionnera pas"</string>
+    <string name="privacy_policy_statement_1_5">"GPSSample enregistre votre itinéraire (fil d\'Ariane) lorsque vous vous déplacez entre les foyers et cartographiez les foyers."</string>
+    <string name="privacy_policy_statement_2_5">"L\'enregistrement ne commence que lorsque vous appuyez sur le bouton ENREGISTRER dans l\'application et s\'arrête lorsque vous appuyez sur le bouton ARRÊTER."</string>
+    <string name="privacy_policy_statement_3_5">""La localisation est collectée en continu pendant l\'enregistrement, même si l\'application est en arrière-plan ou si votre appareil est verrouillé.""</string>
+    <string name="privacy_policy_statement_4_5">"Vos données de localisation sont stockées en toute sécurité sur votre appareil et ne sont exportées que si vous le souhaitez."</string>
+    <string name="privacy_policy_statement_5_5">"Vous pouvez révoquer l\'accès à la localisation en arrière-plan à tout moment dans les paramètres Android."</string>
+    <string name="accept_privacy_policy_1_2">"Activer la localisation en arrière-plan :"</string>
+    <string name="accept_privacy_policy_2_2">"TOUJOURS AUTORISER"</string>
+    <string name="decline_privacy_policy_1_2">"Pas maintenant :"</string>
+    <string name="decline_privacy_policy_2_2">"la fonction de suivi ne fonctionnera pas"</string>
     <string name="background_location_permission">"Autorisation de localisation en arrière-plan"</string>
     <string name="enable_background_activity_title">"Activer l'activité en arrière-plan"</string>
-    <string name="enable_background_activity_body">"1. Appuyez sur le bouton OUVRIR LES PARAMÈTRES\n2. Recherchez GPSSample dans la liste.\n3. Activez AUTORISER L'ACTIVITÉ EN ARRIÈRE-PLAN.\n4. Revenez à cette application."</string>
+    <string name="enable_background_activity_body_1_4">"1. Appuyez sur le bouton OUVRIR LES PARAMÈTRES"</string>
+    <string name="enable_background_activity_body_2_4">"2. Recherchez GPSSample dans la liste."</string>
+    <string name="enable_background_activity_body_3_4">"3. Activez AUTORISER L'ACTIVITÉ EN ARRIÈRE-PLAN."</string>
+    <string name="enable_background_activity_body_4_4">"4. Revenez à cette application."</string>
     <string name="open_settings">"Ouvrir les paramètres"</string>
     <string name="note">"Remarque"</string>
     <string name="edit_location">"Modifiez l'emplacement"</string>
@@ -471,7 +480,13 @@
     <string name="enumerator_hint">"Enquêteur : recense et répertorie les ménages sur le terrain."</string>
     <string name="data_collector_hint">"Collecteur de données : se rend dans les ménages sélectionnés et lance l'enquête."</string>
     <string name="role_hint">"GPSSample est une application Android gratuite destinée au recensement des ménages, à l'échantillonnage et à la navigation sur le terrain. Sélectionnez votre rôle pour commencer, ou rendez-vous sur gpssample.org pour en savoir plus. Remarque : une fois que vous avez enregistré un rôle sur cet appareil, seuls ce rôle et les rôles qui lui sont subordonnés seront disponibles."</string>
-    <string name="sampling_hint">"Description des méthodes :\n\nÉchantillon aléatoire simple :\nChaque ménage a une chance égale d'être sélectionné.\n\nÉchantillon par grappes (nombre de ménages) :\nSélectionner un nombre fixe de ménages dans chaque grappe.\n\nÉchantillon par grappes (pourcentage de ménages) :\nSélectionner un pourcentage de ménages dans chaque grappe."</string>
+    <string name="sampling_hint_1_7">"Description des méthodes :"</string>
+    <string name="sampling_hint_2_7">"Échantillon aléatoire simple :"</string>
+    <string name="sampling_hint_3_7">"Chaque ménage a une chance égale d'être sélectionné."</string>
+    <string name="sampling_hint_4_7">"Échantillon par grappes (nombre de ménages) :"</string>
+    <string name="sampling_hint_5_7">"Sélectionner un nombre fixe de ménages dans chaque grappe."</string>
+    <string name="sampling_hint_6_7">"Échantillon par grappes (pourcentage de ménages) :"</string>
+    <string name="sampling_hint_7_7">"Sélectionner un pourcentage de ménages dans chaque grappe."</string>
     <string name="enter_forgot_pin_question">"Entrez la question de sécurité pour le code PIN oublié"</string>
     <string name="collection_app">"Application de collecte"</string>
     <string name="clone_configuration">"Clonez la configuration"</string>
@@ -481,12 +496,12 @@
     <string name="missing_study">"Aucune étude n'est associée à cette configuration."</string>
     <string name="missing_enumeration_team">"Aucune équipe de recensement n'est associée à cette configuration."</string>
     <string name="missing_collection_team">"Aucune équipe de collecte n'est associée à cette configuration."</string>
-    <string name="edit_enumeration_area">"Modifiez une zone d'énumération"</string>
-    <string name="delete_all_enumeration_areas">"Supprimez toutes les zones d'énumération"</string>
-    <string name="delete_all_enumeration_areas_message">"Êtes-vous sûr de vouloir supprimer définitivement toutes les zones d'énumération ?"</string>
+    <string name="edit_enumeration_area">"Modifiez la zone de recensement"</string>
+    <string name="delete_all_enumeration_areas">"Supprimez toutes les zones de recensement"</string>
+    <string name="delete_all_enumeration_areas_message">"Êtes-vous sûr de vouloir supprimer définitivement toutes les zones de recensement ?"</string>
     <string name="draw_boundary">"Tracez le périmètre de l'équipe sur la carte"</string>
     <string name="tap_boundary">"Appuyez sur les points délimitant le périmètre de l'équipe sur la carte"</string>
-    <string name="distance">""</string>
+    <string name="distance">"Distance"</string>
     <string name="enforce_geofence_boundary">""</string>
     <string name="enter_the_geofence_buffer_value">""</string>
     <string name="geofence_hint">""</string>
@@ -504,6 +519,11 @@
     <string name="keep_this_location">""</string>
     <string name="exclude_this_location">""</string>
     <string name="reason">""</string>
+    <string name="delete_location_message">""</string>
+    <string name="open">""</string>
+    <string name="edit">""</string>
+    <string name="clone">""</string>
+    <string name="configuration">""</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>
@@ -566,10 +586,5 @@
         <item>"Vue par défaut"</item>
         <item>"Carte uniquement"</item>
         <item>"Liste uniquement"</item>
-    </string-array>
-    <string-array name="collection_apps">
-        <item>""</item>
-        <item>""</item>
-        <item>""</item>
     </string-array>
 </resources>
