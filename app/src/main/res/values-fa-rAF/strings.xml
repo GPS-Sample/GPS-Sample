@@ -502,6 +502,28 @@
     <string name="draw_boundary">"کشیدن مرز تیم روی نقشه"</string>
     <string name="tap_boundary">"روی نقاط مرزی تیم روی نقشه ضربه بزنید"</string>
     <string name="distance">"فاصله"</string>
+    <string name="enforce_geofence_boundary">""</string>
+    <string name="enter_the_geofence_buffer_value">""</string>
+    <string name="geofence_hint">""</string>
+    <string name="geofence_error">""</string>
+    <string name="begin_sample_review">""</string>
+    <string name="review_sample">""</string>
+    <string name="review_possible_duplicates">""</string>
+    <string name="review_boundary_violations">""</string>
+    <string name="save_sample">""</string>
+    <string name="duplicate">""</string>
+    <string name="outside_boundary">""</string>
+    <string name="reason_is_required">""</string>
+    <string name="location">""</string>
+    <string name="keep_or_exclude_this_location">""</string>
+    <string name="keep_this_location">""</string>
+    <string name="exclude_this_location">""</string>
+    <string name="reason">""</string>
+    <string name="delete_location_message">""</string>
+    <string name="open">""</string>
+    <string name="edit">""</string>
+    <string name="clone">""</string>
+    <string name="configuration">""</string>
     <string-array name="forgot_pin_questions">
         <item>"نام میانی پدر"</item>
         <item>"نام خانوادگی مادر پیش از ازدواج"</item>
