@@ -44,7 +44,12 @@ class MainFragment : Fragment()
         if (sharedPreferences.getBoolean(key, true ))
         {
             sharedPreferences.edit(commit = true) { putBoolean(key, false) }
-            NotificationDialog(requireActivity(), resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement))
+            var privacyPolicyStatement = resources.getString( R.string.privacy_policy_statement_1_5 ) + "\n"
+            privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_2_5 ) + "\n"
+            privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_3_5 ) + "\n"
+            privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_4_5 ) + "\n"
+            privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_5_5 ) + "\n"
+            NotificationDialog(requireActivity(), resources.getString(R.string.background_location_permission), privacyPolicyStatement )
         }
     }
 

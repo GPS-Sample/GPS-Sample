@@ -588,13 +588,9 @@
         <item>"Map Only"</item>
         <item>"List Only"</item>
     </string-array>
-<<<<<<< HEAD
     <string-array name="collection_apps">
         <item>"ODK Collect"</item>
         <item>"Kobo Collect"</item>
         <item>"Ona"</item>
     </string-array>
 </resources>
-=======
-</resources>
->>>>>>> development
