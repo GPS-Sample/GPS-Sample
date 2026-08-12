@@ -516,7 +516,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
     fun migrateFrom323To324(db: SQLiteDatabase)
     {
-        db.beginTransaction()
         db.transaction {
             try {
                 // Update EnumerationItem Table
@@ -541,15 +540,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             } catch (ex: Exception) {
                 Log.d("xxx", "Migration from DB 323 to 324 FAILED: ${ex.message}")
                 throw ex // optional: rethrow so Android knows migration failed
-            } finally {
-                db.endTransaction()
             }
         }
     }
 
     fun migrateFrom322To323(db: SQLiteDatabase)
     {
-        db.beginTransaction()
         db.transaction {
             try {
                 // ----------------------------
@@ -569,8 +565,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             } catch (ex: Exception) {
                 Log.d("xxx", "Migration from DB 322 to 323 FAILED: ${ex.message}")
                 throw ex // optional: rethrow so Android knows migration failed
-            } finally {
-                db.endTransaction()
             }
         }
     }
