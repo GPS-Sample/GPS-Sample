@@ -402,6 +402,15 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 migrateFrom323To324( db )
                 Log.d( "xxx", "migrated from 314 to 324" )
             }
+            else if (newVersion == 325)
+            {
+                migrateFrom314To321( db )
+                migrateFrom321To322( db )
+                migrateFrom322To323( db )
+                migrateFrom323To324( db )
+                migrateFrom324To325( db )
+                Log.d( "xxx", "migrated from 314 to 325" )
+            }
             else
             {
                 dropAllTables( db )
@@ -427,6 +436,14 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 migrateFrom323To324( db )
                 Log.d( "xxx", "migrated from 321 to 324" )
             }
+            else if (newVersion == 325)
+            {
+                migrateFrom321To322( db )
+                migrateFrom322To323( db )
+                migrateFrom323To324( db )
+                migrateFrom324To325( db )
+                Log.d( "xxx", "migrated from 321 to 325" )
+            }
             else
             {
                 dropAllTables( db )
@@ -445,6 +462,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 migrateFrom323To324( db )
                 Log.d( "xxx", "migrated from 322 to 324" )
             }
+            else if (newVersion == 325)
+            {
+                migrateFrom322To323( db )
+                migrateFrom323To324( db )
+                migrateFrom324To325( db )
+                Log.d( "xxx", "migrated from 322 to 325" )
+            }
             else
             {
                 dropAllTables( db )
@@ -457,6 +481,24 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 migrateFrom323To324( db )
                 Log.d( "xxx", "migrated from 323 to 324" )
             }
+            else if (newVersion == 325)
+            {
+                migrateFrom323To324( db )
+                migrateFrom324To325( db )
+                Log.d( "xxx", "migrated from 323 to 325" )
+            }
+            else
+            {
+                dropAllTables( db )
+            }
+        }
+        else if (oldVersion == 324)
+        {
+            if (newVersion == 325)
+            {
+                migrateFrom324To325( db )
+                Log.d( "xxx", "migrated from 324 to 325" )
+            }
             else
             {
                 dropAllTables( db )
@@ -465,6 +507,55 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         else
         {
             dropAllTables( db )
+        }
+    }
+
+    fun migrateFrom324To325(db: SQLiteDatabase)
+    {
+        db.transaction {
+            try
+            {
+                // Add Version column to all tables
+                db.execSQL("ALTER TABLE $TABLE_BREADCRUMB ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_COLLECTION_TEAM " + "ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_CONFIG ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_ENUM_AREA ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_ENUMERATION_TEAM ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_FIELD ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_FIELD_DATA ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_FIELD_DATA_OPTION ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_FIELD_OPTION ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE `$TABLE_FILTER` ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_LAT_LON ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_LOCATION ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_MAP_TILE_REGION ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_RULE ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_STRATA ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_STUDY ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_USER ADD COLUMN $COLUMN_VERSION TEXT NOT NULL DEFAULT ''")
+
+                // Config - geofence
+                db.execSQL("ALTER TABLE $TABLE_CONFIG ADD COLUMN $COLUMN_CONFIG_GEOFENCE_IS_ENABLED INTEGER")
+                db.execSQL("ALTER TABLE $TABLE_CONFIG ADD COLUMN $COLUMN_CONFIG_GEOFENCE_BUFFER_VALUE INTEGER")
+
+                // EnumerationItem - review/exclusion
+                db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_ENUMERATION_ITEM_REVIEW_STATUS TEXT")
+                db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_ENUMERATION_ITEM_EXCLUSION_REASON TEXT")
+                db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_ENUMERATION_ITEM_EXCLUSION_NOTES TEXT")
+
+                // Update dbVersion in Config
+                val newDbVersion = 325
+                val contentValues = ContentValues().apply {
+                    put(COLUMN_CONFIG_DB_VERSION, newDbVersion)
+                }
+
+                update(TABLE_CONFIG, contentValues, null, null)
+            }
+            catch (ex: Exception) {
+                Log.d("xxx", "Migration from DB 324 to 325 FAILED: ${ex.message}")
+                throw ex // optional: rethrow so Android knows migration failed
+            }
         }
     }
 
@@ -1068,6 +1159,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 _mapTileRegionDAO = MapTileRegionDAO( _instance!! )
                 _breadcrumbDAO = BreadcrumbDAO( _instance!! )
             }
+
+//            logSchema()
 
             return _instance!!
         }

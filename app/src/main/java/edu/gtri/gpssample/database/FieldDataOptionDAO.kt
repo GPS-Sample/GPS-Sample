@@ -218,7 +218,7 @@ class FieldDataOptionDAO(private var dao: DAO)
             ColumnBinding<FieldDataOption>(COLUMN_CREATION_DATE,"INTEGER", FieldDataOption::creationDate ),
             ColumnBinding<FieldDataOption>(COLUMN_VERSION,"TEXT", FieldDataOption::version ),
             ColumnBinding<FieldDataOption>(COLUMN_FIELD_DATA_OPTION_NAME,"TEXT", FieldDataOption::name ),
-            ColumnBinding<FieldDataOption>(COLUMN_FIELD_DATA_OPTION_VALUE,"TEXT", FieldDataOption::value ),
+            ColumnBinding<FieldDataOption>(COLUMN_FIELD_DATA_OPTION_VALUE,"INTEGER", FieldDataOption::value ),
         )
     }
 }
