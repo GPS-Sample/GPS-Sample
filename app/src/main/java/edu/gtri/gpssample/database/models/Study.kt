@@ -28,15 +28,15 @@ data class Study(
     var samplingMethod: SamplingMethod,
     var sampleSize: Int,
     var sampleType : SampleType,
-    var subsetSampleName : String,
-    var subsetSampleSize : Int,
-    var subsetSampleType : SampleType,
+    var subsetSampleName : String = "",
+    var subsetSampleSize : Int = 0,
+    var subsetSampleType : SampleType = SampleType.None,
     var stratas: ArrayList<Strata>,
     var fields : ArrayList<Field>,
-    var primaryRules : ArrayList<Rule>,
-    var primaryFilters : ArrayList<Filter>,
-    var subsetRules : ArrayList<Rule>,
-    var subsetFilters : ArrayList<Filter>,
+    var rules : ArrayList<Rule>,
+    var filters : ArrayList<Filter>,
+    var subsetRules : ArrayList<Rule> = ArrayList<Rule>(),
+    var subsetFilters : ArrayList<Filter> = ArrayList<Filter>(),
 )
 {
     constructor(name: String, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType)

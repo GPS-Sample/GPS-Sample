@@ -347,7 +347,7 @@ class SamplingViewModel : ViewModel()
                 // find and remove items that are not valid
                 if (sampleItem.enumerationState == EnumerationState.Enumerated)
                 {
-                    if (study.primaryFilters.isEmpty())
+                    if (study.filters.isEmpty())
                     {
                         sampleItem.enumerationEligibleForSampling = true
                         validSamples.add(sampleItem)
@@ -356,7 +356,7 @@ class SamplingViewModel : ViewModel()
 
                     var validSample = true
 
-                    for (filter in study.primaryFilters)
+                    for (filter in study.filters)
                     {
                         var validRule = false
 

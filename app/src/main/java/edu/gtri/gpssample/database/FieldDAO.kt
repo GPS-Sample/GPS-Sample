@@ -165,7 +165,7 @@ class FieldDAO(private var dao: DAO)
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         study.subsetRules.clear()
-        study.primaryRules.clear()
+        study.rules.clear()
 
         while (cursor.moveToNext())
         {
@@ -180,7 +180,7 @@ class FieldDAO(private var dao: DAO)
                     for (blockField in blockFields)
                     {
                         val primaryRules = DAO.ruleDAO.getPrimaryRules( blockField )
-                        study.primaryRules.addAll( primaryRules )
+                        study.rules.addAll( primaryRules )
 
                         val subsetRules = DAO.ruleDAO.getSubsetRules( blockField )
                         study.subsetRules.addAll( subsetRules )
@@ -190,7 +190,7 @@ class FieldDAO(private var dao: DAO)
                 field.fieldOptions = DAO.fieldOptionDAO.getFieldOptions( field )
 
                 val primaryRules = DAO.ruleDAO.getPrimaryRules( field )
-                study.primaryRules.addAll(primaryRules )
+                study.rules.addAll(primaryRules )
 
                 val subsetRules = DAO.ruleDAO.getSubsetRules( field )
                 study.subsetRules.addAll(subsetRules )

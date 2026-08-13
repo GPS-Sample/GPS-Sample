@@ -183,7 +183,7 @@ class CreateStudyModel {
     private fun getPrimaryRules() : Array<String>
     {
         val ruleList = ArrayList<String>()
-        _currentStudy?.value?.primaryRules?.let { rules ->
+        _currentStudy?.value?.rules?.let { rules ->
             for (rule in rules)
             {
                 ruleList.add( rule.name )

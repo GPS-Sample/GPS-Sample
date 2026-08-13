@@ -50,7 +50,7 @@ class StudyDAO(private var dao: DAO)
         }
 
         // add primary rules
-        for (rule in study.primaryRules)
+        for (rule in study.rules)
         {
             DAO.ruleDAO.createOrUpdateRule( rule )
         }
@@ -62,7 +62,7 @@ class StudyDAO(private var dao: DAO)
         }
 
         // add primary filters
-        for (filter in study.primaryFilters)
+        for (filter in study.filters)
         {
             DAO.filterDAO.createOrUpdateFilter( filter, study );
         }
@@ -154,7 +154,7 @@ class StudyDAO(private var dao: DAO)
             study = buildStudy( cursor )
             study.fields = DAO.fieldDAO.getFields(study)
             // study.rules is loaded by getFields()
-            study.primaryFilters.addAll(DAO.filterDAO.getPrimaryFilters(study))
+            study.filters.addAll(DAO.filterDAO.getPrimaryFilters(study))
             study.subsetFilters.addAll(DAO.filterDAO.getSubsetFilters(study))
             study.stratas = DAO.strataDAO.getStratasWithStudyUuid(uuid )
         }
@@ -179,7 +179,7 @@ class StudyDAO(private var dao: DAO)
             studies.add( study )
             study.fields = DAO.fieldDAO.getFields(study)
             // study.rules is loaded by getFields()
-            study.primaryFilters.addAll(DAO.filterDAO.getPrimaryFilters(study))
+            study.filters.addAll(DAO.filterDAO.getPrimaryFilters(study))
             study.subsetFilters.addAll(DAO.filterDAO.getSubsetFilters(study))
             study.stratas = DAO.strataDAO.getStratasWithStudyUuid(study.uuid )
         }
@@ -202,7 +202,7 @@ class StudyDAO(private var dao: DAO)
             val study = buildStudy( cursor )
             study.fields = DAO.fieldDAO.getFields(study)
             // study.rules is loaded by getFields()
-            study.primaryFilters.addAll(DAO.filterDAO.getPrimaryFilters(study))
+            study.filters.addAll(DAO.filterDAO.getPrimaryFilters(study))
             study.subsetFilters.addAll(DAO.filterDAO.getSubsetFilters(study))
             studies.add( study )
         }
@@ -227,7 +227,7 @@ class StudyDAO(private var dao: DAO)
     {
 //        val filters = DAO.filterDAO.getPrimaryFilters( study )
 
-        for (filter in study.primaryFilters)
+        for (filter in study.filters)
         {
             DAO.filterDAO.deleteFilter( filter )
         }
@@ -239,7 +239,7 @@ class StudyDAO(private var dao: DAO)
 
         // val rules = DAO.ruleDAO.getRules( study )
 
-        for (rule in study.primaryRules)
+        for (rule in study.rules)
         {
             DAO.ruleDAO.deleteRule( rule )
         }

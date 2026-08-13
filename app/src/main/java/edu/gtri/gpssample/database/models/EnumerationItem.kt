@@ -10,6 +10,7 @@ package edu.gtri.gpssample.database.models
 
 import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.EnumerationState
+import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.constants.SamplingState
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -35,9 +36,9 @@ data class EnumerationItem(
     var enumerationIncompleteReason : String,
     var enumerationNotes : String,
     var enumerationEligibleForSampling : Boolean,
-    var enumerationEligibleForSubsetSampling : Boolean,
+    var enumerationEligibleForSubsetSampling : Boolean = false,
     var samplingState : SamplingState,
-    var subsetSamplingState : SamplingState,
+    var subsetSamplingState : SamplingState = SamplingState.None,
     var collectorName : String,
     var collectionState : CollectionState,
     var collectionDate: Long,
