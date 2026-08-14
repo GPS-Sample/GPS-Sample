@@ -40,8 +40,8 @@ class PrimarySampleAdapter(var context: Context) : BaseExpandableListAdapter()
             }
         }
 
-        rules = study.primaryRules
-        filters = study.primaryFilters
+        rules = study.rules
+        filters = study.filters
 
         notifyDataSetChanged()
     }

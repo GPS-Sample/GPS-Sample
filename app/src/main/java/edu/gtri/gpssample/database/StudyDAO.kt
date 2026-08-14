@@ -10,30 +10,9 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
-import android.util.Log
-import edu.gtri.gpssample.constants.DateFormatConverter
-import edu.gtri.gpssample.constants.DistanceFormatConverter
-import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.constants.SampleTypeConverter
-import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.constants.SamplingMethodConverter
-import edu.gtri.gpssample.constants.TimeFormatConverter
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DATE_FORMAT_INDEX
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DB_VERSION
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_ENCRYPTION_PASSWORD
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_MAP_ENGINE_INDEX
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_MIN_GPS_PRECISION
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_NAME
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_PROXIMITY_WARNING_VALUE
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_TIME_FORMAT_INDEX
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_VALID_USERS
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_UUID
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_NAME
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SAMPLE_SIZE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SAMPLE_SIZE_INDEX
@@ -41,13 +20,9 @@ import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SAMPLING_METHOD_IN
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SUBSET_SAMPLE_NAME
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SUBSET_SAMPLE_SIZE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SUBSET_SAMPLE_SIZE_INDEX
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_UUID
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_TIME_ZONE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.database.models.Study
-import edu.gtri.gpssample.extensions.toBoolean
-import java.util.UUID
 
 class StudyDAO(private var dao: DAO)
 {
@@ -68,7 +43,7 @@ class StudyDAO(private var dao: DAO)
         }
 
         // add primary rules
-        for (rule in study.primaryRules)
+        for (rule in study.rules)
         {
             DAO.ruleDAO.createOrUpdateRule( rule,rule.version )
         }
@@ -80,7 +55,7 @@ class StudyDAO(private var dao: DAO)
         }
 
         // add primary filters
-        for (filter in study.primaryFilters)
+        for (filter in study.filters)
         {
             filter.studyUuid = study.uuid
             DAO.filterDAO.createOrUpdateFilter( filter,filter.version );
@@ -171,7 +146,7 @@ class StudyDAO(private var dao: DAO)
             studies.add( study )
             study.fields = DAO.fieldDAO.getFields(study)
             // study.rules is loaded by getFields()
-            study.primaryFilters.addAll(DAO.filterDAO.getPrimaryFilters(study))
+            study.filters.addAll(DAO.filterDAO.getPrimaryFilters(study))
             study.subsetFilters.addAll(DAO.filterDAO.getSubsetFilters(study))
             study.stratas = DAO.strataDAO.getStratasWithStudyUuid(study.uuid )
         }
@@ -183,7 +158,7 @@ class StudyDAO(private var dao: DAO)
 
     fun deleteStudy( study: Study )
     {
-        for (filter in study.primaryFilters)
+        for (filter in study.filters)
         {
             DAO.filterDAO.deleteFilter( filter )
         }
@@ -193,7 +168,7 @@ class StudyDAO(private var dao: DAO)
             DAO.filterDAO.deleteFilter( filter )
         }
 
-        for (rule in study.primaryRules)
+        for (rule in study.rules)
         {
             DAO.ruleDAO.deleteRule( rule )
         }

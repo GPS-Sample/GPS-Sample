@@ -52,8 +52,8 @@ class PrimarySampleRecyclerAdapter( private val context: Context ) : RecyclerVie
             field.fields?.let { fields.addAll(it) }
         }
 
-        rules = ArrayList(study.primaryRules)
-        filters = ArrayList(study.primaryFilters)
+        rules = ArrayList(study.rules)
+        filters = ArrayList(study.filters)
 
         rebuildRows()
     }

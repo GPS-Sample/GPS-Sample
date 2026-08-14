@@ -31,9 +31,9 @@ class CreateFilterModel
     fun addPrimaryFilter(study : Study)
     {
         currentFilter?.value?.let { filter ->
-            if (!study.primaryFilters.contains( filter ))
+            if (!study.filters.contains( filter ))
             {
-                study.primaryFilters.add(filter)
+                study.filters.add(filter)
             }
         }
     }
@@ -66,7 +66,7 @@ class CreateFilterModel
                 }
                 else
                 {
-                    study.primaryFilters.remove(filter)
+                    study.filters.remove(filter)
                 }
             }
             DAO.filterDAO.deleteFilter(filter)

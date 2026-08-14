@@ -459,7 +459,7 @@ class ManageConfigurationsFragment : Fragment()
 
                                 newConfig.studies[0].uuid = UUID.randomUUID().toString()
                                 newConfig.studies[0].creationDate = Date().time
-                                newConfig.studies[0].primaryFilters.clear()
+                                newConfig.studies[0].filters.clear()
                                 newConfig.studies[0].subsetFilters.clear()
 
                                 // update fields
@@ -471,7 +471,7 @@ class ManageConfigurationsFragment : Fragment()
                                     field.creationDate = Date().time
 
                                     // update primary rules
-                                    for (rule in newConfig.studies[0].primaryRules)
+                                    for (rule in newConfig.studies[0].rules)
                                     {
                                         if (rule.fieldUuid == oldFieldUuid)
                                         {

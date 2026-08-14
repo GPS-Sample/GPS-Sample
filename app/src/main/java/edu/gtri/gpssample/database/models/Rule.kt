@@ -22,7 +22,7 @@ data class Rule(
     var fieldUuid: String,
     var name: String,
     var value: String,
-    var isSubsetRule: Boolean,
+    var isSubsetRule: Boolean = false,
     var operator : Operator?,
     var filterOperator: FilterOperator?,
     var fieldDataOptions : ArrayList<FieldDataOption>,

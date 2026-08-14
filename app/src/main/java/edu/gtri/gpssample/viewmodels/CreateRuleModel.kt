@@ -59,9 +59,9 @@ class CreateRuleModel {
         currentRule?.value?.let { rule ->
             // rule.studyId = id
             // DAO.ruleDAO.createOrUpdateRule( rule )
-            if (!study.primaryRules.contains(rule))
+            if (!study.rules.contains(rule))
             {
-                study.primaryRules.add(rule)
+                study.rules.add(rule)
             }
         }
     }
@@ -94,17 +94,11 @@ class CreateRuleModel {
             }
             else
             {
-                study.primaryRules.remove(rule )
+                study.rules.remove(rule )
             }
             DAO.ruleDAO.deleteRule(rule)
         }
     }
-
-//    fun deleteRule(rule:Rule, study : Study)
-//    {
-//        study.rules.remove(rule)
-//        DAO.ruleDAO.deleteRule(rule)
-//    }
 
     fun createNewPrimaryRule(study: Study) : Boolean
     {

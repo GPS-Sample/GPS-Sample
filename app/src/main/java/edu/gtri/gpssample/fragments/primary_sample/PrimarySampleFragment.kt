@@ -165,7 +165,7 @@ class PrimarySampleFragment : Fragment()
     {
         val bundle = Bundle()
         sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
-            if(study.primaryRules.isEmpty())
+            if(study.rules.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_rule_filter_message), Toast.LENGTH_SHORT).show()
             }else

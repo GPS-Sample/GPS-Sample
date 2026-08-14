@@ -10,12 +10,8 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
-import android.util.Log
 import androidx.core.database.getDoubleOrNull
-import androidx.core.database.getLongOrNull
-import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
-import edu.gtri.gpssample.constants.OperatorConverter
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_DATE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_INDEX
@@ -24,25 +20,16 @@ import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_MAXIMUM
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_MINIMUM
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_NAME
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_NUMBER_OF_RESIDENTS
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_OPTION_1
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_OPTION_2
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_OPTION_3
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_OPTION_4
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_PARENT_UUID
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_PII
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_REQUIRED
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_TIME
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_TYPE_INDEX
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STRATA_NAME
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STRATA_SAMPLE_SIZE
-import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STRATA_SAMPLE_TYPE_INDEX
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_UUID
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldOption
-import edu.gtri.gpssample.database.models.Rule
-import edu.gtri.gpssample.database.models.Strata
 import edu.gtri.gpssample.database.models.Study
 
 class FieldDAO(private var dao: DAO)
@@ -163,7 +150,7 @@ class FieldDAO(private var dao: DAO)
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         study.subsetRules.clear()
-        study.primaryRules.clear()
+        study.rules.clear()
 
         while (cursor.moveToNext())
         {
@@ -178,7 +165,7 @@ class FieldDAO(private var dao: DAO)
                     for (blockField in blockFields)
                     {
                         val primaryRules = DAO.ruleDAO.getPrimaryRules( blockField )
-                        study.primaryRules.addAll( primaryRules )
+                        study.rules.addAll( primaryRules )
 
                         val subsetRules = DAO.ruleDAO.getSubsetRules( blockField )
                         study.subsetRules.addAll( subsetRules )
@@ -188,7 +175,7 @@ class FieldDAO(private var dao: DAO)
                 field.fieldOptions = DAO.fieldOptionDAO.getFieldOptions( field )
 
                 val primaryRules = DAO.ruleDAO.getPrimaryRules( field )
-                study.primaryRules.addAll(primaryRules )
+                study.rules.addAll(primaryRules )
 
                 val subsetRules = DAO.ruleDAO.getSubsetRules( field )
                 study.subsetRules.addAll(subsetRules )

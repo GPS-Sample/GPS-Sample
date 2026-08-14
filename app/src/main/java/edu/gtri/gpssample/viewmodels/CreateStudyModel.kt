@@ -144,6 +144,32 @@ class CreateStudyModel
         return fieldList.toTypedArray()
     }
 
+    private fun getPrimaryRules() : Array<String>
+    {
+        val ruleList = ArrayList<String>()
+        _currentStudy?.value?.rules?.let { rules ->
+            for (rule in rules)
+            {
+                ruleList.add( rule.name )
+            }
+        }
+
+        return ruleList.toTypedArray()
+    }
+
+    private fun getSubsetRules() : Array<String>
+    {
+        val ruleList = ArrayList<String>()
+        _currentStudy?.value?.subsetRules?.let { rules ->
+            for (rule in rules)
+            {
+                ruleList.add( rule.name )
+            }
+        }
+
+        return ruleList.toTypedArray()
+    }
+
     fun onSamplingMethodSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         if(position < samplingMethods.size)

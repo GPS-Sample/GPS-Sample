@@ -59,7 +59,7 @@ class CreateFilterRuleModel {
     val studyHasMultipleRules : ObservableBoolean
         get (){
             _currentStudy?.value?.let { study->
-                if (study.primaryRules.size > 1 || study.subsetRules.size > 1)
+                if (study.rules.size > 1 || study.subsetRules.size > 1)
                 {
                     return ObservableBoolean(true)
                 }
@@ -255,7 +255,7 @@ class CreateFilterRuleModel {
     private fun getPrimaryRules() : Array<Rule>
     {
         val ruleList = ArrayList<Rule>()
-        _currentStudy?.value?.primaryRules?.let { rules ->
+        _currentStudy?.value?.rules?.let { rules ->
             for (rule in rules)
             {
                 val ruleCopy = rule.copy()
