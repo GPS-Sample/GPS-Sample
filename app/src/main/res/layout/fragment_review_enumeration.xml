@@ -158,4 +158,39 @@
         android:layout_weight="1"
         android:layout_height="0dp"/>
 
+    <TextView
+        android:id="@+id/title_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:background="@color/primary"
+        android:textColor="@color/white"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/toolbar"
+            android:orientation="horizontal"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/show_breadcrumbs_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:background="@drawable/navigate2" />
+        </LinearLayout>
+    </HorizontalScrollView>
 </LinearLayout>

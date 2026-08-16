@@ -10,6 +10,7 @@ package edu.gtri.gpssample.fragments.review_enumeration
 import android.Manifest
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -59,6 +60,7 @@ class ReviewEnumerationFragment : Fragment()
     private lateinit var mapView: View
     private lateinit var config: Config
     private lateinit var enumArea: EnumArea
+    private lateinit var defaultColorList : ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
@@ -67,6 +69,8 @@ class ReviewEnumerationFragment : Fragment()
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
+    private val selectedTeamNames = ArrayList<String>()
+    private val selectedBreadcrumbs = ArrayList<Breadcrumb>()
     private var isShowingBreadcrumbs = false
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -173,6 +177,87 @@ class ReviewEnumerationFragment : Fragment()
             sharedViewModel.setCenterOnCurrentLocation( false )
         }
 
+        binding.showBreadcrumbsButton.backgroundTintList?.let {
+            defaultColorList = it
+        }
+
+        if (isShowingBreadcrumbs)
+        {
+            binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)))
+        }
+        else
+        {
+            binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+        }
+
+        binding.showBreadcrumbsButton.setOnClickListener {
+
+            if (isShowingBreadcrumbs)
+            {
+                isShowingBreadcrumbs = false
+                binding.showBreadcrumbsButton.setBackgroundResource( R.drawable.navigate2 )
+                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList)
+                refreshMap()
+            }
+            else
+            {
+                if (enumArea.enumerationTeams.size == 1)
+                {
+                    isShowingBreadcrumbs = true
+                    selectedTeamNames.clear()
+                    selectedBreadcrumbs.clear()
+                    selectedBreadcrumbs.addAll( enumArea.breadcrumbs)
+                    selectedTeamNames.add( enumArea.enumerationTeams.first().name )
+                    binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                    binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)))
+                    refreshMap()
+                }
+                else
+                {
+                    val choices = ArrayList<String>()
+                    val isChecked = ArrayList<Boolean>()
+
+                    for (team in enumArea.enumerationTeams)
+                    {
+                        choices.add( team.name )
+                        isChecked.add( true )
+                    }
+
+                    CheckboxDialog( activity!!, "Select Enumeration Teams", choices, isChecked ) { selected_team_names ->
+                        if (selected_team_names.isNotEmpty())
+                        {
+                            selectedTeamNames.clear()
+                            selectedBreadcrumbs.clear()
+
+                            for (selectedTeamName in selected_team_names)
+                            {
+                                for (team in enumArea.enumerationTeams)
+                                {
+                                    if (team.name == selectedTeamName)
+                                    {
+                                        selectedTeamNames.add( team.name )
+
+                                        for (breadcrumb in enumArea.breadcrumbs)
+                                        {
+                                            if (breadcrumb.enumTeamName == team.name)
+                                            {
+                                                selectedBreadcrumbs.add( breadcrumb )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            isShowingBreadcrumbs = true
+                            binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                            binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)))
+                            refreshMap()
+                        }
+                    }
+                }
+            }
+        }
+
         var sampledCount = 0
         var surveyedCount = 0
         var enumerationCount = 0
@@ -209,15 +294,6 @@ class ReviewEnumerationFragment : Fragment()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ReviewEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    private fun gpsAccuracyIsGood(): Boolean
-    {
-        currentGPSAccuracy?.let {
-            return (it <= config.minGpsPrecision)
-        }
-
-        return false
-    }
-
     private fun refreshMap()
     {
         MapManager.instance().clearMap( mapView )
@@ -233,91 +309,43 @@ class ReviewEnumerationFragment : Fragment()
 
         MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20 )
 
-        if (isShowingBreadcrumbs && enumArea.breadcrumbs.isNotEmpty())
+        if (isShowingBreadcrumbs && selectedBreadcrumbs.isNotEmpty())
         {
-            var numPaths = 1
-            var groupId: String = ""
-            var path = ArrayList<Breadcrumb>()
-            val paths = ArrayList<ArrayList<Breadcrumb>>()
+            MapManager.instance().loadBreadcrumbs(requireContext(), mapView, selectedBreadcrumbs, selectedTeamNames )
 
-            for (breadcrumb in enumArea.breadcrumbs)
-            {
-                if (groupId.isEmpty())
-                {
-                    groupId = breadcrumb.groupId
-                    path.add( breadcrumb )
-                }
-                else if (breadcrumb.groupId == groupId)
-                {
-                    path.add( breadcrumb )
-                }
-                else
-                {
-                    numPaths += 1
-                    paths.add( path )
-                    groupId = breadcrumb.groupId
-                    path = ArrayList<Breadcrumb>()
-                    path.add( breadcrumb )
-                }
-            }
-
-            // add the last path to the list
-            if (paths.size < numPaths)
-            {
-                paths.add( path )
-            }
-
-            for (path in paths)
-            {
-                if (path.size == 1)
-                {
-                    MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
-                    MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
-                }
-                else if (path.size > 1)
-                {
-                    MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
-                    MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
-                    MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.end_breadcrumb, "")
-                    MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.breadcrumb, "")
-                }
-
-                for (breadcrumb in path)
-                {
-                    if (breadcrumb != path.first() && breadcrumb != path.last())
-                    {
-                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
-                    }
-                }
-            }
-
-            groupId = ""
+            var groupId = ""
 
             val breadcrumbs = ArrayList<Breadcrumb>()
 
-            for (breadcrumb in enumArea.breadcrumbs)
+            for (teamName in selectedTeamNames)
             {
-                if (breadcrumbs.isEmpty())
+                for (breadcrumb in selectedBreadcrumbs)
                 {
-                    groupId = breadcrumb.groupId
+                    if (breadcrumb.enumTeamName == teamName)
+                    {
+                        if (breadcrumbs.isEmpty())
+                        {
+                            groupId = breadcrumb.groupId
+                        }
+
+                        if (breadcrumb.groupId == groupId)
+                        {
+                            breadcrumbs.add( breadcrumb )
+                        }
+                        else
+                        {
+                            MapManager.instance().createPolyline( mapView, breadcrumbs )
+                            groupId = breadcrumb.groupId
+                            breadcrumbs.clear()
+                            breadcrumbs.add( breadcrumb )
+                        }
+                    }
                 }
 
-                if (breadcrumb.groupId == groupId)
-                {
-                    breadcrumbs.add( breadcrumb )
-                }
-                else
+                if (breadcrumbs.isNotEmpty())
                 {
                     MapManager.instance().createPolyline( mapView, breadcrumbs )
-                    groupId = breadcrumb.groupId
-                    breadcrumbs.clear()
-                    breadcrumbs.add( breadcrumb )
                 }
-            }
-
-            if (breadcrumbs.isNotEmpty())
-            {
-                MapManager.instance().createPolyline( mapView, breadcrumbs )
             }
         }
 

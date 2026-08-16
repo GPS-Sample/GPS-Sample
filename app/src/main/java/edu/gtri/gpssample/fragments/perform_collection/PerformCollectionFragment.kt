@@ -980,6 +980,8 @@ class PerformCollectionFragment : Fragment(),
 
             if (isShowingBreadcrumbs && selectedBreadcrumbs.isNotEmpty())
             {
+                MapManager.instance().loadBreadcrumbs(requireContext(), mapView, selectedBreadcrumbs, selectedTeamNames )
+
                 var groupId = ""
                 val breadcrumbs = ArrayList<Breadcrumb>()
 
@@ -1087,10 +1089,6 @@ class PerformCollectionFragment : Fragment(),
             if (markerProperties.isNotEmpty())
             {
                 MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, mapboxMapClickListener )
-            }
-
-            if (isShowingBreadcrumbs && selectedBreadcrumbs.isNotEmpty()) {
-                MapManager.instance().loadBreadcrumbs(requireContext(), mapView, selectedBreadcrumbs, selectedTeamNames )
             }
         }
     }

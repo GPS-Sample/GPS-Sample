@@ -231,7 +231,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/light_gray"></View>
+            android:background="@color/light_gray">
+        </View>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
