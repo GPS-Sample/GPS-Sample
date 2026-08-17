@@ -1,30 +1,27 @@
-package edu.gtri.gpssample.ui
+package edu.gtri.gpssample.ui.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import edu.gtri.gpssample.dialogs.ButtonPress
-import edu.gtri.gpssample.dialogs.ComposableConfirmationDialog
+import edu.gtri.gpssample.ui.GPSSampleComposeTheme
 
-class ComposableConfirmationDialogHost {
-
+class ComposableConfirmationDialogHost
+{
     private var confirmation by mutableStateOf<Confirmation?>(null)
 
     fun show(
         title: String?,
         message: String?,
-        leftButtonText: String,
-        rightButtonText: String,
+        items: List<String>,
         layoutVertically: Boolean = false,
         cancelable: Boolean = true,
-        onResult: (ButtonPress) -> Unit
+        onResult: (String) -> Unit
     ) {
         confirmation = Confirmation(
             title = title,
             message = message,
-            leftButtonText = leftButtonText,
-            rightButtonText = rightButtonText,
+            items = items,
             layoutVertically = layoutVertically,
             cancelable = cancelable,
             onResult = onResult
@@ -35,17 +32,16 @@ class ComposableConfirmationDialogHost {
     fun Content()
     {
         GPSSampleComposeTheme {
-            confirmation?.let { dialog ->
+            confirmation?.let {
                 ComposableConfirmationDialog(
-                    title = dialog.title,
-                    message = dialog.message,
-                    leftButtonText = dialog.leftButtonText,
-                    rightButtonText = dialog.rightButtonText,
-                    layoutVertically = dialog.layoutVertically,
-                    cancelable = dialog.cancelable,
+                    title = it.title,
+                    message = it.message,
+                    items = it.items,
+                    layoutVertically = it.layoutVertically,
+                    cancelable = it.cancelable,
                     onResult = { result ->
                         confirmation = null
-                        dialog.onResult(result)
+                        it.onResult(result)
                     }
                 )
             }
@@ -55,10 +51,9 @@ class ComposableConfirmationDialogHost {
     private data class Confirmation(
         val title: String?,
         val message: String?,
-        val leftButtonText: String,
-        val rightButtonText: String,
+        val items: List<String>,
         val layoutVertically: Boolean,
         val cancelable: Boolean,
-        val onResult: (ButtonPress) -> Unit
+        val onResult: (String) -> Unit
     )
 }

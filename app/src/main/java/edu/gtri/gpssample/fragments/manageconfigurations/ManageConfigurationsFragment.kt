@@ -33,15 +33,12 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
-import edu.gtri.gpssample.dialogs.ButtonPress
-import edu.gtri.gpssample.dialogs.InfoDialog
-import edu.gtri.gpssample.dialogs.InputDialog
-import edu.gtri.gpssample.dialogs.MultiConfirmationDialog
 import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
-import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.managers.NearbySessionClientManager
 import edu.gtri.gpssample.managers.PerformanceManager
-import edu.gtri.gpssample.ui.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
@@ -65,6 +62,8 @@ class ManageConfigurationsFragment : Fragment()
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var samplingViewModel: SamplingViewModel
     private val REQUEST_CONFIGURATION   = 1001
+    private lateinit var composableInputDialogHost: ComposableInputDialogHost
+    private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -102,15 +101,17 @@ class ManageConfigurationsFragment : Fragment()
             return
         }
 
+        composableInputDialogHost = ComposableInputDialogHost()
+        binding.inputDialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        binding.inputDialogComposeView.setContent { composableInputDialogHost.Content() }
+
+        composableNotificationDialogHost = ComposableNotificationDialogHost()
+        binding.notificationDialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        binding.notificationDialogComposeView.setContent { composableNotificationDialogHost.Content() }
+
         composableConfirmationDialogHost = ComposableConfirmationDialogHost()
-
-        binding.confirmationComposeView.setViewCompositionStrategy(
-            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
-        )
-
-        binding.confirmationComposeView.setContent {
-            composableConfirmationDialogHost.Content()
-        }
+        binding.confirmationDialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        binding.confirmationDialogComposeView.setContent { composableConfirmationDialogHost.Content() }
 
         val distanceFormats = resources.getTextArray( R.array.distance_formats )
         sharedViewModel.distanceFormats[0] = distanceFormats[0].toString()
@@ -183,22 +184,23 @@ class ManageConfigurationsFragment : Fragment()
             }
 
             binding.importButton.setOnClickListener {
-                var password = ""
+
+                encryptionPassword = ""
 
                 if (minimalConfigurations.size == 1)
                 {
                     encryptionPassword = minimalConfigurations[0].encryptionPassword
-                    for (i in 1..encryptionPassword.length)
-                    {
-                        password += "*"
-                    }
                 }
 
-                InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false)  { action, password, tag ->
-                    when (action) {
-                        InputDialog.Action.DidCancel -> {}
-                        InputDialog.Action.DidEnterText -> {importConfiguration( password )}
-                        InputDialog.Action.DidPressQRButton -> {}
+                composableInputDialogHost.show(
+                    title = resources.getString(R.string.enter_encryption_password),
+                    text = encryptionPassword,
+                    leftButton = resources.getString(R.string.cancel),
+                    rightButton = resources.getString(R.string.save)
+                ) { text ->
+                    if (text.isNotEmpty())
+                    {
+                        importConfiguration( text )
                     }
                 }
             }
@@ -243,19 +245,29 @@ class ManageConfigurationsFragment : Fragment()
             items.add(resources.getString(R.string.clone))
             items.add(resources.getString(R.string.delete))
         }
+        else if (user.role == Role.Supervisor.value)
+        {
+            items.add(resources.getString(R.string.open))
+            items.add(resources.getString(R.string.edit))
+            items.add(resources.getString(R.string.delete))
+        }
         else
         {
             items.add(resources.getString(R.string.open))
             items.add(resources.getString(R.string.delete))
         }
 
+//        if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
+//        {
+//            items.add(resources.getString(R.string.select_strata))
+//        }
 
-        if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
-        {
-            items.add(resources.getString(R.string.select_strata))
-        }
-
-        MultiConfirmationDialog( requireActivity(),config.name, "", items, null ) { selection, tag ->
+        composableConfirmationDialogHost.show(
+            title = config.name,
+            message = null,
+            items = items,
+            layoutVertically = true
+        ) { selection ->
             if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
             {
                 when (selection)
@@ -315,10 +327,9 @@ class ManageConfigurationsFragment : Fragment()
         composableConfirmationDialogHost.show(
             title = resources.getString(R.string.delete_config),
             message = resources.getString(R.string.delete_configuration_message),
-            leftButtonText = resources.getString(R.string.no),
-            rightButtonText = resources.getString(R.string.yes)
-        ) { buttonPressed ->
-            if (buttonPressed == ButtonPress.Right)
+            items = listOf(resources.getString(R.string.no), resources.getString(R.string.yes))
+        ) { selection ->
+            if (selection == resources.getString(R.string.yes))
             {
                 binding.progressOverlayView.visibility= View.VISIBLE
 
@@ -341,12 +352,11 @@ class ManageConfigurationsFragment : Fragment()
     private fun cloneConfig( config: Config )
     {
         composableConfirmationDialogHost.show(
-            title = "Clone Configuration",
-            message = "Are you sure you want to Clone this Configuration?",
-            leftButtonText = "No",
-            rightButtonText = "Yes"
-        ) { buttonPressed ->
-            if (buttonPressed == ButtonPress.Right)
+            title = resources.getString(R.string.clone_configuration),
+            message = resources.getString(R.string.confirm_clone_configuration),
+            items = listOf(resources.getString(R.string.no), resources.getString(R.string.yes))
+        ) { selection ->
+            if (selection == resources.getString(R.string.yes))
             {
                 binding.progressOverlayView.visibility = View.VISIBLE
 
@@ -604,11 +614,19 @@ class ManageConfigurationsFragment : Fragment()
                 {
                     if (enumAreas.isEmpty())
                     {
-                        NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_enumeration_area))
+                        composableNotificationDialogHost.show(
+                            title = resources.getString(R.string.oops),
+                            message = resources.getString(R.string.missing_enumeration_area),
+                            buttonText = resources.getString(R.string.ok),
+                        )
                     }
                     else if (studies.isEmpty())
                     {
-                        NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_study))
+                        composableNotificationDialogHost.show(
+                            title = resources.getString(R.string.oops),
+                            message = resources.getString(R.string.missing_study),
+                            buttonText = resources.getString(R.string.ok),
+                        )
                     }
                     else
                     {
@@ -656,11 +674,19 @@ class ManageConfigurationsFragment : Fragment()
                 {
                     if (enumAreas.isEmpty())
                     {
-                        NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_enumeration_area))
+                        composableNotificationDialogHost.show(
+                            title = resources.getString(R.string.oops),
+                            message = resources.getString(R.string.missing_enumeration_area),
+                            buttonText = resources.getString(R.string.ok),
+                        )
                     }
                     else if (studies.isEmpty())
                     {
-                        NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_study))
+                        composableNotificationDialogHost.show(
+                            title = resources.getString(R.string.oops),
+                            message = resources.getString(R.string.missing_study),
+                            buttonText = resources.getString(R.string.ok),
+                        )
                     }
                     else
                     {
@@ -672,7 +698,11 @@ class ManageConfigurationsFragment : Fragment()
 
                         if (collectionTeams.isEmpty())
                         {
-                            NotificationDialog( requireActivity(), resources.getString( R.string.oops ), resources.getString(R.string.missing_collection_team))
+                            composableNotificationDialogHost.show(
+                                title = resources.getString(R.string.oops),
+                                message = resources.getString(R.string.missing_collection_team),
+                                buttonText = resources.getString(R.string.ok),
+                            )
                         }
                         else
                         {
@@ -708,16 +738,15 @@ class ManageConfigurationsFragment : Fragment()
         composableConfirmationDialogHost.show(
             title = resources.getString(R.string.import_configuration),
             message = resources.getString(R.string.select_import_method),
-            leftButtonText = resources.getString(R.string.qr_code),
-            rightButtonText = resources.getString(R.string.file_system),
+            items = listOf(resources.getString(R.string.qr_code), resources.getString(R.string.file_system)),
             layoutVertically = true
-        ) { buttonPressed ->
-            if (buttonPressed == ButtonPress.Left)
+        ) { selection ->
+            if (selection == resources.getString(R.string.qr_code))
             {
                 val intent = Intent(context, CameraXLivePreviewActivity::class.java)
                 getQrCode.launch(intent)
             }
-            else if (buttonPressed == ButtonPress.Right)
+            else if (selection == resources.getString(R.string.file_system))
             {
                 val intent = Intent()
                     .setType("*/*")
@@ -762,7 +791,11 @@ class ManageConfigurationsFragment : Fragment()
                             if (errorCode != ErrorCode.None)
                             {
                                 val message = if (errorCode == ErrorCode.DecryptError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
-                                NotificationDialog( activity!!, resources.getString(R.string.error), message)
+                                composableNotificationDialogHost.show(
+                                    title = resources.getString(R.string.error),
+                                    message = message,
+                                    buttonText = resources.getString(R.string.ok),
+                                )
                             }
                         }
                         else
@@ -788,14 +821,22 @@ class ManageConfigurationsFragment : Fragment()
                 catch( ex: java.lang.Exception )
                 {
                     binding.progressOverlayView.visibility = View.GONE
-                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                    composableNotificationDialogHost.show(
+                        title = resources.getString(R.string.error),
+                        message = resources.getString(R.string.import_failed),
+                        buttonText = resources.getString(R.string.ok),
+                    )
                 }
             }
         }
         else
         {
             binding.progressOverlayView.visibility = View.GONE
-            InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+            composableNotificationDialogHost.show(
+                title = resources.getString(R.string.error),
+                message = resources.getString(R.string.import_failed),
+                buttonText = resources.getString(R.string.ok),
+            )
         }
     }
 

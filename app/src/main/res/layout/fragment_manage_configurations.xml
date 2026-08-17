@@ -83,7 +83,17 @@
     </FrameLayout>
 
     <androidx.compose.ui.platform.ComposeView
-        android:id="@+id/confirmation_compose_view"
+        android:id="@+id/confirmation_dialog_compose_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/input_dialog_compose_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/notification_dialog_compose_view"
         android:layout_width="0dp"
         android:layout_height="0dp" />
 </FrameLayout>
