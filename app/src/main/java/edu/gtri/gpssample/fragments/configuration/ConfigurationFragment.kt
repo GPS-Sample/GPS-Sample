@@ -43,7 +43,6 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.EnumAreaDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
-import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.CheckboxDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
@@ -63,7 +62,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDialog.BusyIndicatorDialogDelegate
+class ConfigurationFragment : Fragment(), View.OnTouchListener
 {
     private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -133,30 +132,28 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
             findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
         }
 
-        binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_configuration_message),
-                resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {
-                    }
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        sharedViewModel.currentConfiguration?.value?.let { config ->
-                            val busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.delete_config), this, false )
-                            Thread {
-                                DAO.configDAO.deleteConfig( config )
-                                activity!!.runOnUiThread {
-                                    busyIndicatorDialog.alertDialog.cancel()
-                                    findNavController().popBackStack()
-                                }
-                            }.start()
-                        }
-                    }
-                    ConfirmationDialog.ButtonPress.None -> {
-                    }
-                }
-            }
-        }
+//        binding.deleteImageView.setOnClickListener {
+//            ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_configuration_message),
+//                resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+//                when( buttonPressed )
+//                {
+//                    ConfirmationDialog.ButtonPress.Left -> {
+//                    }
+//                    ConfirmationDialog.ButtonPress.Right -> {
+//                        sharedViewModel.currentConfiguration?.value?.let { config ->
+//                            Thread {
+//                                DAO.configDAO.deleteConfig( config )
+//                                activity!!.runOnUiThread {
+//                                    findNavController().popBackStack()
+//                                }
+//                            }.start()
+//                        }
+//                    }
+//                    ConfirmationDialog.ButtonPress.None -> {
+//                    }
+//                }
+//            }
+//        }
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
@@ -714,10 +711,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener, BusyIndicatorDia
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_test, menu)
-    }
-
-    override fun didPressCancelButton()
-    {
     }
 
     override fun onTouch(view: View?, motionEvent: MotionEvent?): Boolean {
