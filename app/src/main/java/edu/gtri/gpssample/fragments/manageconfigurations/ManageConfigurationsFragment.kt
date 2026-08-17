@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.*
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,7 +33,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.ButtonPress
 import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.MultiConfirmationDialog
@@ -40,6 +41,7 @@ import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.managers.NearbySessionClientManager
 import edu.gtri.gpssample.managers.PerformanceManager
+import edu.gtri.gpssample.ui.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
@@ -63,6 +65,7 @@ class ManageConfigurationsFragment : Fragment()
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var samplingViewModel: SamplingViewModel
     private val REQUEST_CONFIGURATION   = 1001
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -97,6 +100,16 @@ class ManageConfigurationsFragment : Fragment()
                     .setPopUpTo(R.id.action_navigate_to_MainFragment, false)
                     .build())
             return
+        }
+
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+
+        binding.confirmationComposeView.setViewCompositionStrategy(
+            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+        )
+
+        binding.confirmationComposeView.setContent {
+            composableConfirmationDialogHost.Content()
         }
 
         val distanceFormats = resources.getTextArray( R.array.distance_formats )
@@ -136,7 +149,6 @@ class ManageConfigurationsFragment : Fragment()
 
             manageConfigurationsAdapter = ManageConfigurationsAdapter( minimalConfigurations )
             manageConfigurationsAdapter.didSelectConfig = this@ManageConfigurationsFragment::didSelectConfig
-            manageConfigurationsAdapter.shouldCloneConfig = this@ManageConfigurationsFragment::shouldCloneConfig
 
             if (user.role == Role.Enumerator.value && minimalConfigurations.isNotEmpty()) // && configurations[0].selectedEnumAreaUuid.isEmpty())
             {
@@ -182,39 +194,11 @@ class ManageConfigurationsFragment : Fragment()
                     }
                 }
 
-                if (false) //((minimalConfigurations.size == 1) && ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())))
-                {
-                    ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                        when( buttonPressed )
-                        {
-                            ConfirmationDialog.ButtonPress.Left -> {
-                            }
-                            ConfirmationDialog.ButtonPress.Right -> {
-                                DAO.deleteAll()
-                                ImageDAO.deleteAll()
-                                minimalConfigurations.clear()
-                                manageConfigurationsAdapter.updateConfigurations(minimalConfigurations)
-                                InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false )  { action, password, tag ->
-                                    when (action) {
-                                        InputDialog.Action.DidCancel -> {}
-                                        InputDialog.Action.DidEnterText -> {importConfiguration( password )}
-                                        InputDialog.Action.DidPressQRButton -> {}
-                                    }
-                                }
-                            }
-                            ConfirmationDialog.ButtonPress.None -> {
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false)  { action, password, tag ->
-                        when (action) {
-                            InputDialog.Action.DidCancel -> {}
-                            InputDialog.Action.DidEnterText -> {importConfiguration( password )}
-                            InputDialog.Action.DidPressQRButton -> {}
-                        }
+                InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false)  { action, password, tag ->
+                    when (action) {
+                        InputDialog.Action.DidCancel -> {}
+                        InputDialog.Action.DidEnterText -> {importConfiguration( password )}
+                        InputDialog.Action.DidPressQRButton -> {}
                     }
                 }
             }
@@ -246,22 +230,6 @@ class ManageConfigurationsFragment : Fragment()
         }
 
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun shouldCloneConfig( config: Config )
-    {
-        ConfirmationDialog( activity, resources.getString(R.string.clone_configuration), resources.getString(R.string.confirm_clone_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-            when( buttonPressed )
-            {
-                ConfirmationDialog.ButtonPress.Left -> {
-                }
-                ConfirmationDialog.ButtonPress.Right -> {
-                    cloneConfig( config )
-                }
-                ConfirmationDialog.ButtonPress.None -> {
-                }
-            }
-        }
     }
 
     private fun didSelectConfig( config: Config )
@@ -344,27 +312,27 @@ class ManageConfigurationsFragment : Fragment()
 
     fun deleteConfig( config: Config )
     {
-        ConfirmationDialog( activity, resources.getString(R.string.delete_config), resources.getString(R.string.delete_configuration_message), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-            when( buttonPressed )
+        composableConfirmationDialogHost.show(
+            title = resources.getString(R.string.delete_config),
+            message = resources.getString(R.string.delete_configuration_message),
+            leftButtonText = resources.getString(R.string.no),
+            rightButtonText = resources.getString(R.string.yes)
+        ) { buttonPressed ->
+            if (buttonPressed == ButtonPress.Right)
             {
-                ConfirmationDialog.ButtonPress.Left -> {}
-                ConfirmationDialog.ButtonPress.None -> {}
-                ConfirmationDialog.ButtonPress.Right -> {
+                binding.progressOverlayView.visibility= View.VISIBLE
 
-                    binding.progressOverlayView.visibility= View.VISIBLE
-
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        withContext(Dispatchers.IO)
-                        {
-                            minimalConfigurations.remove(config)
-                            DAO.configDAO.deleteConfig(config)
-                        }
-
-                        // back on the main thread...
-
-                        binding.progressOverlayView.visibility = View.GONE
-                        manageConfigurationsAdapter.updateConfigurations(minimalConfigurations)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    withContext(Dispatchers.IO)
+                    {
+                        minimalConfigurations.remove(config)
+                        DAO.configDAO.deleteConfig(config)
                     }
+
+                    // back on the main thread...
+
+                    binding.progressOverlayView.visibility = View.GONE
+                    manageConfigurationsAdapter.updateConfigurations(minimalConfigurations)
                 }
             }
         }
@@ -372,158 +340,159 @@ class ManageConfigurationsFragment : Fragment()
 
     private fun cloneConfig( config: Config )
     {
-        ConfirmationDialog( activity, resources.getString(R.string.clone_configuration), resources.getString(R.string.confirm_clone_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-            when( buttonPressed )
+        composableConfirmationDialogHost.show(
+            title = "Clone Configuration",
+            message = "Are you sure you want to Clone this Configuration?",
+            leftButtonText = "No",
+            rightButtonText = "Yes"
+        ) { buttonPressed ->
+            if (buttonPressed == ButtonPress.Right)
             {
-                ConfirmationDialog.ButtonPress.Left -> {}
-                ConfirmationDialog.ButtonPress.None -> {}
-                ConfirmationDialog.ButtonPress.Right -> {
-                    binding.progressOverlayView.visibility = View.VISIBLE
+                binding.progressOverlayView.visibility = View.VISIBLE
 
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        withContext(Dispatchers.IO) {
-                            val newConfig = config.copy()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        val newConfig = config.copy()
 
-                            if (newConfig.studies.isEmpty())
-                            {
-                                newConfig.studies = DAO.studyDAO.getStudies( newConfig )
-                            }
-
-                            if (newConfig.enumAreas.isEmpty())
-                            {
-                                newConfig.enumAreas = DAO.enumAreaDAO.getEnumAreas( newConfig )
-                            }
-
-                            // update config base
-                            newConfig.uuid = UUID.randomUUID().toString()
-                            newConfig.creationDate = Date().time
-                            newConfig.name += "-copy"
-                            newConfig.selectedStudyUuid = ""
-                            newConfig.validUsers = ""
-
-                            // update enumAreas
-                            for (enumArea in newConfig.enumAreas)
-                            {
-                                enumArea.uuid = UUID.randomUUID().toString()
-                                enumArea.creationDate = Date().time
-                                enumArea.configUuid = newConfig.uuid
-                                enumArea.enumerationTeams.clear()
-                                enumArea.collectionTeams.clear()
-                                enumArea.selectedEnumerationTeamUuid = ""
-                                enumArea.selectedCollectionTeamUuid = ""
-
-                                var creationDate = Date().time
-
-                                // update vertices
-                                for (vertice in enumArea.vertices)
-                                {
-                                    vertice.uuid = UUID.randomUUID().toString()
-                                    vertice.creationDate = creationDate
-                                    creationDate += 1
-                                }
-
-                                // update locations
-                                for (location in enumArea.locations)
-                                {
-                                    location.uuid = UUID.randomUUID().toString()
-                                    location.creationDate = Date().time
-                                    location.enumerationItems.clear()
-
-                                    // update images
-                                    if (location.imageUuid.isNotEmpty())
-                                    {
-                                        // create a copy of the image
-                                        ImageDAO.instance().getImage( location.imageUuid )?.let { image ->
-                                            image.uuid = UUID.randomUUID().toString()
-                                            image.creationDate = Date().time
-                                            image.locationUuid = location.uuid
-                                            location.imageUuid = image.uuid
-                                            // save the copy of the image to the image database
-                                            ImageDAO.instance().createImage( image )
-                                        }
-                                    }
-                                }
-                            }
-
-                            // update studies
-                            if (newConfig.studies.isNotEmpty())
-                            {
-                                var numStudies = newConfig.studies.count()
-
-                                // HACK! remove all studies except the first
-                                while (numStudies > 1)
-                                {
-                                    newConfig.studies.remove(newConfig.studies.last())
-                                    numStudies -= 1
-                                }
-
-                                newConfig.studies[0].uuid = UUID.randomUUID().toString()
-                                newConfig.studies[0].creationDate = Date().time
-                                newConfig.studies[0].filters.clear()
-                                newConfig.studies[0].subsetFilters.clear()
-
-                                // update fields
-                                for (field in newConfig.studies[0].fields)
-                                {
-                                    val oldFieldUuid = field.uuid
-
-                                    field.uuid = UUID.randomUUID().toString()
-                                    field.creationDate = Date().time
-
-                                    // update primary rules
-                                    for (rule in newConfig.studies[0].rules)
-                                    {
-                                        if (rule.fieldUuid == oldFieldUuid)
-                                        {
-                                            rule.fieldUuid = field.uuid
-                                            rule.uuid = UUID.randomUUID().toString()
-                                            break
-                                        }
-                                    }
-
-                                    // update subset rules
-                                    for (rule in newConfig.studies[0].subsetRules)
-                                    {
-                                        if (rule.fieldUuid == oldFieldUuid)
-                                        {
-                                            rule.fieldUuid = field.uuid
-                                            rule.uuid = UUID.randomUUID().toString()
-                                            break
-                                        }
-                                    }
-                                }
-
-                                // update stratas
-                                for (strata in newConfig.studies[0].stratas)
-                                {
-                                    val oldStrataUuid = strata.uuid
-
-                                    strata.uuid = UUID.randomUUID().toString()
-                                    strata.creationDate = Date().time
-                                    strata.studyUuid = newConfig.studies[0].uuid
-
-                                    for (enumArea in newConfig.enumAreas)
-                                    {
-                                        if (enumArea.strataUuid == oldStrataUuid)
-                                        {
-                                            enumArea.strataUuid = strata.uuid
-                                            break
-                                        }
-                                    }
-                                }
-                            }
-
-                            // save the new config to the database
-                            DAO.configDAO.createOrUpdateConfig( newConfig, config.version )
-
-                            minimalConfigurations.add( newConfig )
+                        if (newConfig.studies.isEmpty())
+                        {
+                            newConfig.studies = DAO.studyDAO.getStudies( newConfig )
                         }
 
-                        // back on the main thread...
-                        manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
+                        if (newConfig.enumAreas.isEmpty())
+                        {
+                            newConfig.enumAreas = DAO.enumAreaDAO.getEnumAreas( newConfig )
+                        }
 
-                        binding.progressOverlayView.visibility = View.GONE
+                        // update config base
+                        newConfig.uuid = UUID.randomUUID().toString()
+                        newConfig.creationDate = Date().time
+                        newConfig.name += "-copy"
+                        newConfig.selectedStudyUuid = ""
+                        newConfig.validUsers = ""
+
+                        // update enumAreas
+                        for (enumArea in newConfig.enumAreas)
+                        {
+                            enumArea.uuid = UUID.randomUUID().toString()
+                            enumArea.creationDate = Date().time
+                            enumArea.configUuid = newConfig.uuid
+                            enumArea.enumerationTeams.clear()
+                            enumArea.collectionTeams.clear()
+                            enumArea.selectedEnumerationTeamUuid = ""
+                            enumArea.selectedCollectionTeamUuid = ""
+
+                            var creationDate = Date().time
+
+                            // update vertices
+                            for (vertice in enumArea.vertices)
+                            {
+                                vertice.uuid = UUID.randomUUID().toString()
+                                vertice.creationDate = creationDate
+                                creationDate += 1
+                            }
+
+                            // update locations
+                            for (location in enumArea.locations)
+                            {
+                                location.uuid = UUID.randomUUID().toString()
+                                location.creationDate = Date().time
+                                location.enumerationItems.clear()
+
+                                // update images
+                                if (location.imageUuid.isNotEmpty())
+                                {
+                                    // create a copy of the image
+                                    ImageDAO.instance().getImage( location.imageUuid )?.let { image ->
+                                        image.uuid = UUID.randomUUID().toString()
+                                        image.creationDate = Date().time
+                                        image.locationUuid = location.uuid
+                                        location.imageUuid = image.uuid
+                                        // save the copy of the image to the image database
+                                        ImageDAO.instance().createImage( image )
+                                    }
+                                }
+                            }
+                        }
+
+                        // update studies
+                        if (newConfig.studies.isNotEmpty())
+                        {
+                            var numStudies = newConfig.studies.count()
+
+                            // HACK! remove all studies except the first
+                            while (numStudies > 1)
+                            {
+                                newConfig.studies.remove(newConfig.studies.last())
+                                numStudies -= 1
+                            }
+
+                            newConfig.studies[0].uuid = UUID.randomUUID().toString()
+                            newConfig.studies[0].creationDate = Date().time
+                            newConfig.studies[0].filters.clear()
+                            newConfig.studies[0].subsetFilters.clear()
+
+                            // update fields
+                            for (field in newConfig.studies[0].fields)
+                            {
+                                val oldFieldUuid = field.uuid
+
+                                field.uuid = UUID.randomUUID().toString()
+                                field.creationDate = Date().time
+
+                                // update primary rules
+                                for (rule in newConfig.studies[0].rules)
+                                {
+                                    if (rule.fieldUuid == oldFieldUuid)
+                                    {
+                                        rule.fieldUuid = field.uuid
+                                        rule.uuid = UUID.randomUUID().toString()
+                                        break
+                                    }
+                                }
+
+                                // update subset rules
+                                for (rule in newConfig.studies[0].subsetRules)
+                                {
+                                    if (rule.fieldUuid == oldFieldUuid)
+                                    {
+                                        rule.fieldUuid = field.uuid
+                                        rule.uuid = UUID.randomUUID().toString()
+                                        break
+                                    }
+                                }
+                            }
+
+                            // update stratas
+                            for (strata in newConfig.studies[0].stratas)
+                            {
+                                val oldStrataUuid = strata.uuid
+
+                                strata.uuid = UUID.randomUUID().toString()
+                                strata.creationDate = Date().time
+                                strata.studyUuid = newConfig.studies[0].uuid
+
+                                for (enumArea in newConfig.enumAreas)
+                                {
+                                    if (enumArea.strataUuid == oldStrataUuid)
+                                    {
+                                        enumArea.strataUuid = strata.uuid
+                                        break
+                                    }
+                                }
+                            }
+                        }
+
+                        // save the new config to the database
+                        DAO.configDAO.createOrUpdateConfig( newConfig, config.version )
+
+                        minimalConfigurations.add( newConfig )
                     }
+
+                    // back on the main thread...
+                    manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
+
+                    binding.progressOverlayView.visibility = View.GONE
                 }
             }
         }
@@ -736,22 +705,25 @@ class ManageConfigurationsFragment : Fragment()
             encryptionPassword = password
         }
 
-        ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
-            when( buttonPressed )
+        composableConfirmationDialogHost.show(
+            title = resources.getString(R.string.import_configuration),
+            message = resources.getString(R.string.select_import_method),
+            leftButtonText = resources.getString(R.string.qr_code),
+            rightButtonText = resources.getString(R.string.file_system),
+            layoutVertically = true
+        ) { buttonPressed ->
+            if (buttonPressed == ButtonPress.Left)
             {
-                ConfirmationDialog.ButtonPress.Left -> {
-                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                    getQrCode.launch(intent)
-                }
-                ConfirmationDialog.ButtonPress.Right -> {
-                    val intent = Intent()
-                        .setType("*/*")
-                        .setAction(Intent.ACTION_GET_CONTENT)
+                val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                getQrCode.launch(intent)
+            }
+            else if (buttonPressed == ButtonPress.Right)
+            {
+                val intent = Intent()
+                    .setType("*/*")
+                    .setAction(Intent.ACTION_GET_CONTENT)
 
-                    startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_configuration)), REQUEST_CONFIGURATION)
-                }
-                ConfirmationDialog.ButtonPress.None -> {
-                }
+                startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_configuration)), REQUEST_CONFIGURATION)
             }
         }
     }
