@@ -6,26 +6,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import edu.gtri.gpssample.ui.GPSSampleComposeTheme
 
-class ComposableConfirmationDialogHost
+class ComposableBusyIndicatorDialogHost
 {
     private var dialogContent by mutableStateOf<DialogContent?>(null)
 
     fun show(
-        title: String?,
+        title: String,
         message: String?,
-        leftButtonText: String,
-        rightButtonText: String,
-        cancelable: Boolean = true,
-        onResult: (String) -> Unit
+        onCancel: (() -> Unit)? = null
     ) {
         dialogContent = DialogContent(
             title = title,
             message = message,
-            leftButtonText = leftButtonText,
-            rightButtonText = rightButtonText,
-            cancelable = cancelable,
-            onResult = onResult
+            onCancel = onCancel
         )
+    }
+
+    fun cancel()
+    {
+        dialogContent = null
     }
 
     @Composable
@@ -33,15 +32,12 @@ class ComposableConfirmationDialogHost
     {
         GPSSampleComposeTheme {
             dialogContent?.let {
-                ComposableConfirmationDialog(
+                ComposableBusyIndicatorDialog(
                     title = it.title,
                     message = it.message,
-                    leftButtonText = it.leftButtonText,
-                    rightButtonText =  it.rightButtonText,
-                    cancelable = it.cancelable,
-                    onResult = { result ->
+                    onCancel = {
+                        it.onCancel?.invoke()
                         dialogContent = null
-                        it.onResult(result)
                     }
                 )
             }
@@ -49,11 +45,8 @@ class ComposableConfirmationDialogHost
     }
 
     private data class DialogContent(
-        val title: String?,
+        val title: String,
         val message: String?,
-        val leftButtonText: String,
-        val rightButtonText: String,
-        val cancelable: Boolean,
-        val onResult: (String) -> Unit
+        val onCancel: (() -> Unit)?
     )
 }

@@ -34,7 +34,6 @@ import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
-import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -81,8 +80,12 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
         }
 
         composableNotificationDialogHost = ComposableNotificationDialogHost()
+
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-        binding.dialogComposeView.setContent { composableNotificationDialogHost.Content() }
+
+        binding.dialogComposeView.setContent {
+            composableNotificationDialogHost.Content()
+        }
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
@@ -198,7 +201,7 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
                 }
                 else
                 {
-                    val busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.saving_configuration), null, false )
+                    binding.progressOverlayView.visibility = View.VISIBLE
 
                     viewLifecycleOwner.lifecycleScope.launch {
                         withContext(Dispatchers.IO)
@@ -207,7 +210,7 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
                         }
 
                         // back on the main thread...
-                        busyIndicatorDialog.alertDialog.cancel()
+                        binding.progressOverlayView.visibility = View.GONE
 
                         findNavController().popBackStack()
                     }

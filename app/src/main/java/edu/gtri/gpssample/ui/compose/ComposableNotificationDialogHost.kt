@@ -8,14 +8,14 @@ import edu.gtri.gpssample.ui.GPSSampleComposeTheme
 
 class ComposableNotificationDialogHost
 {
-    private var notification by mutableStateOf<Notification?>(null)
+    private var dialogContent by mutableStateOf<DialogContent?>(null)
 
     fun show(
         title: String?,
         message: String?,
         buttonText: String
     ) {
-        notification = Notification(
+        dialogContent = DialogContent(
             title = title,
             message = message,
             buttonText = buttonText
@@ -26,20 +26,20 @@ class ComposableNotificationDialogHost
     fun Content()
     {
         GPSSampleComposeTheme {
-            notification?.let {
+            dialogContent?.let {
                 ComposableNotificationDialog(
                     title = it.title,
                     message = it.message,
                     buttonText = it.buttonText,
                     onDismiss = {
-                        notification = null
+                        dialogContent = null
                     }
                 )
             }
         }
     }
 
-    private data class Notification(
+    private data class DialogContent(
         val title: String?,
         val message: String?,
         val buttonText: String,

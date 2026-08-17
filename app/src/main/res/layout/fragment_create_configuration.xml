@@ -3,7 +3,6 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
 
     tools:context=".fragments.createconfiguration.CreateConfigurationFragment"
@@ -17,565 +16,570 @@
             name="createConfigurationFragment"
             type="edu.gtri.gpssample.fragments.createconfiguration.CreateConfigurationFragment" />
     </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="10"
-            android:layout_marginBottom="0dp">
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/fragment_root_layout"
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="2048dp"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                android:layout_marginBottom="0dp">
 
-                <TextView
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/fragment_root_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:gravity="start|center_vertical"
-                    android:textAlignment="viewStart"
-                    android:text="@string/config_name"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
+                    android:layout_height="2048dp"
+                    android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/config_name_edit_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:inputType="textCapWords"
-                    android:imeOptions="actionNext"
-                    android:textAlignment="viewStart"
-                    android:text="@={viewModel.currentConfiguration.name}"
-                    android:hint="@string/enter_config_name" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="20dp"
-                    android:gravity="start|center_vertical"
-                    android:textAlignment="viewStart"
-                    android:text="@string/map_engine"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:background="@drawable/spinner_frame">
-
-                    <Spinner
-                        android:id="@+id/map_engine_spinner"
+                    <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
-                </FrameLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="20dp"
-                    android:gravity="start|center_vertical"
-                    android:textAlignment="viewStart"
-                    android:text="@string/preferred_units"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:background="@drawable/spinner_frame">
-
-                    <Spinner
-                        android:id="@+id/distance_format_spinner"
-                        android:textAlignment="viewStart"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:entries="@{viewModel.distanceFormats}"
-                        android:selectedItemPosition="@={viewModel.distanceFormatPosition}"
-                        android:onItemSelected="@{viewModel::onDistanceFormatSelected}"/>
-                </FrameLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="20dp"
-                    android:gravity="start|center_vertical"
-                    android:textAlignment="viewStart"
-                    android:text="@string/date_format"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:background="@drawable/spinner_frame">
-
-                    <Spinner
-                        android:id="@+id/date_format_spinner"
-                        android:textAlignment="viewStart"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:entries="@{viewModel.dateFormats}"
-                        android:selectedItemPosition="@={viewModel.dateFormatPosition}"
-                        android:onItemSelected="@{viewModel::onDateFormatSelected}"
-                        />
-                </FrameLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="20dp"
-                    android:gravity="start|center_vertical"
-                    android:textAlignment="viewStart"
-                    android:text="@string/time_format"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:background="@drawable/spinner_frame">
-
-                    <Spinner
-                        android:id="@+id/time_format_spinner"
-                        android:textAlignment="viewStart"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:entries="@{viewModel.timeFormats}"
-                        android:selectedItemPosition="@={viewModel.timeFormatPosition}"
-                        android:onItemSelected="@{viewModel::onTimeFormatSelected}"/>
-                </FrameLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:text="@string/min_gps_precision"
-                        android:textColor="@color/primary_textcolor"
-                        android:textSize="17sp"
-                        android:textStyle="normal" />
-
-                    <ImageView
-                        android:id="@+id/min_gps_precision_tip"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:padding="15dp"
-                        android:layout_margin="0dp"
-                        app:srcCompat="@drawable/info2" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-
-                    <EditText
-                        android:id="@+id/min_gps_precision_edit_text"
-                        android:layout_width="0dp"
-                        android:layout_height="50dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp"
-                        android:inputType="number"
-                        android:imeOptions="actionNext"
-                        android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"
-                        android:hint="@string/enter_min_gps_precision" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp"
-                        android:gravity="center_vertical"
-                        android:text="@{viewModel.distanceFormatString}"
-                        android:textSize="17sp"
-                        android:textColor="@color/primary_textcolor" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:text="@string/encryption_password"
-                        android:textColor="@color/primary_textcolor"
-                        android:textSize="17sp"
-                        android:textStyle="normal" />
-
-                    <ImageView
-                        android:id="@+id/encryption_password_tip"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:padding="15dp"
-                        android:layout_margin="0dp"
-                        app:srcCompat="@drawable/info2" />
-                </LinearLayout>
-
-                <EditText
-                    android:id="@+id/encryption_password_edit_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:inputType="text"
-                    android:imeOptions="actionNext"
-                    android:textAlignment="viewStart"
-                    android:text="@={viewModel.currentConfiguration.encryptionPassword}"
-                    android:hint="@string/enter_encryption_password" />
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-
-                    <TextView
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:gravity="start|center_vertical"
-                        android:textAlignment="viewStart"
-                        android:text="@string/allow_manual_identification_of_locations"
-                        android:textSize="17sp"
-                        android:textColor="@color/primary_textcolor" />
-
-                    <ImageView
-                        android:id="@+id/manual_entry_tip"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:padding="15dp"
-                        app:srcCompat="@drawable/info2" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/location_switch"
-                        android:checked="@={viewModel.currentConfiguration.allowManualLocationEntry}"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-
-                    <TextView
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:gravity="start|center_vertical"
-                        android:textAlignment="viewStart"
-                        android:text="@string/subaddress_is_required"
-                        android:textSize="17sp"
-                        android:textColor="@color/primary_textcolor" />
-
-                    <ImageView
-                        android:id="@+id/subaddress_tip"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:padding="15dp"
-                        app:srcCompat="@drawable/info2" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/subaddress_required_switch"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:checked="@={viewModel.currentConfiguration.subaddressIsrequired}"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-
-                    <TextView
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:gravity="start|center_vertical"
-                        android:textAlignment="viewStart"
-                        android:text="@string/auto_increment_subaddress"
-                        android:textSize="17sp"
-                        android:textColor="@color/primary_textcolor" />
-
-                    <ImageView
-                        android:id="@+id/auto_increment_tip"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:padding="15dp"
-                        app:srcCompat="@drawable/info2" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/auto_subaddress_switch"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:checked="@={viewModel.currentConfiguration.autoIncrementSubaddress}"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-
-                    <TextView
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:gravity="start|center_vertical"
-                        android:textAlignment="viewStart"
-                        android:text="@string/proximity_warning_enabled"
-                        android:textSize="17sp"
-                        android:textColor="@color/primary_textcolor" />
-
-                    <ImageView
-                        android:id="@+id/proximity_warning_hint"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:padding="15dp"
-                        app:srcCompat="@drawable/info2" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/proximity_warning_enabled_switch"
-                        android:checked="@={viewModel.currentConfiguration.proximityWarningIsEnabled}"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/proximity_warning_layout"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-
-                    <EditText
-                        android:id="@+id/proximity_warning_edit_text"
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="50dp"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp"
-                        android:inputType="number"
-                        android:imeOptions="actionDone"
-                        android:text="@={viewModel.currentConfiguration.proximityWarningStringValue}"
-                        android:hint="@string/proximity_warning_value" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp"
-                        android:gravity="center_vertical"
-                        android:text="@{viewModel.distanceFormatString}"
-                        android:textSize="17sp"
-                        android:textColor="@color/primary_textcolor" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-
-                    <TextView
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:gravity="start|center_vertical"
-                        android:textAlignment="viewStart"
-                        android:text="@string/enforce_geofence_boundary"
-                        android:textSize="17sp"
-                        android:textColor="@color/primary_textcolor" />
-
-                    <ImageView
-                        android:id="@+id/geofence_hint"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:padding="15dp"
-                        app:srcCompat="@drawable/info2" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/geofence_switch"
-                        android:checked="@={viewModel.currentConfiguration.geofenceIsEnabled}"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/geofence_layout"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-
-                    <EditText
-                        android:id="@+id/geofence_edit_text"
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="50dp"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp"
-                        android:inputType="number"
-                        android:imeOptions="actionDone"
-                        android:text="@={viewModel.currentConfiguration.geofenceBufferStringValue}"
-                        android:hint="@string/enter_the_geofence_buffer_value" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp"
-                        android:gravity="center_vertical"
-                        android:text="@{viewModel.distanceFormatString}"
-                        android:textSize="17sp"
-                        android:textColor="@color/primary_textcolor" />
-                </LinearLayout>
-
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp" />
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp">
-
-                    <com.mapbox.maps.MapView
-                        android:id="@+id/mapbox_map_view"
-                        android:visibility="visible"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp">
-                    </com.mapbox.maps.MapView>
-
-                    <org.osmdroid.views.MapView
-                        android:id="@+id/osm_map_view"
-                        android:visibility="gone"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp">
-                    </org.osmdroid.views.MapView>
-
-                    <ImageView
-                        android:id="@+id/north_up_image_view"
-                        android:visibility="gone"
-                        android:layout_marginTop="40dp"
-                        android:layout_marginEnd="20dp"
-                        android:layout_width="30dp"
                         android:layout_height="30dp"
-                        android:layout_gravity="top|end"
-                        app:srcCompat="@drawable/compass_icon"/>
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="20dp"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
+                        android:text="@string/config_name"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+
+                    <EditText
+                        android:id="@+id/config_name_edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:inputType="textCapWords"
+                        android:imeOptions="actionNext"
+                        android:textAlignment="viewStart"
+                        android:text="@={viewModel.currentConfiguration.name}"
+                        android:hint="@string/enter_config_name" />
 
                     <TextView
-                        android:id="@+id/osm_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="10dp"
-                        android:gravity="center_vertical|center_horizontal"
-                        android:layout_gravity="bottom|start"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        android:text="OSM"
-                        android:textStyle="normal" />
-
-                    <View
-                        android:id="@+id/map_overlay_view"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp">
-                    </View>
-                </FrameLayout>
+                        android:layout_height="30dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="20dp"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
+                        android:text="@string/map_engine"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
 
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:gravity="start|center_vertical"
-                    android:textAlignment="viewStart"
-                    android:text="@string/enumeration_areas"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
-
-                <FrameLayout
-                    android:layout_marginBottom="2dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:gravity="start|center_vertical"
-                    android:textAlignment="viewStart"
-                    android:text="@string/studies"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
-
-                    <ImageView
-                        android:id="@+id/add_study_button"
-                        android:layout_width="50dp"
+                    <FrameLayout
+                        android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_gravity="end"
+                        android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
-                        android:src="@drawable/plus_blue" />
-                </FrameLayout>
+                        android:background="@drawable/spinner_frame">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/studies_recycler"
-                    android:layout_weight="1"
-                    android:layout_width="match_parent"
-                    android:layout_marginStart="0dp"
-                    android:layout_marginEnd="0dp"
-                    android:layout_height="0dp"/>
-            </androidx.appcompat.widget.LinearLayoutCompat>
-        </ScrollView>
+                        <Spinner
+                            android:id="@+id/map_engine_spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="20dp"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
+                        android:text="@string/preferred_units"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:background="@drawable/spinner_frame">
+
+                        <Spinner
+                            android:id="@+id/distance_format_spinner"
+                            android:textAlignment="viewStart"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:entries="@{viewModel.distanceFormats}"
+                            android:selectedItemPosition="@={viewModel.distanceFormatPosition}"
+                            android:onItemSelected="@{viewModel::onDistanceFormatSelected}"/>
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="20dp"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
+                        android:text="@string/date_format"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:background="@drawable/spinner_frame">
+
+                        <Spinner
+                            android:id="@+id/date_format_spinner"
+                            android:textAlignment="viewStart"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:entries="@{viewModel.dateFormats}"
+                            android:selectedItemPosition="@={viewModel.dateFormatPosition}"
+                            android:onItemSelected="@{viewModel::onDateFormatSelected}"
+                            />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="20dp"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
+                        android:text="@string/time_format"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:background="@drawable/spinner_frame">
+
+                        <Spinner
+                            android:id="@+id/time_format_spinner"
+                            android:textAlignment="viewStart"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:entries="@{viewModel.timeFormats}"
+                            android:selectedItemPosition="@={viewModel.timeFormatPosition}"
+                            android:onItemSelected="@{viewModel::onTimeFormatSelected}"/>
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:text="@string/min_gps_precision"
+                            android:textColor="@color/primary_textcolor"
+                            android:textSize="17sp"
+                            android:textStyle="normal" />
+
+                        <ImageView
+                            android:id="@+id/min_gps_precision_tip"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:padding="15dp"
+                            android:layout_margin="0dp"
+                            app:srcCompat="@drawable/info2" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <EditText
+                            android:id="@+id/min_gps_precision_edit_text"
+                            android:layout_width="0dp"
+                            android:layout_height="50dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:inputType="number"
+                            android:imeOptions="actionNext"
+                            android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"
+                            android:hint="@string/enter_min_gps_precision" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:gravity="center_vertical"
+                            android:text="@{viewModel.distanceFormatString}"
+                            android:textSize="17sp"
+                            android:textColor="@color/primary_textcolor" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:text="@string/encryption_password"
+                            android:textColor="@color/primary_textcolor"
+                            android:textSize="17sp"
+                            android:textStyle="normal" />
+
+                        <ImageView
+                            android:id="@+id/encryption_password_tip"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:padding="15dp"
+                            android:layout_margin="0dp"
+                            app:srcCompat="@drawable/info2" />
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/encryption_password_edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:inputType="text"
+                        android:imeOptions="actionNext"
+                        android:textAlignment="viewStart"
+                        android:text="@={viewModel.currentConfiguration.encryptionPassword}"
+                        android:hint="@string/enter_encryption_password" />
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <TextView
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="20dp"
+                            android:gravity="start|center_vertical"
+                            android:textAlignment="viewStart"
+                            android:text="@string/allow_manual_identification_of_locations"
+                            android:textSize="17sp"
+                            android:textColor="@color/primary_textcolor" />
+
+                        <ImageView
+                            android:id="@+id/manual_entry_tip"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:padding="15dp"
+                            app:srcCompat="@drawable/info2" />
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/location_switch"
+                            android:checked="@={viewModel.currentConfiguration.allowManualLocationEntry}"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <TextView
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="20dp"
+                            android:gravity="start|center_vertical"
+                            android:textAlignment="viewStart"
+                            android:text="@string/subaddress_is_required"
+                            android:textSize="17sp"
+                            android:textColor="@color/primary_textcolor" />
+
+                        <ImageView
+                            android:id="@+id/subaddress_tip"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:padding="15dp"
+                            app:srcCompat="@drawable/info2" />
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/subaddress_required_switch"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:checked="@={viewModel.currentConfiguration.subaddressIsrequired}"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <TextView
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="20dp"
+                            android:gravity="start|center_vertical"
+                            android:textAlignment="viewStart"
+                            android:text="@string/auto_increment_subaddress"
+                            android:textSize="17sp"
+                            android:textColor="@color/primary_textcolor" />
+
+                        <ImageView
+                            android:id="@+id/auto_increment_tip"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:padding="15dp"
+                            app:srcCompat="@drawable/info2" />
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/auto_subaddress_switch"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:checked="@={viewModel.currentConfiguration.autoIncrementSubaddress}"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <TextView
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="20dp"
+                            android:gravity="start|center_vertical"
+                            android:textAlignment="viewStart"
+                            android:text="@string/proximity_warning_enabled"
+                            android:textSize="17sp"
+                            android:textColor="@color/primary_textcolor" />
+
+                        <ImageView
+                            android:id="@+id/proximity_warning_hint"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:padding="15dp"
+                            app:srcCompat="@drawable/info2" />
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/proximity_warning_enabled_switch"
+                            android:checked="@={viewModel.currentConfiguration.proximityWarningIsEnabled}"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/proximity_warning_layout"
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <EditText
+                            android:id="@+id/proximity_warning_edit_text"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="50dp"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:inputType="number"
+                            android:imeOptions="actionDone"
+                            android:text="@={viewModel.currentConfiguration.proximityWarningStringValue}"
+                            android:hint="@string/proximity_warning_value" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:gravity="center_vertical"
+                            android:text="@{viewModel.distanceFormatString}"
+                            android:textSize="17sp"
+                            android:textColor="@color/primary_textcolor" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <TextView
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="20dp"
+                            android:gravity="start|center_vertical"
+                            android:textAlignment="viewStart"
+                            android:text="@string/enforce_geofence_boundary"
+                            android:textSize="17sp"
+                            android:textColor="@color/primary_textcolor" />
+
+                        <ImageView
+                            android:id="@+id/geofence_hint"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:padding="15dp"
+                            app:srcCompat="@drawable/info2" />
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/geofence_switch"
+                            android:checked="@={viewModel.currentConfiguration.geofenceIsEnabled}"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/geofence_layout"
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <EditText
+                            android:id="@+id/geofence_edit_text"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="50dp"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:inputType="number"
+                            android:imeOptions="actionDone"
+                            android:text="@={viewModel.currentConfiguration.geofenceBufferStringValue}"
+                            android:hint="@string/enter_the_geofence_buffer_value" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:gravity="center_vertical"
+                            android:text="@{viewModel.distanceFormatString}"
+                            android:textSize="17sp"
+                            android:textColor="@color/primary_textcolor" />
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="10dp" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp">
+
+                        <com.mapbox.maps.MapView
+                            android:id="@+id/mapbox_map_view"
+                            android:visibility="visible"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp">
+                        </com.mapbox.maps.MapView>
+
+                        <org.osmdroid.views.MapView
+                            android:id="@+id/osm_map_view"
+                            android:visibility="gone"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp">
+                        </org.osmdroid.views.MapView>
+
+                        <ImageView
+                            android:id="@+id/north_up_image_view"
+                            android:visibility="gone"
+                            android:layout_marginTop="40dp"
+                            android:layout_marginEnd="20dp"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="top|end"
+                            app:srcCompat="@drawable/compass_icon"/>
+
+                        <TextView
+                            android:id="@+id/osm_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="10dp"
+                            android:gravity="center_vertical|center_horizontal"
+                            android:layout_gravity="bottom|start"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"
+                            android:text="OSM"
+                            android:textStyle="normal" />
+
+                        <View
+                            android:id="@+id/map_overlay_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp">
+                        </View>
+                    </FrameLayout>
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="10dp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="20dp"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
+                        android:text="@string/enumeration_areas"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+
+                    <FrameLayout
+                        android:layout_marginBottom="2dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:layout_marginTop="20dp"
+                            android:layout_marginStart="20dp"
+                            android:gravity="start|center_vertical"
+                            android:textAlignment="viewStart"
+                            android:text="@string/studies"
+                            android:textSize="17sp"
+                            android:textColor="@color/primary_textcolor" />
+
+                        <ImageView
+                            android:id="@+id/add_study_button"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_gravity="end"
+                            android:layout_marginEnd="20dp"
+                            android:src="@drawable/plus_blue" />
+                    </FrameLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/studies_recycler"
+                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginEnd="0dp"
+                        android:layout_height="0dp"/>
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </ScrollView>
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -609,10 +613,28 @@
                     android:insetBottom="0dp"
                     android:text="@string/save" />
             </LinearLayout>
+        </LinearLayout>
 
-            <androidx.compose.ui.platform.ComposeView
-                android:id="@+id/dialog_compose_view"
-                android:layout_width="0dp"
-                android:layout_height="0dp" />
-    </LinearLayout>
+        <FrameLayout
+            android:id="@+id/progress_overlay_view"
+            android:visibility="gone"
+            android:background="@color/black"
+            android:alpha="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ProgressBar
+                android:id="@+id/device_progress_bar"
+                style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/dialog_compose_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
+
+    </FrameLayout>
 </layout>

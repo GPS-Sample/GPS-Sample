@@ -8,7 +8,7 @@ import edu.gtri.gpssample.ui.GPSSampleComposeTheme
 
 class ComposableInputDialogHost
 {
-    private var dialogInput by mutableStateOf<DialogInput?>(null)
+    private var dialogContent by mutableStateOf<DialogContent?>(null)
 
     fun show(
         title: String?,
@@ -21,7 +21,7 @@ class ComposableInputDialogHost
         cancelable: Boolean = true,
         onResult: (String) -> Unit
     ) {
-        dialogInput = DialogInput(
+        dialogContent = DialogContent(
             title = title,
             text = text,
             leftButton = leftButton,
@@ -38,7 +38,7 @@ class ComposableInputDialogHost
     fun Content()
     {
         GPSSampleComposeTheme {
-            dialogInput?.let {
+            dialogContent?.let {
                 ComposableInputDialog(
                     title = it.title,
                     text = it.text,
@@ -49,7 +49,7 @@ class ComposableInputDialogHost
                     allowQr = it.allowQr,
                     cancelable = it.cancelable,
                     onResult = { result ->
-                        dialogInput = null
+                        dialogContent = null
                         it.onResult(result)
                     }
                 )
@@ -57,7 +57,7 @@ class ComposableInputDialogHost
         }
     }
 
-    private data class DialogInput(
+    private data class DialogContent(
         val title: String?,
         val text: String,
         val leftButton: String,
