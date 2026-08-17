@@ -19,6 +19,7 @@ import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -45,13 +46,14 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.CheckboxDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.InfoDialog
-import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionClientManager
 import edu.gtri.gpssample.managers.NearbySessionHostManager
 import edu.gtri.gpssample.managers.PerformanceManager
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableSelectionDialogHost
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.coroutines.Dispatchers
@@ -76,6 +78,9 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
     private var includeImages = false
     private val REQUEST_CODE_PICK_CONFIG_DIR    = 1001
     private val REQUEST_CONFIGURATION           = 1003
+    private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
+    private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,6 +108,18 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                     .setPopUpTo(R.id.action_navigate_to_MainFragment, false)
                     .build())
             return
+        }
+
+        composableSelectionDialogHost = ComposableSelectionDialogHost()
+        composableNotificationDialogHost = ComposableNotificationDialogHost()
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableSelectionDialogHost.Content()
+            composableNotificationDialogHost.Content()
+            composableConfirmationDialogHost.Content()
         }
 
         binding.apply {
@@ -158,22 +175,20 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.importButton.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString(R.string.import_field_data), resources.getString(R.string.select_import_method_message),
-                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {
-                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                        getQrCode.launch(intent)
-                    }
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        val intent = Intent()
-                            .setType("*/*")
-                            .setAction(Intent.ACTION_GET_CONTENT)
-                        startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_configuration)), REQUEST_CONFIGURATION)
-                    }
-                    ConfirmationDialog.ButtonPress.None -> {
-                    }
+            composableSelectionDialogHost.show(
+                title = resources.getString(R.string.import_field_data),
+                message = resources.getString(R.string.select_import_method),
+                items = listOf(resources.getString(R.string.qr_code), resources.getString(R.string.file_system)),
+            ) { selection ->
+                if (selection == resources.getString(R.string.qr_code)) {
+                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                    getQrCode.launch(intent)
+                }
+                else if (selection == resources.getString(R.string.file_system)) {
+                    val intent = Intent()
+                        .setType("*/*")
+                        .setAction(Intent.ACTION_GET_CONTENT)
+                    startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_configuration)), REQUEST_CONFIGURATION)
                 }
             }
         }
@@ -265,11 +280,11 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                                     zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages ) { success ->
                                                         if (success)
                                                         {
-                                                            NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.export_succeeded))
+                                                            composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded), buttonText = resources.getString(R.string.ok),)
                                                         }
                                                         else
                                                         {
-                                                            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                                            composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed), buttonText = resources.getString(R.string.ok),)
                                                         }
 
                                                         nearbySessionStatusDialog?.dismiss()
@@ -491,7 +506,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
 
                         refreshView( config )
 
-                        NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded))
+                        composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.import_succeeded), buttonText = resources.getString(R.string.ok),)
                     }
                 }
             }
@@ -625,11 +640,11 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                         zipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { success ->
                             if (success)
                             {
-                                NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.export_succeeded))
+                                composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded), buttonText = resources.getString(R.string.ok),)
                             }
                             else
                             {
-                                NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed), buttonText = resources.getString(R.string.ok),)
                             }
 
                             nearbySessionStatusDialog?.dismiss()
@@ -671,7 +686,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                     if (errorCode != ErrorCode.None)
                                     {
                                         val message = if (errorCode == ErrorCode.DecryptError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
-                                        NotificationDialog( activity!!, resources.getString(R.string.error), message)
+                                        composableNotificationDialogHost.show(title = resources.getString(R.string.error), message = message, buttonText = resources.getString(R.string.ok),)
                                     }
                                 }
                                 else
@@ -683,7 +698,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                     	refreshView( it )
                                     }
 
-                                    NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded))
+                                    composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.import_succeeded), buttonText = resources.getString(R.string.ok),)
                                 }
 
                                 nearbySessionStatusDialog?.dismiss()
@@ -695,7 +710,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                         catch( ex: java.lang.Exception )
                         {
                             binding.progressOverlayView.visibility = View.GONE
-                            InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                            composableNotificationDialogHost.show(title = resources.getString(R.string.error), message = resources.getString(R.string.import_failed), buttonText = resources.getString(R.string.ok),)
                         }
                     }
                 }
