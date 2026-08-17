@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -29,12 +30,13 @@ import edu.gtri.gpssample.databinding.FragmentSignUpBinding
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
+import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 
 class SignUpFragment : Fragment()
 {
     private lateinit var role: String
     private lateinit var viewModel: SignUpViewModel
-
+    private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
     private var _binding: FragmentSignUpBinding? = null
     private val binding get() = _binding!!
 
@@ -53,6 +55,14 @@ class SignUpFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        composableNotificationDialogHost = ComposableNotificationDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableNotificationDialogHost.Content()
+        }
 
         arguments?.getString(Keys.kRole.value)?.let { role ->
             this.role = role
@@ -105,7 +115,11 @@ class SignUpFragment : Fragment()
         }
 
         binding.pinTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.pin_hint))
+            composableNotificationDialogHost.show(
+                title = "",
+                message = resources.getString(R.string.pin_hint),
+                buttonText = resources.getString(R.string.ok),
+            )
         }
 
         binding.nextButton.setOnClickListener {

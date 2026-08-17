@@ -20,6 +20,7 @@ import android.widget.RadioButton
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.mapbox.maps.Style
@@ -31,25 +32,34 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentMainBinding
-import edu.gtri.gpssample.dialogs.NotificationDialog
 import androidx.core.content.edit
+import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 
 class MainFragment : Fragment()
 {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
+    private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
+
     private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         val key = "IsFirstRun"
         val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", Context.MODE_PRIVATE)
+
         if (sharedPreferences.getBoolean(key, true ))
         {
             sharedPreferences.edit(commit = true) { putBoolean(key, false) }
+
             var privacyPolicyStatement = resources.getString( R.string.privacy_policy_statement_1_5 ) + "\n"
             privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_2_5 ) + "\n"
             privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_3_5 ) + "\n"
             privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_4_5 ) + "\n"
             privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_5_5 ) + "\n"
-            NotificationDialog(requireActivity(), resources.getString(R.string.background_location_permission), privacyPolicyStatement )
+
+            composableNotificationDialogHost.show(
+                title = resources.getString(R.string.background_location_permission),
+                message = privacyPolicyStatement,
+                buttonText = resources.getString(R.string.ok),
+            )
         }
     }
 
@@ -79,6 +89,14 @@ class MainFragment : Fragment()
         super.onViewCreated(view, savedInstanceState)
 
         requireActivity().setTitle( "GPSSample" )
+
+        composableNotificationDialogHost = ComposableNotificationDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableNotificationDialogHost.Content()
+        }
 
         binding.appVersionTextView.text = resources.getString(R.string.app_version) + " " + BuildConfig.VERSION_NAME
         binding.dbVersionTextView.text = resources.getString(R.string.db_version) + " #" + DAO.DATABASE_VERSION
@@ -182,7 +200,11 @@ class MainFragment : Fragment()
         }
 
         binding.selectRoleTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.role_hint))
+            composableNotificationDialogHost.show(
+                title = "",
+                message = resources.getString(R.string.role_hint),
+                buttonText = resources.getString(R.string.ok),
+            )
         }
 
         val radioButtons = listOf(
@@ -225,19 +247,35 @@ class MainFragment : Fragment()
         binding.dataCollectorTip.isFocusable = true
 
         binding.adminTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.admin_hint))
+            composableNotificationDialogHost.show(
+                title = "",
+                message = resources.getString(R.string.admin_hint),
+                buttonText = resources.getString(R.string.ok),
+            )
         }
 
         binding.supervisorTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.supervisor_hint))
+            composableNotificationDialogHost.show(
+                title = "",
+                message = resources.getString(R.string.supervisor_hint),
+                buttonText = resources.getString(R.string.ok),
+            )
         }
 
         binding.enumeratorTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.enumerator_hint))
+            composableNotificationDialogHost.show(
+                title = "",
+                message = resources.getString(R.string.enumerator_hint),
+                buttonText = resources.getString(R.string.ok),
+            )
         }
 
         binding.dataCollectorTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.data_collector_hint))
+            composableNotificationDialogHost.show(
+                title = "",
+                message = resources.getString(R.string.data_collector_hint),
+                buttonText = resources.getString(R.string.ok),
+            )
         }
 
         binding.webpageLink.paintFlags = binding.webpageLink.paintFlags or Paint.UNDERLINE_TEXT_FLAG

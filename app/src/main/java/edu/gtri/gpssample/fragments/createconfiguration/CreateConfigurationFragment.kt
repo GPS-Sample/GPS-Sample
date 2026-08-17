@@ -9,7 +9,6 @@ package edu.gtri.gpssample.fragments.createconfiguration
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
@@ -19,6 +18,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -35,9 +35,8 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.managers.MapManager
+import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,10 +48,9 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
 {
     private var _binding: FragmentCreateConfigurationBinding? = null
     private val binding get() = _binding!!
-    private var selectedStudy: Study? = null
-
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var manageStudiesAdapter: ManageStudiesAdapter
+    private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -82,34 +80,38 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
             createConfigurationFragment = this@CreateConfigurationFragment
         }
 
+        composableNotificationDialogHost = ComposableNotificationDialogHost()
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        binding.dialogComposeView.setContent { composableNotificationDialogHost.Content() }
+
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.minGpsPrecisionTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.gpsaccuracy_hint))
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.gpsaccuracy_hint), buttonText = resources.getString(R.string.ok),)
         }
 
         binding.encryptionPasswordTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.encryption_hint))
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.encryption_hint), buttonText = resources.getString(R.string.ok),)
         }
 
         binding.manualEntryTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.manual_hint))
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.manual_hint), buttonText = resources.getString(R.string.ok),)
         }
 
         binding.subaddressTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.subaddress_hint))
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.subaddress_hint), buttonText = resources.getString(R.string.ok),)
         }
 
         binding.autoIncrementTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.autoincrement_hint))
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.autoincrement_hint), buttonText = resources.getString(R.string.ok),)
         }
 
         binding.proximityWarningHint.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.proximity_hint))
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.proximity_hint), buttonText = resources.getString(R.string.ok),)
         }
 
         binding.geofenceHint.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.geofence_hint))
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.geofence_hint), buttonText = resources.getString(R.string.ok),)
         }
 
         binding.cancelButton.setOnClickListener {
@@ -242,7 +244,6 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
 
         manageStudiesAdapter = ManageStudiesAdapter(listOf<Study>())
         manageStudiesAdapter.didSelectStudy = this::didSelectStudy
-        manageStudiesAdapter.shouldDeleteStudy = this::shouldDeleteStudy
 
         binding.studiesRecycler.itemAnimator = DefaultItemAnimator()
         binding.studiesRecycler.adapter = manageStudiesAdapter
@@ -262,22 +263,6 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
     {
         sharedViewModel.createStudyModel.setCurrentStudy(study)
         findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
-    }
-    private fun shouldDeleteStudy(study: Study)
-    {
-        selectedStudy = study
-        ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_study_message), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-            when( buttonPressed )
-            {
-                ConfirmationDialog.ButtonPress.Left -> {
-                }
-                ConfirmationDialog.ButtonPress.Right -> {
-                }
-                ConfirmationDialog.ButtonPress.None -> {
-                }
-            }
-        }
-
     }
 
     override fun onTouch(view: View?, motionEvent: MotionEvent?): Boolean {

@@ -6,23 +6,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import edu.gtri.gpssample.ui.GPSSampleComposeTheme
 
-class ComposableConfirmationDialogHost
+class ComposableSelectionDialogHost
 {
-    private var confirmation by mutableStateOf<Confirmation?>(null)
+    private var dialogContent by mutableStateOf<DialogContent?>(null)
 
     fun show(
         title: String?,
         message: String?,
-        leftButtonText: String,
-        rightButtonText: String,
+        items: List<String>,
         cancelable: Boolean = true,
         onResult: (String) -> Unit
     ) {
-        confirmation = Confirmation(
+        dialogContent = DialogContent(
             title = title,
             message = message,
-            leftButtonText = leftButtonText,
-            rightButtonText = rightButtonText,
+            items = items,
             cancelable = cancelable,
             onResult = onResult
         )
@@ -32,15 +30,14 @@ class ComposableConfirmationDialogHost
     fun Content()
     {
         GPSSampleComposeTheme {
-            confirmation?.let {
-                ComposableConfirmationDialog(
+            dialogContent?.let {
+                ComposableSelectionDialog(
                     title = it.title,
                     message = it.message,
-                    leftButtonText = it.leftButtonText,
-                    rightButtonText =  it.rightButtonText,
+                    items = it.items,
                     cancelable = it.cancelable,
                     onResult = { result ->
-                        confirmation = null
+                        dialogContent = null
                         it.onResult(result)
                     }
                 )
@@ -48,11 +45,10 @@ class ComposableConfirmationDialogHost
         }
     }
 
-    private data class Confirmation(
+    private data class DialogContent(
         val title: String?,
         val message: String?,
-        val leftButtonText: String,
-        val rightButtonText: String,
+        val items: List<String>,
         val cancelable: Boolean,
         val onResult: (String) -> Unit
     )

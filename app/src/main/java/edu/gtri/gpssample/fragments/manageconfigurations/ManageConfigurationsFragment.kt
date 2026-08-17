@@ -39,6 +39,7 @@ import edu.gtri.gpssample.managers.PerformanceManager
 import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableSelectionDialogHost
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
@@ -65,6 +66,7 @@ class ManageConfigurationsFragment : Fragment()
     private lateinit var composableInputDialogHost: ComposableInputDialogHost
     private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
+    private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -102,16 +104,18 @@ class ManageConfigurationsFragment : Fragment()
         }
 
         composableInputDialogHost = ComposableInputDialogHost()
-        binding.inputDialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-        binding.inputDialogComposeView.setContent { composableInputDialogHost.Content() }
-
+        composableSelectionDialogHost = ComposableSelectionDialogHost()
         composableNotificationDialogHost = ComposableNotificationDialogHost()
-        binding.notificationDialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-        binding.notificationDialogComposeView.setContent { composableNotificationDialogHost.Content() }
-
         composableConfirmationDialogHost = ComposableConfirmationDialogHost()
-        binding.confirmationDialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-        binding.confirmationDialogComposeView.setContent { composableConfirmationDialogHost.Content() }
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableInputDialogHost.Content()
+            composableSelectionDialogHost.Content()
+            composableNotificationDialogHost.Content()
+            composableConfirmationDialogHost.Content()
+        }
 
         val distanceFormats = resources.getTextArray( R.array.distance_formats )
         sharedViewModel.distanceFormats[0] = distanceFormats[0].toString()
@@ -262,11 +266,10 @@ class ManageConfigurationsFragment : Fragment()
 //            items.add(resources.getString(R.string.select_strata))
 //        }
 
-        composableConfirmationDialogHost.show(
+        composableSelectionDialogHost.show(
             title = config.name,
             message = null,
             items = items,
-            layoutVertically = true
         ) { selection ->
             if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
             {
@@ -327,7 +330,8 @@ class ManageConfigurationsFragment : Fragment()
         composableConfirmationDialogHost.show(
             title = resources.getString(R.string.delete_config),
             message = resources.getString(R.string.delete_configuration_message),
-            items = listOf(resources.getString(R.string.no), resources.getString(R.string.yes))
+            leftButtonText = resources.getString(R.string.no),
+            rightButtonText = resources.getString(R.string.yes),
         ) { selection ->
             if (selection == resources.getString(R.string.yes))
             {
@@ -354,7 +358,8 @@ class ManageConfigurationsFragment : Fragment()
         composableConfirmationDialogHost.show(
             title = resources.getString(R.string.clone_configuration),
             message = resources.getString(R.string.confirm_clone_configuration),
-            items = listOf(resources.getString(R.string.no), resources.getString(R.string.yes))
+            leftButtonText = resources.getString(R.string.no),
+            rightButtonText = resources.getString(R.string.yes),
         ) { selection ->
             if (selection == resources.getString(R.string.yes))
             {
@@ -735,11 +740,10 @@ class ManageConfigurationsFragment : Fragment()
             encryptionPassword = password
         }
 
-        composableConfirmationDialogHost.show(
+        composableSelectionDialogHost.show(
             title = resources.getString(R.string.import_configuration),
             message = resources.getString(R.string.select_import_method),
             items = listOf(resources.getString(R.string.qr_code), resources.getString(R.string.file_system)),
-            layoutVertically = true
         ) { selection ->
             if (selection == resources.getString(R.string.qr_code))
             {

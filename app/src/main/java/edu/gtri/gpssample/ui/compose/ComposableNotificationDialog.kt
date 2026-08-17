@@ -1,15 +1,16 @@
 package edu.gtri.gpssample.ui.compose
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,13 +21,11 @@ import androidx.compose.ui.window.DialogProperties
 fun ComposableNotificationDialog(
     title: String?,
     message: String?,
-    buttonText: String,
+    buttonText: String = "OK",
     onDismiss: () -> Unit
 ) {
     Dialog(
-        onDismissRequest = {
-            onDismiss()
-        },
+        onDismissRequest = onDismiss,
         properties = DialogProperties(
             dismissOnBackPress = false,
             dismissOnClickOutside = false
@@ -34,48 +33,39 @@ fun ComposableNotificationDialog(
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(4.dp),
-            color = MaterialTheme.colorScheme.surface
+            shape = MaterialTheme.shapes.extraLarge,
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 6.dp
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.padding(20.dp)
             ) {
-                Spacer(modifier = Modifier.height(20.dp))
-
-                if (!title.isNullOrEmpty())
-                {
+                if (!title.isNullOrEmpty()) {
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(
-                            start = 20.dp,
-                            end = 20.dp,
-                            bottom = 20.dp
-                        )
+                        style = MaterialTheme.typography.titleLarge
                     )
+
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
+
                 if (!message.isNullOrEmpty())
                 {
                     Text(
                         text = message,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(
-                            start = 20.dp,
-                            end = 20.dp
-                        )
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
 
-                Button(
-                    onClick = {
-                        onDismiss()
-                    },
-                    modifier = Modifier
-                        .padding(all = 20.dp)
-                        .fillMaxWidth()
-                        .height(60.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
                 ) {
-                    Text(buttonText)
+                    TextButton(
+                        onClick = onDismiss
+                    ) {
+                        Text(buttonText.uppercase())
+                    }
                 }
             }
         }
