@@ -24,15 +24,15 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import edu.gtri.gpssample.R
 
 @Composable
 fun ComposableCheckboxDialog(
     title: String?,
     items: List<String>,
-    cancelButtonText: String,
-    continueButtonText: String,
     isChecked: List<Boolean> = emptyList(),
     onCancel: () -> Unit,
     onContinue: (ArrayList<String>) -> Unit
@@ -122,7 +122,7 @@ fun ComposableCheckboxDialog(
                     TextButton(
                         onClick = onCancel
                     ) {
-                        Text(cancelButtonText)
+                        Text(stringResource(R.string.cancel))
                     }
 
                     Button(
@@ -138,7 +138,7 @@ fun ComposableCheckboxDialog(
                             onContinue(selections)
                         }
                     ) {
-                        Text(continueButtonText)
+                        Text(stringResource(R.string.continue_button))
                     }
                 }
             }

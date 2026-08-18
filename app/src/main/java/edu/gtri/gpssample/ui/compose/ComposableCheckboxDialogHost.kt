@@ -13,16 +13,12 @@ class ComposableCheckboxDialogHost
     fun show(
         title: String?,
         items: List<String>,
-        cancelButtonText: String,
-        continueButtonText: String,
         isChecked: List<Boolean> = emptyList(),
         onContinue: (ArrayList<String>) -> Unit
     ) {
         dialogContent = DialogContent(
             title = title,
             items = items,
-            cancelButtonText = cancelButtonText,
-            continueButtonText = continueButtonText,
             isChecked = isChecked,
             onContinue = onContinue
         )
@@ -36,8 +32,6 @@ class ComposableCheckboxDialogHost
                 ComposableCheckboxDialog(
                     title = it.title,
                     items = it.items,
-                    cancelButtonText = it.cancelButtonText,
-                    continueButtonText = it.continueButtonText,
                     isChecked = it.isChecked,
                     onCancel = {
                         dialogContent = null
@@ -54,8 +48,6 @@ class ComposableCheckboxDialogHost
     private data class DialogContent(
         val title: String?,
         val items: List<String>,
-        val cancelButtonText: String,
-        val continueButtonText: String,
         val isChecked: List<Boolean> = emptyList(),
         val onContinue: (ArrayList<String>) -> Unit
     )

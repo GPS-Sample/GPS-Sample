@@ -13,15 +13,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import edu.gtri.gpssample.R
 
 @Composable
 fun ComposableNotificationDialog(
     title: String?,
     message: String?,
-    buttonText: String = "OK",
     onDismiss: () -> Unit
 ) {
     Dialog(
@@ -64,7 +65,7 @@ fun ComposableNotificationDialog(
                     TextButton(
                         onClick = onDismiss
                     ) {
-                        Text(buttonText.uppercase())
+                        Text(stringResource(R.string.save).uppercase())
                     }
                 }
             }

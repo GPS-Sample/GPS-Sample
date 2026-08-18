@@ -55,11 +55,7 @@ class MainFragment : Fragment()
             privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_4_5 ) + "\n"
             privacyPolicyStatement += resources.getString( R.string.privacy_policy_statement_5_5 ) + "\n"
 
-            composableNotificationDialogHost.show(
-                title = resources.getString(R.string.background_location_permission),
-                message = privacyPolicyStatement,
-                buttonText = resources.getString(R.string.ok),
-            )
+            composableNotificationDialogHost.show(title = resources.getString(R.string.background_location_permission), message = privacyPolicyStatement)
         }
     }
 
@@ -200,11 +196,7 @@ class MainFragment : Fragment()
         }
 
         binding.selectRoleTip.setOnClickListener {
-            composableNotificationDialogHost.show(
-                title = "",
-                message = resources.getString(R.string.role_hint),
-                buttonText = resources.getString(R.string.ok),
-            )
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.role_hint))
         }
 
         val radioButtons = listOf(
@@ -247,35 +239,19 @@ class MainFragment : Fragment()
         binding.dataCollectorTip.isFocusable = true
 
         binding.adminTip.setOnClickListener {
-            composableNotificationDialogHost.show(
-                title = "",
-                message = resources.getString(R.string.admin_hint),
-                buttonText = resources.getString(R.string.ok),
-            )
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.admin_hint))
         }
 
         binding.supervisorTip.setOnClickListener {
-            composableNotificationDialogHost.show(
-                title = "",
-                message = resources.getString(R.string.supervisor_hint),
-                buttonText = resources.getString(R.string.ok),
-            )
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.supervisor_hint))
         }
 
         binding.enumeratorTip.setOnClickListener {
-            composableNotificationDialogHost.show(
-                title = "",
-                message = resources.getString(R.string.enumerator_hint),
-                buttonText = resources.getString(R.string.ok),
-            )
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.enumerator_hint))
         }
 
         binding.dataCollectorTip.setOnClickListener {
-            composableNotificationDialogHost.show(
-                title = "",
-                message = resources.getString(R.string.data_collector_hint),
-                buttonText = resources.getString(R.string.ok),
-            )
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.data_collector_hint))
         }
 
         binding.webpageLink.paintFlags = binding.webpageLink.paintFlags or Paint.UNDERLINE_TEXT_FLAG

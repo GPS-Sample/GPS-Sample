@@ -115,11 +115,7 @@ class SignUpFragment : Fragment()
         }
 
         binding.pinTip.setOnClickListener {
-            composableNotificationDialogHost.show(
-                title = "",
-                message = resources.getString(R.string.pin_hint),
-                buttonText = resources.getString(R.string.ok),
-            )
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.pin_hint))
         }
 
         binding.nextButton.setOnClickListener {

@@ -254,8 +254,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                 title = "Select Export Items",
                                 items = items,
                                 isChecked = emptyList(),
-                                cancelButtonText = resources.getString(R.string.cancel),
-                                continueButtonText = resources.getString(R.string.continue_button),
                                 onContinue = { selections ->
                                     includeConfig = false
                                     includeImages = false
@@ -293,11 +291,11 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                                 zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages ) { success ->
                                                     if (success)
                                                     {
-                                                        composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded), buttonText = resources.getString(R.string.ok),)
+                                                        composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded))
                                                     }
                                                     else
                                                     {
-                                                        composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed), buttonText = resources.getString(R.string.ok),)
+                                                        composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
                                                     }
 
                                                     nearbySessionStatusDialog?.dismiss()
@@ -515,7 +513,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
 
                         refreshView( config )
 
-                        composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.import_succeeded), buttonText = resources.getString(R.string.ok),)
+                        composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.import_succeeded))
                     }
                 }
             }
@@ -651,11 +649,11 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                         zipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { success ->
                             if (success)
                             {
-                                composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded), buttonText = resources.getString(R.string.ok),)
+                                composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded))
                             }
                             else
                             {
-                                composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed), buttonText = resources.getString(R.string.ok),)
+                                composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
                             }
 
                             nearbySessionStatusDialog?.dismiss()
@@ -697,7 +695,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                     if (errorCode != ErrorCode.None)
                                     {
                                         val message = if (errorCode == ErrorCode.DecryptError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
-                                        composableNotificationDialogHost.show(title = resources.getString(R.string.error), message = message, buttonText = resources.getString(R.string.ok),)
+                                        composableNotificationDialogHost.show(title = resources.getString(R.string.error), message = message)
                                     }
                                 }
                                 else
@@ -709,7 +707,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                     	refreshView( it )
                                     }
 
-                                    composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.import_succeeded), buttonText = resources.getString(R.string.ok),)
+                                    composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.import_succeeded))
                                 }
 
                                 nearbySessionStatusDialog?.dismiss()
@@ -721,7 +719,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                         catch( ex: java.lang.Exception )
                         {
                             binding.progressOverlayView.visibility = View.GONE
-                            composableNotificationDialogHost.show(title = resources.getString(R.string.error), message = resources.getString(R.string.import_failed), buttonText = resources.getString(R.string.ok),)
+                            composableNotificationDialogHost.show(title = resources.getString(R.string.error), message = resources.getString(R.string.import_failed))
                         }
                     }
                 }

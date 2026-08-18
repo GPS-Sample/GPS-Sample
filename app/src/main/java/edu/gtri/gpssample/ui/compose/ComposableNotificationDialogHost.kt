@@ -12,13 +12,11 @@ class ComposableNotificationDialogHost
 
     fun show(
         title: String?,
-        message: String?,
-        buttonText: String
+        message: String?
     ) {
         dialogContent = DialogContent(
             title = title,
-            message = message,
-            buttonText = buttonText
+            message = message
         )
     }
 
@@ -30,7 +28,6 @@ class ComposableNotificationDialogHost
                 ComposableNotificationDialog(
                     title = it.title,
                     message = it.message,
-                    buttonText = it.buttonText,
                     onDismiss = {
                         dialogContent = null
                     }
@@ -41,7 +38,6 @@ class ComposableNotificationDialogHost
 
     private data class DialogContent(
         val title: String?,
-        val message: String?,
-        val buttonText: String,
+        val message: String?
     )
 }

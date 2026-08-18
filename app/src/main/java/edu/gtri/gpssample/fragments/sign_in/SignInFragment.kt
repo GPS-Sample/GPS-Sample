@@ -124,13 +124,9 @@ class SignInFragment : Fragment()
                                 {
                                     val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
                                     val pin = sharedPreferences.getInt( user.role!!, 0 )
-                                    composableNotificationDialogHost.show(
-                                        title = resources.getString(
+                                    composableNotificationDialogHost.show(title = resources.getString(
                                             R.string.your_pin_is
-                                        ),
-                                        message = pin.toString(),
-                                        buttonText = resources.getString(R.string.ok)
-                                    )                                }
+                                        ), message = pin.toString())                                }
                                 else
                                 {
                                     Toast.makeText(activity!!.applicationContext, resources.getString(R.string.incorrect_answer_message), Toast.LENGTH_SHORT).show()
