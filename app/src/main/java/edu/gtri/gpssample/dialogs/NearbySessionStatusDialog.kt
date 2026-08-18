@@ -79,7 +79,7 @@ class NearbySessionStatusDialog
         val statusTextView = view.findViewById<TextView>( R.id.status_text_view)
         statusTextView.setText( status )
 
-        val imageView = view.findViewById<ImageView>( R.id.image_view)
+        val imageView = view.findViewById<ImageView>( R.id.qr_image_view)
         imageView.visibility = View.GONE
     }
 
@@ -96,7 +96,7 @@ class NearbySessionStatusDialog
         val statusLinearLayout = view.findViewById<LinearLayout>( R.id.status_linear_layout )
         statusLinearLayout.visibility = View.GONE
 
-        val imageView = view.findViewById<ImageView>( R.id.image_view)
+        val imageView = view.findViewById<ImageView>( R.id.qr_image_view)
         imageView.visibility = View.VISIBLE
         imageView.setImageBitmap( qrgEncoder.bitmap )
     }
