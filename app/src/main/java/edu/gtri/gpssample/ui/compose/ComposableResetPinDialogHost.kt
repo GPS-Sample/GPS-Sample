@@ -6,26 +6,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import edu.gtri.gpssample.ui.GPSSampleComposeTheme
 
-class ComposableInputDialogHost
+class ComposableResetPinDialogHost
 {
     private var dialogContent by mutableStateOf<DialogContent?>(null)
 
     fun show(
         title: String?,
-        text: String,
-        required: Boolean = false,
-        inputTypeNumber: Boolean = false,
-        allowQr: Boolean = false,
-        cancelable: Boolean = true,
+        currentPin: String,
         onResult: (String) -> Unit
     ) {
         dialogContent = DialogContent(
             title = title,
-            text = text,
-            required = required,
-            inputTypeNumber = inputTypeNumber,
-            allowQr = allowQr,
-            cancelable = cancelable,
+            currentPin = currentPin,
             onResult = onResult
         )
     }
@@ -35,13 +27,9 @@ class ComposableInputDialogHost
     {
         GPSSampleComposeTheme {
             dialogContent?.let {
-                ComposableInputDialog(
+                ComposableResetPinDialog(
                     title = it.title,
-                    text = it.text,
-                    required = it.required,
-                    inputTypeNumber = it.inputTypeNumber,
-                    allowQr = it.allowQr,
-                    cancelable = it.cancelable,
+                    currentPin = it.currentPin,
                     onResult = { result ->
                         dialogContent = null
                         it.onResult(result)
@@ -53,11 +41,7 @@ class ComposableInputDialogHost
 
     private data class DialogContent(
         val title: String?,
-        val text: String,
-        val required: Boolean = true,
-        val inputTypeNumber: Boolean = false,
-        val allowQr: Boolean = false,
-        val cancelable: Boolean = true,
+        val currentPin: String,
         val onResult: (String) -> Unit
     )
 }

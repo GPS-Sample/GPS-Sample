@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
@@ -25,15 +26,21 @@ import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentSignInBinding
-import edu.gtri.gpssample.dialogs.InputDialog
-import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.dialogs.ResetPinDialog
+import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableResetPinDialogHost
+import kotlin.text.toInt
+import androidx.core.content.edit
 
 class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
 {
     private lateinit var expectedRole: String
     private var _binding: FragmentSignInBinding? = null
     private val binding get() = _binding!!
+    private lateinit var composableInputDialogHost: ComposableInputDialogHost
+    private lateinit var composableResetPinDialogHost: ComposableResetPinDialogHost
+    private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -49,6 +56,18 @@ class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        composableInputDialogHost = ComposableInputDialogHost()
+        composableResetPinDialogHost = ComposableResetPinDialogHost()
+        composableNotificationDialogHost = ComposableNotificationDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableInputDialogHost.Content()
+            composableResetPinDialogHost.Content()
+            composableNotificationDialogHost.Content()
+        }
 
         arguments?.getString(Keys.kRole.value)?.let { role ->
             this.expectedRole = role
@@ -92,27 +111,32 @@ class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
             else
             {
                 DAO.userDAO.getUser(userName)?.let {
-                    InputDialog( activity!!, false, it.recoveryQuestion, "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
-                        when (action) {
-                            InputDialog.Action.DidCancel -> {}
-                            InputDialog.Action.DidEnterText -> {
-                                val userName = binding.nameEditText.text.toString()
-                                val user = DAO.userDAO.getUser(userName)
+                    composableInputDialogHost.show(
+                        title = it.recoveryQuestion,
+                        text = ""
+                    ) { text ->
+                        if (text.isNotEmpty())
+                        {
+                            val userName = binding.nameEditText.text.toString()
+                            val user = DAO.userDAO.getUser(userName)
 
-                                user?.let {
-                                    if (text == it.recoveryAnswer)
-                                    {
-                                        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                                        val pin = sharedPreferences.getInt( user.role!!, 0 )
-                                        NotificationDialog( activity!!, resources.getString(R.string.your_pin_is), pin.toString())
-                                    }
-                                    else
-                                    {
-                                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.incorrect_answer_message), Toast.LENGTH_SHORT).show()
-                                    }
+                            user?.let {
+                                if (text == it.recoveryAnswer)
+                                {
+                                    val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                                    val pin = sharedPreferences.getInt( user.role!!, 0 )
+                                    composableNotificationDialogHost.show(
+                                        title = resources.getString(
+                                            R.string.your_pin_is
+                                        ),
+                                        message = pin.toString(),
+                                        buttonText = resources.getString(R.string.ok)
+                                    )                                }
+                                else
+                                {
+                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.incorrect_answer_message), Toast.LENGTH_SHORT).show()
                                 }
                             }
-                            InputDialog.Action.DidPressQRButton -> {}
                         }
                     }
                 } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.user_name_not_found), Toast.LENGTH_SHORT).show()
@@ -134,7 +158,24 @@ class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
                 DAO.userDAO.getUser(binding.nameEditText.text.toString())?.let { user ->
                     val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
                     val pin = sharedPreferences.getInt( user.role!!, 0 )
-                    ResetPinDialog( activity!!, pin.toString(), this@SignInFragment )
+
+                    composableResetPinDialogHost.show(
+                        title = resources.getString(R.string.reset_pin),
+                        currentPin = pin.toString()
+                    ) { text ->
+                        if (text.isNotEmpty())
+                        {
+                            val userName = binding.nameEditText.text.toString()
+                            val user = DAO.userDAO.getUser(userName)
+
+                            user?.let {
+                                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                                sharedPreferences.edit(commit = true) {
+                                    putInt(user.role, text.toInt())
+                                }
+                            }
+                        }
+                    }
                 } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.user_name_not_found), Toast.LENGTH_SHORT).show()
             }
         }

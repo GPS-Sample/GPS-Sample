@@ -198,9 +198,7 @@ class ManageConfigurationsFragment : Fragment()
 
                 composableInputDialogHost.show(
                     title = resources.getString(R.string.enter_encryption_password),
-                    text = encryptionPassword,
-                    leftButton = resources.getString(R.string.cancel),
-                    rightButton = resources.getString(R.string.save)
+                    text = encryptionPassword
                 ) { text ->
                     if (text.isNotEmpty())
                     {
@@ -620,19 +618,11 @@ class ManageConfigurationsFragment : Fragment()
                 {
                     if (enumAreas.isEmpty())
                     {
-                        composableNotificationDialogHost.show(
-                            title = resources.getString(R.string.oops),
-                            message = resources.getString(R.string.missing_enumeration_area),
-                            buttonText = resources.getString(R.string.ok),
-                        )
+                        composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.missing_enumeration_area), buttonText = resources.getString(R.string.ok),)
                     }
                     else if (studies.isEmpty())
                     {
-                        composableNotificationDialogHost.show(
-                            title = resources.getString(R.string.oops),
-                            message = resources.getString(R.string.missing_study),
-                            buttonText = resources.getString(R.string.ok),
-                        )
+                        composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.missing_study), buttonText = resources.getString(R.string.ok),)
                     }
                     else
                     {
@@ -680,19 +670,11 @@ class ManageConfigurationsFragment : Fragment()
                 {
                     if (enumAreas.isEmpty())
                     {
-                        composableNotificationDialogHost.show(
-                            title = resources.getString(R.string.oops),
-                            message = resources.getString(R.string.missing_enumeration_area),
-                            buttonText = resources.getString(R.string.ok),
-                        )
+                        composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.missing_enumeration_area), buttonText = resources.getString(R.string.ok),)
                     }
                     else if (studies.isEmpty())
                     {
-                        composableNotificationDialogHost.show(
-                            title = resources.getString(R.string.oops),
-                            message = resources.getString(R.string.missing_study),
-                            buttonText = resources.getString(R.string.ok),
-                        )
+                        composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.missing_study), buttonText = resources.getString(R.string.ok),)
                     }
                     else
                     {
@@ -704,11 +686,7 @@ class ManageConfigurationsFragment : Fragment()
 
                         if (collectionTeams.isEmpty())
                         {
-                            composableNotificationDialogHost.show(
-                                title = resources.getString(R.string.oops),
-                                message = resources.getString(R.string.missing_collection_team),
-                                buttonText = resources.getString(R.string.ok),
-                            )
+                            composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.missing_collection_team), buttonText = resources.getString(R.string.ok),)
                         }
                         else
                         {
@@ -796,11 +774,7 @@ class ManageConfigurationsFragment : Fragment()
                             if (errorCode != ErrorCode.None)
                             {
                                 val message = if (errorCode == ErrorCode.DecryptError) resources.getString(R.string.password_error ) else resources.getString(R.string.import_failed)
-                                composableNotificationDialogHost.show(
-                                    title = resources.getString(R.string.error),
-                                    message = message,
-                                    buttonText = resources.getString(R.string.ok),
-                                )
+                                composableNotificationDialogHost.show(title = resources.getString(R.string.error), message = message, buttonText = resources.getString(R.string.ok),)
                             }
                         }
                         else
@@ -826,22 +800,14 @@ class ManageConfigurationsFragment : Fragment()
                 catch( ex: java.lang.Exception )
                 {
                     binding.progressOverlayView.visibility = View.GONE
-                    composableNotificationDialogHost.show(
-                        title = resources.getString(R.string.error),
-                        message = resources.getString(R.string.import_failed),
-                        buttonText = resources.getString(R.string.ok),
-                    )
+                    composableNotificationDialogHost.show(title = resources.getString(R.string.error), message = resources.getString(R.string.import_failed), buttonText = resources.getString(R.string.ok),)
                 }
             }
         }
         else
         {
             binding.progressOverlayView.visibility = View.GONE
-            composableNotificationDialogHost.show(
-                title = resources.getString(R.string.error),
-                message = resources.getString(R.string.import_failed),
-                buttonText = resources.getString(R.string.ok),
-            )
+            composableNotificationDialogHost.show(title = resources.getString(R.string.error), message = resources.getString(R.string.import_failed), buttonText = resources.getString(R.string.ok),)
         }
     }
 

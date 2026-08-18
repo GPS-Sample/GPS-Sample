@@ -7,31 +7,32 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import edu.gtri.gpssample.R
 
 @Composable
 fun ComposableInputDialog(
     title: String?,
     text: String,
-    leftButton: String,
-    rightButton: String,
     required: Boolean = true,
     inputTypeNumber: Boolean = false,
     allowQr: Boolean = false,
@@ -55,22 +56,19 @@ fun ComposableInputDialog(
             color = MaterialTheme.colorScheme.surface
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding( all = 20.dp )
             ) {
-                Spacer(modifier = Modifier.height(20.dp))
-
                 if (!title.isNullOrEmpty())
                 {
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(
-                            start = 20.dp,
-                            end = 20.dp,
-                            bottom = 20.dp
-                        )
                     )
                 }
+
+                Spacer(modifier = Modifier.height(20.dp))
 
                 var textValue by remember { mutableStateOf(text) }
 
@@ -80,40 +78,29 @@ fun ComposableInputDialog(
                     value = textValue,
                     keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
                     textStyle = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(
-                        start = 20.dp,
-                        end = 20.dp,
-                        bottom = 20.dp
-                    ),
                     visualTransformation = PasswordVisualTransformation(),
                     onValueChange = { textValue = it }
                 )
 
+                Spacer(modifier = Modifier.height(20.dp))
+
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            start = 20.dp,
-                            end = 20.dp,
-                            bottom = 20.dp
-                        ),
-                    horizontalArrangement = Arrangement.spacedBy(20.dp)
+                    modifier = Modifier.
+                        fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
                 ) {
-                    Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(60.dp),
+                    TextButton(
                         onClick = {
                             onResult("")
                         }
                     ) {
-                        Text(leftButton)
+                        Text(
+                            text = stringResource(R.string.cancel),
+                            fontWeight = FontWeight.Medium
+                        )
                     }
 
                     Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(60.dp),
                         onClick = {
                             if (!required || (textValue.length > 0))
                             {
@@ -121,7 +108,10 @@ fun ComposableInputDialog(
                             }
                         }
                     ) {
-                        Text(rightButton)
+                        Text(
+                            text = stringResource(R.string.save),
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 }
             }
