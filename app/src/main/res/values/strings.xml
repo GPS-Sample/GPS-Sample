@@ -524,6 +524,7 @@
     <string name="clone">"Clone"</string>
     <string name="configuration">"Configuration"</string>
 
+    // This needs to be update!
     <string name="enter_new_pin">"Enter New PIN"</string>
 
     <string-array name="forgot_pin_questions">
