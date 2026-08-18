@@ -230,7 +230,6 @@
     <string name="launch_survey">"Launch Survey"</string>
     <string name="mark_as_incomplete">"Mark as Incomplete"</string>
     <string name="enter_current_pin">"Enter Current Pin"</string>
-    <string name="enter_new_pin">"Re-Enter New PIN"</string>
     <string name="re_enter_new_pin">"Re-Enter New PIN"</string>
     <string name="select_a_time">"Select a Time"</string>
     <string name="UUID">"UUID"</string>
@@ -524,6 +523,9 @@
     <string name="edit">"Edit"</string>
     <string name="clone">"Clone"</string>
     <string name="configuration">"Configuration"</string>
+
+    <string name="enter_new_pin">"Enter New PIN"</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

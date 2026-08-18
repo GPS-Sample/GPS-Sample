@@ -26,14 +26,13 @@ import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentSignInBinding
-import edu.gtri.gpssample.dialogs.ResetPinDialog
 import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableResetPinDialogHost
 import kotlin.text.toInt
 import androidx.core.content.edit
 
-class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
+class SignInFragment : Fragment()
 {
     private lateinit var expectedRole: String
     private var _binding: FragmentSignInBinding? = null
@@ -290,22 +289,6 @@ class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
             Role.Supervisor.value -> activity!!.setTitle( "${resources.getString(R.string.supervisor)}" )
             Role.Enumerator.value -> activity!!.setTitle( "${resources.getString(R.string.enumerator)}" )
             Role.DataCollector.value -> activity!!.setTitle( "${resources.getString(R.string.data_collector)}" )
-        }
-    }
-
-    override fun didUpdatePin( pin: String )
-    {
-        if (pin.isNotEmpty())
-        {
-            val userName = binding.nameEditText.text.toString()
-            val user = DAO.userDAO.getUser(userName)
-
-            user?.let {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                val editor = sharedPreferences.edit()
-                editor.putInt( user.role, pin.toInt())
-                editor.commit()
-            }
         }
     }
 

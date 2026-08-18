@@ -76,10 +76,10 @@ fun ComposableResetPinDialog(
                     isError = oldPinError,
                     supportingText = {
                         if (oldPinError) {
-                            Text("Incorrect current PIN")
+                            Text(stringResource(R.string.pin_incorrect))
                         }
                     },
-                    placeholder = { Text("Enter your old PIN") },
+                    placeholder = { Text(stringResource(R.string.enter_pin)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 )
 
@@ -100,7 +100,7 @@ fun ComposableResetPinDialog(
                             Text("Please enter a PIN")
                         }
                     },
-                    placeholder = { Text("Enter your new PIN") },
+                    placeholder = { Text(stringResource(R.string.enter_pin)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 )
 
@@ -121,13 +121,13 @@ fun ComposableResetPinDialog(
                     isError = pin2Missing || pinMismatch,
                     supportingText = {
                         if (pin2Missing) {
-                            Text("Please enter a PIN")
+                            Text(stringResource(R.string.enter_pin))
                         }
                         else if (pinMismatch) {
-                            Text("PINs do not match")
+                            Text(stringResource(R.string.pin_not_match))
                         }
                     },
-                    placeholder = { Text("Re-Enter your new PIN") },
+                    placeholder = { Text(stringResource(R.string.reenter_pin)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 )
 
