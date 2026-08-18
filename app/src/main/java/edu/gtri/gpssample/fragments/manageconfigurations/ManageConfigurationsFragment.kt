@@ -332,6 +332,7 @@ class ManageConfigurationsFragment : Fragment()
             message = resources.getString(R.string.delete_configuration_message),
             leftButtonText = resources.getString(R.string.no),
             rightButtonText = resources.getString(R.string.yes),
+            destructive = true
         ) { selection ->
             if (selection == resources.getString(R.string.yes))
             {

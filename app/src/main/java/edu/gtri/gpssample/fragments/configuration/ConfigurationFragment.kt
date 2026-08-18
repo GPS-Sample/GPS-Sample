@@ -44,13 +44,12 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.EnumAreaDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
-import edu.gtri.gpssample.dialogs.CheckboxDialog
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionClientManager
 import edu.gtri.gpssample.managers.NearbySessionHostManager
 import edu.gtri.gpssample.managers.PerformanceManager
+import edu.gtri.gpssample.ui.compose.ComposableCheckboxDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableSelectionDialogHost
@@ -78,6 +77,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
     private var includeImages = false
     private val REQUEST_CODE_PICK_CONFIG_DIR    = 1001
     private val REQUEST_CONFIGURATION           = 1003
+    private lateinit var composableCheckboxDialogHost: ComposableCheckboxDialogHost
     private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
     private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
@@ -110,6 +110,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
             return
         }
 
+        composableCheckboxDialogHost = ComposableCheckboxDialogHost()
         composableSelectionDialogHost = ComposableSelectionDialogHost()
         composableNotificationDialogHost = ComposableNotificationDialogHost()
         composableConfirmationDialogHost = ComposableConfirmationDialogHost()
@@ -117,6 +118,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
         binding.dialogComposeView.setContent {
+            composableCheckboxDialogHost.Content()
             composableSelectionDialogHost.Content()
             composableNotificationDialogHost.Content()
             composableConfirmationDialogHost.Content()
@@ -194,8 +196,12 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
         }
 
         binding.exportButton.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString(R.string.export_configuration), resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
-                sharedViewModel.currentConfiguration?.value?.let{ config ->
+            composableSelectionDialogHost.show(
+                title = resources.getString(R.string.export_configuration),
+                message = resources.getString(R.string.select_export_message),
+                items = listOf(resources.getString(R.string.qr_code), resources.getString(R.string.file_system)),
+            ) { selection ->
+                sharedViewModel.currentConfiguration?.value?.let { config ->
                     config.selectedEnumAreaUuid = ""
 
                     sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
@@ -207,8 +213,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                     viewLifecycleOwner.lifecycleScope.launch {
                         withContext(Dispatchers.IO) {
                             // this may take a while...
-                            for (enumArea in config.enumAreas)
-                            {
+                            for (enumArea in config.enumAreas) {
                                 enumArea.selectedEnumerationTeamUuid = ""
                                 enumArea.selectedCollectionTeamUuid = ""
                             }
@@ -218,35 +223,40 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
 
                         binding.progressOverlayView.visibility = View.GONE
 
-                        when( buttonPressed )
-                        {
-                            ConfirmationDialog.ButtonPress.Left -> {
-                                nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
-                                    nearbySessionHostManager?.stopHosting()
-                                    nearbySessionStatusDialog = null
-                                }
-
-                                config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
-
-                                nearbySessionHostManager = NearbySessionHostManager( requireContext().applicationContext, config )
-
-                                viewLifecycleOwner.lifecycleScope.launch {
-                                    repeatOnLifecycle(Lifecycle.State.STARTED )
-                                    {
-                                        nearbySessionHostManager?.state?.collect { state ->
-                                            nearbySessionStatusDialog?.updateState(state)
-                                        }
-                                    }
-                                }
-
-                                nearbySessionHostManager?.startHosting()
+                        if (selection == resources.getString(R.string.qr_code)) {
+                            nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
+                                nearbySessionHostManager?.stopHosting()
+                                nearbySessionStatusDialog = null
                             }
 
-                            ConfirmationDialog.ButtonPress.Right -> {
-                                val items = ArrayList<String>()
-                                items.add( "Configuration Files" )
-                                items.add( "Image Files" )
-                                CheckboxDialog( activity!!, "Select the file types to export", items ) { selections ->
+                            config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
+
+                            nearbySessionHostManager = NearbySessionHostManager( requireContext().applicationContext, config )
+
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                repeatOnLifecycle(Lifecycle.State.STARTED )
+                                {
+                                    nearbySessionHostManager?.state?.collect { state ->
+                                        nearbySessionStatusDialog?.updateState(state)
+                                    }
+                                }
+                            }
+
+                            nearbySessionHostManager?.startHosting()
+                        }
+                        else if (selection == resources.getString(R.string.file_system))
+                        {
+                            val items = ArrayList<String>()
+                            items.add( "Configuration Files" )
+                            items.add( "Image Files" )
+
+                            composableCheckboxDialogHost.show(
+                                title = "Select Export Items",
+                                items = items,
+                                isChecked = emptyList(),
+                                cancelButtonText = resources.getString(R.string.cancel),
+                                continueButtonText = resources.getString(R.string.continue_button),
+                                onContinue = { selections ->
                                     includeConfig = false
                                     includeImages = false
 
@@ -257,54 +267,53 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
 
                                     if (includeConfig || includeImages)
                                     {
-                                        ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null, true) { buttonPressed, tag ->
-                                            when( buttonPressed )
+                                        composableSelectionDialogHost.show(
+                                            title = resources.getString(R.string.select_file_location),
+                                            message = "",
+                                            items = listOf(resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose)),
+                                        ) { selection ->
+                                            if (selection == resources.getString(R.string.default_location))
                                             {
-                                                ConfirmationDialog.ButtonPress.Left -> {
-                                                    config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
+                                                config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
 
-                                                    val zipUtils = ZipUtils()
+                                                val zipUtils = ZipUtils()
 
-                                                    nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.import_configuration )) {
-                                                        zipUtils.cancel()
-                                                    }
+                                                nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.import_configuration )) {
+                                                    zipUtils.cancel()
+                                                }
 
-                                                    viewLifecycleOwner.lifecycleScope.launch {
-                                                        zipUtils.state.collect { state ->
-                                                            nearbySessionStatusDialog?.updateState(state)
-                                                        }
-                                                    }
-
-                                                    PerformanceManager.startTimer()
-
-                                                    zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages ) { success ->
-                                                        if (success)
-                                                        {
-                                                            composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded), buttonText = resources.getString(R.string.ok),)
-                                                        }
-                                                        else
-                                                        {
-                                                            composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed), buttonText = resources.getString(R.string.ok),)
-                                                        }
-
-                                                        nearbySessionStatusDialog?.dismiss()
-                                                        nearbySessionStatusDialog = null
-
-                                                        Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
+                                                viewLifecycleOwner.lifecycleScope.launch {
+                                                    zipUtils.state.collect { state ->
+                                                        nearbySessionStatusDialog?.updateState(state)
                                                     }
                                                 }
-                                                ConfirmationDialog.ButtonPress.Right -> {
-                                                    exportToDevice()
+
+                                                PerformanceManager.startTimer()
+
+                                                zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages ) { success ->
+                                                    if (success)
+                                                    {
+                                                        composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded), buttonText = resources.getString(R.string.ok),)
+                                                    }
+                                                    else
+                                                    {
+                                                        composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed), buttonText = resources.getString(R.string.ok),)
+                                                    }
+
+                                                    nearbySessionStatusDialog?.dismiss()
+                                                    nearbySessionStatusDialog = null
+
+                                                    Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
                                                 }
-                                                ConfirmationDialog.ButtonPress.None -> {
-                                                }
+                                            }
+                                            else if (selection == resources.getString(R.string.let_me_choose))
+                                            {
+                                                exportToDevice()
                                             }
                                         }
                                     }
                                 }
-                            }
-                            ConfirmationDialog.ButtonPress.None -> {
-                            }
+                            )
                         }
                     }
                 }
@@ -543,7 +552,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
         return ""
     }
 
-    fun exportToDevice( )
+    fun exportToDevice()
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
 
@@ -594,17 +603,19 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                         config.enumAreas.add( enumArea )
                         config.selectedStudyUuid = study.uuid
                         sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-                        ConfirmationDialog( activity, resources.getString(R.string.select_task), "", resources.getString(R.string.client), resources.getString(R.string.survey), null, true ) { buttonPressed, tag ->
-                            when( buttonPressed )
+
+                        composableSelectionDialogHost.show(
+                            title = resources.getString(R.string.select_task),
+                            message = "",
+                            items = listOf(resources.getString(R.string.client), resources.getString(R.string.survey)),
+                        ) { selection ->
+                            if (selection == resources.getString(R.string.client))
                             {
-                                ConfirmationDialog.ButtonPress.Left -> {
-                                    findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamsFragment )
-                                }
-                                ConfirmationDialog.ButtonPress.Right -> {
-                                    findNavController().navigate( R.id.action_navigate_to_CreateSampleFragment )
-                                }
-                                ConfirmationDialog.ButtonPress.None -> {
-                                }
+                                findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamsFragment )
+                            }
+                            else if (selection == resources.getString(R.string.survey))
+                            {
+                                findNavController().navigate( R.id.action_navigate_to_CreateSampleFragment )
                             }
                         }
                     }

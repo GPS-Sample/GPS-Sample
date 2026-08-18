@@ -16,6 +16,7 @@ class ComposableConfirmationDialogHost
         leftButtonText: String,
         rightButtonText: String,
         cancelable: Boolean = true,
+        destructive: Boolean = false,
         onResult: (String) -> Unit
     ) {
         dialogContent = DialogContent(
@@ -24,6 +25,7 @@ class ComposableConfirmationDialogHost
             leftButtonText = leftButtonText,
             rightButtonText = rightButtonText,
             cancelable = cancelable,
+            destructive = destructive,
             onResult = onResult
         )
     }
@@ -39,6 +41,7 @@ class ComposableConfirmationDialogHost
                     leftButtonText = it.leftButtonText,
                     rightButtonText =  it.rightButtonText,
                     cancelable = it.cancelable,
+                    destructive = it.destructive,
                     onResult = { result ->
                         dialogContent = null
                         it.onResult(result)
@@ -54,6 +57,7 @@ class ComposableConfirmationDialogHost
         val leftButtonText: String,
         val rightButtonText: String,
         val cancelable: Boolean,
+        val destructive: Boolean,
         val onResult: (String) -> Unit
     )
 }

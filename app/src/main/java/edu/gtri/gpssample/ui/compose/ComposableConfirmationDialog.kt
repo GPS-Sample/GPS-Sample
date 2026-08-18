@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -27,6 +28,7 @@ fun ComposableConfirmationDialog(
     leftButtonText: String,
     rightButtonText: String,
     cancelable: Boolean = true,
+    destructive: Boolean = false,
     onResult: (String) -> Unit
 ) {
     Dialog(
@@ -77,15 +79,28 @@ fun ComposableConfirmationDialog(
                             onResult(leftButtonText)
                         }
                     ) {
-                        Text(leftButtonText.uppercase())
+                        Text(
+                            text = leftButtonText.uppercase(),
+                            fontWeight = FontWeight.Medium
+                        )
                     }
 
                     TextButton(
                         onClick = {
                             onResult(rightButtonText)
-                        }
+                        },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = if (destructive) {
+                                MaterialTheme.colorScheme.error
+                            } else {
+                                MaterialTheme.colorScheme.primary
+                            }
+                        )
                     ) {
-                        Text(rightButtonText.uppercase())
+                        Text(
+                            text = rightButtonText.uppercase(),
+                            fontWeight = FontWeight.Medium
+                            )
                     }
                 }
             }
