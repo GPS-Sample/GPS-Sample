@@ -33,7 +33,6 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
-import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
 import edu.gtri.gpssample.managers.NearbySessionClientManager
 import edu.gtri.gpssample.managers.NearbySessionState
 import edu.gtri.gpssample.managers.PerformanceManager
@@ -58,7 +57,6 @@ class ManageConfigurationsFragment : Fragment()
     private val binding get() = _binding!!
     private var minimalConfigurations = ArrayList<Config>()
     private var encryptionPassword = ""
-    private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private var nearbySessionClientManager: NearbySessionClientManager? = null
     private lateinit var user: User
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
@@ -758,13 +756,15 @@ class ManageConfigurationsFragment : Fragment()
                 {
                     val zipUtils = ZipUtils()
 
-                    nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.import_configuration )) {
+                    composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.import_configuration))
+                    {
                         zipUtils.cancel()
                     }
 
+
                     viewLifecycleOwner.lifecycleScope.launch {
                         zipUtils.state.collect { state ->
-                            nearbySessionStatusDialog?.updateState(state)
+                            composableNearbySessionStatusDialogHost.updateState(state)
                         }
                     }
 
@@ -796,8 +796,7 @@ class ManageConfigurationsFragment : Fragment()
                             didReceiveConfiguration( config )
                         }
 
-                        nearbySessionStatusDialog?.dismiss()
-                        nearbySessionStatusDialog = null
+                        composableNearbySessionStatusDialogHost.dismiss()
 
                         Log.d( "xxx", "Import time : ${PerformanceManager.elapsedTime()}")
                     }
@@ -818,8 +817,7 @@ class ManageConfigurationsFragment : Fragment()
 
     override fun onDestroyView()
     {
-        nearbySessionStatusDialog?.dismiss()
-        nearbySessionStatusDialog = null
+        composableNearbySessionStatusDialogHost.dismiss()
 
         nearbySessionClientManager?.cancel()
 

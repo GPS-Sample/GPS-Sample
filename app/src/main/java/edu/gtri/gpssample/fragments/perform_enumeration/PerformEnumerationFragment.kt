@@ -23,6 +23,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
@@ -56,6 +57,7 @@ import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionHostManager
 import edu.gtri.gpssample.managers.PerformanceManager
 import edu.gtri.gpssample.managers.TileServer
+import edu.gtri.gpssample.ui.compose.ComposableNearbySessionStatusDialogHost
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -95,11 +97,11 @@ class PerformEnumerationFragment : Fragment(),
     private var includeImages = false
     private var maxSubaddress = 0
     private var nearbySessionHostManager: NearbySessionHostManager? = null
-    private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
     private val selectedTeamNames = ArrayList<String>()
     private val selectedBreadcrumbs = ArrayList<Breadcrumb>()
     private var isShowingBreadcrumbs = false
+    private lateinit var composableNearbySessionStatusDialogHost: ComposableNearbySessionStatusDialogHost
 
     enum class BreadcrumbRecordingState
     {
@@ -131,6 +133,14 @@ class PerformEnumerationFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        composableNearbySessionStatusDialogHost = ComposableNearbySessionStatusDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableNearbySessionStatusDialogHost.Content()
+        }
 
         mapboxMapClickListener = MapManager.instance().createMapboxMapClickListener( binding.mapboxMapView, true )
 
@@ -567,9 +577,9 @@ class PerformEnumerationFragment : Fragment(),
                 when( buttonPressed )
                 {
                     ConfirmationDialog.ButtonPress.Left -> {
-                        nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
+                        composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
+                        {
                             nearbySessionHostManager?.stopHosting()
-                            nearbySessionStatusDialog = null
                         }
 
                         nearbySessionHostManager = NearbySessionHostManager( requireContext().applicationContext, config )
@@ -578,7 +588,7 @@ class PerformEnumerationFragment : Fragment(),
                             repeatOnLifecycle(Lifecycle.State.STARTED )
                             {
                                 nearbySessionHostManager?.state?.collect { state ->
-                                    nearbySessionStatusDialog?.updateState(state)
+                                    composableNearbySessionStatusDialogHost.updateState(state)
                                 }
                             }
                         }
@@ -607,13 +617,14 @@ class PerformEnumerationFragment : Fragment(),
                                         ConfirmationDialog.ButtonPress.Left -> {
                                             val zipUtils = ZipUtils()
 
-                                            nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.import_configuration )) {
+                                            composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
+                                            {
                                                 zipUtils.cancel()
                                             }
 
                                             viewLifecycleOwner.lifecycleScope.launch {
                                                 zipUtils.state.collect { state ->
-                                                    nearbySessionStatusDialog?.updateState(state)
+                                                    composableNearbySessionStatusDialogHost.updateState(state)
                                                 }
                                             }
 
@@ -629,8 +640,7 @@ class PerformEnumerationFragment : Fragment(),
                                                     NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
                                                 }
 
-                                                nearbySessionStatusDialog?.dismiss()
-                                                nearbySessionStatusDialog = null
+                                                composableNearbySessionStatusDialogHost.dismiss()
 
                                                 Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
                                             }
@@ -1255,13 +1265,14 @@ class PerformEnumerationFragment : Fragment(),
                     data?.data?.let { uri ->
                         val zipUtils = ZipUtils()
 
-                        nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
+                        composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
+                        {
                             zipUtils.cancel()
                         }
 
                         viewLifecycleOwner.lifecycleScope.launch {
                             zipUtils.state.collect { state ->
-                                nearbySessionStatusDialog?.updateState(state)
+                                composableNearbySessionStatusDialogHost.updateState(state)
                             }
                         }
 
@@ -1277,8 +1288,7 @@ class PerformEnumerationFragment : Fragment(),
                                 NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
                             }
 
-                            nearbySessionStatusDialog?.dismiss()
-                            nearbySessionStatusDialog = null
+                            composableNearbySessionStatusDialogHost.dismiss()
 
                             Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
                         }
@@ -1961,8 +1971,7 @@ class PerformEnumerationFragment : Fragment(),
         binding.mapboxMapView.gestures.removeOnMapClickListener(mapboxMapClickListener )
         binding.recyclerView.adapter = null
 
-        nearbySessionStatusDialog?.dismiss()
-        nearbySessionStatusDialog = null
+        composableNearbySessionStatusDialogHost.dismiss()
 
         nearbySessionHostManager?.stopHosting()
 
