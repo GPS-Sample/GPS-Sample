@@ -35,10 +35,12 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
 import edu.gtri.gpssample.managers.NearbySessionClientManager
+import edu.gtri.gpssample.managers.NearbySessionState
 import edu.gtri.gpssample.managers.PerformanceManager
 import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableNearbySessionStatusDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableSelectionDialogHost
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -67,6 +69,7 @@ class ManageConfigurationsFragment : Fragment()
     private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
     private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
+    private lateinit var composableNearbySessionStatusDialogHost: ComposableNearbySessionStatusDialogHost
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -107,6 +110,7 @@ class ManageConfigurationsFragment : Fragment()
         composableSelectionDialogHost = ComposableSelectionDialogHost()
         composableNotificationDialogHost = ComposableNotificationDialogHost()
         composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+        composableNearbySessionStatusDialogHost = ComposableNearbySessionStatusDialogHost()
 
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
@@ -115,6 +119,7 @@ class ManageConfigurationsFragment : Fragment()
             composableSelectionDialogHost.Content()
             composableNotificationDialogHost.Content()
             composableConfirmationDialogHost.Content()
+            composableNearbySessionStatusDialogHost.Content()
         }
 
         val distanceFormats = resources.getTextArray( R.array.distance_formats )
@@ -521,7 +526,7 @@ class ManageConfigurationsFragment : Fragment()
             result.data!!.getStringExtra(Keys.kPayload.value )?.let { sessionId ->
                 nearbySessionClientManager = NearbySessionClientManager( requireContext().applicationContext )
 
-                nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(),getString(R.string.import_configuration))
+                composableNearbySessionStatusDialogHost.show(title = getString(R.string.import_configuration))
                 {
                     nearbySessionClientManager?.cancel()
                 }
@@ -530,7 +535,7 @@ class ManageConfigurationsFragment : Fragment()
                     repeatOnLifecycle(Lifecycle.State.STARTED )
                     {
                         nearbySessionClientManager?.state?.collect { state ->
-                            nearbySessionStatusDialog?.updateState(state)
+                            composableNearbySessionStatusDialogHost.updateState(state)
                         }
                     }
                 }
@@ -538,7 +543,7 @@ class ManageConfigurationsFragment : Fragment()
                 PerformanceManager.startTimer()
 
                 nearbySessionClientManager?.connect( sessionId ) { config ->
-                    nearbySessionStatusDialog?.setStatus( "Saving Configuration..." )
+                    composableNearbySessionStatusDialogHost.updateState(NearbySessionState.Message("Saving Configuration..."))
 
                     viewLifecycleOwner.lifecycleScope.launch {
                         withContext(Dispatchers.IO)
@@ -550,7 +555,7 @@ class ManageConfigurationsFragment : Fragment()
 
                         Log.d("xxx", "Transfer time: ${PerformanceManager.elapsedTime()}")
 
-                        nearbySessionStatusDialog?.dismiss()
+                        composableNearbySessionStatusDialogHost.dismiss()
 
                         minimalConfigurations.find { it.uuid == config.uuid } ?.let {
                             minimalConfigurations.remove(it )

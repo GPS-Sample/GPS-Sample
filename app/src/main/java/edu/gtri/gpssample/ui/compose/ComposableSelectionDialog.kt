@@ -85,7 +85,7 @@ fun ComposableSelectionDialog(
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(60.dp)
+                                .height(50.dp)
                         ) {
                             Text(item)
                         }

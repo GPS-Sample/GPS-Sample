@@ -48,9 +48,11 @@ import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionClientManager
 import edu.gtri.gpssample.managers.NearbySessionHostManager
+import edu.gtri.gpssample.managers.NearbySessionState
 import edu.gtri.gpssample.managers.PerformanceManager
 import edu.gtri.gpssample.ui.compose.ComposableCheckboxDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableNearbySessionStatusDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableSelectionDialogHost
 import edu.gtri.gpssample.utils.ZipUtils
@@ -69,7 +71,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
     private var nearbySessionHostManager: NearbySessionHostManager? = null
-    private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
+//    private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private var nearbySessionClientManager: NearbySessionClientManager? = null
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
@@ -81,6 +83,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
     private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
     private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
+    private lateinit var composableNearbySessionStatusDialogHost: ComposableNearbySessionStatusDialogHost
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,6 +117,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
         composableSelectionDialogHost = ComposableSelectionDialogHost()
         composableNotificationDialogHost = ComposableNotificationDialogHost()
         composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+        composableNearbySessionStatusDialogHost = ComposableNearbySessionStatusDialogHost()
 
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
@@ -122,6 +126,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
             composableSelectionDialogHost.Content()
             composableNotificationDialogHost.Content()
             composableConfirmationDialogHost.Content()
+            composableNearbySessionStatusDialogHost.Content()
         }
 
         binding.apply {
@@ -224,9 +229,9 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                         binding.progressOverlayView.visibility = View.GONE
 
                         if (selection == resources.getString(R.string.qr_code)) {
-                            nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
+                            composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
+                            {
                                 nearbySessionHostManager?.stopHosting()
-                                nearbySessionStatusDialog = null
                             }
 
                             config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
@@ -237,7 +242,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                 repeatOnLifecycle(Lifecycle.State.STARTED )
                                 {
                                     nearbySessionHostManager?.state?.collect { state ->
-                                        nearbySessionStatusDialog?.updateState(state)
+                                        composableNearbySessionStatusDialogHost.updateState(state)
                                     }
                                 }
                             }
@@ -276,13 +281,14 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
 
                                                 val zipUtils = ZipUtils()
 
-                                                nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.import_configuration )) {
+                                                composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
+                                                {
                                                     zipUtils.cancel()
                                                 }
 
                                                 viewLifecycleOwner.lifecycleScope.launch {
                                                     zipUtils.state.collect { state ->
-                                                        nearbySessionStatusDialog?.updateState(state)
+                                                        composableNearbySessionStatusDialogHost.updateState(state)
                                                     }
                                                 }
 
@@ -298,8 +304,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                                         composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
                                                     }
 
-                                                    nearbySessionStatusDialog?.dismiss()
-                                                    nearbySessionStatusDialog = null
+                                                    composableNearbySessionStatusDialogHost.dismiss()
 
                                                     Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
                                                 }
@@ -470,7 +475,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
             it.data!!.getStringExtra(Keys.kPayload.value )?.let { sessionId ->
                 nearbySessionClientManager = NearbySessionClientManager( requireContext().applicationContext )
 
-                nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(),getString(R.string.import_configuration))
+                composableNearbySessionStatusDialogHost.show(title = getString(R.string.import_configuration))
                 {
                     nearbySessionClientManager?.cancel()
                 }
@@ -479,13 +484,13 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                     repeatOnLifecycle(Lifecycle.State.STARTED )
                     {
                         nearbySessionClientManager?.state?.collect { state ->
-                            nearbySessionStatusDialog?.updateState(state)
+                            composableNearbySessionStatusDialogHost.updateState(state)
                         }
                     }
                 }
 
                 nearbySessionClientManager?.connect( sessionId ) { config ->
-                    nearbySessionStatusDialog?.setStatus( "Saving Configuration..." )
+                    composableNearbySessionStatusDialogHost.updateState(NearbySessionState.Message("Saving Configuration..."))
 
                     var enumAreaSummaries : List<EnumAreaDAO.EnumAreaSummary>? = null
 
@@ -505,8 +510,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                             enumerationAreasAdapter.updateEnumAreas(it )
                         }
 
-                        nearbySessionStatusDialog?.dismiss()
-                        nearbySessionStatusDialog = null
+                        composableNearbySessionStatusDialogHost.dismiss()
 
                         sharedViewModel.setCurrentConfig( config )
 
@@ -634,13 +638,14 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
 
                         val zipUtils = ZipUtils()
 
-                        nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.export_configuration )) {
+                        composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.import_configuration))
+                        {
                             zipUtils.cancel()
                         }
 
                         viewLifecycleOwner.lifecycleScope.launch {
                             zipUtils.state.collect { state ->
-                                nearbySessionStatusDialog?.updateState(state)
+                                composableNearbySessionStatusDialogHost.updateState(state)
                             }
                         }
 
@@ -656,8 +661,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                 composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
                             }
 
-                            nearbySessionStatusDialog?.dismiss()
-                            nearbySessionStatusDialog = null
+                            composableNearbySessionStatusDialogHost.dismiss()
 
                             Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
                         }
@@ -674,13 +678,15 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                         {
                             val zipUtils = ZipUtils()
 
-                            nearbySessionStatusDialog = NearbySessionStatusDialog(requireContext(), resources.getString( R.string.import_configuration )) {
+                            composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.import_configuration))
+                            {
                                 zipUtils.cancel()
                             }
 
+
                             viewLifecycleOwner.lifecycleScope.launch {
                                 zipUtils.state.collect { state ->
-                                    nearbySessionStatusDialog?.updateState(state)
+                                    composableNearbySessionStatusDialogHost.updateState(state)
                                 }
                             }
 
@@ -710,8 +716,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                     composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.import_succeeded))
                                 }
 
-                                nearbySessionStatusDialog?.dismiss()
-                                nearbySessionStatusDialog = null
+                                composableNearbySessionStatusDialogHost.dismiss()
 
                                 Log.d( "xxx", "Import time : ${PerformanceManager.elapsedTime()}")
                             }
@@ -778,8 +783,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
     {
         binding.mapOverlayView.setOnTouchListener(null)
 
-        nearbySessionStatusDialog?.dismiss()
-        nearbySessionStatusDialog = null
+        composableNearbySessionStatusDialogHost.dismiss()
 
         nearbySessionHostManager?.stopHosting()
         nearbySessionClientManager?.cancel()
