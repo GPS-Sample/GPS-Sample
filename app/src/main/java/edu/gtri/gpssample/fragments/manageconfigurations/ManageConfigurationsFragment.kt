@@ -543,7 +543,7 @@ class ManageConfigurationsFragment : Fragment()
                 PerformanceManager.startTimer()
 
                 nearbySessionClientManager?.connect( sessionId ) { config ->
-                    composableNearbySessionStatusDialogHost.updateState(NearbySessionState.Message("Saving Configuration..."))
+                    composableNearbySessionStatusDialogHost.updateState(NearbySessionState.Message(resources.getString(R.string.saving_configuration)))
 
                     viewLifecycleOwner.lifecycleScope.launch {
                         withContext(Dispatchers.IO)

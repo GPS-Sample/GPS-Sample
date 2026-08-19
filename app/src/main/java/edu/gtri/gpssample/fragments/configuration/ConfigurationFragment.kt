@@ -44,7 +44,6 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.EnumAreaDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
-import edu.gtri.gpssample.dialogs.NearbySessionStatusDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionClientManager
 import edu.gtri.gpssample.managers.NearbySessionHostManager
@@ -71,7 +70,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
     private var nearbySessionHostManager: NearbySessionHostManager? = null
-//    private var nearbySessionStatusDialog: NearbySessionStatusDialog? = null
     private var nearbySessionClientManager: NearbySessionClientManager? = null
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
@@ -490,7 +488,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                 }
 
                 nearbySessionClientManager?.connect( sessionId ) { config ->
-                    composableNearbySessionStatusDialogHost.updateState(NearbySessionState.Message("Saving Configuration..."))
+                    composableNearbySessionStatusDialogHost.updateState(NearbySessionState.Message(resources.getString(R.string.saving_configuration)))
 
                     var enumAreaSummaries : List<EnumAreaDAO.EnumAreaSummary>? = null
 
