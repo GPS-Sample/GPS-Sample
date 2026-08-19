@@ -112,28 +112,32 @@ class SignInFragment : Fragment()
                 DAO.userDAO.getUser(userName)?.let {
                     composableInputDialogHost.show(
                         title = it.recoveryQuestion,
-                        text = ""
-                    ) { text ->
-                        if (text.isNotEmpty())
-                        {
-                            val userName = binding.nameEditText.text.toString()
-                            val user = DAO.userDAO.getUser(userName)
+                        text = "",
+                        onResult = { text ->
+                            if (text.isNotEmpty())
+                            {
+                                if (text.isNotEmpty())
+                                {
+                                    val userName = binding.nameEditText.text.toString()
+                                    val user = DAO.userDAO.getUser(userName)
 
-                            user?.let {
-                                if (text == it.recoveryAnswer)
-                                {
-                                    val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                                    val pin = sharedPreferences.getInt( user.role!!, 0 )
-                                    composableNotificationDialogHost.show(title = resources.getString(
-                                            R.string.your_pin_is
-                                        ), message = pin.toString())                                }
-                                else
-                                {
-                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.incorrect_answer_message), Toast.LENGTH_SHORT).show()
+                                    user?.let {
+                                        if (text == it.recoveryAnswer)
+                                        {
+                                            val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                                            val pin = sharedPreferences.getInt( user.role!!, 0 )
+                                            composableNotificationDialogHost.show(title = resources.getString(
+                                                R.string.your_pin_is
+                                            ), message = pin.toString())                                }
+                                        else
+                                        {
+                                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.incorrect_answer_message), Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
+                    )
                 } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.user_name_not_found), Toast.LENGTH_SHORT).show()
             }
         }

@@ -236,5 +236,10 @@
                 android:insetBottom="0dp"
                 android:text="@string/save" />
         </LinearLayout>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/dialog_compose_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
     </LinearLayout>
 </layout>

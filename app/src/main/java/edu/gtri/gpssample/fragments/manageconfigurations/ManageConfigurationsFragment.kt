@@ -201,13 +201,14 @@ class ManageConfigurationsFragment : Fragment()
 
                 composableInputDialogHost.show(
                     title = resources.getString(R.string.enter_encryption_password),
-                    text = encryptionPassword
-                ) { text ->
-                    if (text.isNotEmpty())
-                    {
-                        importConfiguration( text )
+                    text = encryptionPassword,
+                    onResult = { text ->
+                        if (text.isNotEmpty())
+                        {
+                            importConfiguration( text )
+                        }
                     }
-                }
+                )
             }
         }
     }

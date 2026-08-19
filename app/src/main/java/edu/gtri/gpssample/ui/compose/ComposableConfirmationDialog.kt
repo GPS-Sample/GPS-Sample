@@ -57,6 +57,7 @@ fun ComposableConfirmationDialog(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.fillMaxWidth()
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -67,6 +68,7 @@ fun ComposableConfirmationDialog(
                     Text(
                         text = message,
                         style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
 
