@@ -9,7 +9,6 @@ package edu.gtri.gpssample.fragments.sign_up
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,8 +27,6 @@ import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignUpBinding
 import edu.gtri.gpssample.database.models.User
-import edu.gtri.gpssample.dialogs.InputDialog
-import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 
 class SignUpFragment : Fragment()
