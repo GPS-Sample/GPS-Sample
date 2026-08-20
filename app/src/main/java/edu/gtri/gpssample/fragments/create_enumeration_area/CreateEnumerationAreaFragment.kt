@@ -58,6 +58,7 @@ import edu.gtri.gpssample.ui.compose.ComposableBusyIndicatorDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableCheckboxDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableDropdownDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableEnumAreaHelpDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableMapLegendDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableSelectionDialogHost
@@ -106,6 +107,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
     private lateinit var composableMapLegendDialogHost: ComposableMapLegendDialogHost
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
+    private lateinit var composableEnumAreaHelpDialogHost: ComposableEnumAreaHelpDialogHost
     private lateinit var composableBusyIndicatorDialogHost: ComposableBusyIndicatorDialogHost
     enum class TapType {
         None,
@@ -154,6 +156,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         composableSelectionDialogHost = ComposableSelectionDialogHost()
         composableMapLegendDialogHost = ComposableMapLegendDialogHost()
         composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+        composableEnumAreaHelpDialogHost = ComposableEnumAreaHelpDialogHost()
         composableBusyIndicatorDialogHost = ComposableBusyIndicatorDialogHost()
 
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -165,6 +168,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             composableSelectionDialogHost.Content()
             composableMapLegendDialogHost.Content()
             composableConfirmationDialogHost.Content()
+            composableEnumAreaHelpDialogHost.Content()
             composableBusyIndicatorDialogHost.Content()
         }
 
@@ -455,7 +459,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.helpButton.setOnClickListener {
-            CreateEnumAreaHelpDialog( activity!! )
+            composableEnumAreaHelpDialogHost.show()
         }
 
         binding.cancelButton.setOnClickListener {
