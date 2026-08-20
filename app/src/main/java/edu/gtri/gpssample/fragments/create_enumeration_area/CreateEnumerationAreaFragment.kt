@@ -108,6 +108,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
     private lateinit var composableEnumAreaHelpDialogHost: ComposableEnumAreaHelpDialogHost
     private lateinit var composableBusyIndicatorDialogHost: ComposableBusyIndicatorDialogHost
+
     enum class TapType {
         None,
         EditEnumArea,

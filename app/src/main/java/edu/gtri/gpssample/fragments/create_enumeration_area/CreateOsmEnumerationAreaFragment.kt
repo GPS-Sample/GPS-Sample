@@ -17,7 +17,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -28,29 +27,34 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.*
 import com.mapbox.maps.*
-import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.PreferencesManager
 import edu.gtri.gpssample.managers.TileServer
+import edu.gtri.gpssample.ui.compose.ComposableBusyIndicatorDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableCheckboxDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableDropdownDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableEnumAreaHelpDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableMapLegendDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableSelectionDialogHost
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import io.github.dellisd.spatialk.geojson.FeatureCollection
@@ -62,16 +66,9 @@ import org.json.JSONObject
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
-import org.osmdroid.events.MapListener
-import java.io.File
 import java.util.*
 
-class CreateOsmEnumerationAreaFragment : Fragment(),
-    View.OnTouchListener,
-    MapManager.MapTileCacheDelegate,
-    CheckboxDialog.CheckboxDialogDelegate,
-    SelectionDialog.SelectionDialogDelegate,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate
+class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapManager.MapTileCacheDelegate
 {
     private lateinit var mapView: View
     private lateinit var config: Config
@@ -81,17 +78,23 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     private var radius: Double = 0.0
     private val binding get() = _binding!!
     private var mapStyle = Style.MAPBOX_STREETS
-    private var inputDialog: InputDialog? = null
     private var selectedEnumArea: EnumArea? = null
-    private var checkboxDialog: CheckboxDialog? = null
     private var centerPoint: com.mapbox.geojson.Point? = null
     private var propertySelections = ArrayList<String>()
     private val unsavedEnumAreas = ArrayList<EnumArea>()
-    private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var droppedPoints = ArrayList<com.mapbox.geojson.Point>()
     private var _binding: FragmentCreateEnumerationAreaBinding? = null
     private val kEnumAreaNameTag: Int = 0
     private val kEnumAreaLengthTag: Int = 1
+
+    private lateinit var composableInputDialogHost: ComposableInputDialogHost
+    private lateinit var composableCheckboxDialogHost: ComposableCheckboxDialogHost
+    private lateinit var composableDropdownDialogHost: ComposableDropdownDialogHost
+    private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
+    private lateinit var composableMapLegendDialogHost: ComposableMapLegendDialogHost
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
+    private lateinit var composableEnumAreaHelpDialogHost: ComposableEnumAreaHelpDialogHost
+    private lateinit var composableBusyIndicatorDialogHost: ComposableBusyIndicatorDialogHost
 
     enum class TapType {
         None,
@@ -128,6 +131,28 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
             // Assign the view model to a property in the binding class
             viewModel = this.viewModel
+        }
+
+        composableInputDialogHost = ComposableInputDialogHost()
+        composableCheckboxDialogHost = ComposableCheckboxDialogHost()
+        composableDropdownDialogHost = ComposableDropdownDialogHost()
+        composableSelectionDialogHost = ComposableSelectionDialogHost()
+        composableMapLegendDialogHost = ComposableMapLegendDialogHost()
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+        composableEnumAreaHelpDialogHost = ComposableEnumAreaHelpDialogHost()
+        composableBusyIndicatorDialogHost = ComposableBusyIndicatorDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableInputDialogHost.Content()
+            composableCheckboxDialogHost.Content()
+            composableDropdownDialogHost.Content()
+            composableSelectionDialogHost.Content()
+            composableMapLegendDialogHost.Content()
+            composableConfirmationDialogHost.Content()
+            composableEnumAreaHelpDialogHost.Content()
+            composableBusyIndicatorDialogHost.Content()
         }
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -195,27 +220,22 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         }
 
         binding.deleteButton.setOnClickListener {
-            ConfirmationDialog( activity,
-                resources.getString(R.string.delete_all_enumeration_areas_message), "",
-                resources.getString(R.string.no),
-                resources.getString(R.string.yes),
-                null, false ) { buttonPressed, tag ->
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {
+            composableConfirmationDialogHost.show(
+                title = resources.getString(R.string.delete_all_enumeration_areas_message),
+                message = "",
+                leftButtonText = resources.getString(R.string.no),
+                rightButtonText = resources.getString(R.string.yes),
+                destructive = true
+            ) { selection ->
+                if (selection == resources.getString(R.string.yes)) {
+                    unsavedEnumAreas.clear()
+                    for (enumArea in config.enumAreas)
+                    {
+                        DAO.enumAreaDAO.delete( enumArea )
                     }
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        unsavedEnumAreas.clear()
-                        for (enumArea in config.enumAreas)
-                        {
-                            DAO.enumAreaDAO.delete( enumArea )
-                        }
-                        config.enumAreas.clear()
-                        PreferencesManager.removeAllHashes(config.uuid )
-                        refreshMap()
-                    }
-                    ConfirmationDialog.ButtonPress.None -> {
-                    }
+                    config.enumAreas.clear()
+                    PreferencesManager.removeAllHashes(config.uuid )
+                    refreshMap()
                 }
             }
         }
@@ -239,25 +259,24 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            ConfirmationDialog( activity,
-                resources.getString(R.string.select_file_type), "",
-                resources.getString(R.string.import_geojson),
-                resources.getString(R.string.import_mbtiles),
-                null, true ) { buttonPressed, tag ->
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {
-                        val intent = Intent()
-                            .setType("*/*")
-                            .setAction(Intent.ACTION_GET_CONTENT)
+            binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
 
-                        startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_enumeration)), 1023)
-                    }
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-                    }
-                    ConfirmationDialog.ButtonPress.None -> {
-                    }
+            composableSelectionDialogHost.show(
+                title = resources.getString(R.string.select_file_type),
+                message = null,
+                items = listOf(resources.getString(R.string.import_geojson),resources.getString(R.string.import_mbtiles)),
+            ) { selection ->
+                if (selection == resources.getString(R.string.import_geojson))
+                {
+                    val intent = Intent()
+                        .setType("*/*")
+                        .setAction(Intent.ACTION_GET_CONTENT)
+
+                    startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_enumeration)), 1023)
+                }
+                else if (selection == resources.getString(R.string.import_mbtiles))
+                {
+                    filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
                 }
             }
         }
@@ -265,26 +284,26 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         binding.createEnumAreaButton.setOnClickListener {
             if (currentTapType == TapType.None)
             {
-                droppedPoints.clear()
-                ConfirmationDialog( activity, resources.getString(R.string.creation_options), "", resources.getString(R.string.set_boundary), resources.getString(R.string.set_location), null, true ) { buttonPressed, tag ->
-                    when( buttonPressed )
+                composableSelectionDialogHost.show(
+                    title = resources.getString(R.string.creation_options),
+                    message = null,
+                    items = listOf(resources.getString(R.string.set_boundary),resources.getString(R.string.set_location)),
+                ) { selection ->
+                    if (selection == resources.getString(R.string.set_boundary))
                     {
-                        ConfirmationDialog.ButtonPress.Left -> {
-                            currentTapType = TapType.CreateEnumAreaBoundary
-                            binding.mapOverlayView.visibility = View.VISIBLE
-                            binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
-                            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                            Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_boundary), Toast.LENGTH_SHORT).show()
-                        }
-                        ConfirmationDialog.ButtonPress.Right -> {
-                            currentTapType = TapType.CreateEnumAreaLocation
-                            droppedPoints.clear()
-                            binding.mapOverlayView.visibility = View.VISIBLE
-                            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                            Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
-                        }
-                        ConfirmationDialog.ButtonPress.None -> {
-                        }
+                        currentTapType = TapType.CreateEnumAreaBoundary
+                        binding.mapOverlayView.visibility = View.VISIBLE
+                        binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
+                        binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_boundary), Toast.LENGTH_SHORT).show()
+                    }
+                    else if (selection == resources.getString(R.string.set_location))
+                    {
+                        currentTapType = TapType.CreateEnumAreaLocation
+                        droppedPoints.clear()
+                        binding.mapOverlayView.visibility = View.VISIBLE
+                        binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -314,20 +333,24 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                     }
                     else
                     {
-                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag ) { action, text, tag ->
-                            when (action) {
-                                InputDialog.Action.DidCancel -> {
+                        composableInputDialogHost.show(
+                            title = resources.getString(R.string.enter_enum_area_name),
+                            text = "",
+                            onQrClick = {
+                                val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                getResult.launch(intent)
+                            },
+                            onResult = { text ->
+                                if (text.isEmpty())
+                                {
                                     binding.createEnumAreaButton.backgroundTintList = defaultColorList
                                 }
-                                InputDialog.Action.DidEnterText -> {
+                                else
+                                {
                                     createEnumArea( TapType.CreateEnumAreaBoundary, text )
                                 }
-                                InputDialog.Action.DidPressQRButton -> {
-                                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                                    getResult.launch(intent)
-                                }
                             }
-                        }
+                        )
                     }
                 }
             }
@@ -346,7 +369,11 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
             if (mapTileRegions.isNotEmpty())
             {
-                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+                composableBusyIndicatorDialogHost.show(title = resources.getString(R.string.downloading_map_tiles), message = null) {
+                    composableBusyIndicatorDialogHost.cancel()
+                    MapManager.instance().cancelTilePackDownload()
+                }
+
                 MapManager.instance().cacheMapTiles(activity!!, mapView, mapTileRegions, this )
             }
         }
@@ -383,15 +410,15 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         }
 
         binding.legendTextView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         binding.legendImageView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         binding.helpButton.setOnClickListener {
-            CreateEnumAreaHelpDialog( activity!! )
+            composableEnumAreaHelpDialogHost.show()
         }
 
         binding.cancelButton.setOnClickListener {
@@ -682,27 +709,33 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                                 items.add(resources.getString(R.string.select_strata))
                             }
 
-                            MultiConfirmationDialog(requireActivity(), resources.getString(R.string.select_task), "", items, enumArea ) { selection, tag ->
-                                val enumArea = tag as EnumArea
-
+                            composableSelectionDialogHost.show(
+                                title = resources.getString(R.string.select_task),
+                                message = null,
+                                items = items,
+                            ) { selection ->
                                 when (selection) {
                                     resources.getString(R.string.rename) -> {
-                                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), enumArea.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, false ) { action, text, tag ->
-                                            when (action) {
-                                                InputDialog.Action.DidCancel -> {}
-                                                InputDialog.Action.DidEnterText -> {
-                                                    (tag as EnumArea).name = text
+                                        composableInputDialogHost.show(
+                                            title = resources.getString(R.string.enter_enum_area_name),
+                                            text = enumArea.name,
+                                            onQrClick = {
+                                                val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                                getResult.launch(intent)
+                                            },
+                                            onResult = { text ->
+                                                if (text.isNotEmpty())
+                                                {
+                                                    enumArea.name = text // handles re-name
                                                     refreshMap()
                                                 }
-                                                InputDialog.Action.DidPressQRButton -> {}
                                             }
-                                        }
-
+                                        )
                                     }
                                     resources.getString(R.string.delete) -> {
-                                        unsavedEnumAreas.remove( tag )
-                                        config.enumAreas.remove( tag )
-                                        DAO.enumAreaDAO.delete( tag )
+                                        unsavedEnumAreas.remove( enumArea )
+                                        config.enumAreas.remove( enumArea )
+                                        DAO.enumAreaDAO.delete( enumArea )
                                         refreshMap()
                                     }
                                     resources.getString(R.string.attach_mbtiles) -> {
@@ -741,34 +774,36 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                         binding.createEnumAreaButton.backgroundTintList = defaultColorList
                         currentTapType = TapType.None
 
-                        val inputDialog = InputDialog(activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaLengthTag ) { action, text, tag ->
-                            when (action) {
-                                InputDialog.Action.DidCancel -> {}
-                                InputDialog.Action.DidEnterText -> {
+                        composableInputDialogHost.show(
+                            title = resources.getString(R.string.map_tile_boundary),
+                            text = "",
+                            inputTypeNumber = true,
+                            onResult = { text ->
+                                if (text.isNotEmpty())
+                                {
                                     text.toDoubleOrNull()?.let {
                                         radius = it * 1000
-                                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag, false ) { action, text, tag ->
-                                            when (action) {
-                                                InputDialog.Action.DidCancel -> {
+                                        composableInputDialogHost.show(
+                                            title = resources.getString(R.string.enter_enum_area_name),
+                                            text = "",
+                                            onQrClick = {
+                                                getResult.launch(Intent(context, CameraXLivePreviewActivity::class.java))
+                                            },
+                                            onResult = { text ->
+                                                if (text.isEmpty())
+                                                {
                                                     binding.createEnumAreaButton.backgroundTintList = defaultColorList
                                                 }
-                                                InputDialog.Action.DidEnterText -> {
+                                                else
+                                                {
                                                     createEnumArea( TapType.CreateEnumAreaLocation, text )
                                                 }
-                                                InputDialog.Action.DidPressQRButton -> {
-                                                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                                                    getResult.launch(intent)
-                                                }
                                             }
-                                        }
-
+                                        )
                                     }
                                 }
-                                InputDialog.Action.DidPressQRButton -> {}
                             }
-                        }
-
-                        inputDialog.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                        )
                     }
                     else -> {}
                 }
@@ -783,9 +818,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == ResultCode.BarcodeScanned.value) {
                 val payload = it.data!!.getStringExtra(Keys.kPayload.value)
-                inputDialog?.editText?.let { editText ->
-                    editText.setText( payload.toString())
-                }
+                composableInputDialogHost.updateQrText(payload.toString())
             }
         }
 
@@ -900,25 +933,32 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
     fun presentMBTilesDialog()
     {
-        ConfirmationDialog( activity, "",
-            resources.getString(R.string.attach_mbtiles_question),
-            resources.getString(R.string.no),
-            resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-            when( buttonPressed )
-            {
-                ConfirmationDialog.ButtonPress.Left -> {
-                }
-                ConfirmationDialog.ButtonPress.Right -> {
-                    if (TileServer.getCachedFiles( activity!! ).isNotEmpty())
-                    {
-                        SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ),this)
+        composableConfirmationDialogHost.show(
+            title = resources.getString(R.string.attach_mbtiles_question),
+            message = "",
+            leftButtonText = resources.getString(R.string.no),
+            rightButtonText = resources.getString(R.string.yes),
+            destructive = false
+        ) { selection ->
+            if (selection == resources.getString(R.string.yes)) {
+                val cachedFiles = TileServer.getCachedFiles( activity!! )
+                if (cachedFiles.isNotEmpty())
+                {
+                    composableSelectionDialogHost.show(
+                        title = resources.getString(R.string.select_map_tiles),
+                        message = null,
+                        items = cachedFiles,
+                    ) { selection ->
+                        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
+                        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
+                            refreshMap()
+                            TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
+                        }
                     }
-                    else
-                    {
-                        filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-                    }
                 }
-                ConfirmationDialog.ButtonPress.None -> {
+                else
+                {
+                    filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
                 }
             }
         }
@@ -928,7 +968,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     {
         val study = config.studies.first()
 
-        DropdownDialog(requireActivity(), resources.getString(R.string.select_strata), study.stratas, null ) { strata ->
+        composableDropdownDialogHost.showStrata(title = resources.getString(R.string.select_strata), strataList = study.stratas) { strata ->
             strata?.let { strata ->
                 enumArea.strataUuid = strata.uuid
                 if (enumArea.name.contains("[") && enumArea.name.contains("]"))
@@ -947,35 +987,20 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {
-        busyIndicatorDialog?.let {
-            activity!!.runOnUiThread {
-                it.updateProgress("${numLoaded}/${numNeeded}")
-            }
+        activity!!.runOnUiThread {
+            composableBusyIndicatorDialogHost.updateMessage("${numLoaded}/${numNeeded}")
         }
     }
 
     override fun tilePacksLoaded( error: String )
     {
         activity!!.runOnUiThread {
+            composableBusyIndicatorDialogHost.cancel()
             if (error.isNotEmpty())
             {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                }
+                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    override fun didPressCancelButton()
-    {
-        MapManager.instance().cancelTilePackDownload()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
@@ -998,10 +1023,10 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                                 when (geometry) {
                                     is Polygon,
                                     is MultiPolygon -> {
-                                        DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), items ) { propertySelection ->
+                                        composableDropdownDialogHost.show(title = resources.getString(R.string.select_the_property_identifier), items) { propertySelection ->
                                             if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
                                             {
-                                                DropdownDialog(requireActivity(), resources.getString(R.string.select_the_strata_identifier), items ) { strataSelection ->
+                                                composableDropdownDialogHost.show(title = resources.getString(R.string.select_the_strata_identifier), items) { strataSelection ->
                                                     if (strataSelection.isNotEmpty())
                                                     {
                                                         processGeoJson( json, propertySelection, strataSelection )
@@ -1019,7 +1044,14 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                                         }
                                     }
                                     is Point -> {
-                                        checkboxDialog = CheckboxDialog( activity!!, resources.getString(R.string.select_the_hh_identifiers), items, json, this )
+                                        composableCheckboxDialogHost.show(
+                                            title = resources.getString(R.string.select_the_hh_identifiers),
+                                            items = items,
+                                            isChecked = emptyList()
+                                        ) { selections ->
+                                            propertySelections = selections
+                                            processGeoJson( json, "" )
+                                        }
                                     }
                                     else -> {}
                                 }
@@ -1039,35 +1071,21 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         }
     }
 
-    override fun checkboxDialogDidSelectCancelButton()
-    {
-    }
-
-    override fun checkboxDialogDidSelectSaveButton( json: String, selections: ArrayList<String> )
-    {
-        propertySelections = selections
-        processGeoJson( json, "" )
-    }
-
     fun processGeoJson( json: String, nameKey: String, strataKey: String = "" )
     {
         val hash = PreferencesManager.computeHash( json )
 
         if (PreferencesManager.isHashImported(config.uuid, hash ))
         {
-            ConfirmationDialog( activity,
-                resources.getString(R.string.oops), resources.getString(R.string.duplicate_import),
-                resources.getString(R.string.no),
-                resources.getString(R.string.yes),
-                null, false ) { buttonPressed, tag ->
-                when (buttonPressed) {
-                    ConfirmationDialog.ButtonPress.Left -> {}
-
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        finishProcessGeoJson( json, nameKey, strataKey )
-                    }
-
-                    ConfirmationDialog.ButtonPress.None -> {}
+            composableConfirmationDialogHost.show(
+                title = resources.getString(R.string.oops),
+                message = resources.getString(R.string.duplicate_import),
+                leftButtonText = resources.getString(R.string.no),
+                rightButtonText = resources.getString(R.string.yes),
+                destructive = false
+            ) { selection ->
+                if (selection == resources.getString(R.string.yes)) {
+                    finishProcessGeoJson( json, nameKey, strataKey )
                 }
             }
         }
@@ -1083,7 +1101,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         if (json.isNotEmpty())
         {
             activity!!.runOnUiThread {
-                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )
+                composableBusyIndicatorDialogHost.show(title = resources.getString(R.string.importing_locations), message = null)
             }
 
             Thread {
@@ -1102,10 +1120,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 }
                 finally
                 {
-                    busyIndicatorDialog?.let { busyIndicatorDialog ->
-                        activity!!.runOnUiThread {
-                            busyIndicatorDialog.alertDialog.cancel()
-                        }
+                    activity!!.runOnUiThread {
+                        composableBusyIndicatorDialogHost.cancel()
                     }
                 }
             }.start()
@@ -1251,10 +1267,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
             for (point in points)
             {
-                busyIndicatorDialog?.let {
-                    activity!!.runOnUiThread {
-                        it.updateProgress("${count}/${points.size}")
-                    }
+                activity!!.runOnUiThread {
+                    composableBusyIndicatorDialogHost.updateMessage("${count}/${points.size}")
                 }
 
                 count += 1
@@ -1358,7 +1372,21 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
             R.id.select_map_tiles ->
             {
-                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ),this)
+                val cachedFiles = TileServer.getCachedFiles( activity!! )
+                if (cachedFiles.isNotEmpty())
+                {
+                    composableSelectionDialogHost.show(
+                        title = resources.getString(R.string.select_map_tiles),
+                        message = null,
+                        items = cachedFiles,
+                    ) { selection ->
+                        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
+                        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
+                            refreshMap()
+                            TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
+                        }
+                    }
+                }
             }
         }
 
@@ -1392,23 +1420,23 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         }
     }
 
-    override fun didMakeSelection( selection: String, tag: Int )
-    {
-        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
-
-        selectedEnumArea?.let {
-            it.mbTilesPath = mbTilesPath
-            val mbtilesFile = File( mbTilesPath )
-            it.mbTilesSize = mbtilesFile.length()
-            selectedEnumArea = null
-        }
-
-        TileServer.startServer( mbTilesPath )
-
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
-            refreshMap()
-        }
-    }
+//    override fun didMakeSelection( selection: String, tag: Int )
+//    {
+//        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
+//
+//        selectedEnumArea?.let {
+//            it.mbTilesPath = mbTilesPath
+//            val mbtilesFile = File( mbTilesPath )
+//            it.mbTilesSize = mbtilesFile.length()
+//            selectedEnumArea = null
+//        }
+//
+//        TileServer.startServer( mbTilesPath )
+//
+//        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
+//            refreshMap()
+//        }
+//    }
 
     override fun onDestroyView()
     {
