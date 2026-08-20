@@ -52,7 +52,7 @@ fun ComposableBusyIndicatorDialog(
                     )
             ) {
 
-                // Title + progress indicator
+                // title + progress indicator
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

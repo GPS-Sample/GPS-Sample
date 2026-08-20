@@ -22,6 +22,10 @@ class ComposableBusyIndicatorDialogHost
         )
     }
 
+    fun updateMessage(message: String) {
+        dialogContent = dialogContent?.copy(message = message)
+    }
+
     fun cancel()
     {
         dialogContent = null

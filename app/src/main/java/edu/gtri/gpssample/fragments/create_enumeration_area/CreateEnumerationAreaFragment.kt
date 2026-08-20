@@ -54,6 +54,7 @@ import edu.gtri.gpssample.managers.MapManager.Companion.GEORGIA_TECH
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.PreferencesManager
 import edu.gtri.gpssample.managers.TileServer
+import edu.gtri.gpssample.ui.compose.ComposableBusyIndicatorDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableCheckboxDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
@@ -75,8 +76,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     OnMapClickListener,
     View.OnTouchListener,
     OnCameraChangeListener,
-    MapManager.MapTileCacheDelegate,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate
+    MapManager.MapTileCacheDelegate
 {
     private lateinit var config: Config
     private lateinit var mapboxManager: MapboxManager
@@ -90,7 +90,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     private var point: com.mapbox.geojson.Point? = null
     private var propertySelections = ArrayList<String>()
     private val unsavedEnumAreas = ArrayList<EnumArea>()
-    private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var allPointAnnotations = ArrayList<PointAnnotation>()
     private var _binding: FragmentCreateEnumerationAreaBinding? = null
     private var allPolygonAnnotations = ArrayList<PolygonAnnotation>()
@@ -103,6 +102,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private lateinit var composableCheckboxDialogHost: ComposableCheckboxDialogHost
     private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
+    private lateinit var composableBusyIndicatorDialogHost: ComposableBusyIndicatorDialogHost
 
     enum class TapType {
         None,
@@ -149,6 +149,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         composableCheckboxDialogHost = ComposableCheckboxDialogHost()
         composableSelectionDialogHost = ComposableSelectionDialogHost()
         composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+        composableBusyIndicatorDialogHost = ComposableBusyIndicatorDialogHost()
 
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
@@ -157,6 +158,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             composableCheckboxDialogHost.Content()
             composableSelectionDialogHost.Content()
             composableConfirmationDialogHost.Content()
+            composableBusyIndicatorDialogHost.Content()
         }
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -395,7 +397,11 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             if (mapTileRegions.isNotEmpty())
             {
-                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+                composableBusyIndicatorDialogHost.show(title = resources.getString(R.string.downloading_map_tiles), message = null) {
+                    composableBusyIndicatorDialogHost.cancel()
+                    MapManager.instance().cancelTilePackDownload()
+                }
+
                 MapManager.instance().cacheMapTiles(activity!!, binding.mapboxMapView, mapTileRegions, this )
             }
         }
@@ -961,35 +967,20 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {
-        busyIndicatorDialog?.let {
-            activity!!.runOnUiThread {
-                it.updateProgress("${numLoaded}/${numNeeded}")
-            }
+        activity!!.runOnUiThread {
+            composableBusyIndicatorDialogHost.updateMessage("${numLoaded}/${numNeeded}")
         }
     }
 
     override fun tilePacksLoaded( error: String )
     {
         activity!!.runOnUiThread {
+            composableBusyIndicatorDialogHost.cancel()
             if (error.isNotEmpty())
             {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                }
+                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    override fun didPressCancelButton()
-    {
-        MapManager.instance().cancelTilePackDownload()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
@@ -1093,7 +1084,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         else
         {
             activity!!.runOnUiThread {
-                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )
+                composableBusyIndicatorDialogHost.show(title = resources.getString(R.string.importing_locations), message = null)
             }
 
             Thread {
@@ -1123,10 +1114,8 @@ class CreateEnumerationAreaFragment : Fragment(),
                 }
                 finally
                 {
-                    busyIndicatorDialog?.let { busyIndicatorDialog ->
-                        activity!!.runOnUiThread {
-                            busyIndicatorDialog.alertDialog.cancel()
-                        }
+                    activity!!.runOnUiThread {
+                        composableBusyIndicatorDialogHost.cancel()
                     }
                 }
             }.start()
@@ -1277,10 +1266,8 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             for (point in points)
             {
-                busyIndicatorDialog?.let {
-                    activity!!.runOnUiThread {
-                        it.updateProgress("${count}/${points.size}")
-                    }
+                activity!!.runOnUiThread {
+                    composableBusyIndicatorDialogHost.updateMessage("${count}/${points.size}")
                 }
 
                 count += 1
