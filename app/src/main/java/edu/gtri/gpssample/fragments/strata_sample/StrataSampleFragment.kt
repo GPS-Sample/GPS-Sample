@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.CompoundButton
 import android.widget.Toast
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -25,7 +26,7 @@ import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Strata
 import edu.gtri.gpssample.database.models.Study
-import edu.gtri.gpssample.dialogs.AddStrataDialog
+import edu.gtri.gpssample.ui.compose.ComposableAddStrataDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class StrataSampleFragment : Fragment()
@@ -35,6 +36,7 @@ class StrataSampleFragment : Fragment()
     private val binding get() = _binding!!
     private lateinit var strataSampleAdapter: StrataSampleAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var composableAddStrataDialogHost: ComposableAddStrataDialogHost
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -52,6 +54,14 @@ class StrataSampleFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        composableAddStrataDialogHost = ComposableAddStrataDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableAddStrataDialogHost.Content()
+        }
 
         strataSampleAdapter = StrataSampleAdapter(activity!!)
         strataSampleAdapter.didSelectStrata = this::didSelectStrata
@@ -108,14 +118,11 @@ class StrataSampleFragment : Fragment()
 
     private fun shouldAddStrata()
     {
-        val strata = Strata(study.uuid,"", 0, SampleType.NumberHouseholds )
-
-        AddStrataDialog(requireActivity(), strata, false ) { buttonPressed ->
-            if (buttonPressed == AddStrataDialog.ButtonPress.Save)
-            {
-                study.stratas.add( strata )
-                strataSampleAdapter.updateStudy( study )
-            }
+        composableAddStrataDialogHost.show { name, sampleSize, sampleTypeIndex ->
+            val sampleType = if (sampleTypeIndex == 0) SampleType.NumberHouseholds else SampleType.PercentHouseholds
+            val strata = Strata(studyUuid = study.uuid, name, sampleSize = sampleSize.toInt(), sampleType)
+            study.stratas.add( strata )
+            strataSampleAdapter.updateStudy( study )
         }
     }
 
@@ -159,16 +166,18 @@ class StrataSampleFragment : Fragment()
 
     private fun didSelectStrata( strata: Strata )
     {
-        AddStrataDialog(requireActivity(), strata, true ) { buttonPressed ->
-            if (buttonPressed == AddStrataDialog.ButtonPress.Save)
-            {
-                strataSampleAdapter.updateStudy( study )
-            }
-            else if (buttonPressed == AddStrataDialog.ButtonPress.Delete)
-            {
-                study.stratas.remove( strata )
-                strataSampleAdapter.updateStudy( study )
-            }
+        val index = if (strata.sampleType == SampleType.NumberHouseholds) 0 else 1
+
+        composableAddStrataDialogHost.show(
+            strataName =strata.name,
+            sampleSize = strata.sampleSize.toString(),
+            sampleTypeIndex = index)
+        { name, sampleSize, sampleTypeIndex ->
+            strata.name = name
+            strata.sampleSize = sampleSize.toInt()
+            strata.sampleType = if (sampleTypeIndex == 0) SampleType.NumberHouseholds else SampleType.PercentHouseholds
+            study.stratas.add( strata )
+            strataSampleAdapter.updateStudy( study )
         }
     }
 
