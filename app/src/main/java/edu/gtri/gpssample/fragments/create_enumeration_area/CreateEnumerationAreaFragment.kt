@@ -48,7 +48,6 @@ import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
-import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.MapManager.Companion.GEORGIA_TECH
 import edu.gtri.gpssample.managers.MapboxManager
