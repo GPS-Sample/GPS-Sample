@@ -59,6 +59,7 @@ import edu.gtri.gpssample.ui.compose.ComposableCheckboxDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableDropdownDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableMapLegendDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableSelectionDialogHost
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -103,9 +104,9 @@ class CreateEnumerationAreaFragment : Fragment(),
     private lateinit var composableCheckboxDialogHost: ComposableCheckboxDialogHost
     private lateinit var composableDropdownDialogHost: ComposableDropdownDialogHost
     private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
+    private lateinit var composableMapLegendDialogHost: ComposableMapLegendDialogHost
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
     private lateinit var composableBusyIndicatorDialogHost: ComposableBusyIndicatorDialogHost
-
     enum class TapType {
         None,
         EditEnumArea,
@@ -151,6 +152,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         composableCheckboxDialogHost = ComposableCheckboxDialogHost()
         composableDropdownDialogHost = ComposableDropdownDialogHost()
         composableSelectionDialogHost = ComposableSelectionDialogHost()
+        composableMapLegendDialogHost = ComposableMapLegendDialogHost()
         composableConfirmationDialogHost = ComposableConfirmationDialogHost()
         composableBusyIndicatorDialogHost = ComposableBusyIndicatorDialogHost()
 
@@ -161,6 +163,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             composableCheckboxDialogHost.Content()
             composableDropdownDialogHost.Content()
             composableSelectionDialogHost.Content()
+            composableMapLegendDialogHost.Content()
             composableConfirmationDialogHost.Content()
             composableBusyIndicatorDialogHost.Content()
         }
@@ -444,11 +447,11 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.legendTextView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         binding.legendImageView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         binding.helpButton.setOnClickListener {
