@@ -57,6 +57,7 @@ import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.ui.compose.ComposableBusyIndicatorDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableCheckboxDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableDropdownDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableSelectionDialogHost
 import edu.gtri.gpssample.utils.GeoUtils
@@ -100,6 +101,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private var polylineAnnotationManager: PolylineAnnotationManager? = null
     private lateinit var composableInputDialogHost: ComposableInputDialogHost
     private lateinit var composableCheckboxDialogHost: ComposableCheckboxDialogHost
+    private lateinit var composableDropdownDialogHost: ComposableDropdownDialogHost
     private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
     private lateinit var composableBusyIndicatorDialogHost: ComposableBusyIndicatorDialogHost
@@ -147,6 +149,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         composableInputDialogHost = ComposableInputDialogHost()
         composableCheckboxDialogHost = ComposableCheckboxDialogHost()
+        composableDropdownDialogHost = ComposableDropdownDialogHost()
         composableSelectionDialogHost = ComposableSelectionDialogHost()
         composableConfirmationDialogHost = ComposableConfirmationDialogHost()
         composableBusyIndicatorDialogHost = ComposableBusyIndicatorDialogHost()
@@ -156,6 +159,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         binding.dialogComposeView.setContent {
             composableInputDialogHost.Content()
             composableCheckboxDialogHost.Content()
+            composableDropdownDialogHost.Content()
             composableSelectionDialogHost.Content()
             composableConfirmationDialogHost.Content()
             composableBusyIndicatorDialogHost.Content()
@@ -948,7 +952,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         val study = config.studies.first()
 
-        DropdownDialog(requireActivity(), resources.getString(R.string.select_strata), study.stratas, null ) { strata ->
+        composableDropdownDialogHost.showStrata(title = resources.getString(R.string.select_strata), strataList = study.stratas) { strata ->
             strata?.let { strata ->
                 enumArea.strataUuid = strata.uuid
                 if (enumArea.name.contains("[") && enumArea.name.contains("]"))
@@ -1003,10 +1007,10 @@ class CreateEnumerationAreaFragment : Fragment(),
                                 when (geometry) {
                                     is Polygon,
                                     is MultiPolygon -> {
-                                        DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), items ) { propertySelection ->
+                                        composableDropdownDialogHost.show(title = resources.getString(R.string.select_the_property_identifier), items) { propertySelection ->
                                             if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
                                             {
-                                                DropdownDialog(requireActivity(), resources.getString(R.string.select_the_strata_identifier), items ) { strataSelection ->
+                                                composableDropdownDialogHost.show(title = resources.getString(R.string.select_the_strata_identifier), items) { strataSelection ->
                                                     if (strataSelection.isNotEmpty())
                                                     {
                                                         processGeoJson( json, propertySelection, strataSelection )
