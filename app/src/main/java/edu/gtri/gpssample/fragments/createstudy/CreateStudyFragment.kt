@@ -10,14 +10,12 @@ package edu.gtri.gpssample.fragments.createstudy
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.Parcelable
-import android.util.SparseArray
 import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -29,14 +27,10 @@ import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldOption
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Study
-import edu.gtri.gpssample.dialogs.NotificationDialog
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.Date
 import java.util.UUID
 
 enum class DeleteMode(val value : Int)
@@ -50,6 +44,8 @@ class CreateStudyFragment : Fragment()
     private var _binding: FragmentCreateStudyBinding? = null
     private val binding get() = _binding!!
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -85,6 +81,16 @@ class CreateStudyFragment : Fragment()
             createStudyFragment = this@CreateStudyFragment
         }
 
+        composableNotificationDialogHost = ComposableNotificationDialogHost()
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableNotificationDialogHost.Content()
+            composableConfirmationDialogHost.Content()
+        }
+
         ArrayAdapter.createFromResource(
             activity!!,
             R.array.samling_methods,
@@ -93,12 +99,6 @@ class CreateStudyFragment : Fragment()
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.samplingMethodSpinner.adapter = adapter
         }
-
-//        ArrayAdapter.createFromResource(activity!!, R.array.collection_apps, android.R.layout.simple_spinner_item)
-//            .also { adapter ->
-//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-//                binding.collectionAppSpinner.adapter = adapter
-//            }
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
             this.study = study
@@ -129,21 +129,20 @@ class CreateStudyFragment : Fragment()
             samplingHint += resources.getString( R.string.sampling_hint_6_7 ) + "\n"
             samplingHint += resources.getString( R.string.sampling_hint_7_7 )
 
-            NotificationDialog( requireActivity(), "", samplingHint )
+            composableNotificationDialogHost.show(title = "", message = samplingHint )
         }
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog(activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_study_message), resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {
-                    }
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        sharedViewModel.deleteCurrentStudy()
-                        findNavController().popBackStack()
-                    }
-                    ConfirmationDialog.ButtonPress.None -> {
-                    }
+            composableConfirmationDialogHost.show(
+                title = resources.getString(R.string.please_confirm),
+                message = resources.getString(R.string.delete_study_message),
+                leftButtonText = resources.getString(R.string.no),
+                rightButtonText = resources.getString(R.string.yes),
+                destructive = true
+            ) { selection ->
+                if (selection == resources.getString(R.string.yes)) {
+                    sharedViewModel.deleteCurrentStudy()
+                    findNavController().popBackStack()
                 }
             }
         }
@@ -199,41 +198,42 @@ class CreateStudyFragment : Fragment()
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     if (config.studies.isEmpty())
                     {
-                        ConfirmationDialog(activity, resources.getString(R.string.please_confirm), "Auto generate the study?", resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
-                            when( buttonPressed )
-                            {
-                                ConfirmationDialog.ButtonPress.None -> {}
-                                ConfirmationDialog.ButtonPress.Left -> {}
-                                ConfirmationDialog.ButtonPress.Right -> {
-                                    val studyName = "Test-Study"
-                                    val study = Study( studyName, SamplingMethod.Cluster, 10000, SampleType.NumberHouseholds )
+                        composableConfirmationDialogHost.show(
+                            title = resources.getString(R.string.please_confirm),
+                            message = "Auto generate the study?",
+                            leftButtonText = resources.getString(R.string.no),
+                            rightButtonText = resources.getString(R.string.yes),
+                            destructive = true
+                        ) { selection ->
+                            if (selection == resources.getString(R.string.yes)) {
+                                val studyName = "Test-Study"
+                                val study = Study( studyName, SamplingMethod.Cluster, 10000, SampleType.NumberHouseholds )
 
-                                    val noteField = Field( null, 1, "Note", FieldType.Note, false, false, false, false, false, false, null, null,study.uuid)
-                                    val textField = Field( null, 2, "Text", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid)
-                                    val numberField = Field( null, 3, "Number", FieldType.Number, false, false, true, false, false, false, null, null,study.uuid)
-                                    val dateField = Field( null, 4, "Date", FieldType.Date, false, false, false, false, true, false, null, null,study.uuid)
-                                    val checkBoxField = Field( null, 5, "Checkbox", FieldType.Checkbox, false, false, false, false, false, false, null, null,study.uuid)
-                                    val dropDownField = Field( null, 6, "Dropdown", FieldType.Dropdown, false, false, false, false, false, false, null, null,study.uuid)
+                                val noteField = Field( null, 1, "Note", FieldType.Note, false, false, false, false, false, false, null, null,study.uuid)
+                                val textField = Field( null, 2, "Text", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid)
+                                val numberField = Field( null, 3, "Number", FieldType.Number, false, false, true, false, false, false, null, null,study.uuid)
+                                val dateField = Field( null, 4, "Date", FieldType.Date, false, false, false, false, true, false, null, null,study.uuid)
+                                val checkBoxField = Field( null, 5, "Checkbox", FieldType.Checkbox, false, false, false, false, false, false, null, null,study.uuid)
+                                val dropDownField = Field( null, 6, "Dropdown", FieldType.Dropdown, false, false, false, false, false, false, null, null,study.uuid)
 
-                                    checkBoxField.fieldOptions.add( FieldOption("CB 1" ))
-                                    checkBoxField.fieldOptions.add( FieldOption("CB 2" ))
-                                    checkBoxField.fieldOptions.add( FieldOption("CB 3" ))
+                                checkBoxField.fieldOptions.add( FieldOption("CB 1" ))
+                                checkBoxField.fieldOptions.add( FieldOption("CB 2" ))
+                                checkBoxField.fieldOptions.add( FieldOption("CB 3" ))
 
-                                    dropDownField.fieldOptions.add( FieldOption("DD 1" ))
-                                    dropDownField.fieldOptions.add( FieldOption("DD 2" ))
-                                    dropDownField.fieldOptions.add( FieldOption("DD 3" ))
+                                dropDownField.fieldOptions.add( FieldOption("DD 1" ))
+                                dropDownField.fieldOptions.add( FieldOption("DD 2" ))
+                                dropDownField.fieldOptions.add( FieldOption("DD 3" ))
 
-                                    study.fields.add( noteField )
-                                    study.fields.add( textField )
-                                    study.fields.add( numberField )
-                                    study.fields.add( dateField )
-                                    study.fields.add( checkBoxField )
-                                    study.fields.add( dropDownField )
+                                study.fields.add( noteField )
+                                study.fields.add( textField )
+                                study.fields.add( numberField )
+                                study.fields.add( dateField )
+                                study.fields.add( checkBoxField )
+                                study.fields.add( dropDownField )
 
-                                    config.studies.add( study )
+                                config.studies.add( study )
 
-                                    findNavController().popBackStack()
-                                }
+                                findNavController().popBackStack()
                             }
                         }
                     }
