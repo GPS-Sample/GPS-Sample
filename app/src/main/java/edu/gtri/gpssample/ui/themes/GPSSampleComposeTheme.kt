@@ -74,7 +74,7 @@ fun GPSSampleComposeTheme(
             primary = colorResource(R.color.primary_high),
             onPrimary = colorResource(R.color.white),
 
-            secondary = colorResource(R.color.teal_200),
+            secondary = colorResource(R.color.secondary),
             onSecondary = colorResource(R.color.black),
 
             background = colorResource(R.color.background),
@@ -88,7 +88,7 @@ fun GPSSampleComposeTheme(
             primary = colorResource(R.color.primary_low),
             onPrimary = colorResource(R.color.white),
 
-            secondary = colorResource(R.color.secondary_mid),
+            secondary = colorResource(R.color.secondary),
             onSecondary = colorResource(R.color.black),
 
             background = colorResource(R.color.background),

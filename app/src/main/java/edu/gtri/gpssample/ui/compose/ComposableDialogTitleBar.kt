@@ -22,7 +22,7 @@ fun ComposableDialogTitleBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.secondary)
     ) {
         title?.let {
             val paddingEnd = if (actionIcon == null) 20.dp else 60.dp

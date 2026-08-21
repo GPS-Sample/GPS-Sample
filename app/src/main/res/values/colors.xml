@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#FF0000FF</color>
     <color name="primary">#FF0360A9</color>
+    <color name="secondary">#FF12395A</color>
     <color name="clear">#00FFFFFF</color>
     <color name="primary_textcolor">#000000</color>
     <color name="secondary_textcolor">@color/primary</color>
