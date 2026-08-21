@@ -8,37 +8,28 @@
 package edu.gtri.gpssample.fragments.createfield
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.common.io.Resources
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.FieldOption
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.dialogs.DatePickerDialog
-import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
-import edu.gtri.gpssample.dialogs.TimePickerDialog
-import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
-import edu.gtri.gpssample.fragments.add_household.AddHouseholdAdapter
+import edu.gtri.gpssample.ui.compose.ComposableDatePickerDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
 import edu.gtri.gpssample.utils.DateUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
@@ -56,7 +47,8 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
     private lateinit var createFieldDropdownAdapter: CreateFieldDropdownAdapter
     private lateinit var dropdownLayout: LinearLayout
     private lateinit var sharedViewModel : ConfigurationViewModel
-
+    private lateinit var composableInputDialogHost: ComposableInputDialogHost
+    private lateinit var composableDatePickerDialogHost: ComposableDatePickerDialogHost
     private var isBlockField = false
 
     val fieldTypes : Array<String>
@@ -109,6 +101,16 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
             // Assign the fragment
             createFieldFragment = this@CreateFieldFragment
             this.executePendingBindings()
+        }
+
+        composableInputDialogHost = ComposableInputDialogHost()
+        composableDatePickerDialogHost = ComposableDatePickerDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableInputDialogHost.Content()
+            composableDatePickerDialogHost.Content()
         }
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
@@ -278,11 +280,35 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
         })
 
         minimumDateCalendarButton.setOnClickListener {
-            DatePickerDialog( context!!, context?.getString(R.string.select_date) ?: "Select Date", Date(), field, null, minimumDateEditText,this )
+            composableDatePickerDialogHost.show(date = Date()) { date ->
+                date?.let {
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                        val calendar = Calendar.getInstance()
+                        calendar.time = date
+                        calendar[Calendar.HOUR] = 0
+                        calendar[Calendar.MINUTE] = 0
+                        calendar[Calendar.SECOND] = 0
+                        calendar[Calendar.AM_PM] = Calendar.AM
+                        minimumDateEditText.setText( DateUtils.dateString( date, config.dateFormat ))
+                    }
+                }
+            }
         }
 
         maximumDateCalendarButton.setOnClickListener {
-            DatePickerDialog( context!!, context?.getString(R.string.select_date) ?: "Select Date", Date(), field, null, maximumDateEditText,this )
+            composableDatePickerDialogHost.show(date = Date()) { date ->
+                date?.let {
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                        val calendar = Calendar.getInstance()
+                        calendar.time = date
+                        calendar[Calendar.HOUR] = 0
+                        calendar[Calendar.MINUTE] = 0
+                        calendar[Calendar.SECOND] = 0
+                        calendar[Calendar.AM_PM] = Calendar.AM
+                        maximumDateEditText.setText( DateUtils.dateString( date, config.dateFormat ))
+                    }
+                }
+            }
         }
 
         // respond to changes to the FieldType dropdown
@@ -394,33 +420,35 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
         val checkboxAddAnotherButton = checkboxLayout.findViewById<Button>(R.id.add_another_button)
 
         checkboxAddAnotherButton.setOnClickListener {
-            InputDialog( activity!!, false, resources.getString(R.string.option_item_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null ) { action, text, tag ->
-                when (action) {
-                    InputDialog.Action.DidCancel -> {}
-                    InputDialog.Action.DidEnterText -> {
+            composableInputDialogHost.show(
+                title = resources.getString(R.string.option_item_name),
+                description = null,
+                text = "",
+                onResult = { text ->
+                    if (text.isNotEmpty()) {
                         val fieldOption = FieldOption( text )
                         field.fieldOptions.add( fieldOption )
                         createFieldCheckboxAdapter.updateFieldOptions( field.fieldOptions )
                     }
-                    InputDialog.Action.DidPressQRButton -> {}
                 }
-            }
+            )
         }
 
         val dropdownAddAnotherButton = dropdownLayout.findViewById<Button>(R.id.add_another_button)
 
         dropdownAddAnotherButton.setOnClickListener {
-            InputDialog( activity!!, false, resources.getString(R.string.option_item_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
-                when (action) {
-                    InputDialog.Action.DidCancel -> {}
-                    InputDialog.Action.DidEnterText -> {
+            composableInputDialogHost.show(
+                title = resources.getString(R.string.option_item_name),
+                description = null,
+                text = "",
+                onResult = { text ->
+                    if (text.isNotEmpty()) {
                         val fieldOption = FieldOption( text )
                         field.fieldOptions.add( fieldOption )
                         createFieldDropdownAdapter.updateFieldOptions( field.fieldOptions )
                     }
-                    InputDialog.Action.DidPressQRButton -> {}
                 }
-            }
+            )
         }
 
         binding.saveButton.setOnClickListener {

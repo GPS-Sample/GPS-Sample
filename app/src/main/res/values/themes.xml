@@ -38,4 +38,9 @@
     <style name="Theme.GPSSample.Background">
         <item name="android:background">@drawable/common_google_signin_btn_icon_light</item>
     </style>
+
+    <style name="GPSSampleDatePicker" parent="@android:style/Widget.Material.DatePicker">
+        <item name="android:datePickerMode">spinner</item>
+        <item name="android:calendarViewShown">false</item>
+    </style>
 </resources>
