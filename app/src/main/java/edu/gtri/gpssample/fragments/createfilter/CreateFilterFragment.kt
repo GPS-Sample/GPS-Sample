@@ -7,13 +7,12 @@
 
 package edu.gtri.gpssample.fragments.createfilter
 
-import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -23,14 +22,10 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.databinding.FragmentCreateFilterBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
-
-import edu.gtri.gpssample.dialogs.SelectRuleDialogFragment
 import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class CreateFilterFragment : Fragment()
@@ -40,6 +35,7 @@ class CreateFilterFragment : Fragment()
     private lateinit var createFilterAdapter: CreateFilterAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
     private var isSubsetRule : Boolean = true
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -69,6 +65,14 @@ class CreateFilterFragment : Fragment()
             // Assign the fragment
             createFilterFragment = this@CreateFilterFragment
             this.executePendingBindings()
+        }
+
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableConfirmationDialogHost.Content()
         }
 
         arguments?.getBoolean( Keys.kIsSubsetRule.value)?.let { isSubsetRule ->
@@ -165,28 +169,27 @@ class CreateFilterFragment : Fragment()
 
         if (isOnlyRule || isLastRule)
         {
-            ConfirmationDialog( activity!!, resources.getString(R.string.please_confirm), "Are you sure you want to delete this Filter Rule?", "No", "Yes", null, false ) { buttonPressed, tag ->
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {
-                    }
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        if (isOnlyRule)
-                        {
-                            sharedViewModel.createFilterModel.currentFilter?.value?.let{ filter->
-                                filter.rule = null
-                                createFilterAdapter.updateRules(filter.rule )
-                            }
-                        }
-                        else if (isLastRule)
-                        {
-                            previousRule?.filterOperator = null
-                            sharedViewModel.createFilterModel.currentFilter?.value?.let{ filter->
-                                createFilterAdapter.updateRules(filter.rule )
-                            }
+            composableConfirmationDialogHost.show(
+                title = resources.getString(R.string.please_confirm),
+                message = resources.getString(R.string.delete_filter_message),
+                leftButtonText = resources.getString(R.string.no),
+                rightButtonText = resources.getString(R.string.yes),
+                destructive = true
+            ) { selection ->
+                if (selection == resources.getString(R.string.yes)) {
+                    if (isOnlyRule)
+                    {
+                        sharedViewModel.createFilterModel.currentFilter?.value?.let{ filter->
+                            filter.rule = null
+                            createFilterAdapter.updateRules(filter.rule )
                         }
                     }
-                    ConfirmationDialog.ButtonPress.None -> {
+                    else if (isLastRule)
+                    {
+                        previousRule?.filterOperator = null
+                        sharedViewModel.createFilterModel.currentFilter?.value?.let{ filter->
+                            createFilterAdapter.updateRules(filter.rule )
+                        }
                     }
                 }
             }

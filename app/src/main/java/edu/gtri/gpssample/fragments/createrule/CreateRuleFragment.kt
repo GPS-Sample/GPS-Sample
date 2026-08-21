@@ -7,46 +7,40 @@
 
 package edu.gtri.gpssample.fragments.createrule
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.EditText
 import android.widget.Toast
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
-import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateRuleBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.DatePickerDialog
-import edu.gtri.gpssample.dialogs.InputDialog
-import edu.gtri.gpssample.dialogs.NotificationDialog
-import edu.gtri.gpssample.dialogs.TimePickerDialog
 import edu.gtri.gpssample.fragments.add_household.CheckboxOptionAdapter
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableDatePickerDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableTimePickerDialogHost
 import edu.gtri.gpssample.utils.DateUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
-class CreateRuleFragment : Fragment(),
-    DatePickerDialog.DatePickerDialogDelegate,
-    TimePickerDialog.TimePickerDialogDelegate
-{
-    private var _binding: FragmentCreateRuleBinding? = null
+class CreateRuleFragment : Fragment()
+{ private var _binding: FragmentCreateRuleBinding? = null
     private val binding get() = _binding!!
     private lateinit var sharedViewModel : ConfigurationViewModel
-
+    private lateinit var composableDatePickerDialogHost: ComposableDatePickerDialogHost
+    private lateinit var composableTimePickerDialogHost: ComposableTimePickerDialogHost
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
+    private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
     private var fieldList = ArrayList<Field>()
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -68,7 +62,7 @@ class CreateRuleFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.apply {
+        binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
 
@@ -80,8 +74,22 @@ class CreateRuleFragment : Fragment(),
             this.executePendingBindings()
         }
 
+        composableDatePickerDialogHost = ComposableDatePickerDialogHost()
+        composableTimePickerDialogHost = ComposableTimePickerDialogHost()
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+        composableNotificationDialogHost = ComposableNotificationDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableTimePickerDialogHost.Content()
+            composableDatePickerDialogHost.Content()
+            composableConfirmationDialogHost.Content()
+            composableNotificationDialogHost.Content()
+        }
+
         binding.ruleTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.rule_hint))
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.rule_hint))
         }
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -260,11 +268,63 @@ class CreateRuleFragment : Fragment(),
                             val date = Date()
                             if (field.time && !field.date)
                             {
-                                TimePickerDialog(context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, null, null, this)
+                                composableTimePickerDialogHost.show(date = date) { date ->
+                                    date?.let {
+                                        sharedViewModel.currentConfiguration?.value?.let { config ->
+                                            sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
+                                                val unixTime = date.time
+                                                rule.value = unixTime.toString()
+
+                                                if (field.date && field.time)
+                                                {
+                                                    binding.dateValueTextView.setText( DateUtils.dateTimeString( Date( unixTime ), config.dateFormat, config.timeFormat))
+                                                }
+                                                else if (field.time)
+                                                {
+                                                    binding.dateValueTextView.setText( DateUtils.timeString( Date( unixTime ), config.timeFormat))
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             else
                             {
-                                DatePickerDialog(context!!, context?.getString(R.string.select_date) ?: "Select Date", date, field, null, null, this)
+                                composableDatePickerDialogHost.show(date = date) { date ->
+                                    date?.let {
+                                        sharedViewModel.currentConfiguration?.value?.let { config ->
+                                            sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
+                                                val unixTime = date.time
+                                                rule.value = unixTime.toString()
+
+                                                binding.dateValueTextView.setText( DateUtils.dateString( Date( unixTime ), config.dateFormat ))
+
+                                                if (field.time)
+                                                {
+                                                    composableTimePickerDialogHost.show(date = date) { date ->
+                                                        date?.let {
+                                                            sharedViewModel.currentConfiguration?.value?.let { config ->
+                                                                sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
+                                                                    val unixTime = date.time
+                                                                    rule.value = unixTime.toString()
+
+                                                                    if (field.date && field.time)
+                                                                    {
+                                                                        binding.dateValueTextView.setText( DateUtils.dateTimeString( Date( unixTime ), config.dateFormat, config.timeFormat))
+                                                                    }
+                                                                    else if (field.time)
+                                                                    {
+                                                                        binding.dateValueTextView.setText( DateUtils.timeString( Date( unixTime ), config.timeFormat))
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -285,20 +345,18 @@ class CreateRuleFragment : Fragment(),
                     }
 
                     binding.deleteImageView.setOnClickListener {
-                        ConfirmationDialog( activity,  resources.getString(R.string.please_confirm), resources.getString(R.string.delete_rule_message), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                            when( buttonPressed )
-                            {
-                                ConfirmationDialog.ButtonPress.Left -> {
-                                }
-                                ConfirmationDialog.ButtonPress.Right -> {
-                                    sharedViewModel.createRuleModel.deleteSelectedRule( study )
-                                    findNavController().popBackStack()
-                                }
-                                ConfirmationDialog.ButtonPress.None -> {
-                                }
+                        composableConfirmationDialogHost.show(
+                            title = resources.getString(R.string.please_confirm),
+                            message = resources.getString(R.string.delete_rule_message),
+                            leftButtonText = resources.getString(R.string.no),
+                            rightButtonText = resources.getString(R.string.yes),
+                            destructive = true
+                        ) { selection ->
+                            if (selection == resources.getString(R.string.yes)) {
+                                sharedViewModel.createRuleModel.deleteSelectedRule(study)
+                                findNavController().popBackStack()
                             }
                         }
-
                     }
 
                     binding.cancelButton.setOnClickListener {
@@ -450,42 +508,6 @@ class CreateRuleFragment : Fragment(),
         else
         {
             binding.textValueEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
-        }
-    }
-
-    override fun didSelectDate(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
-    {
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
-                val unixTime = date.time
-                rule.value = unixTime.toString()
-
-                binding.dateValueTextView.setText( DateUtils.dateString( Date( unixTime ), config.dateFormat ))
-
-                if (field.time)
-                {
-                    TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, fieldData, editText,this )
-                }
-            }
-        }
-    }
-
-    override fun didSelectTime(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
-    {
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
-                val unixTime = date.time
-                rule.value = unixTime.toString()
-
-                if (field.date && field.time)
-                {
-                    binding.dateValueTextView.setText( DateUtils.dateTimeString( Date( unixTime ), config.dateFormat, config.timeFormat))
-                }
-                else if (field.time)
-                {
-                    binding.dateValueTextView.setText( DateUtils.timeString( Date( unixTime ), config.timeFormat))
-                }
-            }
         }
     }
 

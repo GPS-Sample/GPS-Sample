@@ -34,7 +34,7 @@ import edu.gtri.gpssample.utils.DateUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
-class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegate
+class CreateFieldFragment : Fragment()
 {
     private var _binding: FragmentCreateFieldBinding? = null
     private val binding get() = _binding!!
@@ -617,36 +617,6 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
     {
         field.fieldOptions.remove(fieldOption)
         createFieldDropdownAdapter.updateFieldOptions( field.fieldOptions )
-    }
-
-    override fun didSelectDate(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
-    {
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            editText?.let { editText ->
-                if (editText.id == R.id.minimum_date_edit_text)
-                {
-                    val calendar = Calendar.getInstance()
-                    calendar.time = date
-                    calendar[Calendar.HOUR] = 0
-                    calendar[Calendar.MINUTE] = 0
-                    calendar[Calendar.SECOND] = 0
-                    calendar[Calendar.AM_PM] = Calendar.AM
-                    editText.tag = calendar.time.time.toDouble()
-                }
-                else if (editText.id == R.id.maximum_date_edit_text)
-                {
-                    val calendar = Calendar.getInstance()
-                    calendar.time = date
-                    calendar[Calendar.HOUR] = 11
-                    calendar[Calendar.MINUTE] = 59
-                    calendar[Calendar.SECOND] = 59
-                    calendar[Calendar.AM_PM] = Calendar.PM
-                    editText.tag = calendar.time.time.toDouble()
-                }
-
-                editText.setText( DateUtils.dateString( date, config.dateFormat ))
-            }
-        }
     }
 
     override fun onDestroyView()
