@@ -36,44 +36,50 @@ fun ComposableEnumAreaHelpDialog(onDismiss: () -> Unit)
             color = MaterialTheme.colorScheme.surface
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 20.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
-                LegendItem(
-                    R.drawable.import_blue,
-                    stringResource(R.string.import_enumeration_area)
-                )
+                ComposableDialogTitleBar()
 
-                LegendItem(
-                    R.drawable.add_location_blue,
-                    stringResource(R.string.create_enumeration_area)
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp)
+                ) {
+                    LegendItem(
+                        R.drawable.import_blue,
+                        stringResource(R.string.import_enumeration_area)
+                    )
 
-                LegendItem(
-                    R.drawable.add_house_blue,
-                    stringResource(R.string.add_household)
-                )
+                    LegendItem(
+                        R.drawable.add_location_blue,
+                        stringResource(R.string.create_enumeration_area)
+                    )
 
-                LegendItem(
-                    R.drawable.cache2,
-                    stringResource(R.string.download_map_tiles)
-                )
+                    LegendItem(
+                        R.drawable.add_house_blue,
+                        stringResource(R.string.add_household)
+                    )
 
-                LegendItem(
-                    R.drawable.edit_location,
-                    stringResource(R.string.edit_enumeration_area)
-                )
+                    LegendItem(
+                        R.drawable.cache2,
+                        stringResource(R.string.download_map_tiles)
+                    )
 
-                LegendItem(
-                    R.drawable.delete_blue,
-                    stringResource(R.string.delete_all_enumeration_areas)
-                )
+                    LegendItem(
+                        R.drawable.edit_location,
+                        stringResource(R.string.edit_enumeration_area)
+                    )
 
-                LegendItem(
-                    R.drawable.location_bubble_primary,
-                    stringResource(R.string.center_on_location)
-                )
+                    LegendItem(
+                        R.drawable.delete_blue,
+                        stringResource(R.string.delete_all_enumeration_areas)
+                    )
+
+                    LegendItem(
+                        R.drawable.location_bubble_primary,
+                        stringResource(R.string.center_on_location)
+                    )
+                }
             }
         }
     }

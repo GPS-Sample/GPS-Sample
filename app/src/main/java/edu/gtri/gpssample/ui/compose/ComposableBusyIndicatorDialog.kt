@@ -42,58 +42,63 @@ fun ComposableBusyIndicatorDialog(
             tonalElevation = 6.dp
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        start = 24.dp,
-                        top = 24.dp,
-                        end = 24.dp,
-                        bottom = 12.dp
-                    )
+                modifier = Modifier.fillMaxWidth()
             ) {
+                ComposableDialogTitleBar()
 
-                // title + progress indicator
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(70.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(
+                            top = 10.dp,
+                            start = 20.dp,
+                            end = 20.dp,
+                            bottom = 10.dp
+                        )
                 ) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 20.dp)
-                    )
-
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(30.dp),
-                        strokeWidth = 3.dp
-                    )
-                }
-
-                if (!message.isNullOrEmpty()) {
-                    Text(
-                        text = message,
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
+                    // title + progress indicator
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 12.dp)
-                    )
-                }
-
-                if (onCancel != null)
-                {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
+                            .height(60.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TextButton(
-                            onClick = onCancel
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 20.dp)
+                        )
+
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(30.dp),
+                            strokeWidth = 3.dp
+                        )
+                    }
+
+                    if (!message.isNullOrEmpty()) {
+                        Text(
+                            text = message,
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 10.dp)
+                        )
+                    }
+
+                    if (onCancel != null)
+                    {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
                         ) {
-                            Text("Cancel")
+                            TextButton(
+                                onClick = onCancel
+                            ) {
+                                Text("Cancel")
+                            }
                         }
                     }
                 }

@@ -43,20 +43,8 @@ fun ComposableSelectionDialog(
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Spacer(modifier = Modifier.height(20.dp))
+                ComposableDialogTitleBar(title = title)
 
-                if (!title.isNullOrEmpty())
-                {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(
-                            start = 20.dp,
-                            end = 20.dp,
-                            bottom = 20.dp
-                        )
-                    )
-                }
                 if (!message.isNullOrEmpty())
                 {
                     Text(
@@ -74,6 +62,7 @@ fun ComposableSelectionDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
+                            top = 20.dp,
                             start = 20.dp,
                             end = 20.dp,
                         )

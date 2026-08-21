@@ -48,62 +48,59 @@ fun ComposableConfirmationDialog(
             color = MaterialTheme.colorScheme.surface
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding( all = 20.dp )
+                modifier = Modifier.fillMaxWidth()
             ) {
-                if (!title.isNullOrEmpty())
-                {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
+                title?.let {
+                    ComposableDialogTitleBar(title = it)
                 }
 
-                if (!message.isNullOrEmpty())
-                {
-                    Text(
-                        text = message,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.
-                        fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding( all = 20.dp )
                 ) {
-                    TextButton(
-                        onClick = {
-                            onResult(leftButtonText)
-                        }
-                    ) {
+                    if (!message.isNullOrEmpty())
+                    {
                         Text(
-                            text = leftButtonText.uppercase(),
-                            fontWeight = FontWeight.Medium
+                            text = message,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
 
-                    TextButton(
-                        onClick = {
-                            onResult(rightButtonText)
-                        },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = if (destructive) {
-                                MaterialTheme.colorScheme.error
-                            } else {
-                                MaterialTheme.colorScheme.primary
-                            }
-                        )
+                    Row(
+                        modifier = Modifier.
+                        fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        Text(
-                            text = rightButtonText.uppercase(),
-                            fontWeight = FontWeight.Medium
+                        TextButton(
+                            onClick = {
+                                onResult(leftButtonText)
+                            }
+                        ) {
+                            Text(
+                                text = leftButtonText.uppercase(),
+                                fontWeight = FontWeight.Medium
                             )
+                        }
+
+                        TextButton(
+                            onClick = {
+                                onResult(rightButtonText)
+                            },
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = if (destructive) {
+                                    MaterialTheme.colorScheme.error
+                                } else {
+                                    MaterialTheme.colorScheme.primary
+                                }
+                            )
+                        ) {
+                            Text(
+                                text = rightButtonText.uppercase(),
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
             }

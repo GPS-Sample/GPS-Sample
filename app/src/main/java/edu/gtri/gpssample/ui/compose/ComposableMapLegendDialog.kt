@@ -3,7 +3,9 @@ package edu.gtri.gpssample.ui.compose
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -39,8 +41,11 @@ fun ComposableMapLegendDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 20.dp)
             ) {
+                ComposableDialogTitleBar()
+
+                Spacer(modifier = Modifier.height( 20.dp ))
+
                 LegendItem(
                     R.drawable.home_black,
                     stringResource(R.string.not_visited)
@@ -70,6 +75,8 @@ fun ComposableMapLegendDialog(
                     R.drawable.home_purple,
                     stringResource(R.string.completed_collection)
                 )
+
+                Spacer(modifier = Modifier.height( 20.dp ))
             }
         }
     }

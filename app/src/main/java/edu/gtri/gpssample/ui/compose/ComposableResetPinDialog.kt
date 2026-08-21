@@ -49,132 +49,128 @@ fun ComposableResetPinDialog(
             color = MaterialTheme.colorScheme.surface
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding( all = 20.dp )
+                modifier = Modifier.fillMaxWidth()
             ) {
-                if (!title.isNullOrEmpty())
-                {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                }
+                ComposableDialogTitleBar(title = title)
 
-                Spacer(modifier = Modifier.height(20.dp))
-
-                var oldPin by remember { mutableStateOf("") }
-                var oldPinError by remember { mutableStateOf(false) }
-
-                OutlinedTextField(
-                    value = oldPin,
-                    textStyle = MaterialTheme.typography.bodyLarge,
-                    onValueChange = {
-                        oldPin = it
-                        oldPinError = false
-                    },
-                    isError = oldPinError,
-                    supportingText = {
-                        if (oldPinError) {
-                            Text(stringResource(R.string.pin_incorrect))
-                        }
-                    },
-                    placeholder = { Text(stringResource(R.string.enter_pin)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                var newPin1 by remember { mutableStateOf("") }
-                var pin1Missing by remember { mutableStateOf(false) }
-
-                OutlinedTextField(
-                    value = newPin1,
-                    textStyle = MaterialTheme.typography.bodyLarge,
-                    onValueChange = {
-                        newPin1 = it
-                        pin1Missing = false },
-                    isError = pin1Missing,
-                    supportingText = {
-                        if (pin1Missing) {
-                            Text("Please enter a PIN")
-                        }
-                    },
-                    placeholder = { Text(stringResource(R.string.enter_pin)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                var newPin2 by remember { mutableStateOf("") }
-                var pinMismatch by remember { mutableStateOf(false) }
-                var pin2Missing by remember { mutableStateOf(false) }
-
-                OutlinedTextField(
-                    value = newPin2,
-                    textStyle = MaterialTheme.typography.bodyLarge,
-                    onValueChange = {
-                        newPin2 = it
-                        pin2Missing = false
-                        pinMismatch = false
-                    },
-                    isError = pin2Missing || pinMismatch,
-                    supportingText = {
-                        if (pin2Missing) {
-                            Text(stringResource(R.string.enter_pin))
-                        }
-                        else if (pinMismatch) {
-                            Text(stringResource(R.string.pin_not_match))
-                        }
-                    },
-                    placeholder = { Text(stringResource(R.string.reenter_pin)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                )
-
-                Row(
-                    modifier = Modifier.
-                    fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding( all = 20.dp )
                 ) {
-                    TextButton(
-                        onClick = {
-                            onResult("")
-                        }
-                    ) {
-                        Text(
-                            text = stringResource(R.string.cancel),
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                    var oldPin by remember { mutableStateOf("") }
+                    var oldPinError by remember { mutableStateOf(false) }
 
-                    Button(
-                        onClick = {
-                            if (oldPin != currentPin)
-                            {
-                                oldPinError = true
+                    OutlinedTextField(
+                        value = oldPin,
+                        textStyle = MaterialTheme.typography.bodyLarge,
+                        onValueChange = {
+                            oldPin = it
+                            oldPinError = false
+                        },
+                        isError = oldPinError,
+                        supportingText = {
+                            if (oldPinError) {
+                                Text(stringResource(R.string.pin_incorrect))
                             }
-                            else if (newPin1.isEmpty())
-                            {
-                                pin1Missing = true
+                        },
+                        placeholder = { Text(stringResource(R.string.enter_pin)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    var newPin1 by remember { mutableStateOf("") }
+                    var pin1Missing by remember { mutableStateOf(false) }
+
+                    OutlinedTextField(
+                        value = newPin1,
+                        textStyle = MaterialTheme.typography.bodyLarge,
+                        onValueChange = {
+                            newPin1 = it
+                            pin1Missing = false },
+                        isError = pin1Missing,
+                        supportingText = {
+                            if (pin1Missing) {
+                                Text("Please enter a PIN")
                             }
-                            else if (newPin2.isEmpty())
-                            {
-                                pin2Missing = true
+                        },
+                        placeholder = { Text(stringResource(R.string.enter_pin)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    var newPin2 by remember { mutableStateOf("") }
+                    var pinMismatch by remember { mutableStateOf(false) }
+                    var pin2Missing by remember { mutableStateOf(false) }
+
+                    OutlinedTextField(
+                        value = newPin2,
+                        textStyle = MaterialTheme.typography.bodyLarge,
+                        onValueChange = {
+                            newPin2 = it
+                            pin2Missing = false
+                            pinMismatch = false
+                        },
+                        isError = pin2Missing || pinMismatch,
+                        supportingText = {
+                            if (pin2Missing) {
+                                Text(stringResource(R.string.enter_pin))
                             }
-                            else if (newPin1 != newPin2)
-                            {
-                                pinMismatch = true
+                            else if (pinMismatch) {
+                                Text(stringResource(R.string.pin_not_match))
                             }
-                            else
-                            {
-                                onResult( newPin1 )
-                            }
-                        }
+                        },
+                        placeholder = { Text(stringResource(R.string.reenter_pin)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    )
+
+                    Row(
+                        modifier = Modifier.
+                        fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        Text(
-                            text = stringResource(R.string.save),
-                            fontWeight = FontWeight.Medium
-                        )
+                        TextButton(
+                            onClick = {
+                                onResult("")
+                            }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.cancel),
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+
+                        Button(
+                            onClick = {
+                                if (oldPin != currentPin)
+                                {
+                                    oldPinError = true
+                                }
+                                else if (newPin1.isEmpty())
+                                {
+                                    pin1Missing = true
+                                }
+                                else if (newPin2.isEmpty())
+                                {
+                                    pin2Missing = true
+                                }
+                                else if (newPin1 != newPin2)
+                                {
+                                    pinMismatch = true
+                                }
+                                else
+                                {
+                                    onResult( newPin1 )
+                                }
+                            }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.save),
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
             }

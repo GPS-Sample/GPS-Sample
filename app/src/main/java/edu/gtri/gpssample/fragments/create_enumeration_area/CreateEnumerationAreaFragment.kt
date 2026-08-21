@@ -363,6 +363,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                     {
                         composableInputDialogHost.show(
                             title = resources.getString(R.string.enter_enum_area_name),
+                            description = null,
                             text = "",
                             onResult = { text ->
                                 if (text.isEmpty())
@@ -530,7 +531,8 @@ class CreateEnumerationAreaFragment : Fragment(),
                 binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
 
                 composableInputDialogHost.show(
-                    title = resources.getString(R.string.map_tile_boundary),
+                    title = null,
+                    description = resources.getString(R.string.map_tile_boundary),
                     text = "",
                     inputTypeNumber = true,
                     onResult = { text ->
@@ -575,6 +577,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                                     composableInputDialogHost.show(
                                         title = resources.getString(R.string.enter_enum_area_name),
+                                        description = null,
                                         text = "",
                                         onQrClick = {
                                             val intent = Intent(context, CameraXLivePreviewActivity::class.java)
@@ -818,6 +821,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                                     resources.getString(R.string.rename) -> {
                                         composableInputDialogHost.show(
                                             title = resources.getString(R.string.enter_enum_area_name),
+                                            description = null,
                                             text = enumArea.name,
                                             onQrClick = {
                                                 val intent = Intent(context, CameraXLivePreviewActivity::class.java)

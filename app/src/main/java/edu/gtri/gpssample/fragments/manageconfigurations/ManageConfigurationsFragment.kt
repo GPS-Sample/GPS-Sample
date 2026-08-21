@@ -201,6 +201,7 @@ class ManageConfigurationsFragment : Fragment()
 
                 composableInputDialogHost.show(
                     title = resources.getString(R.string.enter_encryption_password),
+                    description = null,
                     text = encryptionPassword,
                     onResult = { text ->
                         if (text.isNotEmpty())

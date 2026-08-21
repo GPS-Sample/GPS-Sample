@@ -59,86 +59,84 @@ fun ComposableCheckboxDialog(
             tonalElevation = 6.dp
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
-
-                if (!title.isNullOrEmpty()) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
+                title?.let {
+                    ComposableDialogTitleBar( title = it )
                 }
 
-                LazyColumn(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 400.dp)
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(4.dp)
-                        )
+                        .padding(24.dp)
                 ) {
-                    itemsIndexed(items) { index, item ->
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    checkedStates[index] = !checkedStates[index]
-                                }
-                                .padding(
-                                    horizontal = 12.dp,
-                                    vertical = 0.dp
-                                ),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = checkedStates[index],
-                                onCheckedChange = { checked ->
-                                    checkedStates[index] = checked
-                                }
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 400.dp)
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.outline,
+                                shape = RoundedCornerShape(4.dp)
                             )
-
-                            Text(
-                                text = item,
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.padding(start = 8.dp)
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(
-                        onClick = onCancel
                     ) {
-                        Text(stringResource(R.string.cancel))
-                    }
+                        itemsIndexed(items) { index, item ->
 
-                    Button(
-                        onClick = {
-                            val selections = ArrayList<String>()
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        checkedStates[index] = !checkedStates[index]
+                                    }
+                                    .padding(
+                                        horizontal = 12.dp,
+                                        vertical = 0.dp
+                                    ),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = checkedStates[index],
+                                    onCheckedChange = { checked ->
+                                        checkedStates[index] = checked
+                                    }
+                                )
 
-                            items.forEachIndexed { index, item ->
-                                if (checkedStates[index]) {
-                                    selections.add(item)
-                                }
+                                Text(
+                                    text = item,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
                             }
-
-                            onContinue(selections)
                         }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        Text(stringResource(R.string.continue_button))
+                        TextButton(
+                            onClick = onCancel
+                        ) {
+                            Text(stringResource(R.string.cancel))
+                        }
+
+                        Button(
+                            onClick = {
+                                val selections = ArrayList<String>()
+
+                                items.forEachIndexed { index, item ->
+                                    if (checkedStates[index]) {
+                                        selections.add(item)
+                                    }
+                                }
+
+                                onContinue(selections)
+                            }
+                        ) {
+                            Text(stringResource(R.string.continue_button))
+                        }
                     }
                 }
             }

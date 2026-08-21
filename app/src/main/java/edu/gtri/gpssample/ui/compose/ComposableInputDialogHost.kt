@@ -16,6 +16,7 @@ class ComposableInputDialogHost
     fun show(
         title: String?,
         text: String,
+        description: String?,
         required: Boolean = false,
         inputTypeNumber: Boolean = false,
         isPassword: Boolean = false,
@@ -28,6 +29,7 @@ class ComposableInputDialogHost
 
         dialogContent = DialogContent(
             title = title,
+            description = description,
             text = text,
             required = required,
             inputTypeNumber = inputTypeNumber,
@@ -47,6 +49,7 @@ class ComposableInputDialogHost
                 {
                     ComposableInputDialog(
                         title = it.title,
+                        description = it.description,
                         text = it.text,
                         required = it.required,
                         inputTypeNumber = it.inputTypeNumber,
@@ -70,6 +73,7 @@ class ComposableInputDialogHost
 
     private data class DialogContent(
         val title: String?,
+        val description: String?,
         val text: String,
         val required: Boolean = true,
         val inputTypeNumber: Boolean = false,

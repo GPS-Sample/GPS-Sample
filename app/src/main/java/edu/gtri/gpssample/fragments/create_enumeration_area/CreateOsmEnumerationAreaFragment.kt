@@ -335,6 +335,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                     {
                         composableInputDialogHost.show(
                             title = resources.getString(R.string.enter_enum_area_name),
+                            description = null,
                             text = "",
                             onQrClick = {
                                 val intent = Intent(context, CameraXLivePreviewActivity::class.java)
@@ -718,6 +719,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                                     resources.getString(R.string.rename) -> {
                                         composableInputDialogHost.show(
                                             title = resources.getString(R.string.enter_enum_area_name),
+                                            description = null,
                                             text = enumArea.name,
                                             onQrClick = {
                                                 val intent = Intent(context, CameraXLivePreviewActivity::class.java)
@@ -775,7 +777,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                         currentTapType = TapType.None
 
                         composableInputDialogHost.show(
-                            title = resources.getString(R.string.map_tile_boundary),
+                            title = null,
+                            description = resources.getString(R.string.map_tile_boundary),
                             text = "",
                             inputTypeNumber = true,
                             onResult = { text ->
@@ -785,6 +788,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                                         radius = it * 1000
                                         composableInputDialogHost.show(
                                             title = resources.getString(R.string.enter_enum_area_name),
+                                            description = null,
                                             text = "",
                                             onQrClick = {
                                                 getResult.launch(Intent(context, CameraXLivePreviewActivity::class.java))

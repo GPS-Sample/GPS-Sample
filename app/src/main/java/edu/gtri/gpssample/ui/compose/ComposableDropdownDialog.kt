@@ -53,84 +53,83 @@ fun ComposableDropdownDialog(
             color = MaterialTheme.colorScheme.surface
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
-                if (!title.isNullOrEmpty()) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
+                title?.let {
+                    ComposableDialogTitleBar(title = it)
                 }
 
-                var selectedItem by remember { mutableIntStateOf(selectedIndex) }
-
-                var expanded by remember { mutableStateOf(false) }
-
-                Box(
-                    modifier = Modifier.fillMaxWidth()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp)
                 ) {
-                    OutlinedTextField(
-                        value = items.getOrNull(selectedItem) ?: "",
-                        onValueChange = {},
-                        readOnly = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                expanded = true
-                            },
-                    )
+                    var selectedItem by remember { mutableIntStateOf(selectedIndex) }
 
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = {
-                            expanded = false
-                        },
+                    var expanded by remember { mutableStateOf(false) }
+
+                    Box(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        items.forEachIndexed { index, item ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(item)
+                        OutlinedTextField(
+                            value = items.getOrNull(selectedItem) ?: "",
+                            onValueChange = {},
+                            readOnly = true,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    expanded = true
                                 },
-                                onClick = {
-                                    selectedItem = index
-                                    expanded = false
-                                }
+                        )
+
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = {
+                                expanded = false
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            items.forEachIndexed { index, item ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(item)
+                                    },
+                                    onClick = {
+                                        selectedItem = index
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(
+                            onClick = {
+                                onResult(null)
+                            }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.cancel),
+                                fontWeight = FontWeight.Medium
                             )
                         }
-                    }
-                }
 
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(
-                        onClick = {
-                            onResult(null)
+                        Button(
+                            onClick = {
+                                onResult(selectedItem)
+                            }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.save),
+                                fontWeight = FontWeight.Medium
+                            )
                         }
-                    ) {
-                        Text(
-                            text = stringResource(R.string.cancel),
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    Button(
-                        onClick = {
-                            onResult(selectedItem)
-                        }
-                    ) {
-                        Text(
-                            text = stringResource(R.string.save),
-                            fontWeight = FontWeight.Medium
-                        )
                     }
                 }
             }

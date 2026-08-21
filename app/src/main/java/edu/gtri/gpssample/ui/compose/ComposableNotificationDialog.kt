@@ -39,33 +39,30 @@ fun ComposableNotificationDialog(
             tonalElevation = 6.dp
         ) {
             Column(
-                modifier = Modifier.padding(20.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
-                if (!title.isNullOrEmpty()) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                ComposableDialogTitleBar( title = title )
 
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                if (!message.isNullOrEmpty())
-                {
-                    Text(
-                        text = message,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                Column(
+                    modifier = Modifier.padding(20.dp)
                 ) {
-                    TextButton(
-                        onClick = onDismiss
+                    if (!message.isNullOrEmpty())
+                    {
+                        Text(
+                            text = message,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        Text(stringResource(R.string.save).uppercase())
+                        TextButton(
+                            onClick = onDismiss
+                        ) {
+                            Text(stringResource(R.string.ok).uppercase())
+                        }
                     }
                 }
             }

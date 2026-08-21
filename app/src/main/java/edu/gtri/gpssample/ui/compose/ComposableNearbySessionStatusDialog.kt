@@ -55,61 +55,62 @@ fun ComposableNearbySessionStatusDialog(
             tonalElevation = 6.dp
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        start = 20.dp,
-                        top = 20.dp,
-                        end = 20.dp,
-                        bottom = 12.dp
-                    )
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge
-                )
+                ComposableDialogTitleBar( title = title )
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                when (state) {
-                    is NearbySessionState.Advertising -> {
-                        NearbySessionQrCode(
-                            sessionId = state.sessionId
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 20.dp,
+                            top = 20.dp,
+                            end = 20.dp,
+                            bottom = 10.dp
                         )
-                    }
+                ) {
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                    NearbySessionState.Idle -> {
-                        // Nothing to display.
-                    }
-
-                    else -> {
-                        NearbySessionStatus(
-                            state = state
-                        )
-                    }
-                }
-
-                if (state != NearbySessionState.Idle) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 12.dp),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        Button(
-                            onClick = onCancel
-                        ) {
-                            Text(
-                                text = when (state) {
-                                    NearbySessionState.Connecting,
-                                    NearbySessionState.Connected ->
-                                        stringResource(R.string.cancel)
-
-                                    else ->
-                                        stringResource(R.string.done)
-                                },
-                                fontWeight = FontWeight.Medium
+                    when (state) {
+                        is NearbySessionState.Advertising -> {
+                            NearbySessionQrCode(
+                                sessionId = state.sessionId
                             )
+                        }
+
+                        NearbySessionState.Idle -> {
+                            // Nothing to display.
+                        }
+
+                        else -> {
+                            NearbySessionStatus(
+                                state = state
+                            )
+                        }
+                    }
+
+                    if (state != NearbySessionState.Idle) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 20.dp, bottom = 10.dp),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            Button(
+                                onClick = onCancel
+                            ) {
+                                Text(
+                                    text = when (state) {
+                                        NearbySessionState.Connecting,
+                                        NearbySessionState.Connected ->
+                                            stringResource(R.string.cancel)
+
+                                        else ->
+                                            stringResource(R.string.done)
+                                    },
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
                         }
                     }
                 }

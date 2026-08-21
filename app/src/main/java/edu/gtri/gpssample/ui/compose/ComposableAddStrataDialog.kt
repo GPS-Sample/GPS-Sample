@@ -66,33 +66,20 @@ fun ComposableAddStrataDialog(
                     .fillMaxWidth()
                     .padding(bottom = 20.dp)
             ) {
-
-                // Title bar
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .background(MaterialTheme.colorScheme.primary)
-                ) {
-                    Text(
-                        text = title,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-
-                    IconButton(
-                        onClick = onDelete,
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.delete_white),
-                            contentDescription = "Delete",
-                            tint = Color.Unspecified
-                        )
+                ComposableDialogTitleBar(
+                    title = title,
+                    actionIcon = {
+                        IconButton(
+                            onClick = onDelete
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.delete_white),
+                                contentDescription = stringResource(R.string.delete),
+                                tint = Color.Unspecified
+                            )
+                        }
                     }
-                }
+                )
 
                 // Strata name
                 Text(

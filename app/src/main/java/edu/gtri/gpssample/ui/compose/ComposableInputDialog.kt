@@ -39,6 +39,7 @@ import edu.gtri.gpssample.R
 @Composable
 fun ComposableInputDialog(
     title: String?,
+    description: String?,
     text: String,
     required: Boolean = true,
     inputTypeNumber: Boolean = false,
@@ -65,88 +66,96 @@ fun ComposableInputDialog(
             color = MaterialTheme.colorScheme.surface
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding( all = 20.dp )
+                modifier = Modifier.fillMaxWidth()
             ) {
-                if (!title.isNullOrEmpty())
+                if (title == null && onQrClick == null)
                 {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.weight(1f)
-                        )
-
-                        if (onQrClick != null) {
-                            IconButton(
-                                onClick = {
-                                    onQrClick.invoke()
-                                }
-                            ) {
+                    ComposableDialogTitleBar()
+                }
+                else if (title != null && onQrClick == null) {
+                    ComposableDialogTitleBar(title)
+                }
+                else if (onQrClick != null)
+                {
+                    ComposableDialogTitleBar(
+                        title = title,
+                        actionIcon = {
+                            IconButton(onClick = onQrClick) {
                                 Icon(
                                     painter = painterResource(R.drawable.qrcode),
                                     contentDescription = "Scan QR code",
-                                    tint = Color.Unspecified
+                                    tint = Color.White
                                 )
                             }
                         }
-                    }                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                var textValue by remember { mutableStateOf(text) }
-                val keyboardType = if (inputTypeNumber) KeyboardType.Decimal else KeyboardType.Text
-
-                LaunchedEffect(qrText) {
-                    if (qrText != null) {
-                        textValue = qrText
-                    }
+                    )
                 }
 
-                OutlinedTextField(
-                    value = textValue,
-                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-                    textStyle = MaterialTheme.typography.bodyLarge,
-                    visualTransformation =     if (isPassword) { PasswordVisualTransformation() } else { VisualTransformation.None },
-                    onValueChange = {
-                        textValue = it
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding( all = 20.dp )
+                ) {
+                    description?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 20.dp)
+                        )
                     }
-                )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                    var textValue by remember { mutableStateOf(text) }
+                    val keyboardType = if (inputTypeNumber) KeyboardType.Decimal else KeyboardType.Text
 
-                Row(
-                    modifier = Modifier.
+                    LaunchedEffect(qrText) {
+                        if (qrText != null) {
+                            textValue = qrText
+                        }
+                    }
+
+                    OutlinedTextField(
+                        value = textValue,
+                        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                        textStyle = MaterialTheme.typography.bodyLarge,
+                        visualTransformation =     if (isPassword) { PasswordVisualTransformation() } else { VisualTransformation.None },
+                        onValueChange = {
+                            textValue = it
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Row(
+                        modifier = Modifier.
                         fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(
-                        onClick = {
-                            onResult("")
-                        }
                     ) {
-                        Text(
-                            text = stringResource(R.string.cancel),
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    Button(
-                        onClick = {
-                            if (!required || (textValue.length > 0))
-                            {
-                                onResult(textValue)
+                        TextButton(
+                            onClick = {
+                                onResult("")
                             }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.cancel),
+                                fontWeight = FontWeight.Medium
+                            )
                         }
-                    ) {
-                        Text(
-                            text = stringResource(R.string.save),
-                            fontWeight = FontWeight.Medium
-                        )
+
+                        Button(
+                            onClick = {
+                                if (!required || (textValue.length > 0))
+                                {
+                                    onResult(textValue)
+                                }
+                            }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.save),
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
             }
