@@ -20,12 +20,8 @@ import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.mapbox.geojson.Point
 import com.mapbox.maps.Style
@@ -40,10 +36,8 @@ import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import kotlinx.coroutines.launch
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
-import org.osmdroid.events.MapListener
 import java.util.*
 
 class CreateEnumerationTeamFragment : Fragment(), OnTouchListener

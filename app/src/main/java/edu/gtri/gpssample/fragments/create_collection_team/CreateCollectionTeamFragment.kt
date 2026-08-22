@@ -19,38 +19,29 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.mapbox.geojson.Point
 import com.mapbox.maps.Style
-import com.mapbox.maps.plugin.gestures.OnMapClickListener
-import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateCollectionTeamBinding
-import edu.gtri.gpssample.databinding.FragmentCreateEnumerationTeamBinding
-import edu.gtri.gpssample.dialogs.MultiConfirmationDialog
-import edu.gtri.gpssample.fragments.create_enumeration_team.CreateEnumerationTeamFragment
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
+import edu.gtri.gpssample.ui.compose.ComposableSelectionDialogHost
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
-import kotlinx.coroutines.launch
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
-import org.osmdroid.events.MapListener
 import java.util.*
 
 class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
@@ -67,7 +58,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
     private var intersectionPolygon: Any? = null
     private val locationUuids = ArrayList<String>()
     private val polyLinePoints = ArrayList<Point>()
-
+    private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
     enum class TapType {
         None,
         DrawBoundary,
@@ -99,6 +90,14 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        composableSelectionDialogHost = ComposableSelectionDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableSelectionDialogHost.Content()
+        }
 
         sharedViewModel.currentConfiguration?.value?.let {_config ->
             config = _config
@@ -198,22 +197,29 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
                 items.add( team.name )
             }
 
-            MultiConfirmationDialog( requireActivity(), "Select an existing Team", "", items, null ) { selection, tag ->
-                polyLinePoints.clear()
-
-                for (team in enumArea.enumerationTeams)
+            composableSelectionDialogHost.show(
+                title = resources.getString(R.string.select_an_existing_team),
+                message = null,
+                items = items,
+            ) { selection ->
+                if (selection.isNotEmpty())
                 {
-                    if (selection == team.name)
+                    polyLinePoints.clear()
+
+                    for (team in enumArea.enumerationTeams)
                     {
-                        for (latLon in team.polygon)
+                        if (selection == team.name)
                         {
-                            polyLinePoints.add( Point.fromLngLat(latLon.longitude, latLon.latitude ))
+                            for (latLon in team.polygon)
+                            {
+                                polyLinePoints.add( Point.fromLngLat(latLon.longitude, latLon.latitude ))
+                            }
+
+                            binding.teamNameEditText.setText( team.name )
+                            createIntersectionPolygon()
+
+                            break
                         }
-
-                        binding.teamNameEditText.setText( team.name )
-                        createIntersectionPolygon()
-
-                        break
                     }
                 }
             }

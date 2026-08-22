@@ -7,10 +7,9 @@
 
 package edu.gtri.gpssample.fragments.manage_enumeration_teams
 
-import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.*
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -20,16 +19,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.CollectionTeam
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.EnumerationTeam
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamsBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.fragments.manage_collection_teams.ManageCollectionTeamsAdapter
-import edu.gtri.gpssample.managers.MapManager
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,7 +36,7 @@ class ManageEnumerationTeamsFragment : Fragment()
     private lateinit var enumArea: EnumArea
     private lateinit var manageEnumerationTeamsAdapter: ManageEnumerationTeamsAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
-
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
     private var _binding: FragmentManageEnumerationTeamsBinding? = null
     private val binding get() = _binding!!
 
@@ -63,6 +58,14 @@ class ManageEnumerationTeamsFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableConfirmationDialogHost.Content()
+        }
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
             study = it
@@ -135,19 +138,18 @@ class ManageEnumerationTeamsFragment : Fragment()
 
     private fun shouldDeleteTeam(enumerationTeam: EnumerationTeam)
     {
-        ConfirmationDialog( activity, resources.getString(R.string.delete_team_message), resources.getString(R.string.delete_team_message), resources.getString(R.string.no), resources.getString(R.string.yes), enumerationTeam, false ) { buttonPressed, tag ->
-            when( buttonPressed )
+        composableConfirmationDialogHost.show(
+            title = resources.getString(R.string.delete_team_message),
+            message = resources.getString(R.string.delete_team_message),
+            leftButtonText = resources.getString(R.string.no),
+            rightButtonText = resources.getString(R.string.yes),
+            destructive = true
+        ) { selection ->
+            if (selection == resources.getString(R.string.yes))
             {
-                ConfirmationDialog.ButtonPress.Left -> {
-                }
-                ConfirmationDialog.ButtonPress.Right -> {
-                    val team = tag as EnumerationTeam
-                    enumArea.enumerationTeams.remove( team )
-                    manageEnumerationTeamsAdapter.updateTeams(enumArea.enumerationTeams)
-                    DAO.enumerationTeamDAO.deleteTeam( team )
-                }
-                ConfirmationDialog.ButtonPress.None -> {
-                }
+                enumArea.enumerationTeams.remove( enumerationTeam )
+                manageEnumerationTeamsAdapter.updateTeams(enumArea.enumerationTeams)
+                DAO.enumerationTeamDAO.deleteTeam( enumerationTeam )
             }
         }
     }

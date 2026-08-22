@@ -52,12 +52,19 @@ import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.*
-import edu.gtri.gpssample.fragments.createstudy.DeleteMode
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionHostManager
 import edu.gtri.gpssample.managers.PerformanceManager
 import edu.gtri.gpssample.managers.TileServer
+import edu.gtri.gpssample.ui.compose.ComposableBusyIndicatorDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableCheckboxDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableEnumerationHelpDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableMapLegendDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableNearbySessionStatusDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableSelectionDialogHost
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -72,8 +79,7 @@ import java.util.*
 class PerformEnumerationFragment : Fragment(),
     View.OnTouchListener,
     InfoDialog.InfoDialogDelegate,
-    MapManager.MapTileCacheDelegate,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate
+    MapManager.MapTileCacheDelegate
 {
     private lateinit var user: User
     private lateinit var mapView: View
@@ -92,7 +98,6 @@ class PerformEnumerationFragment : Fragment(),
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
     private val enumerationTeamLocations = ArrayList<Location>()
-    private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var includeConfig = false
     private var includeImages = false
     private var maxSubaddress = 0
@@ -101,6 +106,14 @@ class PerformEnumerationFragment : Fragment(),
     private val selectedTeamNames = ArrayList<String>()
     private val selectedBreadcrumbs = ArrayList<Breadcrumb>()
     private var isShowingBreadcrumbs = false
+    private lateinit var composableInputDialogHost: ComposableInputDialogHost
+    private lateinit var composableCheckboxDialogHost: ComposableCheckboxDialogHost
+    private lateinit var composableMapLegendDialogHost: ComposableMapLegendDialogHost
+    private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
+    private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
+    private lateinit var composableBusyIndicatorDialogHost: ComposableBusyIndicatorDialogHost
+    private lateinit var composableEnumerationHelpDialogHost: ComposableEnumerationHelpDialogHost
     private lateinit var composableNearbySessionStatusDialogHost: ComposableNearbySessionStatusDialogHost
 
     enum class BreadcrumbRecordingState
@@ -134,11 +147,27 @@ class PerformEnumerationFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
+        composableInputDialogHost = ComposableInputDialogHost()
+        composableCheckboxDialogHost = ComposableCheckboxDialogHost()
+        composableMapLegendDialogHost = ComposableMapLegendDialogHost()
+        composableSelectionDialogHost = ComposableSelectionDialogHost()
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+        composableNotificationDialogHost = ComposableNotificationDialogHost()
+        composableBusyIndicatorDialogHost = ComposableBusyIndicatorDialogHost()
+        composableEnumerationHelpDialogHost = ComposableEnumerationHelpDialogHost()
         composableNearbySessionStatusDialogHost = ComposableNearbySessionStatusDialogHost()
 
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
         binding.dialogComposeView.setContent {
+            composableInputDialogHost.Content()
+            composableCheckboxDialogHost.Content()
+            composableMapLegendDialogHost.Content()
+            composableSelectionDialogHost.Content()
+            composableConfirmationDialogHost.Content()
+            composableNotificationDialogHost.Content()
+            composableBusyIndicatorDialogHost.Content()
+            composableEnumerationHelpDialogHost.Content()
             composableNearbySessionStatusDialogHost.Content()
         }
 
@@ -446,15 +475,15 @@ class PerformEnumerationFragment : Fragment(),
         }
 
         binding.legendTextView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         binding.legendImageView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         binding.helpButton.setOnClickListener {
-            PerformEnumerationHelpDialog( activity!! )
+            composableEnumerationHelpDialogHost.show()
         }
 
         binding.deleteBreadcrumbsButton.setOnClickListener {
@@ -479,7 +508,10 @@ class PerformEnumerationFragment : Fragment(),
             enumArea.mapTileRegion?.let {
                 val mapTileRegions = ArrayList<MapTileRegion>()
                 mapTileRegions.add( it )
-                busyIndicatorDialog = BusyIndicatorDialog(activity!!, resources.getString(R.string.downloading_map_tiles), this )
+                composableBusyIndicatorDialogHost.show(title = resources.getString(R.string.downloading_map_tiles), message = null) {
+                    composableBusyIndicatorDialogHost.cancel()
+                    MapManager.instance().cancelTilePackDownload()
+                }
                 MapManager.instance().cacheMapTiles(activity!!, mapView, mapTileRegions, this )
             }
         }
@@ -512,18 +544,17 @@ class PerformEnumerationFragment : Fragment(),
             {
                 if (config.allowManualLocationEntry)
                 {
-                    ConfirmationDialog( activity, resources.getString(R.string.select_location), "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), null, true ) { buttonPressed, tag ->
-                        when( buttonPressed )
-                        {
-                            ConfirmationDialog.ButtonPress.Left -> {
-                                addHouseholdButtonPress()
-                            }
-                            ConfirmationDialog.ButtonPress.Right -> {
-                                dropMode = true
-                                binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                            }
-                            ConfirmationDialog.ButtonPress.None -> {
-                            }
+                    composableSelectionDialogHost.show(
+                        title = resources.getString(R.string.select_location),
+                        message = null,
+                        items = listOf(resources.getString(R.string.current_location),resources.getString(R.string.new_location)),
+                    ) { selection ->
+                        if (selection == resources.getString(R.string.current_location)) {
+                            addHouseholdButtonPress()
+                        }
+                        else if (selection == resources.getString(R.string.new_location)) {
+                            dropMode = true
+                            binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                         }
                     }
                 }
@@ -573,89 +604,91 @@ class PerformEnumerationFragment : Fragment(),
 
             val title = if (user.role == Role.Enumerator.value) resources.getString(R.string.export_enum_data) else resources.getString(R.string.export_configuration)
 
-            ConfirmationDialog( activity, title, resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {
-                        composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
-                        {
-                            nearbySessionHostManager?.stopHosting()
-                        }
-
-                        nearbySessionHostManager = NearbySessionHostManager( requireContext().applicationContext, config )
-
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            repeatOnLifecycle(Lifecycle.State.STARTED )
-                            {
-                                nearbySessionHostManager?.state?.collect { state ->
-                                    composableNearbySessionStatusDialogHost.updateState(state)
-                                }
-                            }
-                        }
-
-                        nearbySessionHostManager?.startHosting()
+            composableSelectionDialogHost.show(
+                title = title,
+                message = resources.getString(R.string.select_export_message),
+                items = listOf(resources.getString(R.string.qr_code),resources.getString(R.string.file_system)),
+            ) { selection ->
+                if (selection == resources.getString(R.string.current_location)) {
+                    composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
+                    {
+                        nearbySessionHostManager?.stopHosting()
                     }
 
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        val items = ArrayList<String>()
-                        items.add( "Configuration Files" )
-                        items.add( "Image Files" )
-                        CheckboxDialog( activity!!, "Select the file types to export", items ) { selections ->
-                            includeConfig = false
-                            includeImages = false
+                    nearbySessionHostManager = NearbySessionHostManager( requireContext().applicationContext, config )
 
-                            for (selection in selections) {
-                                if (selection == items[0]) includeConfig = true
-                                if (selection == items[1]) includeImages = true
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        repeatOnLifecycle(Lifecycle.State.STARTED )
+                        {
+                            nearbySessionHostManager?.state?.collect { state ->
+                                composableNearbySessionStatusDialogHost.updateState(state)
                             }
+                        }
+                    }
 
-                            if (includeConfig || includeImages)
-                            {
-                                ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null, true) { buttonPressed, tag ->
-                                    when( buttonPressed )
+                    nearbySessionHostManager?.startHosting()
+                }
+                else if (selection == resources.getString(R.string.new_location)) {
+                    val items = ArrayList<String>()
+                    items.add( "Configuration Files" )
+                    items.add( "Image Files" )
+
+                    composableCheckboxDialogHost.show(
+                        title = resources.getString(R.string.select_the_file_types_to_export),
+                        items = items,
+                        isChecked = emptyList()
+                    ) { selections ->
+                        includeConfig = false
+                        includeImages = false
+
+                        for (selection in selections) {
+                            if (selection == items[0]) includeConfig = true
+                            if (selection == items[1]) includeImages = true
+                        }
+
+                        if (includeConfig || includeImages)
+                        {
+                            composableSelectionDialogHost.show(
+                                title = resources.getString(R.string.select_file_location),
+                                message = null,
+                                items = listOf(resources.getString(R.string.default_location),resources.getString(R.string.let_me_choose)),
+                            ) { selection ->
+                                if (selection == resources.getString(R.string.default_location)) {
+                                    val zipUtils = ZipUtils()
+
+                                    composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
                                     {
-                                        ConfirmationDialog.ButtonPress.Left -> {
-                                            val zipUtils = ZipUtils()
+                                        zipUtils.cancel()
+                                    }
 
-                                            composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
-                                            {
-                                                zipUtils.cancel()
-                                            }
-
-                                            viewLifecycleOwner.lifecycleScope.launch {
-                                                zipUtils.state.collect { state ->
-                                                    composableNearbySessionStatusDialogHost.updateState(state)
-                                                }
-                                            }
-
-                                            PerformanceManager.startTimer()
-
-                                            zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Enumerated", includeConfig, includeImages ) { success ->
-                                                if (success)
-                                                {
-                                                    NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.export_succeeded))
-                                                }
-                                                else
-                                                {
-                                                    NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
-                                                }
-
-                                                composableNearbySessionStatusDialogHost.dismiss()
-
-                                                Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
-                                            }
-                                        }
-                                        ConfirmationDialog.ButtonPress.Right -> {
-                                            exportToDevice()
-                                        }
-                                        ConfirmationDialog.ButtonPress.None -> {
+                                    viewLifecycleOwner.lifecycleScope.launch {
+                                        zipUtils.state.collect { state ->
+                                            composableNearbySessionStatusDialogHost.updateState(state)
                                         }
                                     }
+
+                                    PerformanceManager.startTimer()
+
+                                    zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Enumerated", includeConfig, includeImages ) { success ->
+                                        if (success)
+                                        {
+                                            composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded))
+                                        }
+                                        else
+                                        {
+                                            composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
+                                        }
+
+                                        composableNearbySessionStatusDialogHost.dismiss()
+
+                                        Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
+                                    }
+                                }
+                                else if (selection == resources.getString(R.string.let_me_choose)) {
+                                    exportToDevice()
                                 }
                             }
                         }
-                    }
-                    ConfirmationDialog.ButtonPress.None -> {
                     }
                 }
             }
@@ -681,17 +714,21 @@ class PerformEnumerationFragment : Fragment(),
 
         if (enumerationCount == 0)
         {
-            InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "1", resources.getString(R.string.cancel), resources.getString(R.string.save), null, false, true, true )  { action, text, tag ->
-                when (action) {
-                    InputDialog.Action.DidCancel -> {}
-                    InputDialog.Action.DidEnterText -> {
+            composableInputDialogHost.show(
+                title = resources.getString(R.string.subaddress_start),
+                description = null,
+                text = "1",
+                inputTypeNumber = true,
+                cancelable = true,
+                onResult = { text ->
+                    if (text.isNotEmpty())
+                    {
                         text.toIntOrNull()?.let {
                             maxSubaddress = it - 1
                         }
                     }
-                    InputDialog.Action.DidPressQRButton -> {}
                 }
-            }
+            )
         }
 
         binding.listItemEnumArea.titleLayout.visibility = View.GONE
@@ -791,36 +828,37 @@ class PerformEnumerationFragment : Fragment(),
                         isChecked.add( if (team.name == enumerationTeam.name) true else false )
                     }
 
-                    CheckboxDialog( activity!!, "Select Enumeration Teams", choices, isChecked ) { selected_team_names ->
-                        if (selected_team_names.isNotEmpty())
+                    composableCheckboxDialogHost.show(
+                        title = resources.getString(R.string.select_enumeration_teams),
+                        items = choices,
+                        isChecked = emptyList()
+                    ) { selections ->
+                        selectedTeamNames.clear()
+                        selectedBreadcrumbs.clear()
+
+                        for (selectedTeamName in selections)
                         {
-                            selectedTeamNames.clear()
-                            selectedBreadcrumbs.clear()
-
-                            for (selectedTeamName in selected_team_names)
+                            for (team in enumArea.enumerationTeams)
                             {
-                                for (team in enumArea.enumerationTeams)
+                                if (team.name == selectedTeamName)
                                 {
-                                    if (team.name == selectedTeamName)
-                                    {
-                                        selectedTeamNames.add( team.name )
+                                    selectedTeamNames.add( team.name )
 
-                                        for (breadcrumb in enumArea.breadcrumbs)
+                                    for (breadcrumb in enumArea.breadcrumbs)
+                                    {
+                                        if (breadcrumb.enumTeamName == team.name)
                                         {
-                                            if (breadcrumb.enumTeamName == team.name)
-                                            {
-                                                selectedBreadcrumbs.add( breadcrumb )
-                                            }
+                                            selectedBreadcrumbs.add( breadcrumb )
                                         }
                                     }
                                 }
                             }
-
-                            isShowingBreadcrumbs = true
-                            binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
-                            binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)))
-                            refreshMap()
                         }
+
+                        isShowingBreadcrumbs = true
+                        binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
+                        binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)))
+                        refreshMap()
                     }
                 }
             }
@@ -915,34 +953,32 @@ class PerformEnumerationFragment : Fragment(),
 
     private fun pointIsTooClose( distance: String, message: String, point: Point )
     {
-        ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, false ) { buttonPressed, tag ->
-            when( buttonPressed )
-            {
-                ConfirmationDialog.ButtonPress.Left -> {
+        composableConfirmationDialogHost.show(
+            title = resources.getString(R.string.warning),
+            message = message,
+            leftButtonText = resources.getString(R.string.no),
+            rightButtonText = resources.getString(R.string.yes),
+        ) { selection ->
+            if (selection == resources.getString(R.string.yes)) {
+                var accuracy = -1
+
+                currentGPSAccuracy?.let {
+                    accuracy = it
                 }
-                ConfirmationDialog.ButtonPress.Right -> {
-                    var accuracy = -1
 
-                    currentGPSAccuracy?.let {
-                        accuracy = it
-                    }
+                val pt = tag as Point
+                val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+                val location = Location( timeZone, accuracy, pt.latitude(), pt.longitude(), pt.altitude(), false, "", "")
 
-                    val pt = tag as Point
-                    val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                    val location = Location( timeZone, accuracy, pt.latitude(), pt.longitude(), pt.altitude(), false, "", "")
+                DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
+                enumArea.locations.add(location)
 
-                    DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
-                    enumArea.locations.add(location)
+                sharedViewModel.currentLocationUuid = location.uuid
 
-                    sharedViewModel.currentLocationUuid = location.uuid
-
-                    enumerationTeamLocations.add(location)
-                    enumerationTeam.locationUuids.add(location.uuid)
-                    DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
-                    navigateToAddHouseholdFragment()
-                }
-                ConfirmationDialog.ButtonPress.None -> {
-                }
+                enumerationTeamLocations.add(location)
+                enumerationTeam.locationUuids.add(location.uuid)
+                DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
+                navigateToAddHouseholdFragment()
             }
         }
     }
@@ -1119,43 +1155,40 @@ class PerformEnumerationFragment : Fragment(),
                         enumArea.breadcrumbs.add(Breadcrumb(enumArea.uuid, enumerationTeam.name, location.latitude, location.longitude, enumArea.breadcrumbs.last().groupId))
                     }
 
-                    ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                        when( buttonPressed )
+                    composableConfirmationDialogHost.show(
+                        title = resources.getString(R.string.please_confirm),
+                        message = resources.getString(R.string.is_multi_family),
+                        leftButtonText = resources.getString(R.string.no),
+                        rightButtonText = resources.getString(R.string.yes),
+                    ) { selection ->
+                        val enumerationItem = EnumerationItem()
+
+                        enumerationItem.locationUuid = location.uuid
+
+                        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem,enumerationItem.version )
+                        location.enumerationItems.add(enumerationItem)
+                        sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
+
+                        sharedViewModel.currentConfiguration?.value?.let { config ->
+                            if (config.autoIncrementSubaddress) {
+                                enumerationItem.subAddress = "${maxSubaddress + 1}"
+                            }
+                        }
+
+                        if (selection == resources.getString(R.string.no))
                         {
-                            ConfirmationDialog.ButtonPress.Left,
-                            ConfirmationDialog.ButtonPress.Right -> {
-                                val enumerationItem = EnumerationItem()
-
-                                enumerationItem.locationUuid = location.uuid
-
-                                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem,enumerationItem.version )
-                                location.enumerationItems.add(enumerationItem)
-                                sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
-
-                                sharedViewModel.currentConfiguration?.value?.let { config ->
-                                    if (config.autoIncrementSubaddress) {
-                                        enumerationItem.subAddress = "${maxSubaddress + 1}"
-                                    }
-                                }
-
-                                if (buttonPressed == ConfirmationDialog.ButtonPress.Left)
-                                {
-                                    didNavigate = true
-                                    val bundle = Bundle()
-                                    bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
-                                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
-                                }
-                                else
-                                {
-                                    didNavigate = true
-                                    val bundle = Bundle()
-                                    bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
-                                    bundle.putInt( Keys.kStartSubaddress.value, maxSubaddress)
-                                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle)
-                                }
-                            }
-                            ConfirmationDialog.ButtonPress.None -> {
-                            }
+                            didNavigate = true
+                            val bundle = Bundle()
+                            bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
+                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
+                        }
+                        else if (selection == resources.getString(R.string.yes))
+                        {
+                            didNavigate = true
+                            val bundle = Bundle()
+                            bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
+                            bundle.putInt( Keys.kStartSubaddress.value, maxSubaddress)
+                            findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle)
                         }
                     }
                 }
@@ -1281,11 +1314,11 @@ class PerformEnumerationFragment : Fragment(),
                         zipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { success ->
                             if (success)
                             {
-                                NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.export_succeeded))
+                                composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded))
                             }
                             else
                             {
-                                NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
                             }
 
                             composableNearbySessionStatusDialogHost.dismiss()
@@ -1299,7 +1332,7 @@ class PerformEnumerationFragment : Fragment(),
         catch (ex: java.lang.Exception)
         {
             Log.d( "xxx", ex.stackTraceToString())
-            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
         }
     }
 
@@ -1309,33 +1342,20 @@ class PerformEnumerationFragment : Fragment(),
         binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
     }
 
-    override fun didPressCancelButton()
-    {
-        MapManager.instance().cancelTilePackDownload()
-    }
-
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {
-        busyIndicatorDialog?.let {
-            activity!!.runOnUiThread {
-                it.updateProgress(resources.getString(R.string.downloading_map_tiles) + " ${numLoaded}/${numNeeded}")
-            }
+        activity!!.runOnUiThread {
+            composableBusyIndicatorDialogHost.updateMessage("${numLoaded}/${numNeeded}")
         }
     }
 
     override fun tilePacksLoaded( error: String )
     {
         activity!!.runOnUiThread {
+            composableBusyIndicatorDialogHost.cancel()
             if (error.isNotEmpty())
             {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                busyIndicatorDialog?.alertDialog?.cancel()
+                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -1344,16 +1364,18 @@ class PerformEnumerationFragment : Fragment(),
 
     fun autoGenerateLocations()
     {
-        InputDialog(activity!!, false, "Enter the number of HH's to create", "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, false, true) { action, text, tag ->
-            when (action)
-            {
-                InputDialog.Action.DidCancel -> {}
-                InputDialog.Action.DidPressQRButton -> {}
-                InputDialog.Action.DidEnterText -> {
+        composableInputDialogHost.show(
+            title = "Enter the number of HH's to create",
+            description = null,
+            text = "",
+            inputTypeNumber = true,
+            onResult = { text ->
+                if (text.isNotEmpty())
+                {
                     text.toIntOrNull()?.let { numLocations ->
 
                         isAcceptingLocationUpdates = false
-                        busyIndicatorDialog = BusyIndicatorDialog(activity!!, "Generating Locations...", this )
+                        composableBusyIndicatorDialogHost.show(title = "Generating Locations...", message = null)
 
                         viewLifecycleOwner.lifecycleScope.launch {
                             withContext(Dispatchers.IO)
@@ -1362,10 +1384,9 @@ class PerformEnumerationFragment : Fragment(),
 
                                 val randomLocationGenerator = GeoUtils.RandomLocationGenerator2(enumerationTeam.polygon, 10.0)
                                 randomLocationGenerator.generate(numLocations ) { point, count ->
-                                    busyIndicatorDialog?.let {
-                                        requireActivity().runOnUiThread {
-                                            it.updateProgress("Generated Location ${count}/${numLocations}")
-                                        }
+                                    requireActivity().runOnUiThread {
+                                        composableBusyIndicatorDialogHost.updateMessage("Generated Location ${count}/${numLocations}")
+
                                     }
                                     val location = Location(point.latitude(), point.longitude(), 0.0)
                                     DAO.locationDAO.createOrUpdateLocation(location, enumArea, location.version)
@@ -1382,15 +1403,14 @@ class PerformEnumerationFragment : Fragment(),
 
                             // back on the main thread...
 
-                            isAcceptingLocationUpdates = true
-                            busyIndicatorDialog?.alertDialog?.cancel()
+                            composableBusyIndicatorDialogHost.cancel()
 
                             refreshMap()
                         }
                     }
                 }
             }
-        }
+        )
     }
 
     fun autoEnumerateLocations()
@@ -1609,28 +1629,30 @@ class PerformEnumerationFragment : Fragment(),
 
                 R.id.action_auto_enumerate ->
                 {
-                    ConfirmationDialog(activity, resources.getString(R.string.please_confirm), "Auto enumerate these locations?", resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
-                        when (buttonPressed) {
-                            ConfirmationDialog.ButtonPress.None -> {}
-                            ConfirmationDialog.ButtonPress.Left -> {}
-                            ConfirmationDialog.ButtonPress.Right -> {
-                                binding.progressOverlayView.visibility = View.VISIBLE
+                    composableConfirmationDialogHost.show(
+                        title = resources.getString(R.string.please_confirm),
+                        message = "Auto enumerate these locations?",
+                        leftButtonText = resources.getString(R.string.no),
+                        rightButtonText = resources.getString(R.string.yes),
+                    ) { selection ->
+                        if (selection == resources.getString(R.string.yes))
+                        {
+                            binding.progressOverlayView.visibility = View.VISIBLE
 
-                                viewLifecycleOwner.lifecycleScope.launch {
-                                    withContext(Dispatchers.IO )
-                                    {
-                                        autoEnumerateLocations()
-                                    }
-
-                                    // back on the main thread...
-
-                                    binding.progressOverlayView.visibility = View.GONE
-
-                                    refreshMap()
-                                    updateSummaryInfo()
-                                    performEnumerationAdapter.updateLocations( performEnumerationAdapter.locations )
-                                    Toast.makeText(activity!!.applicationContext,  "Auto Enumeration Complete.", Toast.LENGTH_SHORT).show()
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                withContext(Dispatchers.IO )
+                                {
+                                    autoEnumerateLocations()
                                 }
+
+                                // back on the main thread...
+
+                                binding.progressOverlayView.visibility = View.GONE
+
+                                refreshMap()
+                                updateSummaryInfo()
+                                performEnumerationAdapter.updateLocations( performEnumerationAdapter.locations )
+                                Toast.makeText(activity!!.applicationContext,  "Auto Enumeration Complete.", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -1638,26 +1660,28 @@ class PerformEnumerationFragment : Fragment(),
 
                 R.id.action_add_images ->
                 {
-                    ConfirmationDialog(activity, resources.getString(R.string.please_confirm), "Auto generate Images?", resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
-                        when (buttonPressed) {
-                            ConfirmationDialog.ButtonPress.None -> {}
-                            ConfirmationDialog.ButtonPress.Left -> {}
-                            ConfirmationDialog.ButtonPress.Right -> {
-                                binding.progressOverlayView.visibility = View.VISIBLE
+                    composableConfirmationDialogHost.show(
+                        title = resources.getString(R.string.please_confirm),
+                        message = "Auto enumerate Images?",
+                        leftButtonText = resources.getString(R.string.no),
+                        rightButtonText = resources.getString(R.string.yes),
+                    ) { selection ->
+                        if (selection == resources.getString(R.string.yes))
+                        {
+                            binding.progressOverlayView.visibility = View.VISIBLE
 
-                                viewLifecycleOwner.lifecycleScope.launch {
-                                    withContext(Dispatchers.IO )
-                                    {
-                                        autoGenerateImages()
-                                    }
-
-                                    // back on the main thread...
-
-                                    binding.progressOverlayView.visibility = View.GONE
-
-                                    refreshMap()
-                                    Toast.makeText(activity!!.applicationContext,  "Auto Image Generation Complete.", Toast.LENGTH_SHORT).show()
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                withContext(Dispatchers.IO )
+                                {
+                                    autoGenerateImages()
                                 }
+
+                                // back on the main thread...
+
+                                binding.progressOverlayView.visibility = View.GONE
+
+                                refreshMap()
+                                Toast.makeText(activity!!.applicationContext,  "Auto Image Generation Complete.", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -1665,26 +1689,28 @@ class PerformEnumerationFragment : Fragment(),
 
                 R.id.action_add_breadcrumbs ->
                 {
-                    ConfirmationDialog(activity, resources.getString(R.string.please_confirm), "Auto generate Breadcrumbs?", resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
-                        when (buttonPressed) {
-                            ConfirmationDialog.ButtonPress.None -> {}
-                            ConfirmationDialog.ButtonPress.Left -> {}
-                            ConfirmationDialog.ButtonPress.Right -> {
-                                binding.progressOverlayView.visibility = View.VISIBLE
+                    composableConfirmationDialogHost.show(
+                        title = resources.getString(R.string.please_confirm),
+                        message = "Auto enumerate Breadcrumbs?",
+                        leftButtonText = resources.getString(R.string.no),
+                        rightButtonText = resources.getString(R.string.yes),
+                    ) { selection ->
+                        if (selection == resources.getString(R.string.yes))
+                        {
+                            binding.progressOverlayView.visibility = View.VISIBLE
 
-                                viewLifecycleOwner.lifecycleScope.launch {
-                                    withContext(Dispatchers.IO )
-                                    {
-                                        autoGenerateBreadcrumbs()
-                                    }
-
-                                    // back on the main thread...
-
-                                    binding.progressOverlayView.visibility = View.GONE
-
-                                    refreshMap()
-                                    Toast.makeText(activity!!.applicationContext,  "Auto Breadcrumb Generation Complete.", Toast.LENGTH_SHORT).show()
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                withContext(Dispatchers.IO )
+                                {
+                                    autoGenerateBreadcrumbs()
                                 }
+
+                                // back on the main thread...
+
+                                binding.progressOverlayView.visibility = View.GONE
+
+                                refreshMap()
+                                Toast.makeText(activity!!.applicationContext,  "Auto Breadcrumb Generation Complete.", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -1692,17 +1718,17 @@ class PerformEnumerationFragment : Fragment(),
 
                 R.id.set_subaddress ->
                 {
-                    InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, false, true )  { action, text, tag ->
-                        when (action) {
-                            InputDialog.Action.DidCancel -> {}
-                            InputDialog.Action.DidEnterText -> {
-                                text.toIntOrNull()?.let {
-                                    maxSubaddress = it - 1
-                                }
+                    composableInputDialogHost.show(
+                        title = resources.getString(R.string.subaddress_start),
+                        description = null,
+                        text = "",
+                        inputTypeNumber = true,
+                        onResult = { text ->
+                            text.toIntOrNull()?.let {
+                                maxSubaddress = it - 1
                             }
-                            InputDialog.Action.DidPressQRButton -> {}
                         }
-                    }
+                    )
                 }
 
                 R.id.mapbox_streets ->

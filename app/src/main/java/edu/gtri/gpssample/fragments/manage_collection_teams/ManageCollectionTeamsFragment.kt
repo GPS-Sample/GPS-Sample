@@ -7,10 +7,10 @@
 
 package edu.gtri.gpssample.fragments.manage_collection_teams
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.*
 import androidx.activity.OnBackPressedCallback
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -21,17 +21,15 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Role
-import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentManageCollectionTeamsBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.collections.ArrayList
 
 class ManageCollectionTeamsFragment : Fragment()
 {
@@ -40,7 +38,7 @@ class ManageCollectionTeamsFragment : Fragment()
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var manageCollectionTeamsAdapter: ManageCollectionTeamsAdapter
-
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
     private var _binding: FragmentManageCollectionTeamsBinding? = null
     private val binding get() = _binding!!
 
@@ -68,6 +66,14 @@ class ManageCollectionTeamsFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableConfirmationDialogHost.Content()
+        }
 
         activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed()
@@ -152,22 +158,20 @@ class ManageCollectionTeamsFragment : Fragment()
 
     fun shouldDeleteTeam(collectionTeam: CollectionTeam)
     {
-        ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_team_message), resources.getString(R.string.no), resources.getString(R.string.yes), collectionTeam, false) { buttonPressed, tag ->
-            when( buttonPressed )
+        composableConfirmationDialogHost.show(
+            title = resources.getString(R.string.please_confirm),
+            message = resources.getString(R.string.delete_team_message),
+            leftButtonText = resources.getString(R.string.no),
+            rightButtonText = resources.getString(R.string.yes),
+            destructive = true
+        ) { selection ->
+            if (selection == resources.getString(R.string.yes))
             {
-                ConfirmationDialog.ButtonPress.Left -> {
-                }
-                ConfirmationDialog.ButtonPress.Right -> {
-                    val team = tag as CollectionTeam
-                    enumArea.collectionTeams.remove( team )
-                    manageCollectionTeamsAdapter.updateTeams(enumArea.collectionTeams)
-                    DAO.collectionTeamDAO.deleteTeam( team )
-                }
-                ConfirmationDialog.ButtonPress.None -> {
-                }
+                enumArea.collectionTeams.remove( collectionTeam )
+                manageCollectionTeamsAdapter.updateTeams(enumArea.collectionTeams)
+                DAO.collectionTeamDAO.deleteTeam( collectionTeam )
             }
         }
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean

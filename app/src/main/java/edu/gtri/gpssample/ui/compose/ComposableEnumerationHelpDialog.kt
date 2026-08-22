@@ -14,7 +14,7 @@ import androidx.compose.ui.window.DialogProperties
 import edu.gtri.gpssample.R
 
 @Composable
-fun ComposableEnumAreaHelpDialog(onDismiss: () -> Unit)
+fun ComposableEnumerationHelpDialog(onDismiss: () -> Unit)
 {
     Dialog(
         onDismissRequest = onDismiss,
@@ -39,13 +39,13 @@ fun ComposableEnumAreaHelpDialog(onDismiss: () -> Unit)
                         .padding(vertical = 20.dp)
                 ) {
                     ComposableDialogHelpItem(
-                        R.drawable.import_blue,
-                        stringResource(R.string.import_enumeration_area)
+                        R.drawable.cache2,
+                        stringResource(R.string.download_map_tiles)
                     )
 
                     ComposableDialogHelpItem(
-                        R.drawable.add_location_blue,
-                        stringResource(R.string.create_enumeration_area)
+                        R.drawable.location_bubble_primary,
+                        stringResource(R.string.center_on_location)
                     )
 
                     ComposableDialogHelpItem(
@@ -54,23 +54,28 @@ fun ComposableEnumAreaHelpDialog(onDismiss: () -> Unit)
                     )
 
                     ComposableDialogHelpItem(
-                        R.drawable.cache2,
-                        stringResource(R.string.download_map_tiles)
+                        R.drawable.add_location_blue,
+                        stringResource(R.string.add_landmark)
                     )
 
                     ComposableDialogHelpItem(
-                        R.drawable.edit_location,
-                        stringResource(R.string.edit_enumeration_area)
+                        R.drawable.export_blue,
+                        stringResource(R.string.export_configuration)
+                    )
+
+                    ComposableDialogHelpItem(
+                        R.drawable.record,
+                        stringResource(R.string.record_breadcrumbs)
+                    )
+
+                    ComposableDialogHelpItem(
+                        R.drawable.navigate2,
+                        stringResource(R.string.show_breadcrumbs)
                     )
 
                     ComposableDialogHelpItem(
                         R.drawable.delete_blue,
-                        stringResource(R.string.delete_all_enumeration_areas)
-                    )
-
-                    ComposableDialogHelpItem(
-                        R.drawable.location_bubble_primary,
-                        stringResource(R.string.center_on_location)
+                        stringResource(R.string.delete_breadcrumbs)
                     )
                 }
             }

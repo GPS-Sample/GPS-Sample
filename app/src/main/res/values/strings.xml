@@ -525,11 +525,14 @@
     <string name="configuration">"Configuration"</string>
 
     // This needs to be update!
-    <string name="enter_new_pin">"Enter New PIN"</string>
+    <string name="enter_new_pin">Enter New PIN</string>
 
     // These are new!
-    <string name="delete_filter_message">"Are you sure you want to permanently delete this filter?"</string>
-    <string name="notice">"Notice"</string>
+    <string name="delete_filter_message">Are you sure you want to permanently delete this filter?</string>
+    <string name="notice">Notice</string>
+    <string name="select_an_existing_team">Select an existing Team</string>
+    <string name="select_the_file_types_to_export">Select the file types to export</string>
+    <string name="select_enumeration_teams">Select Enumeration Teams</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
