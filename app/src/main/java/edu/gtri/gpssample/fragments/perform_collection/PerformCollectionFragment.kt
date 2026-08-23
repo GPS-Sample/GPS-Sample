@@ -58,29 +58,35 @@ import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
-import edu.gtri.gpssample.dialogs.*
-import edu.gtri.gpssample.fragments.createstudy.DeleteMode
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionHostManager
 import edu.gtri.gpssample.managers.PerformanceManager
 import edu.gtri.gpssample.managers.TileServer
+import edu.gtri.gpssample.ui.compose.ComposableAdditionalInfoDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableBusyIndicatorDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableCheckboxDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableCollectionHelpDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableMapLegendDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableNearbySessionStatusDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableSelectionDialogHost
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
 
 class PerformCollectionFragment : Fragment(),
-    MapManager.MapTileCacheDelegate,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate,
-    AdditionalInfoDialog.AdditionalInfoDialogDelegate,
-    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
+    MapManager.MapTileCacheDelegate
 {
     private lateinit var user: User
     private lateinit var mapView: View
@@ -99,7 +105,6 @@ class PerformCollectionFragment : Fragment(),
     private var currentGPSLocation: Point? = null
     private var landmarkLocations = ArrayList<Location>()
     private val collectionTeamLocations = ArrayList<Location>()
-    private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var _binding: FragmentPerformCollectionBinding? = null
     private val fragmentResultListener = "PerformCollectionFragment"
     private val enumerationItems = ArrayList<EnumerationItem>()
@@ -110,6 +115,15 @@ class PerformCollectionFragment : Fragment(),
     private val selectedTeamNames = ArrayList<String>()
     private val selectedBreadcrumbs = ArrayList<Breadcrumb>()
     private var isShowingBreadcrumbs = false
+    private lateinit var composableInputDialogHost: ComposableInputDialogHost
+    private lateinit var composableCheckboxDialogHost: ComposableCheckboxDialogHost
+    private lateinit var composableMapLegendDialogHost: ComposableMapLegendDialogHost
+    private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
+    private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
+    private lateinit var composableBusyIndicatorDialogHost: ComposableBusyIndicatorDialogHost
+    private lateinit var composableCollectionHelpDialogHost: ComposableCollectionHelpDialogHost
+    private lateinit var composableAdditionalInfoDialogHost: ComposableAdditionalInfoDialogHost
     private lateinit var composableNearbySessionStatusDialogHost: ComposableNearbySessionStatusDialogHost
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -136,7 +150,17 @@ class PerformCollectionFragment : Fragment(),
                         {
                             when (request)
                             {
-                                Keys.kAdditionalInfoRequest.value -> AdditionalInfoDialog(activity, "", "", this)
+                                Keys.kAdditionalInfoRequest.value ->
+                                {
+                                    composableAdditionalInfoDialogHost.show(
+                                        complete = true,
+                                        incompleteReason = "",
+                                        notes = ""
+                                    ) { complete, incompleteReason, notes ->
+                                        didSelectSaveButton( incompleteReason, notes )
+                                    }
+                                }
+
                                 Keys.kLaunchSurveyRequest.value ->
                                 {
                                     if (enumerationItem.odkRecordUri.isNotEmpty())
@@ -149,7 +173,17 @@ class PerformCollectionFragment : Fragment(),
                                     else
                                     {
                                         // This will create a new ODK instance record
-                                        SurveyLaunchNotificationDialog(activity!!, this)
+                                        composableBusyIndicatorDialogHost.show(title = resources.getString(R.string.launching_odk_collect_application), message = null)
+
+                                        viewLifecycleOwner.lifecycleScope.launch {
+                                            delay(2000.milliseconds)
+
+                                            composableBusyIndicatorDialogHost.cancel()
+
+                                            val intent = Intent(Intent.ACTION_VIEW)
+                                            intent.type = "vnd.android.cursor.dir/vnd.odk.form"
+                                            odk_result.launch(intent)
+                                        }
                                     }
                                 }
                             }
@@ -184,9 +218,28 @@ class PerformCollectionFragment : Fragment(),
 
         composableNearbySessionStatusDialogHost = ComposableNearbySessionStatusDialogHost()
 
+        composableInputDialogHost = ComposableInputDialogHost()
+        composableCheckboxDialogHost = ComposableCheckboxDialogHost()
+        composableMapLegendDialogHost = ComposableMapLegendDialogHost()
+        composableSelectionDialogHost = ComposableSelectionDialogHost()
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+        composableNotificationDialogHost = ComposableNotificationDialogHost()
+        composableBusyIndicatorDialogHost = ComposableBusyIndicatorDialogHost()
+        composableCollectionHelpDialogHost = ComposableCollectionHelpDialogHost()
+        composableAdditionalInfoDialogHost = ComposableAdditionalInfoDialogHost()
+        composableNearbySessionStatusDialogHost = ComposableNearbySessionStatusDialogHost()
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
         binding.dialogComposeView.setContent {
+            composableInputDialogHost.Content()
+            composableCheckboxDialogHost.Content()
+            composableMapLegendDialogHost.Content()
+            composableSelectionDialogHost.Content()
+            composableConfirmationDialogHost.Content()
+            composableNotificationDialogHost.Content()
+            composableBusyIndicatorDialogHost.Content()
+            composableCollectionHelpDialogHost.Content()
+            composableAdditionalInfoDialogHost.Content()
             composableNearbySessionStatusDialogHost.Content()
         }
 
@@ -641,21 +694,25 @@ class PerformCollectionFragment : Fragment(),
             enumArea.mapTileRegion?.let {
                 val mapTileRegions = ArrayList<MapTileRegion>()
                 mapTileRegions.add( it )
-                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this@PerformCollectionFragment )
+                composableBusyIndicatorDialogHost.show(title = resources.getString(R.string.downloading_map_tiles), message = null) {
+                    composableBusyIndicatorDialogHost.cancel()
+                    MapManager.instance().cancelTilePackDownload()
+                }
+
                 MapManager.instance().cacheMapTiles(activity!!, mapView, mapTileRegions, this@PerformCollectionFragment )
             }
         }
 
         binding.legendTextView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         binding.legendImageView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         binding.helpButton.setOnClickListener {
-            PerformCollectionHelpDialog( activity!! )
+            composableCollectionHelpDialogHost.show()
         }
 
         binding.centerOnLocationButton.setOnClickListener {
@@ -688,90 +745,89 @@ class PerformCollectionFragment : Fragment(),
                 title = resources.getString(R.string.export_collection_data)
             }
 
-            ConfirmationDialog( activity, title, resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    when( buttonPressed )
+            composableSelectionDialogHost.show(
+                title = title,
+                message = resources.getString(R.string.select_export_message),
+                items = listOf(resources.getString(R.string.qr_code),resources.getString(R.string.file_system)),
+            ) { selection ->
+                if (selection == resources.getString(R.string.qr_code)) {
+                    composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
                     {
-                        ConfirmationDialog.ButtonPress.Left -> {
-                            composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
-                            {
-                                nearbySessionHostManager?.stopHosting()
+                        nearbySessionHostManager?.stopHosting()
+                    }
+
+                    nearbySessionHostManager = NearbySessionHostManager( requireContext().applicationContext, config )
+
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        repeatOnLifecycle(Lifecycle.State.STARTED )
+                        {
+                            nearbySessionHostManager?.state?.collect { state ->
+                                composableNearbySessionStatusDialogHost.updateState(state)
                             }
+                        }
+                    }
 
-                            nearbySessionHostManager = NearbySessionHostManager( requireContext().applicationContext, config )
+                    nearbySessionHostManager?.startHosting()
+                }
+                else if (selection == resources.getString(R.string.file_system)) {
+                    val items = ArrayList<String>()
+                    items.add( "Configuration Files" )
+                    items.add( "Image Files" )
+                    composableCheckboxDialogHost.show(
+                        title = resources.getString(R.string.select_the_file_types_to_export),
+                        items = items,
+                        isChecked = emptyList()
+                    ) { selections ->
+                        includeConfig = false
+                        includeImages = false
 
-                            viewLifecycleOwner.lifecycleScope.launch {
-                                repeatOnLifecycle(Lifecycle.State.STARTED )
-                                {
-                                    nearbySessionHostManager?.state?.collect { state ->
-                                        composableNearbySessionStatusDialogHost.updateState(state)
-                                    }
-                                }
-                            }
-
-                            nearbySessionHostManager?.startHosting()
+                        for (selection in selections) {
+                            if (selection == items[0]) includeConfig = true
+                            if (selection == items[1]) includeImages = true
                         }
 
-                        ConfirmationDialog.ButtonPress.Right -> {
-                            val items = ArrayList<String>()
-                            items.add( "Configuration Files" )
-                            items.add( "Image Files" )
-                            CheckboxDialog( activity!!, "Select the file types to export", items ) { selections ->
-                                includeConfig = false
-                                includeImages = false
+                        if (includeConfig || includeImages)
+                        {
+                            composableSelectionDialogHost.show(
+                                title = resources.getString(R.string.select_file_location),
+                                message = null,
+                                items = listOf(resources.getString(R.string.default_location),resources.getString(R.string.let_me_choose)),
+                            ) { selection ->
+                                if (selection == resources.getString(R.string.default_location)) {
+                                    val zipUtils = ZipUtils()
 
-                                for (selection in selections) {
-                                    if (selection == items[0]) includeConfig = true
-                                    if (selection == items[1]) includeImages = true
-                                }
+                                    composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
+                                    {
+                                        zipUtils.cancel()
+                                    }
 
-                                if (includeConfig || includeImages)
-                                {
-                                    ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null,true ) { buttonPressed, tag ->
-                                        when( buttonPressed )
-                                        {
-                                            ConfirmationDialog.ButtonPress.Left -> {
-                                                val zipUtils = ZipUtils()
-
-                                                composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
-                                                {
-                                                    zipUtils.cancel()
-                                                }
-
-                                                viewLifecycleOwner.lifecycleScope.launch {
-                                                    zipUtils.state.collect { state ->
-                                                        composableNearbySessionStatusDialogHost.updateState(state)
-                                                    }
-                                                }
-
-                                                PerformanceManager.startTimer()
-
-                                                zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Surveyed", includeConfig, includeImages,) { success ->
-                                                    if (success)
-                                                    {
-                                                        NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.export_succeeded))
-                                                    }
-                                                    else
-                                                    {
-                                                        NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
-                                                    }
-
-                                                    composableNearbySessionStatusDialogHost.dismiss()
-
-                                                    Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
-                                                }
-                                            }
-                                            ConfirmationDialog.ButtonPress.Right -> {
-                                                exportToDevice()
-                                            }
-                                            ConfirmationDialog.ButtonPress.None -> {
-                                            }
+                                    viewLifecycleOwner.lifecycleScope.launch {
+                                        zipUtils.state.collect { state ->
+                                            composableNearbySessionStatusDialogHost.updateState(state)
                                         }
                                     }
+
+                                    PerformanceManager.startTimer()
+
+                                    zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Surveyed", includeConfig, includeImages,) { success ->
+                                        if (success)
+                                        {
+                                            composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded))
+                                        }
+                                        else
+                                        {
+                                            composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
+                                        }
+
+                                        composableNearbySessionStatusDialogHost.dismiss()
+
+                                        Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
+                                    }
+                                }
+                                else if (selection == resources.getString(R.string.let_me_choose)) {
+                                    exportToDevice()
                                 }
                             }
-                        }
-                        ConfirmationDialog.ButtonPress.None -> {
                         }
                     }
                 }
@@ -810,7 +866,11 @@ class PerformCollectionFragment : Fragment(),
                         isChecked.add( if (team.name == collectionTeam.name) true else false )
                     }
 
-                    CheckboxDialog( activity!!, "Select Enumeration Teams", choices, isChecked ) { selections ->
+                    composableCheckboxDialogHost.show(
+                        title = resources.getString(R.string.select_enumeration_teams),
+                        items = choices,
+                        isChecked = emptyList()
+                    ) { selections ->
                         if (selections.isNotEmpty())
                         {
                             selectedTeamNames.clear()
@@ -1176,11 +1236,11 @@ class PerformCollectionFragment : Fragment(),
                         zipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { success ->
                             if (success)
                             {
-                                NotificationDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.export_succeeded))
+                                composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded))
                             }
                             else
                             {
-                                NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
                             }
 
                             composableNearbySessionStatusDialogHost.dismiss()
@@ -1194,16 +1254,8 @@ class PerformCollectionFragment : Fragment(),
         catch (ex: java.lang.Exception)
         {
             Log.d( "xxx", ex.stackTraceToString())
-            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
         }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun shouldLaunchODK()
-    {
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.type = "vnd.android.cursor.dir/vnd.odk.form"
-        odk_result.launch(intent)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -1229,15 +1281,17 @@ class PerformCollectionFragment : Fragment(),
             mainApplication.currentEnumerationItemUUID = mainApplication.defaultEnumerationItemUUID
             mainApplication.currentEnumerationAreaName = mainApplication.defaultEnumerationAreaName
 
-            AdditionalInfoDialog( activity, "", "", this)
+            composableAdditionalInfoDialogHost.show(
+                complete = true,
+                incompleteReason = "",
+                notes = ""
+            ) { complete, incompleteReason, notes ->
+                didSelectSaveButton( incompleteReason, notes )
+            }
         }
     }
 
-    override fun didSelectCancelButton()
-    {
-    }
-
-    override fun didSelectSaveButton( incompleteReason: String, notes: String )
+    fun didSelectSaveButton( incompleteReason: String?, notes: String )
     {
         enumArea.locations.find { it.uuid == sharedViewModel.currentLocationUuid }?.let { location: Location ->
             location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
@@ -1250,7 +1304,7 @@ class PerformCollectionFragment : Fragment(),
                     enumerationItem.collectorName = user.name
                 }
 
-                if (incompleteReason.isNotEmpty())
+                if (!incompleteReason.isNullOrEmpty())
                 {
                     enumerationItem.collectionState = CollectionState.Incomplete
                     enumerationItem.collectionIncompleteReason = incompleteReason
@@ -1316,35 +1370,20 @@ class PerformCollectionFragment : Fragment(),
 
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {
-        busyIndicatorDialog?.let {
-            activity!!.runOnUiThread {
-                it.updateProgress(resources.getString(R.string.downloading_map_tiles) + " ${numLoaded}/${numNeeded}")
-            }
+        activity!!.runOnUiThread {
+            composableBusyIndicatorDialogHost.updateMessage("${numLoaded}/${numNeeded}")
         }
     }
 
     override fun tilePacksLoaded( error: String )
     {
         activity!!.runOnUiThread {
+            composableBusyIndicatorDialogHost.cancel()
             if (error.isNotEmpty())
             {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                }
+                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    override fun didPressCancelButton()
-    {
-        MapManager.instance().cancelTilePackDownload()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
@@ -1373,29 +1412,30 @@ class PerformCollectionFragment : Fragment(),
         {
             R.id.action_auto_survey ->
             {
-                ConfirmationDialog(activity, resources.getString(R.string.please_confirm), "Auto survey these locations?", resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
-                    when (buttonPressed) {
-                        ConfirmationDialog.ButtonPress.None -> {}
-                        ConfirmationDialog.ButtonPress.Left -> {}
-                        ConfirmationDialog.ButtonPress.Right -> {
-                            binding.progressOverlayView.visibility = View.VISIBLE
+                composableConfirmationDialogHost.show(
+                    title = resources.getString(R.string.please_confirm),
+                    message = "Auto survey these locations?",
+                    leftButtonText = resources.getString(R.string.no),
+                    rightButtonText = resources.getString(R.string.yes),
+                ) { selection ->
+                    if (selection == resources.getString(R.string.yes)) {
+                        binding.progressOverlayView.visibility = View.VISIBLE
 
-                            viewLifecycleOwner.lifecycleScope.launch {
-                                withContext(Dispatchers.IO )
-                                {
-                                    autoSurveyLocations()
-                                }
-
-                                // back on the main thread...
-
-                                binding.progressOverlayView.visibility = View.GONE
-
-                                refreshMap()
-                                updateSummaryInfo()
-                                performCollectionAdapter.updateItems( performCollectionAdapter.enumerationItems, performCollectionAdapter.locations )
-
-                                Toast.makeText(activity!!.applicationContext,  "Auto Survey Complete.", Toast.LENGTH_SHORT).show()
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            withContext(Dispatchers.IO )
+                            {
+                                autoSurveyLocations()
                             }
+
+                            // back on the main thread...
+
+                            binding.progressOverlayView.visibility = View.GONE
+
+                            refreshMap()
+                            updateSummaryInfo()
+                            performCollectionAdapter.updateItems( performCollectionAdapter.enumerationItems, performCollectionAdapter.locations )
+
+                            Toast.makeText(activity!!.applicationContext,  "Auto Survey Complete.", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }

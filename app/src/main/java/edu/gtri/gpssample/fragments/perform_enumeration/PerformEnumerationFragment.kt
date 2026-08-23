@@ -609,7 +609,7 @@ class PerformEnumerationFragment : Fragment(),
                 message = resources.getString(R.string.select_export_message),
                 items = listOf(resources.getString(R.string.qr_code),resources.getString(R.string.file_system)),
             ) { selection ->
-                if (selection == resources.getString(R.string.current_location)) {
+                if (selection == resources.getString(R.string.qr_code)) {
                     composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
                     {
                         nearbySessionHostManager?.stopHosting()
@@ -628,7 +628,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     nearbySessionHostManager?.startHosting()
                 }
-                else if (selection == resources.getString(R.string.new_location)) {
+                else if (selection == resources.getString(R.string.file_system)) {
                     val items = ArrayList<String>()
                     items.add( "Configuration Files" )
                     items.add( "Image Files" )
