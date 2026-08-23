@@ -191,4 +191,9 @@
                 android:background="@drawable/navigate2" />
         </LinearLayout>
     </HorizontalScrollView>
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/dialog_compose_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
 </LinearLayout>

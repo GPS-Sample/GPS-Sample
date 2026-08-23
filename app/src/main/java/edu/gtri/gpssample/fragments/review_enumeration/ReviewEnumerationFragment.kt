@@ -44,14 +44,14 @@ import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentReviewEnumerationBinding
-import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.fragments.perform_enumeration.PerformEnumerationAdapter
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
+import edu.gtri.gpssample.ui.compose.ComposableCheckboxDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableMapLegendDialogHost
 import kotlinx.coroutines.launch
-import org.osmdroid.events.MapListener
 import java.util.*
 
 class ReviewEnumerationFragment : Fragment()
@@ -65,6 +65,8 @@ class ReviewEnumerationFragment : Fragment()
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
     private lateinit var mapboxMapClickListener: OnMapClickListener
+    private lateinit var composableMapLegendDialogHost: ComposableMapLegendDialogHost
+    private lateinit var composableCheckboxDialogHost: ComposableCheckboxDialogHost
     private var _binding: FragmentReviewEnumerationBinding? = null
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
@@ -94,6 +96,14 @@ class ReviewEnumerationFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        composableMapLegendDialogHost = ComposableMapLegendDialogHost()
+        composableCheckboxDialogHost = ComposableCheckboxDialogHost()
+
+        binding.dialogComposeView.setContent {
+            composableMapLegendDialogHost.Content()
+            composableCheckboxDialogHost.Content()
+        }
 
         mapboxMapClickListener = MapManager.instance().createMapboxMapClickListener( binding.mapboxMapView, true )
 
@@ -164,11 +174,11 @@ class ReviewEnumerationFragment : Fragment()
         }
 
         binding.legendTextView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         binding.legendImageView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
@@ -223,13 +233,17 @@ class ReviewEnumerationFragment : Fragment()
                         isChecked.add( true )
                     }
 
-                    CheckboxDialog( activity!!, "Select Enumeration Teams", choices, isChecked ) { selected_team_names ->
-                        if (selected_team_names.isNotEmpty())
+                    composableCheckboxDialogHost.show(
+                        title = resources.getString(R.string.select_enumeration_teams),
+                        items = choices,
+                        isChecked = emptyList()
+                    ) { selections ->
+                        if (selections.isNotEmpty())
                         {
                             selectedTeamNames.clear()
                             selectedBreadcrumbs.clear()
 
-                            for (selectedTeamName in selected_team_names)
+                            for (selectedTeamName in selections)
                             {
                                 for (team in enumArea.enumerationTeams)
                                 {

@@ -42,15 +42,15 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentReviewCollectionBinding
 import edu.gtri.gpssample.dialogs.*
-import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionAdapter
 import edu.gtri.gpssample.fragments.perform_enumeration.PerformEnumerationAdapter
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
+import edu.gtri.gpssample.ui.compose.ComposableCheckboxDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableMapLegendDialogHost
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import kotlinx.coroutines.launch
-import org.osmdroid.events.MapListener
 import java.util.*
 
 class ReviewCollectionFragment : Fragment()
@@ -65,6 +65,8 @@ class ReviewCollectionFragment : Fragment()
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performCollectionAdapter: PerformEnumerationAdapter
     private lateinit var mapboxMapClickListener: OnMapClickListener
+    private lateinit var composableMapLegendDialogHost: ComposableMapLegendDialogHost
+    private lateinit var composableCheckboxDialogHost: ComposableCheckboxDialogHost
     private var isShowingBreadcrumbs = false
     private val selectedTeamNames = ArrayList<String>()
     private val selectedBreadcrumbs = ArrayList<Breadcrumb>()
@@ -98,6 +100,16 @@ class ReviewCollectionFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        composableMapLegendDialogHost = ComposableMapLegendDialogHost()
+        composableCheckboxDialogHost = ComposableCheckboxDialogHost()
+
+        binding.dialogComposeView.setContent {
+            composableMapLegendDialogHost.Content()
+            composableCheckboxDialogHost.Content()
+        }
+
+        mapboxMapClickListener = MapManager.instance().createMapboxMapClickListener( binding.mapboxMapView, true )
 
         mapboxMapClickListener = MapManager.instance().createMapboxMapClickListener( binding.mapboxMapView, true )
 
@@ -257,13 +269,17 @@ class ReviewCollectionFragment : Fragment()
                         isChecked.add( true )
                     }
 
-                    CheckboxDialog( activity!!, "Select Enumeration Teams", choices, isChecked ) { selected_team_names ->
-                        if (selected_team_names.isNotEmpty())
+                    composableCheckboxDialogHost.show(
+                        title = resources.getString(R.string.select_enumeration_teams),
+                        items = choices,
+                        isChecked = emptyList()
+                    ) { selections ->
+                        if (selections.isNotEmpty())
                         {
                             selectedTeamNames.clear()
                             selectedBreadcrumbs.clear()
 
-                            for (selectedTeamName in selected_team_names)
+                            for (selectedTeamName in selections)
                             {
                                 for (team in enumArea.enumerationTeams)
                                 {
