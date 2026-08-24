@@ -7,16 +7,12 @@
 
 package edu.gtri.gpssample.fragments.add_household
 
-import android.content.Intent
-import android.content.res.ColorStateList
-import android.content.res.Resources
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
@@ -25,21 +21,21 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
 import edu.gtri.gpssample.dialogs.*
+import edu.gtri.gpssample.ui.compose.ComposableAdditionalInfoDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 import edu.gtri.gpssample.utils.CameraUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import org.json.JSONObject
 import java.util.*
 
-class AddHouseholdFragment : Fragment(),
-    ImageDialog.ImageDialogDelegate,
-    AdditionalInfoDialog.AdditionalInfoDialogDelegate
+class AddHouseholdFragment : Fragment()
 {
     private var _binding: FragmentAddHouseholdBinding? = null
     private val binding get() = _binding!!
@@ -52,6 +48,9 @@ class AddHouseholdFragment : Fragment(),
     private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
+    private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
+    private lateinit var composableAdditionalInfoDialogHost: ComposableAdditionalInfoDialogHost
     private var editMode = true
     private var collectionMode = false
     private var reviewDuplicate = false
@@ -82,6 +81,18 @@ class AddHouseholdFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        composableNotificationDialogHost = ComposableNotificationDialogHost()
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+        composableAdditionalInfoDialogHost = ComposableAdditionalInfoDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableNotificationDialogHost.Content()
+            composableConfirmationDialogHost.Content()
+            composableAdditionalInfoDialogHost.Content()
+        }
 
         arguments?.getBoolean( Keys.kEditMode.value)?.let { editMode ->
             this.editMode = editMode
@@ -207,7 +218,7 @@ class AddHouseholdFragment : Fragment(),
         }
 
         binding.subaddressTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.subaddress_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.subaddress_hint))
         }
 
         if (enumerationItem.version.isEmpty())
@@ -374,74 +385,41 @@ class AddHouseholdFragment : Fragment(),
         }
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_household_message),
-                resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {}
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        location.enumerationItems.remove( enumerationItem )
-                        DAO.enumerationItemDAO.delete( enumerationItem )
+            composableConfirmationDialogHost.show(
+                title = resources.getString(R.string.please_confirm),
+                message = resources.getString(R.string.delete_household_message),
+                leftButtonText = resources.getString(R.string.no),
+                rightButtonText = resources.getString(R.string.yes),
+                destructive = true
+            ) { selection ->
+                if (selection == resources.getString(R.string.yes)) {
+                    location.enumerationItems.remove(enumerationItem)
+                    DAO.enumerationItemDAO.delete(enumerationItem)
 
-                        if (location.enumerationItems.size == 0)
-                        {
-                            ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_location_message),
-                                resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                                when (buttonPressed) {
-                                    ConfirmationDialog.ButtonPress.Left -> {}
-                                    ConfirmationDialog.ButtonPress.Right -> {
-                                        enumArea.locations.remove( location )
-                                        DAO.locationDAO.delete( location )
-                                        enumerationTeam.locationUuids.remove( location.uuid )
-                                    }
-                                    ConfirmationDialog.ButtonPress.None -> {}
-                                }
-
-                                findNavController().popBackStack()
+                    if (location.enumerationItems.size == 0)
+                    {
+                        composableConfirmationDialogHost.show(
+                            title = resources.getString(R.string.please_confirm),
+                            message = resources.getString(R.string.delete_location_message),
+                            leftButtonText = resources.getString(R.string.no),
+                            rightButtonText = resources.getString(R.string.yes),
+                            destructive = true
+                        ) { selection ->
+                            if (selection == resources.getString(R.string.yes)) {
+                                enumArea.locations.remove(location)
+                                DAO.locationDAO.delete(location)
+                                enumerationTeam.locationUuids.remove(location.uuid)
                             }
-                        }
-                        else
-                        {
                             findNavController().popBackStack()
                         }
-
-//                        DAO.configDAO.getConfig( config.uuid )?.let {
-//                            sharedViewModel.setCurrentConfig( it )
-//                        }
-//
-//                        DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
-//                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
-//                        }
-//
-//                        DAO.studyDAO.getStudy( study.uuid )?.let {
-//                            sharedViewModel.createStudyModel.setStudy( it )
-//                        }
-
-//                        DAO.enumerationTeamDAO.getEnumerationTeam( enumTeam.uuid )?.let {
-//                            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
-//                        }
                     }
-                    ConfirmationDialog.ButtonPress.None -> {}
+                    } else {
+                        findNavController().popBackStack()
+                    }
                 }
-            }
-
         }
 
         binding.addPhotoImageView.setOnClickListener {
-
-            // get the total size of all image data
-//            var size = 0
-//
-//            for (location in enumArea.locations)
-//            {
-//                size += location.imageData.length
-//            }
-//
-//            if (size > 25 * 1024 * 1024)
-//            {
-//                NotificationDialog( activity!!, resources.getString( R.string.warning), resources.getString( R.string.image_size_warning))
-//            }
-
             findNavController().navigate(R.id.action_navigate_to_CameraFragment)
         }
 
@@ -465,16 +443,10 @@ class AddHouseholdFragment : Fragment(),
                             if (reviewDuplicate)
                             {
                                 findNavController().popBackStack()
-//                                duplicateLocations.removeIf{ it.uuid == location.uuid }
-//                                duplicateLocations.add( location )
-//                                showMap( duplicateLocations )
                             }
                             else if (reviewFenceViolation)
                             {
                                 findNavController().popBackStack()
-//                                geofenceViolations.removeIf{ it.uuid == location.uuid }
-//                                geofenceViolations.add( location )
-//                                showMap(geofenceViolations )
                             }
                         }
                     }
@@ -538,11 +510,23 @@ class AddHouseholdFragment : Fragment(),
 
             if (enumerationItem.enumerationState == EnumerationState.Incomplete)
             {
-                AdditionalInfoDialog( activity, enumerationItem.enumerationIncompleteReason, enumerationItem.enumerationNotes, this)
+                composableAdditionalInfoDialogHost.show(
+                    complete = enumerationItem.enumerationState == EnumerationState.Enumerated,
+                    incompleteReason = enumerationItem.enumerationIncompleteReason,
+                    notes = enumerationItem.enumerationNotes
+                ) { complete, incompleteReason, notes ->
+                    didSelectSaveButton( incompleteReason, notes )
+                }
             }
             else
             {
-                AdditionalInfoDialog( activity, "", "", this)
+                composableAdditionalInfoDialogHost.show(
+                    complete = if (enumerationItem.enumerationState == EnumerationState.Enumerated) true else false,
+                    incompleteReason = "",
+                    notes = ""
+                ) { complete, incompleteReason, notes ->
+                    didSelectSaveButton( incompleteReason, notes )
+                }
             }
         }
     }
@@ -553,13 +537,9 @@ class AddHouseholdFragment : Fragment(),
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.AddHouseholdFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    override fun didSelectCancelButton()
+    fun didSelectSaveButton( incompleteReason: String?, notes: String )
     {
-    }
-
-    override fun didSelectSaveButton( incompleteReason: String, notes: String )
-    {
-        if (incompleteReason.isNotEmpty())
+        if (!incompleteReason.isNullOrEmpty())
         {
             enumerationItem.enumerationIncompleteReason = incompleteReason
             enumerationItem.enumerationState = EnumerationState.Incomplete
@@ -672,12 +652,6 @@ class AddHouseholdFragment : Fragment(),
         DAO.locationDAO.createOrUpdateLocation( location, enumArea, UUID.randomUUID().toString())
 
         findNavController().popBackStack()
-    }
-
-    override fun shouldDeleteImage()
-    {
-        location.imageUuid = ""
-        binding.imageCardView.visibility = View.GONE
     }
 
     override fun onDestroyView()

@@ -51,7 +51,6 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
-import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.NearbySessionHostManager
 import edu.gtri.gpssample.managers.PerformanceManager
@@ -78,7 +77,6 @@ import java.util.*
 
 class PerformEnumerationFragment : Fragment(),
     View.OnTouchListener,
-    InfoDialog.InfoDialogDelegate,
     MapManager.MapTileCacheDelegate
 {
     private lateinit var user: User
@@ -1334,12 +1332,6 @@ class PerformEnumerationFragment : Fragment(),
             Log.d( "xxx", ex.stackTraceToString())
             composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
         }
-    }
-
-    override fun didSelectOkButton(tag: Any?)
-    {
-        dropMode = true
-        binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
     }
 
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
