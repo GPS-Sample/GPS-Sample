@@ -422,8 +422,8 @@ class CreateFieldFragment : Fragment()
 
         checkboxAddAnotherButton.setOnClickListener {
             composableInputDialogHost.show(
-                title = resources.getString(R.string.option_item_name),
-                description = null,
+                title = null,
+                description = resources.getString(R.string.option_item_name),
                 text = "",
                 onResult = { text ->
                     if (text.isNotEmpty()) {
@@ -439,8 +439,8 @@ class CreateFieldFragment : Fragment()
 
         dropdownAddAnotherButton.setOnClickListener {
             composableInputDialogHost.show(
-                title = resources.getString(R.string.option_item_name),
-                description = null,
+                title = null,
+                description = resources.getString(R.string.option_item_name),
                 text = "",
                 onResult = { text ->
                     if (text.isNotEmpty()) {

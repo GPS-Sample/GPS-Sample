@@ -84,9 +84,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
     private val unsavedEnumAreas = ArrayList<EnumArea>()
     private var droppedPoints = ArrayList<com.mapbox.geojson.Point>()
     private var _binding: FragmentCreateEnumerationAreaBinding? = null
-    private val kEnumAreaNameTag: Int = 0
-    private val kEnumAreaLengthTag: Int = 1
-
     private lateinit var composableInputDialogHost: ComposableInputDialogHost
     private lateinit var composableCheckboxDialogHost: ComposableCheckboxDialogHost
     private lateinit var composableDropdownDialogHost: ComposableDropdownDialogHost
@@ -334,8 +331,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                     else
                     {
                         composableInputDialogHost.show(
-                            title = resources.getString(R.string.enter_enum_area_name),
-                            description = null,
+                            title = null,
+                            description = resources.getString(R.string.enter_enum_area_name),
                             text = "",
                             onQrClick = {
                                 val intent = Intent(context, CameraXLivePreviewActivity::class.java)
@@ -718,8 +715,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                                 when (selection) {
                                     resources.getString(R.string.rename) -> {
                                         composableInputDialogHost.show(
-                                            title = resources.getString(R.string.enter_enum_area_name),
-                                            description = null,
+                                            title = null,
+                                            description = resources.getString(R.string.enter_enum_area_name),
                                             text = enumArea.name,
                                             onQrClick = {
                                                 val intent = Intent(context, CameraXLivePreviewActivity::class.java)
@@ -787,8 +784,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                                     text.toDoubleOrNull()?.let {
                                         radius = it * 1000
                                         composableInputDialogHost.show(
-                                            title = resources.getString(R.string.enter_enum_area_name),
-                                            description = null,
+                                            title = null,
+                                            description = resources.getString(R.string.enter_enum_area_name),
                                             text = "",
                                             onQrClick = {
                                                 getResult.launch(Intent(context, CameraXLivePreviewActivity::class.java))
@@ -938,8 +935,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
     fun presentMBTilesDialog()
     {
         composableConfirmationDialogHost.show(
-            title = resources.getString(R.string.attach_mbtiles_question),
-            message = "",
+            title = "",
+            message = resources.getString(R.string.attach_mbtiles_question),
             leftButtonText = resources.getString(R.string.no),
             rightButtonText = resources.getString(R.string.yes),
             destructive = false

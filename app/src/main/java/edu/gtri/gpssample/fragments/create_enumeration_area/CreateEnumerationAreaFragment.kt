@@ -362,8 +362,8 @@ class CreateEnumerationAreaFragment : Fragment(),
                     else
                     {
                         composableInputDialogHost.show(
-                            title = resources.getString(R.string.enter_enum_area_name),
-                            description = null,
+                            title = null,
+                            description = resources.getString(R.string.enter_enum_area_name),
                             text = "",
                             onResult = { text ->
                                 if (text.isEmpty())
@@ -576,8 +576,8 @@ class CreateEnumerationAreaFragment : Fragment(),
                                     droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
 
                                     composableInputDialogHost.show(
-                                        title = resources.getString(R.string.enter_enum_area_name),
-                                        description = null,
+                                        title = null,
+                                        description = resources.getString(R.string.enter_enum_area_name),
                                         text = "",
                                         onQrClick = {
                                             val intent = Intent(context, CameraXLivePreviewActivity::class.java)
@@ -820,8 +820,8 @@ class CreateEnumerationAreaFragment : Fragment(),
                                 when (selection) {
                                     resources.getString(R.string.rename) -> {
                                         composableInputDialogHost.show(
-                                            title = resources.getString(R.string.enter_enum_area_name),
-                                            description = null,
+                                            title = null,
+                                            description = resources.getString(R.string.enter_enum_area_name),
                                             text = enumArea.name,
                                             onQrClick = {
                                                 val intent = Intent(context, CameraXLivePreviewActivity::class.java)
