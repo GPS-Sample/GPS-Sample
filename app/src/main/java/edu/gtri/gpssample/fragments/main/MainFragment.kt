@@ -196,7 +196,7 @@ class MainFragment : Fragment()
         }
 
         binding.selectRoleTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.role_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.role_hint))
         }
 
         val radioButtons = listOf(
@@ -239,19 +239,19 @@ class MainFragment : Fragment()
         binding.dataCollectorTip.isFocusable = true
 
         binding.adminTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.admin_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.admin_hint))
         }
 
         binding.supervisorTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.supervisor_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.supervisor_hint))
         }
 
         binding.enumeratorTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.enumerator_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.enumerator_hint))
         }
 
         binding.dataCollectorTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.data_collector_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.data_collector_hint))
         }
 
         binding.webpageLink.paintFlags = binding.webpageLink.paintFlags or Paint.UNDERLINE_TEXT_FLAG

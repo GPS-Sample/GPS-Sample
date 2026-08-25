@@ -90,35 +90,35 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.minGpsPrecisionTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.gpsaccuracy_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.gpsaccuracy_hint))
         }
 
         binding.encryptionPasswordTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.encryption_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.encryption_hint))
         }
 
         binding.supervisorEditTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.supervisor_edit_tip))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.supervisor_edit_tip))
         }
 
         binding.manualEntryTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.manual_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.manual_hint))
         }
 
         binding.subaddressTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.subaddress_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.subaddress_hint))
         }
 
         binding.autoIncrementTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.autoincrement_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.autoincrement_hint))
         }
 
         binding.proximityWarningHint.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.proximity_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.proximity_hint))
         }
 
         binding.geofenceHint.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.geofence_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.geofence_hint))
         }
 
         binding.cancelButton.setOnClickListener {

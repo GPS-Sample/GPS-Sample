@@ -89,7 +89,7 @@ class CreateRuleFragment : Fragment()
         }
 
         binding.ruleTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.rule_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.rule_hint))
         }
 
         sharedViewModel.currentConfiguration?.value?.let { config ->

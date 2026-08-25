@@ -129,7 +129,7 @@ class CreateStudyFragment : Fragment()
             samplingHint += resources.getString( R.string.sampling_hint_6_7 ) + "\n"
             samplingHint += resources.getString( R.string.sampling_hint_7_7 )
 
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = samplingHint )
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = samplingHint )
         }
 
         binding.deleteImageView.setOnClickListener {

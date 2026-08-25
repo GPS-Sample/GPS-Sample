@@ -218,7 +218,7 @@ class AddHouseholdFragment : Fragment()
         }
 
         binding.subaddressTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.subaddress_hint))
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.subaddress_hint))
         }
 
         if (enumerationItem.version.isEmpty())
