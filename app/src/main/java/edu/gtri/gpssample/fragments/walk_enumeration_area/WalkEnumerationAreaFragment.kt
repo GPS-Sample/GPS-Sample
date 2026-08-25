@@ -15,7 +15,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Looper
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -25,13 +24,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -48,13 +45,15 @@ import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentWalkEnumerationAreaBinding
-import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableDropdownDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableMapLegendDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableWalkEnumerationAreaHelpDialogHost
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import kotlinx.coroutines.launch
-import org.osmdroid.events.MapListener
 import java.util.*
 
 class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
@@ -64,7 +63,11 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var defaultColorList : ColorStateList
     private lateinit var fusedLocationClient : FusedLocationProviderClient
-    private var inputDialog: InputDialog? = null
+    private lateinit var composableInputDialogHost: ComposableInputDialogHost
+    private lateinit var composableDropdownDialogHost: ComposableDropdownDialogHost
+    private lateinit var composableMapLegendDialogHost: ComposableMapLegendDialogHost
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
+    private lateinit var composableWalkEnumerationAreaHelpDialogHost: ComposableWalkEnumerationAreaHelpDialogHost
     private var isRecording = false
     private val binding get() = _binding!!
     private var showCurrentLocation = false
@@ -105,6 +108,22 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
             walkEnumerationAreaFragment = this@WalkEnumerationAreaFragment
         }
 
+        composableInputDialogHost = ComposableInputDialogHost()
+        composableDropdownDialogHost = ComposableDropdownDialogHost()
+        composableMapLegendDialogHost = ComposableMapLegendDialogHost()
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+        composableWalkEnumerationAreaHelpDialogHost = ComposableWalkEnumerationAreaHelpDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableInputDialogHost.Content()
+            composableDropdownDialogHost.Content()
+            composableMapLegendDialogHost.Content()
+            composableConfirmationDialogHost.Content()
+            composableWalkEnumerationAreaHelpDialogHost.Content()
+        }
+
         sharedViewModel.currentConfiguration?.value?.let { config ->
             this.config = config
         }
@@ -116,16 +135,15 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
         }
 
         binding.legendTextView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         binding.legendImageView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         binding.centerOnLocationButton.backgroundTintList?.let {
             defaultColorList = it
-//            binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
         }
 
         if (config.enumAreas.isNotEmpty() && config.enumAreas[0].mbTilesPath.isNotEmpty())
@@ -188,10 +206,6 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
             binding.walkButton.isEnabled = false
             binding.addPointButton.isEnabled = false
             binding.deletePointButton.isEnabled = false
-        }
-
-        binding.legendTextView.setOnClickListener {
-            MapLegendDialog( activity!! )
         }
 
         binding.mapOverlayView.setOnTouchListener(this)
@@ -268,33 +282,30 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
 
             if (polyLinePoints.size > 0)
             {
-                ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_point), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                    when( buttonPressed )
-                    {
-                        ConfirmationDialog.ButtonPress.Left -> {
-                        }
-                        ConfirmationDialog.ButtonPress.Right -> {
-                            polyLinePoints.removeAt(polyLinePoints.lastIndex)
+                composableConfirmationDialogHost.show(
+                    title = resources.getString(R.string.please_confirm),
+                    message = resources.getString(R.string.delete_point),
+                    leftButtonText = resources.getString(R.string.no),
+                    rightButtonText = resources.getString(R.string.yes),
+                ) { selection ->
+                    if (selection == resources.getString(R.string.yes)) {
+                        polyLinePoints.removeAt(polyLinePoints.lastIndex)
 
-                            MapManager.instance().clearMap( mapView )
+                        MapManager.instance().clearMap( mapView )
 
-                            if (polyLinePoints.isNotEmpty())
-                            {
-                                startPoint?.let {
-                                    MapManager.instance().createMarker( activity!!, mapView, it, R.drawable.location_blue, "" )
-                                }
-                            }
-
-                            if (polyLinePoints.size > 1)
-                            {
-                                MapManager.instance().createPolyline( mapView, polyLinePoints, Color.RED )
+                        if (polyLinePoints.isNotEmpty())
+                        {
+                            startPoint?.let {
+                                MapManager.instance().createMarker( activity!!, mapView, it, R.drawable.location_blue, "" )
                             }
                         }
-                        ConfirmationDialog.ButtonPress.None -> {
+
+                        if (polyLinePoints.size > 1)
+                        {
+                            MapManager.instance().createPolyline( mapView, polyLinePoints, Color.RED )
                         }
                     }
                 }
-
             }
         }
 
@@ -320,7 +331,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
         }
 
         binding.helpButton.setOnClickListener {
-            WalkEnumerationHelpHelpDialog( activity!! )
+            composableWalkEnumerationAreaHelpDialogHost.show()
         }
 
         binding.cancelButton.setOnClickListener {
@@ -336,16 +347,23 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                 // close the polygon
                 polyLinePoints.add( polyLinePoints[0] )
 
-                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaName, false )  { action, text, tag ->
-                    when (action) {
-                        InputDialog.Action.DidCancel -> {}
-                        InputDialog.Action.DidEnterText -> {createEnumArea( text )}
-                        InputDialog.Action.DidPressQRButton -> {
-                            val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                            getResult.launch(intent)
+                composableInputDialogHost.show(
+                    title = resources.getString(R.string.enter_enum_area_name),
+                    description = null,
+                    text = "1",
+                    inputTypeNumber = true,
+                    cancelable = true,
+                    onQrClick = {
+                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                        getResult.launch(intent)
+                    },
+                    onResult = { text ->
+                        if (text.isNotEmpty())
+                        {
+                            createEnumArea( text )
                         }
                     }
-                }
+                )
             }
         }
     }
@@ -358,34 +376,32 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
 
     private fun clearMap()
     {
-        ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.clear_map), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-            when( buttonPressed )
-            {
-                ConfirmationDialog.ButtonPress.Left -> {
+        composableConfirmationDialogHost.show(
+            title = resources.getString(R.string.please_confirm),
+            message = resources.getString(R.string.clear_map),
+            leftButtonText = resources.getString(R.string.no),
+            rightButtonText = resources.getString(R.string.yes),
+        ) { selection ->
+            if (selection == resources.getString(R.string.yes)) {
+                isRecording = false
+
+                MapManager.instance().clearMap( mapView )
+
+                binding.walkButton.isEnabled = true
+                binding.saveButton.isEnabled = true
+                binding.addPointButton.isEnabled = true
+                binding.deletePointButton.isEnabled = true
+                binding.walkButton.setBackgroundTintList(defaultColorList);
+
+                for (enumArea in config.enumAreas)
+                {
+                    DAO.enumAreaDAO.delete( enumArea )
                 }
-                ConfirmationDialog.ButtonPress.Right -> {
-                    isRecording = false
 
-                    MapManager.instance().clearMap( mapView )
+                config.enumAreas.clear()
+                config.selectedEnumAreaUuid = ""
 
-                    binding.walkButton.isEnabled = true
-                    binding.saveButton.isEnabled = true
-                    binding.addPointButton.isEnabled = true
-                    binding.deletePointButton.isEnabled = true
-                    binding.walkButton.setBackgroundTintList(defaultColorList);
-
-                    for (enumArea in config.enumAreas)
-                    {
-                        DAO.enumAreaDAO.delete( enumArea )
-                    }
-
-                    config.enumAreas.clear()
-                    config.selectedEnumAreaUuid = ""
-
-                    DAO.configDAO.createOrUpdateConfig( config, UUID.randomUUID().toString())
-                }
-                ConfirmationDialog.ButtonPress.None -> {
-                }
+                DAO.configDAO.createOrUpdateConfig( config, UUID.randomUUID().toString())
             }
         }
     }
@@ -443,9 +459,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
             ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == ResultCode.BarcodeScanned.value) {
                 val payload = it.data!!.getStringExtra(Keys.kPayload.value)
-                inputDialog?.editText?.let { editText ->
-                    editText.setText( payload.toString())
-                }
+                composableInputDialogHost.updateQrText(payload.toString())
             }
         }
 
@@ -505,10 +519,9 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
     {
         val study = config.studies.first()
 
-        DropdownDialog(requireActivity(), resources.getString(R.string.select_strata), study.stratas, null ) { strata ->
+        composableDropdownDialogHost.showStrata(title = resources.getString(R.string.select_strata), strataList = study.stratas) { strata ->
             strata?.let { strata ->
                 enumArea.strataUuid = strata.uuid
-
                 if (enumArea.name.contains("[") && enumArea.name.contains("]"))
                 {
                     enumArea.name = enumArea.name.replace(Regex("\\[.*?]"), "[" + strata.name + "]")
@@ -535,10 +548,15 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
 
                 startPoint = MapManager.instance().getLocationFromPixelPoint( mapView, p1 )
 
-                val inputDialog = InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
-                    when (action) {
-                        InputDialog.Action.DidCancel -> {}
-                        InputDialog.Action.DidEnterText -> {
+                composableInputDialogHost.show(
+                    title = resources.getString(R.string.map_tile_boundary),
+                    description = null,
+                    text = "1",
+                    inputTypeNumber = true,
+                    cancelable = true,
+                    onResult = { text ->
+                        if (text.isNotEmpty())
+                        {
                             text.toDoubleOrNull()?.let {
                                 val radius = it * 1000
                                 val r_earth = 6378000.0
@@ -565,23 +583,28 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
 
                                     MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
 
-                                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaName, false )  { action, text, tag ->
-                                        when (action) {
-                                            InputDialog.Action.DidCancel -> {}
-                                            InputDialog.Action.DidEnterText -> {createEnumArea(text)}
-                                            InputDialog.Action.DidPressQRButton -> {
-                                                val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                                                getResult.launch(intent)
+                                    composableInputDialogHost.show(
+                                        title = resources.getString(R.string.enter_enum_area_name),
+                                        description = null,
+                                        text = "1",
+                                        inputTypeNumber = true,
+                                        cancelable = true,
+                                        onQrClick = {
+                                            val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                            getResult.launch(intent)
+                                        },
+                                        onResult = { text ->
+                                            if (text.isNotEmpty())
+                                            {
+                                                createEnumArea(text )
                                             }
                                         }
-                                    }
+                                    )
                                 }
                             }
                         }
-                        InputDialog.Action.DidPressQRButton -> {}
                     }
-                }
-                inputDialog.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                )
             }
         }
 
