@@ -121,12 +121,12 @@ class CreateStudyFragment : Fragment()
         })
 
         binding.samplingMethodTip.setOnClickListener {
-            var samplingHint = resources.getString( R.string.sampling_hint_1_7 ) + "\n"
-            samplingHint += resources.getString( R.string.sampling_hint_2_7 ) + "\n"
-            samplingHint += resources.getString( R.string.sampling_hint_3_7 ) + "\n"
-            samplingHint += resources.getString( R.string.sampling_hint_4_7 ) + "\n"
-            samplingHint += resources.getString( R.string.sampling_hint_5_7 ) + "\n"
-            samplingHint += resources.getString( R.string.sampling_hint_6_7 ) + "\n"
+            var samplingHint = resources.getString( R.string.sampling_hint_1_7 ) + "\n\n"
+            samplingHint += resources.getString( R.string.sampling_hint_2_7 ) + "\n\n"
+            samplingHint += resources.getString( R.string.sampling_hint_3_7 ) + "\n\n"
+            samplingHint += resources.getString( R.string.sampling_hint_4_7 ) + "\n\n"
+            samplingHint += resources.getString( R.string.sampling_hint_5_7 ) + "\n\n"
+            samplingHint += resources.getString( R.string.sampling_hint_6_7 ) + "\n\n"
             samplingHint += resources.getString( R.string.sampling_hint_7_7 )
 
             composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = samplingHint )
