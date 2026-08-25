@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:gravity="center_vertical|center_horizontal"
-            android:text="@string/define_enumeration_area"
+            android:text=""
             android:background="@color/primary"
             android:textColor="@color/white"
             android:textSize="17sp"
@@ -131,5 +131,10 @@
                 android:insetBottom="0dp"
                 android:background="@drawable/help" />
         </LinearLayout>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/dialog_compose_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
     </LinearLayout>
 </layout>

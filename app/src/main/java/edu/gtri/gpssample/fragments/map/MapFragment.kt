@@ -13,7 +13,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -23,10 +22,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.LocationServices
 import com.mapbox.geojson.Point
 import com.mapbox.maps.*
@@ -37,34 +36,32 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.MapTileRegion
 import edu.gtri.gpssample.databinding.FragmentMapBinding
-import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.InputDialog
-import edu.gtri.gpssample.dialogs.MapHelpDialog
-import edu.gtri.gpssample.dialogs.SelectionDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
+import edu.gtri.gpssample.ui.compose.ComposableBusyIndicatorDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableMapHelpDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableSelectionDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import kotlinx.coroutines.selects.select
-import org.osmdroid.events.MapListener
 import java.util.ArrayList
 import java.util.Date
 
 class MapFragment : Fragment(),
     View.OnTouchListener,
-    MapManager.MapTileCacheDelegate,
-    SelectionDialog.SelectionDialogDelegate,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate
+    MapManager.MapTileCacheDelegate
 {
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
-    private lateinit var mapView: View
     private var centerOnLocation = true
     private var defineMapRegion = false
     private var mapTileRegion: MapTileRegion? = null
-    private var busyIndicatorDialog: BusyIndicatorDialog? = null
+    private lateinit var mapView: View
     private lateinit var defaultColorList : ColorStateList
     private lateinit var sharedViewModel: ConfigurationViewModel
+    private lateinit var composableInputDialogHost: ComposableInputDialogHost
+    private lateinit var composableMapHelpDialogHost: ComposableMapHelpDialogHost
+    private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
+    private lateinit var composableBusyIndicatorDialogHost: ComposableBusyIndicatorDialogHost
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -89,6 +86,20 @@ class MapFragment : Fragment(),
         binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
+        }
+
+        composableInputDialogHost = ComposableInputDialogHost()
+        composableMapHelpDialogHost = ComposableMapHelpDialogHost()
+        composableSelectionDialogHost = ComposableSelectionDialogHost()
+        composableBusyIndicatorDialogHost = ComposableBusyIndicatorDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableInputDialogHost.Content()
+            composableMapHelpDialogHost.Content()
+            composableSelectionDialogHost.Content()
+            composableBusyIndicatorDialogHost.Content()
         }
 
         binding.osmLabel.visibility = View.GONE
@@ -145,7 +156,12 @@ class MapFragment : Fragment(),
                 defineMapRegion = false
                 binding.mapOverlayView.visibility = View.GONE
                 binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
-                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+
+                composableBusyIndicatorDialogHost.show(title = resources.getString(R.string.downloading_map_tiles), message = null) {
+                    composableBusyIndicatorDialogHost.cancel()
+                    MapManager.instance().cancelTilePackDownload()
+                }
+
                 val mapTileRegions = ArrayList<MapTileRegion>()
                 mapTileRegions.add(it)
                 MapManager.instance().cacheMapTiles(activity!!, binding.osmMapView, mapTileRegions, this )
@@ -153,7 +169,7 @@ class MapFragment : Fragment(),
         }
 
         binding.helpButton.setOnClickListener {
-            MapHelpDialog( activity!! )
+            composableMapHelpDialogHost.show()
         }
 
         binding.clearMapButton.setOnClickListener {
@@ -206,12 +222,14 @@ class MapFragment : Fragment(),
                     binding.mapOverlayView.visibility = View.GONE
                     binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
 
-                    val inputDialog = InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
-                        when (action) {
-                            InputDialog.Action.DidCancel -> {
-                                defineMapRegion = false
-                            }
-                            InputDialog.Action.DidEnterText -> {
+                    composableInputDialogHost.show(
+                        title = resources.getString(R.string.map_tile_boundary),
+                        description = null,
+                        text = "1",
+                        inputTypeNumber = true,
+                        cancelable = true,
+                        onResult = { text ->
+                            text.toDoubleOrNull()?.let {
                                 defineMapRegion = false
 
                                 text.toDoubleOrNull()?.let {
@@ -233,12 +251,8 @@ class MapFragment : Fragment(),
                                     }
                                 }
                             }
-
-                            InputDialog.Action.DidPressQRButton -> {}
                         }
-                    }
-
-                    inputDialog.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                    )
                 }
             }
         }
@@ -269,35 +283,20 @@ class MapFragment : Fragment(),
         MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0, Color.BLACK )
     }
 
-    override fun didPressCancelButton()
-    {
-        MapManager.instance().cancelTilePackDownload()
-    }
-
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {
-        busyIndicatorDialog?.let {
-            activity!!.runOnUiThread {
-                it.updateProgress(resources.getString(edu.gtri.gpssample.R.string.downloading_map_tiles) + " ${numLoaded}/${numNeeded}")
-            }
+        activity!!.runOnUiThread {
+            composableBusyIndicatorDialogHost.updateMessage("${numLoaded}/${numNeeded}")
         }
     }
 
     override fun tilePacksLoaded( error: String )
     {
         activity!!.runOnUiThread {
+            composableBusyIndicatorDialogHost.cancel()
             if (error.isNotEmpty())
             {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(edu.gtri.gpssample.R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                }
+                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -415,7 +414,20 @@ class MapFragment : Fragment(),
 
             R.id.select_map_tiles ->
             {
-                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
+                val cachedFiles = TileServer.getCachedFiles( activity!! )
+                if (cachedFiles.isNotEmpty())
+                {
+                    composableSelectionDialogHost.show(
+                        title = resources.getString(R.string.select_map_tiles),
+                        message = null,
+                        items = cachedFiles,
+                    ) { selection ->
+                        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
+                        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
+                            TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
+                        }
+                    }
+                }
             }
         }
 
@@ -426,47 +438,46 @@ class MapFragment : Fragment(),
     {
         val mapEngines = resources.getTextArray( R.array.map_engines )
 
-        ConfirmationDialog( activity, resources.getString(R.string.select_map_engine), "", mapEngines[0].toString(), mapEngines[1].toString(), null, true ) { buttonPressed, tag ->
-            when( buttonPressed )
-            {
-                ConfirmationDialog.ButtonPress.Left -> {
-                    binding.osmLabel.visibility = View.VISIBLE
-                    binding.osmMapView.visibility = View.VISIBLE
-                    binding.mapboxMapView.visibility = View.GONE
-                    MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
-                        this.mapView = mapView
+        composableSelectionDialogHost.show(
+            title = resources.getString(R.string.select_map_engine),
+            message = null,
+            items = listOf( mapEngines[0].toString(), mapEngines[1].toString()),
+        ) { selection ->
+            if (selection == mapEngines[0]) {
+                binding.osmLabel.visibility = View.VISIBLE
+                binding.osmMapView.visibility = View.VISIBLE
+                binding.mapboxMapView.visibility = View.GONE
+                MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
+                    this.mapView = mapView
 
-                        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                        {
-                            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+                    if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                    {
+                        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-                            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                                if (location != null)
-                                {
-                                    val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
-                                    MapManager.instance().centerMap( point, mapView )
-                                    MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                                    binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                                }
+                        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                            if (location != null)
+                            {
+                                val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
+                                MapManager.instance().centerMap( point, mapView )
+                                MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                             }
                         }
                     }
                 }
-                ConfirmationDialog.ButtonPress.Right -> {
-                    binding.osmLabel.visibility = View.GONE
-                    binding.osmMapView.visibility = View.GONE
-                    binding.northUpImageView.visibility = View.GONE
-                    binding.mapboxMapView.visibility = View.VISIBLE
-                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null ) { mapView ->
-                        this.mapView = mapView
-                        MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
-                        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                        MapManager.instance().setMapZoomLevel( mapView, MapManager.zoomLevel())
-                    }
-                }
-                ConfirmationDialog.ButtonPress.None -> {
+            }
+            else if (selection == mapEngines[1]) {
+                binding.osmLabel.visibility = View.GONE
+                binding.osmMapView.visibility = View.GONE
+                binding.northUpImageView.visibility = View.GONE
+                binding.mapboxMapView.visibility = View.VISIBLE
+                MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null ) { mapView ->
+                    this.mapView = mapView
+                    MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                    binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                    MapManager.instance().setMapZoomLevel( mapView, MapManager.zoomLevel())
                 }
             }
         }
@@ -478,16 +489,6 @@ class MapFragment : Fragment(),
 //                TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
 //            }
         }
-    }
-
-    override fun didMakeSelection( selection: String, tag: Int )
-    {
-        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
-
-//        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapView.getMapboxMap()) {
-//            createAnnotationManagers()
-//            TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
-//        }
     }
 
     override fun onDestroyView()
