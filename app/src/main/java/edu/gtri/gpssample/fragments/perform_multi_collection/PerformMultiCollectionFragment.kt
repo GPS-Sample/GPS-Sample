@@ -18,9 +18,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,24 +36,25 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.databinding.FragmentPerformMultiCollectionBinding
-import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
-import edu.gtri.gpssample.dialogs.SurveyLaunchNotificationDialog
+import edu.gtri.gpssample.ui.compose.ComposableAdditionalInfoDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableBusyIndicatorDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
 
-class PerformMultiCollectionFragment : Fragment(),
-    AdditionalInfoDialog.AdditionalInfoDialogDelegate,
-    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
+class PerformMultiCollectionFragment : Fragment()
 {
     private lateinit var location: Location
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var performMultiCollectionAdapter: PerformMultiCollectionAdapter
-
+    private lateinit var composableAdditionalInfoDialogHost: ComposableAdditionalInfoDialogHost
+    private lateinit var composableBusyIndicatorDialogHost: ComposableBusyIndicatorDialogHost
     private var gpsAccuracyIsGood = false
     private var gpsLocationIsGood = false
     private var _binding: FragmentPerformMultiCollectionBinding? = null
     private val binding get() = _binding!!
-
     private val fragmentResultListener = "PerformMultiCollectionFragment"
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -65,7 +68,15 @@ class PerformMultiCollectionFragment : Fragment(),
                 {
                     when (request)
                     {
-                        Keys.kAdditionalInfoRequest.value -> AdditionalInfoDialog(activity, "", "", this)
+                        Keys.kAdditionalInfoRequest.value -> {
+                            composableAdditionalInfoDialogHost.show(
+                                complete = true,
+                                incompleteReason = "",
+                                notes = ""
+                            ) { complete, incompleteReason, notes ->
+                                didSelectSaveButton( incompleteReason, notes )
+                            }
+                        }
                         Keys.kLaunchSurveyRequest.value ->
                         {
                             this.location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
@@ -79,7 +90,17 @@ class PerformMultiCollectionFragment : Fragment(),
                                 else
                                 {
                                     // This will create a new ODK instance record
-                                    SurveyLaunchNotificationDialog(activity!!, this)
+                                    composableBusyIndicatorDialogHost.show(title = resources.getString(R.string.launching_odk_collect_application), message = null)
+
+                                    viewLifecycleOwner.lifecycleScope.launch {
+                                        delay(2000.milliseconds)
+
+                                        composableBusyIndicatorDialogHost.cancel()
+
+                                        val intent = Intent(Intent.ACTION_VIEW)
+                                        intent.type = "vnd.android.cursor.dir/vnd.odk.form"
+                                        odk_result.launch(intent)
+                                    }
                                 }
                             }
                         }
@@ -126,6 +147,16 @@ class PerformMultiCollectionFragment : Fragment(),
 
         arguments?.getBoolean(Keys.kGpsLocationIsGood.value)?.let { gpsLocationIsGood ->
             this.gpsLocationIsGood = gpsLocationIsGood
+        }
+
+        composableBusyIndicatorDialogHost = ComposableBusyIndicatorDialogHost()
+        composableAdditionalInfoDialogHost = ComposableAdditionalInfoDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableBusyIndicatorDialogHost.Content()
+            composableAdditionalInfoDialogHost.Content()
         }
 
         val enumerationItems = ArrayList<EnumerationItem>()
@@ -176,11 +207,7 @@ class PerformMultiCollectionFragment : Fragment(),
         }
     }
 
-    override fun didSelectCancelButton()
-    {
-    }
-
-    override fun didSelectSaveButton( incompleteReason: String, notes: String )
+    fun didSelectSaveButton( incompleteReason: String?, notes: String )
     {
         this.location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
             enumerationItem.collectionNotes = notes
@@ -192,7 +219,7 @@ class PerformMultiCollectionFragment : Fragment(),
                 enumerationItem.collectorName = user.name
             }
 
-            if (incompleteReason.isNotEmpty())
+            if (!incompleteReason.isNullOrEmpty())
             {
                 enumerationItem.collectionState = CollectionState.Incomplete
                 enumerationItem.collectionIncompleteReason = incompleteReason
@@ -202,14 +229,6 @@ class PerformMultiCollectionFragment : Fragment(),
 
             performMultiCollectionAdapter.updateEnumerationItems()
         }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun shouldLaunchODK()
-    {
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.type = "vnd.android.cursor.dir/vnd.odk.form"
-        odk_result.launch(intent)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -232,7 +251,13 @@ class PerformMultiCollectionFragment : Fragment(),
             mainApplication.currentEnumerationItemUUID = mainApplication.defaultEnumerationItemUUID
             mainApplication.currentEnumerationAreaName = mainApplication.defaultEnumerationAreaName
 
-            AdditionalInfoDialog( activity, "", "", this)
+            composableAdditionalInfoDialogHost.show(
+                complete = true,
+                incompleteReason = "",
+                notes = ""
+            ) { complete, incompleteReason, notes ->
+                didSelectSaveButton( incompleteReason, notes )
+            }
         }
     }
 

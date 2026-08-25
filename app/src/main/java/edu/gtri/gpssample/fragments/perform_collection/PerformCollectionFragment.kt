@@ -228,6 +228,7 @@ class PerformCollectionFragment : Fragment(),
         composableCollectionHelpDialogHost = ComposableCollectionHelpDialogHost()
         composableAdditionalInfoDialogHost = ComposableAdditionalInfoDialogHost()
         composableNearbySessionStatusDialogHost = ComposableNearbySessionStatusDialogHost()
+
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
         binding.dialogComposeView.setContent {
