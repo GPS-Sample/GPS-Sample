@@ -23,13 +23,11 @@ import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
 import edu.gtri.gpssample.database.models.Field
-import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.FieldOption
 import edu.gtri.gpssample.database.models.Study
-import edu.gtri.gpssample.dialogs.DatePickerDialog
-import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.ui.compose.ComposableDatePickerDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 import edu.gtri.gpssample.utils.DateUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
@@ -49,6 +47,7 @@ class CreateFieldFragment : Fragment()
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var composableInputDialogHost: ComposableInputDialogHost
     private lateinit var composableDatePickerDialogHost: ComposableDatePickerDialogHost
+    private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
     private var isBlockField = false
 
     val fieldTypes : Array<String>
@@ -105,12 +104,14 @@ class CreateFieldFragment : Fragment()
 
         composableInputDialogHost = ComposableInputDialogHost()
         composableDatePickerDialogHost = ComposableDatePickerDialogHost()
+        composableNotificationDialogHost = ComposableNotificationDialogHost()
 
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
         binding.dialogComposeView.setContent {
             composableInputDialogHost.Content()
             composableDatePickerDialogHost.Content()
+            composableNotificationDialogHost.Content()
         }
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
@@ -134,7 +135,7 @@ class CreateFieldFragment : Fragment()
         binding.fieldIndexEditText.setText( "${field.index}.")
 
         binding.beginBlockTip.setOnClickListener {
-            NotificationDialog( requireActivity(), "", resources.getString(R.string.field_block_hint))
+            composableNotificationDialogHost.show(title = "", message = resources.getString(R.string.field_block_hint))
         }
 
         binding.fieldBlockContainerCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener

@@ -210,11 +210,11 @@ class ReviewCollectionFragment : Fragment()
         }
 
         binding.legendTextView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         binding.legendImageView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value

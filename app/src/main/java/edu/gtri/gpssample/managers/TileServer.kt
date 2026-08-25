@@ -13,27 +13,20 @@ import android.content.SharedPreferences
 import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
 import android.provider.OpenableColumns
-import android.util.Log
-import android.view.View
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.style.layers.generated.RasterLayer
 import com.mapbox.maps.extension.style.sources.TileSet
 import com.mapbox.maps.extension.style.sources.generated.RasterSource
 import com.mapbox.maps.extension.style.style
-import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
-import edu.gtri.gpssample.dialogs.InfoDialog
 import fi.iki.elonen.NanoHTTPD
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
-import kotlin.io.path.name
 
 class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {

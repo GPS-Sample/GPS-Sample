@@ -29,7 +29,6 @@ import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateSampleBinding
-import edu.gtri.gpssample.dialogs.MapLegendDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
@@ -48,6 +47,7 @@ import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.constants.ReviewStatus
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableMapLegendDialogHost
 
 class CreateSampleFragment : Fragment()
 {
@@ -57,6 +57,7 @@ class CreateSampleFragment : Fragment()
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var mapboxMapClickListener: OnMapClickListener
+    private lateinit var composableMapLegendDialogHost: ComposableMapLegendDialogHost
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
     private var mapView: View? = null
     private var sampleHasDuplicates = false
@@ -102,11 +103,13 @@ class CreateSampleFragment : Fragment()
             createSampleFragment = this@CreateSampleFragment
         }
 
+        composableMapLegendDialogHost = ComposableMapLegendDialogHost()
         composableConfirmationDialogHost = ComposableConfirmationDialogHost()
 
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
         binding.dialogComposeView.setContent {
+            composableMapLegendDialogHost.Content()
             composableConfirmationDialogHost.Content()
         }
 
@@ -162,11 +165,11 @@ class CreateSampleFragment : Fragment()
         }
 
         binding.legendTextView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         binding.legendImageView.setOnClickListener {
-            MapLegendDialog( activity!! )
+            composableMapLegendDialogHost.show()
         }
 
         when(study.samplingMethod)
