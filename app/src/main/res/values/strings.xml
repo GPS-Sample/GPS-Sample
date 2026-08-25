@@ -252,6 +252,7 @@
     <string name="export_enum_data">"Export Enumeration Data"</string>
     <string name="delete_landmark_message">"Are you sure you want to permanently delete this landmark?"</string>
     <string name="subaddress">"Subaddress"</string>
+    <string name="subaddress_hint2">""A subaddress can be the household address or a number (1, 2, 3, et.). This will help teams return to the household if it is selected.""</string>
     <string name="sampled">"Sampled"</string>
     <string name="completed_enumeration">"Completed Enumeration"</string>
     <string name="incomplete_enumeration">"Incomplete Enumeration"</string>
@@ -479,13 +480,17 @@
     <string name="enumerator_hint">"Enumerator: Maps and lists households in the field."</string>
     <string name="data_collector_hint">"Data Collector: Navigates to sampled households and launches the survey."</string>
     <string name="role_hint">""GPSSample is a free Android app for field-based household listing, sampling, and navigation. Select your role to get started, or visit gpssample.org to learn more. Note: Once you register a role on this device, only that role and roles below it will be available.""</string>
-    <string name="sampling_hint_1_7">"Method descriptions:"</string>
-    <string name="sampling_hint_2_7">"Simple Random Sample:"</string>
-    <string name="sampling_hint_3_7">"Each household has an equal chance of being selected."</string>
-    <string name="sampling_hint_4_7">"Cluster Sample (# of households):"</string>
-    <string name="sampling_hint_5_7">"Select a fixed number of households from each cluster."</string>
-    <string name="sampling_hint_6_7">"Cluster Sample (% of households):"</string>
-    <string name="sampling_hint_7_7">"Select a percentage of households from each cluster."</string>
+    <string name="sampling_hint_1_11">"Method descriptions:"</string>
+    <string name="sampling_hint_2_11">"Simple Random Sample:"</string>
+    <string name="sampling_hint_3_11">"Each household has an equal chance of being selected."</string>
+    <string name="sampling_hint_4_11">"Cluster Sample (# of households):"</string>
+    <string name="sampling_hint_5_11">"Select a fixed number of households from each cluster."</string>
+    <string name="sampling_hint_6_11">"Cluster Sample (% of households):"</string>
+    <string name="sampling_hint_7_11">"Select a percentage of households from each cluster."</string>
+    <string name="sampling_hint_8_11">"Stratified Sample (# of households):"</string>
+    <string name="sampling_hint_9_11">""Set the strata. Within each strata, select a fixed number of households from each cluster""</string>
+    <string name="sampling_hint_10_11">"Stratified sample (% of households):"</string>
+    <string name="sampling_hint_11_11">""Set the strata. Within each strata, select a percentage of households from each cluster""</string>
     <string name="enter_forgot_pin_question">"Enter the forgot PIN question"</string>
     <string name="collection_app">"Collection App"</string>
     <string name="clone_configuration">"Clone Configuration"</string>
@@ -503,7 +508,7 @@
     <string name="distance">"Distance"</string>
     <string name="enforce_geofence_boundary">"Enforce Geofence Boundary"</string>
     <string name="enter_the_geofence_buffer_value">"Enter the geofence buffer value"</string>
-    <string name="geofence_hint">""A geofence is an error buffer around your enumeration areas. Teams are able to collect data outside the geofence, but anything beyond the error buffer will be flagged for review by the supervisors. Ex. For a 5m geofence, any location collected at 6m+ will be flagged for the supervisor to review.""</string>
+    <string name="geofence_hint">""A geofence is an error buffer around your enumeration areas. Teams are NOT able to collect data outside the geofence.  Anything between the edge of the enumeration area and the geofence buffer will be flagged for review by the supervisors. Ex. For a 5m geofence, any location collected at &lt;5m will be flagged for the supervisor to review.""</string>
     <string name="geofence_error">"You are currently outside of the Geofence"</string>
     <string name="begin_sample_review">"Begin Sample Review"</string>
     <string name="review_sample">"Review Sample"</string>
@@ -577,11 +582,11 @@
         <item>"OR"</item>
         <item>"NOT"</item>
     </string-array>
-    <string-array name="samling_methods">
+    <string-array name="sampling_methods">
         <item>"Simple Random Sampling"</item>
         <item>"Cluster Sampling"</item>
         <item>"Subsets: May Overlap"</item>
-        <item>"Strata: Mutually Exclusive"</item>
+        <item>"Stratified Sampling"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"dd/mm/yyyy"</item>

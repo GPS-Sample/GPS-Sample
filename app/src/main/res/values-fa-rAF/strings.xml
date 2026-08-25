@@ -253,6 +253,7 @@
     <string name="export_enum_data">"صادرات داده"</string>
     <string name="delete_landmark_message">"آیا مطمئن هستید که می"</string>
     <string name="subaddress">"زیرآدرس"</string>
+    <string name="subaddress_hint2">"زیرآدرس می"</string>
     <string name="sampled">"نمونه برداری شده"</string>
     <string name="completed_enumeration">"سرشماری تکمیل شده"</string>
     <string name="incomplete_enumeration">"سرشماری تکمیل نشده"</string>
@@ -480,13 +481,17 @@
     <string name="enumerator_hint">"موسوم به شمارشگر: نقشه"</string>
     <string name="data_collector_hint">"جمع"</string>
     <string name="role_hint">"GPSSample یک اپلیکیشن رایگان اندروید برای فهرست"</string>
-    <string name="sampling_hint_1_7">"توضیحات روش:"</string>
-    <string name="sampling_hint_2_7">"نمونهٔ تصادفی ساده:"</string>
-    <string name="sampling_hint_3_7">"هر خانوار شانس یکسانی برای انتخاب شدن دارد."</string>
-    <string name="sampling_hint_4_7">"نمونهٔ خوشه"</string>
-    <string name="sampling_hint_5_7">"از هر خوشه تعداد ثابتی از خانوارها را انتخاب کنید."</string>
-    <string name="sampling_hint_6_7">"نمونهٔ خوشه"</string>
-    <string name="sampling_hint_7_7">"از هر خوشه درصد مشخصی از خانوارها را انتخاب کنید."</string>
+    <string name="sampling_hint_1_11">"توضیحات روش:"</string>
+    <string name="sampling_hint_2_11">"نمونهٔ تصادفی ساده:"</string>
+    <string name="sampling_hint_3_11">"هر خانوار شانس یکسانی برای انتخاب شدن دارد."</string>
+    <string name="sampling_hint_4_11">"نمونهٔ خوشه"</string>
+    <string name="sampling_hint_5_11">"از هر خوشه تعداد ثابتی از خانوارها را انتخاب کنید."</string>
+    <string name="sampling_hint_6_11">"نمونهٔ خوشه"</string>
+    <string name="sampling_hint_7_11">"از هر خوشه درصد مشخصی از خانوارها را انتخاب کنید."</string>
+    <string name="sampling_hint_8_11">"نمونه طبقاتی (تعداد خانوارها):"</string>
+    <string name="sampling_hint_9_11">"طبقات را مشخص کنید. در هر طبقه، تعداد ثابتی از خانوارها را از هر خوشه انتخاب کنید."</string>
+    <string name="sampling_hint_10_11">"نمونه طبقاتی (درصد خانوارها):"</string>
+    <string name="sampling_hint_11_11">"طبقات را مشخص کنید. در هر طبقه، درصدی از خانوارها را از هر خوشه انتخاب کنید."</string>
     <string name="enter_forgot_pin_question">"سؤال رمز PIN فراموش"</string>
     <string name="collection_app">"اپلیکیشن کلکشن"</string>
     <string name="clone_configuration">"کپی پیکربندی"</string>
@@ -560,11 +565,11 @@
         <item>"یا"</item>
         <item>"غیر"</item>
     </string-array>
-    <string-array name="samling_methods">
+    <string-array name="sampling_methods">
         <item>"نمونه گیری تصادفی ساده"</item>
         <item>"نمونه گیری خوشه"</item>
         <item>"زیرمجموعه"</item>
-        <item>"طبقات: به"</item>
+        <item>"نمونه گیری طبقاتی"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"روز/ماه/سال"</item>

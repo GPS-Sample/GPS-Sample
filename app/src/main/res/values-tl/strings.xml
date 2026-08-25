@@ -253,6 +253,7 @@
     <string name="export_enum_data">"I-export ang Data ng Enumeration"</string>
     <string name="delete_landmark_message">"Sigurado ka bang gusto mong permanenteng tanggalin ang landmark na ito?"</string>
     <string name="subaddress">"Subaddress"</string>
+    <string name="subaddress_hint2">""Ang isang subaddress ay maaaring ang address ng sambahayan o isang numero (1, 2, 3, atbp.). Makakatulong ito sa mga pangkat na makabalik sa sambahayan kung ito ay mapili.""</string>
     <string name="sampled">"Na-sample"</string>
     <string name="completed_enumeration">"Nakumpleto ang Enumeration"</string>
     <string name="incomplete_enumeration">"Hindi Kumpletong Enumeration"</string>
@@ -480,13 +481,17 @@
     <string name="enumerator_hint">"Tagabilang: Nagmamapa at naglilista ng mga kabahayan sa field."</string>
     <string name="data_collector_hint">"Tagakolekta ng Datos: Nagna-navigate sa mga na-sample na kabahayan at naglulunsad ng survey."</string>
     <string name="role_hint">""Ang GPSSample ay isang libreng Android app para sa paglilista, pagkuha ng sample, at pag-navigate sa mga sambahayan na nakabatay sa field. Piliin ang iyong tungkulin upang makapagsimula, o bisitahin ang gpssample.org upang matuto nang higit pa. Paalala: Kapag nakapagrehistro ka na ng isang tungkulin sa device na ito, tanging ang tungkulin at mga tungkulin sa ibaba nito ang magiging available.""</string>
-    <string name="sampling_hint_1_7">"Mga paglalarawan ng pamamaraan:"</string>
-    <string name="sampling_hint_2_7">"Simpleng Random na Sample:"</string>
-    <string name="sampling_hint_3_7">"Ang bawat sambahayan ay may pantay na pagkakataong mapili."</string>
-    <string name="sampling_hint_4_7">"Cluster Sample (# ng mga sambahayan):"</string>
-    <string name="sampling_hint_5_7">"Pumili ng isang takdang bilang ng mga sambahayan mula sa bawat cluster."</string>
-    <string name="sampling_hint_6_7">"Cluster Sample (% ng mga sambahayan):"</string>
-    <string name="sampling_hint_7_7">"Pumili ng porsyento ng mga sambahayan mula sa bawat cluster."</string>
+    <string name="sampling_hint_1_11">"Mga paglalarawan ng pamamaraan:"</string>
+    <string name="sampling_hint_2_11">"Simpleng Random na Sample:"</string>
+    <string name="sampling_hint_3_11">"Ang bawat sambahayan ay may pantay na pagkakataong mapili."</string>
+    <string name="sampling_hint_4_11">"Cluster Sample (# ng mga sambahayan):"</string>
+    <string name="sampling_hint_5_11">"Pumili ng isang takdang bilang ng mga sambahayan mula sa bawat cluster."</string>
+    <string name="sampling_hint_6_11">"Cluster Sample (% ng mga sambahayan):"</string>
+    <string name="sampling_hint_7_11">"Pumili ng porsyento ng mga sambahayan mula sa bawat cluster."</string>
+    <string name="sampling_hint_8_11">"Stratified Sample (Bilang ng mga sambahayan):"</string>
+    <string name="sampling_hint_9_11">""Itakda ang strata. Sa loob ng bawat strata, pumili ng isang takdang bilang ng mga sambahayan mula sa bawat kumpol.""</string>
+    <string name="sampling_hint_10_11">"Stratified sample (% ng mga sambahayan)"</string>
+    <string name="sampling_hint_11_11">""Itakda ang strata. Sa loob ng bawat strata, pumili ng isang porsyento ng mga sambahayan mula sa bawat kumpol.""</string>
     <string name="enter_forgot_pin_question">"Ilagay ang tanong tungkol sa nakalimutang PIN"</string>
     <string name="collection_app">"App ng Koleksyon"</string>
     <string name="clone_configuration">"Pag-configure ng I-clone"</string>
@@ -504,7 +509,7 @@
     <string name="distance">"Distansya"</string>
     <string name="enforce_geofence_boundary">"Ipatupad ang Hangganan ng Geofence"</string>
     <string name="enter_the_geofence_buffer_value">"Ilagay ang halaga ng geofence buffer"</string>
-    <string name="geofence_hint">""Ang geofence ay isang error buffer sa paligid ng iyong mga enumeration area. Ang mga team ay makakakolekta ng data sa labas ng geofence, ngunit ang anumang bagay na lampas sa error buffer ay ifa-flag para sa pagsusuri ng mga superbisor. Hal. Para sa isang 5m geofence, ang anumang lokasyon na nakolekta sa 6m+ ay ifa-flag para sa pagsusuri ng superbisor.""</string>
+    <string name="geofence_hint">""Ang geofence ay isang error buffer sa paligid ng iyong mga enumeration area. HINDI makakakolekta ng data ang mga team sa labas ng geofence. Anumang bagay sa pagitan ng gilid ng enumeration area at ng geofence buffer ay ifa-flag para sa pagsusuri ng mga superbisor. Hal. Para sa 5m geofence, anumang lokasyon na nakolekta sa &lt;5m ay ifa-flag para sa pagsusuri ng superbisor.""</string>
     <string name="geofence_error">"Kasalukuyan kang nasa labas ng Geofence"</string>
     <string name="begin_sample_review">"Simulan ang Sample na Pagsusuri"</string>
     <string name="review_sample">"Suriin ang Sample"</string>
@@ -560,11 +565,11 @@
         <item>"O"</item>
         <item>"HINDI"</item>
     </string-array>
-    <string-array name="samling_methods">
+    <string-array name="sampling_methods">
         <item>"Simple Random Sampling"</item>
         <item>"Cluster Sampling"</item>
         <item>"Mga Subset: Maaaring Mag-overlap"</item>
-        <item>"Strata: Mutually Exclusive"</item>
+        <item>"Stratified Sampling"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"araw/buwan/taon"</item>

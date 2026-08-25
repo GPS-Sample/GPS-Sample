@@ -93,7 +93,7 @@ class CreateStudyFragment : Fragment()
 
         ArrayAdapter.createFromResource(
             activity!!,
-            R.array.samling_methods,
+            R.array.sampling_methods,
             android.R.layout.simple_spinner_item
         ).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -121,13 +121,17 @@ class CreateStudyFragment : Fragment()
         })
 
         binding.samplingMethodTip.setOnClickListener {
-            var samplingHint = resources.getString( R.string.sampling_hint_1_7 ) + "\n\n"
-            samplingHint += resources.getString( R.string.sampling_hint_2_7 ) + "\n\n"
-            samplingHint += resources.getString( R.string.sampling_hint_3_7 ) + "\n\n"
-            samplingHint += resources.getString( R.string.sampling_hint_4_7 ) + "\n\n"
-            samplingHint += resources.getString( R.string.sampling_hint_5_7 ) + "\n\n"
-            samplingHint += resources.getString( R.string.sampling_hint_6_7 ) + "\n\n"
-            samplingHint += resources.getString( R.string.sampling_hint_7_7 )
+            var samplingHint = resources.getString( R.string.sampling_hint_1_11 ) + "\n\n"
+            samplingHint += resources.getString( R.string.sampling_hint_2_11 ) + "\n"
+            samplingHint += resources.getString( R.string.sampling_hint_3_11 ) + "\n\n"
+            samplingHint += resources.getString( R.string.sampling_hint_4_11 ) + "\n"
+            samplingHint += resources.getString( R.string.sampling_hint_5_11 ) + "\n\n"
+            samplingHint += resources.getString( R.string.sampling_hint_6_11 ) + "\n"
+            samplingHint += resources.getString( R.string.sampling_hint_7_11 ) + "\n\n"
+            samplingHint += resources.getString( R.string.sampling_hint_8_11 ) + "\n"
+            samplingHint += resources.getString( R.string.sampling_hint_9_11 ) + "\n\n"
+            samplingHint += resources.getString( R.string.sampling_hint_10_11 ) + "\n"
+            samplingHint += resources.getString( R.string.sampling_hint_11_11 )
 
             composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = samplingHint )
         }

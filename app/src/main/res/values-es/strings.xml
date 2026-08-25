@@ -253,6 +253,7 @@
     <string name="export_enum_data">"Exportar datos de enumeración"</string>
     <string name="delete_landmark_message">"¿Está seguro de que desea eliminar definitivamente este hito?"</string>
     <string name="subaddress">"Subdirección"</string>
+    <string name="subaddress_hint2">""Una subdirección puede ser la dirección del domicilio o un número (1, 2, 3, etc.). Esto ayudará a los equipos a volver al domicilio si se selecciona.""</string>
     <string name="sampled">"Muestreo"</string>
     <string name="completed_enumeration">"Enumeración completada"</string>
     <string name="incomplete_enumeration">"Enumeración incompleta"</string>
@@ -480,13 +481,17 @@
     <string name="enumerator_hint">"Encuestador: localiza y registra los hogares sobre el terreno."</string>
     <string name="data_collector_hint">"Recopilador de datos: se desplaza hasta los hogares seleccionados y pone en marcha la encuesta."</string>
     <string name="role_hint">""GPSSample es una aplicación gratuita para Android destinada al registro de hogares, el muestreo y la navegación sobre el terreno. Selecciona tu función para empezar, o visita gpssample.org para obtener más información. Nota: Una vez que registres una función en este dispositivo, solo estarán disponibles esa función y las funciones subordinadas a ella.""</string>
-    <string name="sampling_hint_1_7">"Descripciones de los métodos:"</string>
-    <string name="sampling_hint_2_7">"Muestra aleatoria simple:"</string>
-    <string name="sampling_hint_3_7">"Cada hogar tiene las mismas posibilidades de ser seleccionado."</string>
-    <string name="sampling_hint_4_7">"Muestra por conglomerados (n.º de hogares):"</string>
-    <string name="sampling_hint_5_7">"Se selecciona un número fijo de hogares de cada conglomerado."</string>
-    <string name="sampling_hint_6_7">"Muestra por conglomerados (% de hogares):"</string>
-    <string name="sampling_hint_7_7">"Se selecciona un porcentaje de hogares de cada conglomerado."</string>
+    <string name="sampling_hint_1_11">"Descripciones de los métodos:"</string>
+    <string name="sampling_hint_2_11">"Muestra aleatoria simple:"</string>
+    <string name="sampling_hint_3_11">"Cada hogar tiene las mismas posibilidades de ser seleccionado."</string>
+    <string name="sampling_hint_4_11">"Muestra por conglomerados (n.º de hogares):"</string>
+    <string name="sampling_hint_5_11">"Se selecciona un número fijo de hogares de cada conglomerado."</string>
+    <string name="sampling_hint_6_11">"Muestra por conglomerados (% de hogares):"</string>
+    <string name="sampling_hint_7_11">"Se selecciona un porcentaje de hogares de cada conglomerado."</string>
+    <string name="sampling_hint_8_11">"Muestra estratificada (número de hogares):"</string>
+    <string name="sampling_hint_9_11">""Establece los estratos. Dentro de cada estrato, selecciona un número fijo de hogares de cada conglomerado""</string>
+    <string name="sampling_hint_10_11">"Muestra estratificada (% de hogares)"</string>
+    <string name="sampling_hint_11_11">""Establece los estratos. Dentro de cada estrato, selecciona un porcentaje de hogares de cada conglomerado""</string>
     <string name="enter_forgot_pin_question">"Introduce la pregunta de recuperación de PIN"</string>
     <string name="collection_app">"Aplicación de recopilación"</string>
     <string name="clone_configuration">"Clonar configuración"</string>
@@ -504,7 +509,7 @@
     <string name="distance">"Distancia"</string>
     <string name="enforce_geofence_boundary">"Aplicar los límites de la zona restringida"</string>
     <string name="enter_the_geofence_buffer_value">"Introduce el valor del margen de la zona restringida"</string>
-    <string name="geofence_hint">""Una geovalla es un margen de error que rodea las áreas de recuento. Los equipos pueden recopilar datos fuera de la geovalla, pero cualquier dato que se encuentre más allá del margen de error se marcará para que lo revisen los supervisores. Por ejemplo: en el caso de una geovalla de 5 m, cualquier ubicación registrada a 6 m o más se marcará para que la revise el supervisor.""</string>
+    <string name="geofence_hint">""Una geovalla es una zona de seguridad alrededor de las áreas de censo. Los equipos NO pueden recopilar datos fuera de la geovalla. Cualquier dato que se encuentre entre el límite del área de censo y la zona de seguridad de la geovalla se marcará para que lo revisen los supervisores. Por ejemplo: en el caso de una geovalla de 5 m, cualquier ubicación registrada a menos de 5 m se marcará para que la revise el supervisor.""</string>
     <string name="geofence_error">"Actualmente te encuentras fuera de la zona geolocalizada"</string>
     <string name="begin_sample_review">"Iniciar revisión de la muestra"</string>
     <string name="review_sample">"Revisar muestra"</string>
@@ -560,11 +565,11 @@
         <item>"O"</item>
         <item>"NO"</item>
     </string-array>
-    <string-array name="samling_methods">
+    <string-array name="sampling_methods">
         <item>"Muestreo aleatorio simple"</item>
         <item>"Muestreo por conglomerados"</item>
         <item>"Subconjuntos: pueden superponerse"</item>
-        <item>"Estratos: Mutuamente excluyentes"</item>
+        <item>"Muestreo estratificado"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"dd/mm/aaaa"</item>

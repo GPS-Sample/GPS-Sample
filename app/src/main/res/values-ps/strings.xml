@@ -253,6 +253,7 @@
     <string name="export_enum_data">"د شمېرنې ډیټا صادرول"</string>
     <string name="delete_landmark_message">"ایا تاسو ډاډه یاست چې غواړئ دا د پیژندنې ټکی په دایمي ډول حذف کړئ؟"</string>
     <string name="subaddress">"فرعي پته"</string>
+    <string name="subaddress_hint2">"فرعي پته کیدای شي د کور پته یا یوه شمېره (۱، ۲، ۳، او داسې نور) وي. دا به له ټیمونو سره مرسته وکړي چې که وټاکل شي، کور ته راستانه شي."</string>
     <string name="sampled">"نمونې اخیستل شوی"</string>
     <string name="completed_enumeration">"بشپړ شوی شمېرنه"</string>
     <string name="incomplete_enumeration">"ناپوره شمېرنه"</string>
@@ -480,13 +481,17 @@
     <string name="enumerator_hint">"شمېرونکی: په ساحه کې د کورنیو نقشې او لیستونه جوړوي."</string>
     <string name="data_collector_hint">"د معلوماتو راټولونکی: نمونې شویو کورنیو ته ځي او سروې پیلوي."</string>
     <string name="role_hint">"GPSSample د انډرایډ یو وړیا اپلیکیشن دی چې د ساحوي کورونو لیست کولو، نمونې اخیستنې، او لارښوونې لپاره کارول کیږي. د پیل کولو لپاره خپل رول وټاکئ، یا د نورو معلوماتو لپاره gpssample.org ویبپاڼې ته مراجعه وکړئ. یادونه: کله چې تاسو په دې وسیله کې یو رول ثبت کړئ، نو یوازې هماغه رول او تر هغه لاندې رولونه به شتون ولري."</string>
-    <string name="sampling_hint_1_7">"د میتودونو توضیحات:"</string>
-    <string name="sampling_hint_2_7">"ساده تصادفي نمونه:"</string>
-    <string name="sampling_hint_3_7">"هر کور د ټاکل کېدو مساوي چانس لري."</string>
-    <string name="sampling_hint_4_7">"_د خوشې نمونه (د کورونو شمېر):"</string>
-    <string name="sampling_hint_5_7">"له هرې خوشې څخه یو ټاکلی شمیر کورونه وټاکئ."</string>
-    <string name="sampling_hint_6_7">"د خوشې نمونه (د کورونو سلنه):"</string>
-    <string name="sampling_hint_7_7">"له هرې خوشې څخه د کورونو یوه سلنه وټاکئ."</string>
+    <string name="sampling_hint_1_11">"د میتودونو توضیحات:"</string>
+    <string name="sampling_hint_2_11">"ساده تصادفي نمونه:"</string>
+    <string name="sampling_hint_3_11">"هر کور د ټاکل کېدو مساوي چانس لري."</string>
+    <string name="sampling_hint_4_11">"_د خوشې نمونه (د کورونو شمېر):"</string>
+    <string name="sampling_hint_5_11">"له هرې خوشې څخه یو ټاکلی شمیر کورونه وټاکئ."</string>
+    <string name="sampling_hint_6_11">"د خوشې نمونه (د کورونو سلنه):"</string>
+    <string name="sampling_hint_7_11">"له هرې خوشې څخه د کورونو یوه سلنه وټاکئ."</string>
+    <string name="sampling_hint_8_11">"طبقاتي نمونه (د کورنیو شمېر):"</string>
+    <string name="sampling_hint_9_11">"طبقات وټاکئ. د هر طبق په چوکاټ کې، له هرې خوشې څخه د کورنیو یو ثابت شمېر وټاکئ"</string>
+    <string name="sampling_hint_10_11">"طبقاتي نمونه (د کورنیو سلنه)"</string>
+    <string name="sampling_hint_11_11">"طبقات وټاکئ. د هر طبق په چوکاټ کې، له هرې خوشې څخه د کورنیو سلنه وټاکئ"</string>
     <string name="enter_forgot_pin_question">"هېر شوی پین پوښتنه ولیکئ"</string>
     <string name="collection_app">"د راټولولو اپلیکیشن"</string>
     <string name="clone_configuration">"د کلون تشکیلات"</string>
@@ -504,7 +509,7 @@
     <string name="distance">"واټن"</string>
     <string name="enforce_geofence_boundary">"د جیوفینس پولې پلي کړئ"</string>
     <string name="enter_the_geofence_buffer_value">"د جیوفینس بفر ارزښت داخل کړئ"</string>
-    <string name="geofence_hint">"جیوفینس ستاسو د شمېرنې سیمو شاوخوا د تېروتنې لپاره یو حدمحسوبېږي. ټیمونه کولی شي د جیوفینس څخه بهر معلومات راټول کړي، خو هر هغه څه چې د تېروتنې له حدمحسوبې څخه واوړي، د څارونکو لخوا د بیاکتنې لپاره به په نښه شي. د بېلګې په توګه: د ۵ متره جیوفینس لپاره، هر هغه موقعیت چې په ۶ متره یا ډېر واټن کې راټول شي، د څارونکي د بیاکتنې لپاره به په نښه شي."</string>
+    <string name="geofence_hint">"جیوفینس ستاسو د شمېرنې ساحو شاوخوا د تېروتنې مخنیوي لپاره یو حصار دی. ټیمونه د جیوفینس څخه بهر معلومات راټولولی نشي. د شمېرنې ساحې له څنډې او د جیوفینس حصار ترمنځ هر څه به د څارونکو لخوا د بیاکتنې لپاره په نښه شي. د بېلګې په توګه، د ۵ متره جیوفینس لپاره، هر هغه موقعیت چې له ۵ متره څخه کم واټن ولري، د څارونکي د بیاکتنې لپاره په نښه به شي."</string>
     <string name="geofence_error">"تاسو اوسمهال له جیوفینس څخه بهر یاست"</string>
     <string name="begin_sample_review">"د نمونې بیاکتنه پیل کړئ"</string>
     <string name="review_sample">"د نمونې بیاکتنه"</string>
@@ -560,11 +565,11 @@
         <item>"یا"</item>
         <item>"غیر"</item>
     </string-array>
-    <string-array name="samling_methods">
+    <string-array name="sampling_methods">
         <item>"ساده تصادفي نمونه"</item>
         <item>"ډله"</item>
         <item>"فرعي ټولګي: ممکن تداخل ولري"</item>
-        <item>"طبقات: یو له بل سره غیر قابل ترکیب"</item>
+        <item>"طبقاتي نمونه"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"ورځ/میاشت/کال"</item>
