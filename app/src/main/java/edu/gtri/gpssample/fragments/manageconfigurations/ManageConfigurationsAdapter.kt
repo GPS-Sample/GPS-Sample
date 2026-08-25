@@ -9,6 +9,7 @@ package edu.gtri.gpssample.fragments.manageconfigurations
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,7 +51,9 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
         val config = configurations!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( config.name )
-        holder.dateTextView.setText( Date(config.creationDate).toLocalizedDateTimeString())
+        val dateText = holder.itemView.resources.getString( R.string.created ) + " " + Date(config.creationDate).toLocalizedDateTimeString()
+
+        holder.dateTextView.setText( dateText )
         holder.itemView.setOnClickListener {
             didSelectConfig(config)
         }

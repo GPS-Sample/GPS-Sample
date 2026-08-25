@@ -24,14 +24,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.extensions.toLocalizedDateTimeString
 import edu.gtri.gpssample.ui.compose.ComposableSelectionDialog
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialog
+import java.util.Date
 
 @Composable
 fun ManageArchivesScreen(
@@ -58,7 +62,6 @@ fun ManageArchivesScreen(
                 colorResource(R.color.background)
             )
     ) {
-
         Text(
             text = "Archives",
             fontSize = 20.sp,
@@ -101,27 +104,45 @@ fun ManageArchivesScreen(
                         containerColor = colorResource(R.color.white)
                     )
                 ) {
-                    Text(
-                        text = archive.name,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = colorResource(R.color.primary_textcolor),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(70.dp)
-                            .padding(horizontal = 20.dp)
-                            .wrapContentHeight(
-                                Alignment.CenterVertically
-                            )
-                    )
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = archive.name,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorResource(R.color.primary_textcolor),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(45.dp)
+                                .padding(horizontal = 20.dp)
+                                .wrapContentHeight(
+                                    Alignment.CenterVertically
+                                )
+                        )
+
+                        Text(
+                            text = stringResource(R.string.created ) + " " + Date(archive.creationDate).toLocalizedDateTimeString(),
+                            fontSize = 16.sp,
+                            fontStyle = FontStyle.Italic,
+                            color = colorResource(R.color.primary_textcolor),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(45.dp)
+                                .padding(horizontal = 20.dp)
+                                .wrapContentHeight(
+                                    Alignment.CenterVertically
+                                )
+                        )
+                    }
                 }
             }
         }
     }
 
     // Restore / Delete selection dialog
-    if (showSelectionDialog) {
-
+    if (showSelectionDialog)
+    {
         selectedConfig?.let { config ->
 
             ComposableSelectionDialog(
@@ -153,8 +174,8 @@ fun ManageArchivesScreen(
     }
 
     // Delete confirmation dialog
-    if (showDeleteConfirmation) {
-
+    if (showDeleteConfirmation)
+    {
         selectedConfig?.let { config ->
 
             ComposableConfirmationDialog(
