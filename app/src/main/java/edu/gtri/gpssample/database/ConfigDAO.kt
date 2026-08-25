@@ -15,6 +15,7 @@ import android.util.Log
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_ALLOW_SUPERVISOR_EDITS
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DATE_FORMAT_INDEX
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DB_VERSION
@@ -22,6 +23,7 @@ import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_DISTANCE_FORMAT_I
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_ENCRYPTION_PASSWORD
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_GEOFENCE_BUFFER_VALUE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_GEOFENCE_IS_ENABLED
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_IS_ARCHIVED
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_MAP_ENGINE_INDEX
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_MIN_GPS_PRECISION
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_NAME
@@ -97,6 +99,7 @@ class ConfigDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CONFIG_MAP_ENGINE_INDEX, config.mapEngineIndex )
         values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
         values.put( DAO.COLUMN_CONFIG_ENCRYPTION_PASSWORD, config.encryptionPassword )
+        values.put( DAO.COLUMN_CONFIG_ALLOW_SUPERVISOR_EDITS, config.allowSupervisorEdits )
         values.put( DAO.COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY, config.allowManualLocationEntry )
         values.put( DAO.COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED, config.subaddressIsrequired )
         values.put( DAO.COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS, config.autoIncrementSubaddress )
@@ -104,6 +107,7 @@ class ConfigDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CONFIG_PROXIMITY_WARNING_VALUE, config.proximityWarningValue )
         values.put( DAO.COLUMN_CONFIG_GEOFENCE_IS_ENABLED, config.geofenceIsEnabled )
         values.put( DAO.COLUMN_CONFIG_GEOFENCE_BUFFER_VALUE, config.geofenceBufferValue )
+        values.put( DAO.COLUMN_CONFIG_IS_ARCHIVED, config.isArchived )
         values.put( DAO.COLUMN_CONFIG_VALID_USERS, config.validUsers )
 
         // TODO: these should be from lookup tables
@@ -139,6 +143,7 @@ class ConfigDAO(private var dao: DAO)
         val timeFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_TIME_FORMAT_INDEX))
         val minGpsPrecision = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION))
         val encryptionPassword = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_ENCRYPTION_PASSWORD))
+        val allowSupervisorEdits = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_ALLOW_SUPERVISOR_EDITS)).toBoolean()
         val allowManualLocationEntry = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY)).toBoolean()
         val subaddressIsRequired = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED)).toBoolean()
         val autoIncrementSubaddress = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS)).toBoolean()
@@ -146,6 +151,7 @@ class ConfigDAO(private var dao: DAO)
         val proximityWarningValue = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_PROXIMITY_WARNING_VALUE))
         val geofenceIsEnabled = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_GEOFENCE_IS_ENABLED)).toBoolean()
         val geofenceBufferValue = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_GEOFENCE_BUFFER_VALUE))
+        val isArchived = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_IS_ARCHIVED)).toBoolean()
         var validUsers = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_VALID_USERS))
 
         // HACK!!! is this really necessary?
@@ -160,14 +166,14 @@ class ConfigDAO(private var dao: DAO)
         val dateFormat = DateFormatConverter.fromIndex(dateFormatIndex)
         val timeFormat = TimeFormatConverter.fromIndex(timeFormatIndex)
 
-        return Config( uuid, creationDate, timeZone, name, dbVersion, mapEngineIndex, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsRequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, geofenceIsEnabled, geofenceBufferValue, selectedStudyUuid, selectedEnumAreaUuid, validUsers, version )
+        return Config( uuid, creationDate, timeZone, name, dbVersion, mapEngineIndex, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowSupervisorEdits, allowManualLocationEntry, subaddressIsRequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, geofenceIsEnabled, geofenceBufferValue, isArchived, selectedStudyUuid, selectedEnumAreaUuid, validUsers, version )
     }
 
     fun getConfig( uuid: String ): Config?
     {
         var config: Config? = null
 
-        val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_UUID} = '$uuid' AND ${DAO.COLUMN_CONFIG_IS_ARCHIVED} = 0"
 
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
@@ -187,7 +193,31 @@ class ConfigDAO(private var dao: DAO)
         val configs = ArrayList<Config>()
 
         MainApplication.instance.user?.let { user ->
-            val query = "SELECT * FROM ${DAO.TABLE_CONFIG} ORDER BY ${DAO.COLUMN_CREATION_DATE}"
+            val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_CONFIG_IS_ARCHIVED} = 0 ORDER BY ${DAO.COLUMN_CREATION_DATE}"
+            val cursor = dao.writableDatabase.rawQuery(query, null)
+
+            while (cursor.moveToNext())
+            {
+                val config = buildConfig(cursor)
+
+                if (config.validUsers.contains(user.uuid ))
+                {
+                    configs.add( config)
+                }
+            }
+
+            cursor.close()
+        }
+
+        return configs
+    }
+
+    fun getArchivedConfigs(): ArrayList<Config>
+    {
+        val configs = ArrayList<Config>()
+
+        MainApplication.instance.user?.let { user ->
+            val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_CONFIG_IS_ARCHIVED} = 1 ORDER BY ${DAO.COLUMN_CREATION_DATE}"
             val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext())
@@ -242,8 +272,8 @@ class ConfigDAO(private var dao: DAO)
         val surveyedCount: Int
     )
 
-    fun getConfigSummary(configUuid: String): ConfigSummary {
-
+    fun getConfigSummary(configUuid: String): ConfigSummary
+    {
         val db = dao.readableDatabase
 
         val enumAreaCount = DatabaseUtils.longForQuery(db,"""
@@ -346,7 +376,7 @@ class ConfigDAO(private var dao: DAO)
             ColumnBinding<Config>(COLUMN_CREATION_DATE, "INTEGER",Config::creationDate),
             ColumnBinding<Config>(COLUMN_VERSION,"TEXT",Config::version ),
             ColumnBinding<Config>(COLUMN_TIME_ZONE,"INTEGER",Config::timeZone),
-            ColumnBinding<Config>(COLUMN_CONFIG_NAME,"TEXT UNIQUE NOT NULL",Config::name),
+            ColumnBinding<Config>( COLUMN_CONFIG_NAME,"TEXT UNIQUE NOT NULL",Config::name),
             ColumnBinding<Config>(COLUMN_CONFIG_DB_VERSION,"INTEGER",Config::creationDate),
             ColumnBinding<Config>(COLUMN_CONFIG_MAP_ENGINE_INDEX,"INTEGER",Config::mapEngineIndex),
             ColumnBinding<Config>(COLUMN_CONFIG_DATE_FORMAT_INDEX,"INTEGER",{ DateFormatConverter.toIndex(it.dateFormat) }),
@@ -354,6 +384,7 @@ class ConfigDAO(private var dao: DAO)
             ColumnBinding<Config>(COLUMN_CONFIG_DISTANCE_FORMAT_INDEX,"INTEGER",{ DistanceFormatConverter.toIndex(it.distanceFormat) }),
             ColumnBinding<Config>(COLUMN_CONFIG_MIN_GPS_PRECISION,"INTEGER",Config::minGpsPrecision),
             ColumnBinding<Config>(COLUMN_CONFIG_ENCRYPTION_PASSWORD,"TEXT",Config::encryptionPassword),
+            ColumnBinding<Config>(COLUMN_CONFIG_ALLOW_SUPERVISOR_EDITS,"INTEGER",Config::allowSupervisorEdits),
             ColumnBinding<Config>(COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY,"INTEGER",Config::allowManualLocationEntry),
             ColumnBinding<Config>(COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED,"INTEGER",Config::subaddressIsrequired),
             ColumnBinding<Config>(COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS,"INTEGER",Config::autoIncrementSubaddress),
@@ -361,6 +392,7 @@ class ConfigDAO(private var dao: DAO)
             ColumnBinding<Config>(COLUMN_CONFIG_PROXIMITY_WARNING_VALUE,"INTEGER",Config::proximityWarningValue),
             ColumnBinding<Config>(COLUMN_CONFIG_GEOFENCE_IS_ENABLED,"INTEGER",Config::geofenceIsEnabled),
             ColumnBinding<Config>(COLUMN_CONFIG_GEOFENCE_BUFFER_VALUE,"INTEGER",Config::geofenceBufferValue),
+            ColumnBinding<Config>(COLUMN_CONFIG_IS_ARCHIVED,"INTEGER",Config::isArchived),
             ColumnBinding<Config>(COLUMN_ENUM_AREA_UUID,"TEXT",Config::selectedEnumAreaUuid),
             ColumnBinding<Config>(COLUMN_STUDY_UUID,"TEXT",Config::selectedStudyUuid),
             ColumnBinding<Config>(COLUMN_CONFIG_VALID_USERS,"TEXT",Config::validUsers),

@@ -38,6 +38,7 @@ data class Config(
     var distanceFormat: DistanceFormat,
     var minGpsPrecision: Int,
     var encryptionPassword: String,
+    var allowSupervisorEdits: Boolean,
     var allowManualLocationEntry: Boolean,
     var subaddressIsrequired: Boolean,
     var autoIncrementSubaddress: Boolean,
@@ -45,6 +46,7 @@ data class Config(
     var proximityWarningValue: Int,
     var geofenceIsEnabled: Boolean,
     var geofenceBufferValue: Int,
+    var isArchived: Boolean,
     var studies : ArrayList<Study>,
     @kotlinx.serialization.Transient
     var enumAreas : ArrayList<EnumArea> = ArrayList(),
@@ -53,13 +55,13 @@ data class Config(
     var validUsers : String,
     var version : String )
 {
-    constructor(timeZone: Int, name: String, dbVersion: Int, mapEngine: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, geofenceIsEnabled: Boolean, geofenceBufferValue: Int)
-            : this(UUID.randomUUID().toString(), Date().time, timeZone, name, dbVersion, mapEngine, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, geofenceIsEnabled, geofenceBufferValue,
-                ArrayList<Study>(), ArrayList<EnumArea>(), "", "", "", UUID.randomUUID().toString())
+    constructor(timeZone: Int, name: String, dbVersion: Int, mapEngine: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, encryptionPassword: String, allowSupervisorEdits: Boolean, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, geofenceIsEnabled: Boolean, geofenceBufferValue: Int)
+            : this(UUID.randomUUID().toString(), Date().time, timeZone, name, dbVersion, mapEngine, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowSupervisorEdits, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, geofenceIsEnabled, geofenceBufferValue,
+                false, ArrayList<Study>(), ArrayList<EnumArea>(), "", "", "", UUID.randomUUID().toString())
     constructor(uuid: String, creationDate: Long, timeZone: Int, name: String, dbVersion: Int, mapEngine: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-                minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, geofenceIsEnabled: Boolean, geofenceBufferValue: Int, selectedStudyUuid: String, selectedEnumAreaUuid: String, validUsers: String, version: String)
-            : this(uuid, creationDate, timeZone, name, dbVersion, mapEngine, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, geofenceIsEnabled, geofenceBufferValue,
-                ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyUuid, selectedEnumAreaUuid, validUsers, version)
+                minGpsPrecision: Int, encryptionPassword: String, allowSupervisorEdits: Boolean, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, geofenceIsEnabled: Boolean, geofenceBufferValue: Int, isArchived: Boolean, selectedStudyUuid: String, selectedEnumAreaUuid: String, validUsers: String, version: String)
+            : this(uuid, creationDate, timeZone, name, dbVersion, mapEngine, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowSupervisorEdits, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, geofenceIsEnabled, geofenceBufferValue,
+                isArchived, ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyUuid, selectedEnumAreaUuid, validUsers, version)
 
     var minimumGPSPrecision : String
         get() {

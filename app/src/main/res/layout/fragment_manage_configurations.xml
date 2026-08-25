@@ -18,6 +18,14 @@
             android:layout_width="match_parent"
             android:layout_height="50dp">
 
+            <ImageView
+                android:id="@+id/archives_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="start"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/archives" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -33,7 +41,7 @@
                 android:layout_height="50dp"
                 android:layout_gravity="end"
                 android:layout_marginEnd="20dp"
-                android:src="@drawable/plus_blue" />
+                android:src="@drawable/add" />
         </FrameLayout>
 
         <androidx.recyclerview.widget.RecyclerView

@@ -177,6 +177,12 @@ class ManageConfigurationsFragment : Fragment()
                 findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
             }
 
+            binding.archivesButton.visibility = if (DAO.configDAO.getArchivedConfigs().count() > 0) View.VISIBLE else View.GONE
+
+            binding.archivesButton.setOnClickListener {
+                findNavController().navigate(R.id.action_navigate_to_ManageArchivesFragment)
+            }
+
             binding.walkButton.setOnClickListener {
 
                 if (minimalConfigurations.isNotEmpty())
@@ -250,18 +256,18 @@ class ManageConfigurationsFragment : Fragment()
             items.add(resources.getString(R.string.open))
             items.add(resources.getString(R.string.edit))
             items.add(resources.getString(R.string.clone))
-            items.add(resources.getString(R.string.delete))
+            items.add(resources.getString(R.string.archive))
         }
         else if (user.role == Role.Supervisor.value)
         {
             items.add(resources.getString(R.string.open))
             items.add(resources.getString(R.string.edit))
-            items.add(resources.getString(R.string.delete))
+            items.add(resources.getString(R.string.archive))
         }
         else
         {
             items.add(resources.getString(R.string.open))
-            items.add(resources.getString(R.string.delete))
+            items.add(resources.getString(R.string.archive))
         }
 
 //        if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
@@ -281,7 +287,7 @@ class ManageConfigurationsFragment : Fragment()
                     items[0] -> { navigateBasedOnRole( config ) }
                     items[1] -> { editConfig( config ) }
                     items[2] -> { cloneConfig( config ) }
-                    items[3] -> { deleteConfig( config ) }
+                    items[3] -> { archiveConfig( config ) }
                 }
             }
             else
@@ -289,7 +295,7 @@ class ManageConfigurationsFragment : Fragment()
                 when (selection)
                 {
                     items[0] -> { navigateBasedOnRole( config ) }
-                    items[1] -> { deleteConfig( config ) }
+                    items[1] -> { archiveConfig( config ) }
                 }
             }
         }
@@ -328,31 +334,22 @@ class ManageConfigurationsFragment : Fragment()
         }
     }
 
-    fun deleteConfig( config: Config )
+    fun archiveConfig( config: Config )
     {
         composableConfirmationDialogHost.show(
-            title = resources.getString(R.string.delete_config),
-            message = resources.getString(R.string.delete_configuration_message),
+            title = resources.getString(R.string.archive_config),
+            message = resources.getString(R.string.archive_configuration_message),
             leftButtonText = resources.getString(R.string.no),
             rightButtonText = resources.getString(R.string.yes),
             destructive = true
         ) { selection ->
             if (selection == resources.getString(R.string.yes))
             {
-                binding.progressOverlayView.visibility= View.VISIBLE
-
-                viewLifecycleOwner.lifecycleScope.launch {
-                    withContext(Dispatchers.IO)
-                    {
-                        minimalConfigurations.remove(config)
-                        DAO.configDAO.deleteConfig(config)
-                    }
-
-                    // back on the main thread...
-
-                    binding.progressOverlayView.visibility = View.GONE
-                    manageConfigurationsAdapter.updateConfigurations(minimalConfigurations)
-                }
+                config.isArchived = true
+                DAO.configDAO.createOrUpdateConfig( config, config.version )
+                minimalConfigurations.remove(config)
+                manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
+                binding.archivesButton.visibility = View.VISIBLE
             }
         }
     }

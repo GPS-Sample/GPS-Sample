@@ -97,6 +97,10 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
             composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.encryption_hint))
         }
 
+        binding.supervisorEditTip.setOnClickListener {
+            composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.supervisor_edit_tip))
+        }
+
         binding.manualEntryTip.setOnClickListener {
             composableNotificationDialogHost.show(title = resources.getString(R.string.notice), message = resources.getString(R.string.manual_hint))
         }

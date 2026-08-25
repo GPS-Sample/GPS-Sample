@@ -880,6 +880,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_CONFIG_TIME_FORMAT_INDEX = "config_time_format_index"
         const val COLUMN_CONFIG_MIN_GPS_PRECISION = "config_min_gps_precision"
         const val COLUMN_CONFIG_ENCRYPTION_PASSWORD = "config_encryption_password"
+        const val COLUMN_CONFIG_ALLOW_SUPERVISOR_EDITS = "config_allow_supervisor_edits"
         const val COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY = "config_allow_manual_location_entry"
         const val COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED = "config_subaddress_is_required"
         const val COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS = "config_auto_increment_subaddress"
@@ -887,6 +888,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_CONFIG_PROXIMITY_WARNING_VALUE = "config_proximity_warning_value"
         const val COLUMN_CONFIG_GEOFENCE_IS_ENABLED = "config_geofence_is_enabled"
         const val COLUMN_CONFIG_GEOFENCE_BUFFER_VALUE = "config_geofence_buffer_value"
+        const val COLUMN_CONFIG_IS_ARCHIVED = "config_is_archived"
         const val COLUMN_CONFIG_VALID_USERS = "config_valid_users"
 
         // Study Table
