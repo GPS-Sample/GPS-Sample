@@ -111,8 +111,8 @@ class SignInFragment : Fragment()
             {
                 DAO.userDAO.getUser(userName)?.let {
                     composableInputDialogHost.show(
-                        title = it.recoveryQuestion,
-                        description = null,
+                        title = null,
+                        description = it.recoveryQuestion,
                         text = "",
                         onResult = { text ->
                             if (text.isNotEmpty())

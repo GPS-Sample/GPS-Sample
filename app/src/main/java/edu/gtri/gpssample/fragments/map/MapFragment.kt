@@ -223,8 +223,8 @@ class MapFragment : Fragment(),
                     binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
 
                     composableInputDialogHost.show(
-                        title = resources.getString(R.string.map_tile_boundary),
-                        description = null,
+                        title = null,
+                        description = resources.getString(R.string.map_tile_boundary),
                         text = "1",
                         inputTypeNumber = true,
                         cancelable = true,

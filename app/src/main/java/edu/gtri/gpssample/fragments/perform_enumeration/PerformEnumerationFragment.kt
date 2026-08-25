@@ -713,8 +713,8 @@ class PerformEnumerationFragment : Fragment(),
         if (enumerationCount == 0)
         {
             composableInputDialogHost.show(
-                title = resources.getString(R.string.subaddress_start),
-                description = null,
+                title = null,
+                description = resources.getString(R.string.subaddress_start),
                 text = "1",
                 inputTypeNumber = true,
                 cancelable = true,
@@ -1357,8 +1357,8 @@ class PerformEnumerationFragment : Fragment(),
     fun autoGenerateLocations()
     {
         composableInputDialogHost.show(
-            title = "Enter the number of HH's to create",
-            description = null,
+            title = null,
+            description = "Enter the number of HH's to create",
             text = "",
             inputTypeNumber = true,
             onResult = { text ->
@@ -1711,8 +1711,8 @@ class PerformEnumerationFragment : Fragment(),
                 R.id.set_subaddress ->
                 {
                     composableInputDialogHost.show(
-                        title = resources.getString(R.string.subaddress_start),
-                        description = null,
+                        title = null,
+                        description = resources.getString(R.string.subaddress_start),
                         text = "",
                         inputTypeNumber = true,
                         onResult = { text ->

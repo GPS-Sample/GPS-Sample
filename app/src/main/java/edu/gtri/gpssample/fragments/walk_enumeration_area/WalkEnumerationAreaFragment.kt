@@ -348,8 +348,8 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                 polyLinePoints.add( polyLinePoints[0] )
 
                 composableInputDialogHost.show(
-                    title = resources.getString(R.string.enter_enum_area_name),
-                    description = null,
+                    title = null,
+                    description = resources.getString(R.string.enter_enum_area_name),
                     text = "1",
                     inputTypeNumber = true,
                     cancelable = true,
@@ -549,8 +549,8 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                 startPoint = MapManager.instance().getLocationFromPixelPoint( mapView, p1 )
 
                 composableInputDialogHost.show(
-                    title = resources.getString(R.string.map_tile_boundary),
-                    description = null,
+                    title = null,
+                    description = resources.getString(R.string.map_tile_boundary),
                     text = "1",
                     inputTypeNumber = true,
                     cancelable = true,
@@ -584,8 +584,8 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                                     MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
 
                                     composableInputDialogHost.show(
-                                        title = resources.getString(R.string.enter_enum_area_name),
-                                        description = null,
+                                        title = null,
+                                        description = resources.getString(R.string.enter_enum_area_name),
                                         text = "1",
                                         inputTypeNumber = true,
                                         cancelable = true,
