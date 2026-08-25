@@ -261,7 +261,10 @@ class ManageConfigurationsFragment : Fragment()
         else if (user.role == Role.Supervisor.value)
         {
             items.add(resources.getString(R.string.open))
-            items.add(resources.getString(R.string.edit))
+            if (config.allowSupervisorEdits)
+            {
+                items.add(resources.getString(R.string.edit))
+            }
             items.add(resources.getString(R.string.archive))
         }
         else
@@ -269,11 +272,6 @@ class ManageConfigurationsFragment : Fragment()
             items.add(resources.getString(R.string.open))
             items.add(resources.getString(R.string.archive))
         }
-
-//        if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
-//        {
-//            items.add(resources.getString(R.string.select_strata))
-//        }
 
         composableSelectionDialogHost.show(
             title = config.name,
