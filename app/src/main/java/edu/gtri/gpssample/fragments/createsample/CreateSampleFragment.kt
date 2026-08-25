@@ -12,6 +12,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -28,7 +29,6 @@ import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateSampleBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.MapLegendDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.TileServer
@@ -47,6 +47,7 @@ import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.constants.ReviewStatus
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 
 class CreateSampleFragment : Fragment()
 {
@@ -56,6 +57,7 @@ class CreateSampleFragment : Fragment()
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var mapboxMapClickListener: OnMapClickListener
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
     private var mapView: View? = null
     private var sampleHasDuplicates = false
     private var sampleHasGeofenceViolations = false
@@ -98,6 +100,14 @@ class CreateSampleFragment : Fragment()
 
             // Assign the fragment
             createSampleFragment = this@CreateSampleFragment
+        }
+
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableConfirmationDialogHost.Content()
         }
 
         return binding.root
@@ -287,16 +297,15 @@ class CreateSampleFragment : Fragment()
 
         if (GeoUtils.isSelfIntersectingPolygon3( enumArea.vertices))
         {
-            ConfirmationDialog( activity, resources.getString(R.string.oops), resources.getString(R.string.boundary_is_self_intersecting), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {
-                    }
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        redefineEnumerationAreaBoundary()
-                    }
-                    ConfirmationDialog.ButtonPress.None -> {
-                    }
+            composableConfirmationDialogHost.show(
+                title = resources.getString(R.string.oops),
+                message = resources.getString(R.string.boundary_is_self_intersecting),
+                leftButtonText = resources.getString(R.string.no),
+                rightButtonText = resources.getString(R.string.yes),
+                destructive = true
+            ) { selection ->
+                if (selection == resources.getString(R.string.yes)) {
+                    redefineEnumerationAreaBoundary()
                 }
             }
         }

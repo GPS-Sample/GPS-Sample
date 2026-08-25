@@ -7,10 +7,9 @@
 
 package edu.gtri.gpssample.fragments.add_landmark
 
-import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.*
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -21,8 +20,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddLandmarkBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.NotificationDialog
+import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.utils.CameraUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.Date
@@ -32,12 +30,12 @@ class AddLandmarkFragment : Fragment()
 {
     private var _binding: FragmentAddLandmarkBinding? = null
     private val binding get() = _binding!!
-
     private lateinit var study: Study
     private lateinit var config: Config
     private lateinit var enumArea : EnumArea
     private lateinit var location: Location
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -56,6 +54,14 @@ class AddLandmarkFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        composableConfirmationDialogHost = ComposableConfirmationDialogHost()
+
+        binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+        binding.dialogComposeView.setContent {
+            composableConfirmationDialogHost.Content()
+        }
 
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
@@ -87,40 +93,24 @@ class AddLandmarkFragment : Fragment()
         }
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_landmark_message), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {
-                    }
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        enumArea.locations.remove(location)
+            composableConfirmationDialogHost.show(
+                title = resources.getString(R.string.please_confirm),
+                message = resources.getString(R.string.delete_landmark_message),
+                leftButtonText = resources.getString(R.string.no),
+                rightButtonText = resources.getString(R.string.yes),
+                destructive = true
+            ) { selection ->
+                if (selection == resources.getString(R.string.yes)) {
+                    enumArea.locations.remove(location)
 
-                        DAO.locationDAO.delete( location )
+                    DAO.locationDAO.delete( location )
 
-                        findNavController().popBackStack()
-                    }
-                    ConfirmationDialog.ButtonPress.None -> {
-                    }
+                    findNavController().popBackStack()
                 }
             }
-
         }
 
         binding.addPhotoImageView.setOnClickListener {
-
-            // get the total size of all image data
-//            var size = 0
-//
-//            for (location in enumArea.locations)
-//            {
-//                size += location.imageData.length
-//            }
-//
-//            if (size > 25 * 1024 * 1024)
-//            {
-//                NotificationDialog( activity!!, resources.getString( R.string.warning), resources.getString( R.string.image_size_warning))
-//            }
-
             findNavController().navigate(R.id.action_navigate_to_CameraFragment)
         }
 
@@ -133,33 +123,6 @@ class AddLandmarkFragment : Fragment()
 
             location.creationDate = Date().time
             DAO.locationDAO.createOrUpdateLocation( location, enumArea, UUID.randomUUID().toString())
-
-//            DAO.configDAO.getConfig( config.uuid )?.let {
-//                it.selectedStudyUuid = config.selectedStudyUuid
-//                it.selectedEnumAreaUuid = config.selectedEnumAreaUuid
-//
-//                val enumAreas = it.enumAreas.filter {
-//                    it.uuid == config.selectedEnumAreaUuid
-//                }
-//
-//                if (enumAreas.isNotEmpty())
-//                {
-//                    enumAreas[0].selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
-//                    enumAreas[0].selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
-//                }
-//
-//                sharedViewModel.setCurrentConfig( it )
-//            }
-//
-//            DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
-//                it.selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
-//                it.selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
-//                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
-//            }
-//
-//            DAO.studyDAO.getStudy( study.uuid )?.let {
-//                sharedViewModel.createStudyModel.setStudy( it )
-//            }
 
             findNavController().popBackStack()
         }

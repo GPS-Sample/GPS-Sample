@@ -14,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.dialogs.ConfirmationDialog.ButtonPress
 
 class InputDialog
 {

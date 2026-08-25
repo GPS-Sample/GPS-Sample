@@ -14,7 +14,6 @@ import android.view.View
 import android.widget.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Strata
-import edu.gtri.gpssample.dialogs.ConfirmationDialog.ButtonPress
 import java.util.ArrayList
 
 class DropdownDialog
