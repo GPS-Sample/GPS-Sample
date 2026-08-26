@@ -6,6 +6,10 @@ pluginManagement {
     }
 }
 
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
 // Function to read a property from local.properties
 def getLocalProperty(String key) {
     def propertiesFile = new File(rootDir, "local.properties")
