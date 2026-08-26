@@ -850,7 +850,7 @@ class PerformCollectionFragment : Fragment(),
                     isShowingBreadcrumbs = true
                     selectedTeamNames.clear()
                     selectedBreadcrumbs.clear()
-                    selectedTeamNames.add( collectionTeam.name )
+                    selectedTeamNames.add( enumArea.enumerationTeams.first().name )
                     selectedBreadcrumbs.addAll( enumArea.breadcrumbs)
                     binding.showBreadcrumbsButton.setBackgroundResource(R.drawable.navigate2)
                     binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));

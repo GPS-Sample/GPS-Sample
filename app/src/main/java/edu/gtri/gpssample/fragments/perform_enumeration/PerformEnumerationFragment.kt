@@ -1034,6 +1034,7 @@ class PerformEnumerationFragment : Fragment(),
             if (breadcrumbRecordingState == BreadcrumbRecordingState.RECORDING)
             {
                 selectedTeamNames.clear()
+                selectedBreadcrumbs.clear()
                 selectedBreadcrumbs.addAll( enumArea.breadcrumbs )
                 selectedTeamNames.add( enumerationTeam.name )
             }
@@ -1811,13 +1812,6 @@ class PerformEnumerationFragment : Fragment(),
                             val lastBreadcrumb = enumArea.breadcrumbs.last()
                             val lastLatLng = LatLng( lastBreadcrumb.latitude, lastBreadcrumb.longitude )
                             distance = GeoUtils.distanceBetween( currentLatLng, lastLatLng )
-                        }
-
-                        Log.d( "xxx", "distance = ${distance}")
-
-                        for (breadcrumb in enumArea.breadcrumbs)
-                        {
-                            DAO.breadcrumbDAO.delete( breadcrumb )
                         }
 
                         if (distance > MIN_BREADCRUMB_METERS)

@@ -508,25 +508,12 @@ class AddHouseholdFragment : Fragment()
                 }
             }
 
-            if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-            {
-                composableAdditionalInfoDialogHost.show(
-                    complete = enumerationItem.enumerationState == EnumerationState.Enumerated,
-                    incompleteReason = enumerationItem.enumerationIncompleteReason,
-                    notes = enumerationItem.enumerationNotes
-                ) { complete, incompleteReason, notes ->
-                    didSelectSaveButton( incompleteReason, notes )
-                }
-            }
-            else
-            {
-                composableAdditionalInfoDialogHost.show(
-                    complete = if (enumerationItem.enumerationState == EnumerationState.Enumerated) true else false,
-                    incompleteReason = "",
-                    notes = ""
-                ) { complete, incompleteReason, notes ->
-                    didSelectSaveButton( incompleteReason, notes )
-                }
+            composableAdditionalInfoDialogHost.show(
+                complete = enumerationItem.enumerationState == EnumerationState.Enumerated,
+                incompleteReason = enumerationItem.enumerationIncompleteReason,
+                notes = enumerationItem.enumerationNotes
+            ) { complete, incompleteReason, notes ->
+                didSelectSaveButton( incompleteReason, notes )
             }
         }
     }
