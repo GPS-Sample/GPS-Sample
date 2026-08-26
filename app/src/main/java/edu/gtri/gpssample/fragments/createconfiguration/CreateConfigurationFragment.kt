@@ -182,42 +182,47 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
 
             if (binding.configNameEditText.text.toString().isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (binding.minGpsPrecisionEditText.text.toString().isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.desired_gps_position), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.desired_gps_position), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (binding.encryptionPasswordEditText.text.toString().length < 6)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.min_password_required), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.min_password_required), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             sharedViewModel.currentConfiguration?.value?.let { config ->
+                if (DAO.configDAO.nameExists( config.name ))
+                {
+                    Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.config_name_already_exists), Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
                 if (config.minGpsPrecision == 0)
                 {
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.desired_gps_position), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.desired_gps_position), Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
                 }
-                else
-                {
-                    binding.progressOverlayView.visibility = View.VISIBLE
 
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        withContext(Dispatchers.IO)
-                        {
-                            DAO.configDAO.createOrUpdateConfig( config,UUID.randomUUID().toString())
-                        }
+                binding.progressOverlayView.visibility = View.VISIBLE
 
-                        // back on the main thread...
-                        binding.progressOverlayView.visibility = View.GONE
-
-                        findNavController().popBackStack()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    withContext(Dispatchers.IO)
+                    {
+                        DAO.configDAO.createOrUpdateConfig( config,UUID.randomUUID().toString())
                     }
+
+                    // back on the main thread...
+                    binding.progressOverlayView.visibility = View.GONE
+
+                    findNavController().popBackStack()
                 }
             }
         }

@@ -69,6 +69,12 @@ class ConfigDAO(private var dao: DAO)
         dao.writableDatabase.endTransaction()
     }
 
+    fun nameExists(name: String): Boolean
+    {
+        val cursor = dao.writableDatabase.rawQuery("SELECT 1 FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_CONFIG_NAME} = ? LIMIT 1", arrayOf(name))
+        return cursor.use { it.moveToFirst() }
+    }
+
     fun doRealUpsert()
     {
         // Possible future improvement, if needed
