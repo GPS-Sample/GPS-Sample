@@ -372,6 +372,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
             studiesAdapter.didSelectStudy = this::didSelectStudy
 
             binding.locationSwitch.isChecked = config.allowManualLocationEntry
+            binding.supervisorEditSwitch.isChecked = config.allowSupervisorEdits
 
             if(config.studies.count() > 0)
             {
