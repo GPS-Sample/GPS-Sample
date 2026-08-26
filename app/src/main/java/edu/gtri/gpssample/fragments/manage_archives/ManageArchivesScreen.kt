@@ -58,15 +58,13 @@ fun ManageArchivesScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                colorResource(R.color.background)
-            )
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Text(
             text = "Archives",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
@@ -101,7 +99,7 @@ fun ManageArchivesScreen(
                         defaultElevation = 2.dp
                     ),
                     colors = CardDefaults.cardColors(
-                        containerColor = colorResource(R.color.white)
+                        containerColor = MaterialTheme.colorScheme.surface
                     )
                 ) {
                     Column(
@@ -111,7 +109,7 @@ fun ManageArchivesScreen(
                             text = archive.name,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = colorResource(R.color.primary_textcolor),
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(45.dp)
@@ -125,7 +123,7 @@ fun ManageArchivesScreen(
                             text = stringResource(R.string.created ) + " " + Date(archive.creationDate).toLocalizedDateTimeString(),
                             fontSize = 16.sp,
                             fontStyle = FontStyle.Italic,
-                            color = colorResource(R.color.primary_textcolor),
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(45.dp)

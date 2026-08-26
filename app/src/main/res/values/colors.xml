@@ -27,5 +27,6 @@
 
     <color name="highlight_red">#EC0000</color>
     <color name="highlight_green">#35eb0d</color>
+    <color name="surface_dark">#424242</color>
 
 </resources>

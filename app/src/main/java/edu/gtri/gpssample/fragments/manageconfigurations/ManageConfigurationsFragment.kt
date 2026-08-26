@@ -251,7 +251,7 @@ class ManageConfigurationsFragment : Fragment()
     {
         val items = ArrayList<String>()
 
-        if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
+        if (user.role == Role.Admin.value)
         {
             items.add(resources.getString(R.string.open))
             items.add(resources.getString(R.string.edit))
@@ -278,7 +278,7 @@ class ManageConfigurationsFragment : Fragment()
             message = null,
             items = items,
         ) { selection ->
-            if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
+            if (user.role == Role.Admin.value)
             {
                 when (selection)
                 {
@@ -286,6 +286,26 @@ class ManageConfigurationsFragment : Fragment()
                     items[1] -> { editConfig( config ) }
                     items[2] -> { cloneConfig( config ) }
                     items[3] -> { archiveConfig( config ) }
+                }
+            }
+            else if (user.role == Role.Supervisor.value)
+            {
+                if (config.allowSupervisorEdits)
+                {
+                    when (selection)
+                    {
+                        items[0] -> { navigateBasedOnRole( config ) }
+                        items[1] -> { editConfig( config ) }
+                        items[2] -> { archiveConfig( config ) }
+                    }
+                }
+                else
+                {
+                    when (selection)
+                    {
+                        items[0] -> { navigateBasedOnRole( config ) }
+                        items[1] -> { archiveConfig( config ) }
+                    }
                 }
             }
             else

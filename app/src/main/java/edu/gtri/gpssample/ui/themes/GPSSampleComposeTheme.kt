@@ -78,10 +78,10 @@ fun GPSSampleComposeTheme(
             onSecondary = colorResource(R.color.black),
 
             background = colorResource(R.color.background),
-            onBackground = colorResource(R.color.primary_textcolor),
+            onBackground = colorResource(R.color.white),
 
-            surface = colorResource(R.color.background),
-            onSurface = colorResource(R.color.primary_textcolor)
+            surface = colorResource(R.color.surface_dark),
+            onSurface = colorResource(R.color.white)
         )
     } else {
         lightColorScheme(
@@ -94,7 +94,7 @@ fun GPSSampleComposeTheme(
             background = colorResource(R.color.background),
             onBackground = colorResource(R.color.primary_textcolor),
 
-            surface = colorResource(R.color.background),
+            surface = colorResource(R.color.white),
             onSurface = colorResource(R.color.primary_textcolor)
         )
     }
