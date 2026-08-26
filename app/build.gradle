@@ -9,15 +9,15 @@ plugins {
 
 android {
     namespace 'edu.gtri.gpssample'
-    compileSdk 36
+    compileSdk = 36
 
     defaultConfig {
-        applicationId "edu.gtri.gpssample"
-        minSdk 26
-        targetSdk 36
-        versionCode 32
-        versionName "3.0.0 beta-10"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        applicationId = "edu.gtri.gpssample"
+        minSdk = 26
+        targetSdk = 36
+        versionCode = 32
+        versionName = "3.0.0 beta-11"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
