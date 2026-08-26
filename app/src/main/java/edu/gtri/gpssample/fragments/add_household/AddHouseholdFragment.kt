@@ -509,7 +509,7 @@ class AddHouseholdFragment : Fragment()
             }
 
             composableAdditionalInfoDialogHost.show(
-                complete = enumerationItem.enumerationState == EnumerationState.Enumerated,
+                complete = enumerationItem.enumerationState == EnumerationState.Undefined || enumerationItem.enumerationState == EnumerationState.Enumerated,
                 incompleteReason = enumerationItem.enumerationIncompleteReason,
                 notes = enumerationItem.enumerationNotes
             ) { complete, incompleteReason, notes ->
@@ -521,7 +521,8 @@ class AddHouseholdFragment : Fragment()
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.AddHouseholdFragment.value.toString() + ": " + this.javaClass.simpleName
+
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.AddHouseholdFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun didSelectSaveButton( incompleteReason: String?, notes: String )
