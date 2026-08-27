@@ -52,13 +52,14 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
     private lateinit var enumArea: EnumArea
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
     private var fingerPolyline: Any? = null
     private var _binding: FragmentCreateCollectionTeamBinding? = null
     private val binding get() = _binding!!
     private var intersectionPolygon: Any? = null
     private val locationUuids = ArrayList<String>()
     private val polyLinePoints = ArrayList<Point>()
-    private lateinit var composableSelectionDialogHost: ComposableSelectionDialogHost
+
     enum class TapType {
         None,
         DrawBoundary,
@@ -152,7 +153,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
                 binding.mapOverlayView.visibility = View.VISIBLE
                 binding.drawPolygonButton.setBackgroundResource( R.drawable.save_blue )
 
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.draw_boundary), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.draw_boundary), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -185,7 +186,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
                 binding.mapOverlayView.visibility = View.VISIBLE
                 binding.tapPolygonButton.setBackgroundResource( R.drawable.save_blue )
 
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.tap_boundary), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.tap_boundary), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -204,19 +205,26 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
             ) { selection ->
                 if (selection.isNotEmpty())
                 {
-                    polyLinePoints.clear()
-
                     for (team in enumArea.enumerationTeams)
                     {
                         if (selection == team.name)
                         {
+                            polyLinePoints.clear()
+
                             for (latLon in team.polygon)
                             {
                                 polyLinePoints.add( Point.fromLngLat(latLon.longitude, latLon.latitude ))
                             }
 
                             binding.teamNameEditText.setText( team.name )
-                            createIntersectionPolygon()
+
+                            locationUuids.clear()
+                            locationUuids.addAll(team.locationUuids )
+
+                            val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+                            pointList.add( polyLinePoints )
+
+                            intersectionPolygon = MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x30 )
 
                             break
                         }
@@ -232,7 +240,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
         binding.saveButton.setOnClickListener {
             if (binding.teamNameEditText.text.toString().length == 0)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.team_name_message), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.team_name_message), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -272,7 +280,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
 
                 DAO.collectionTeamDAO.createOrUpdateCollectionTeam( collectionTeam, collectionTeam.version )
                 enumArea.collectionTeams.add(collectionTeam)
-                activity!!.runOnUiThread {
+                requireActivity().runOnUiThread {
                     findNavController().popBackStack()
                 }
             }.start()
@@ -285,7 +293,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateCollectionTeamFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.CreateCollectionTeamFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun refreshMap()
@@ -361,7 +369,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
 
             if (markerProperties.isNotEmpty())
             {
-                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, null )
+                MapManager.instance().loadMarkers( requireActivity(), mapView, markerProperties, null )
             }
         }
     }
@@ -509,7 +517,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
                             }
                         }
 
-                        val count = locationUuids.size
+                        var count = locationUuids.size
 
                         // now look for HH's that are in the selectionPolygon but outside of the EA
                         for (location in enumArea.locations)
@@ -565,24 +573,24 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
         {
             R.id.mapbox_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }
 
             R.id.satellite_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }
