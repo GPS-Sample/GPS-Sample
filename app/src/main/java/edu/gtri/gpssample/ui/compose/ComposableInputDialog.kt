@@ -22,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -45,6 +44,8 @@ fun ComposableInputDialog(
     inputTypeNumber: Boolean = false,
     isPassword: Boolean = false,
     cancelable: Boolean = true,
+    leftButtonText: String? = null,
+    rightButtonText: String? = null,
     qrText: String? = null,
     onQrClick: (() -> Unit)? = null,
     onResult: (String) -> Unit
@@ -119,7 +120,7 @@ fun ComposableInputDialog(
                         value = textValue,
                         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
                         textStyle = MaterialTheme.typography.bodyLarge,
-                        visualTransformation =     if (isPassword) { PasswordVisualTransformation() } else { VisualTransformation.None },
+                        visualTransformation = if (isPassword) { PasswordVisualTransformation() } else { VisualTransformation.None },
                         onValueChange = {
                             textValue = it
                         }
@@ -138,7 +139,7 @@ fun ComposableInputDialog(
                             }
                         ) {
                             Text(
-                                text = stringResource(R.string.cancel),
+                                text = if (leftButtonText.isNullOrEmpty()) stringResource(R.string.cancel) else leftButtonText,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -152,7 +153,7 @@ fun ComposableInputDialog(
                             }
                         ) {
                             Text(
-                                text = stringResource(R.string.save),
+                                text = if (rightButtonText.isNullOrEmpty()) stringResource(R.string.save) else rightButtonText,
                                 fontWeight = FontWeight.Medium
                             )
                         }

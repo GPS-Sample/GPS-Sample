@@ -328,7 +328,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
 
-            MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
+            MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
 
                 binding.osmLabel.visibility = if (mapView is MapView) View.VISIBLE else View.GONE
 
@@ -442,7 +442,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.ConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun updateOverview()
@@ -531,7 +531,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
     fun getFileName() : String
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
-            val user = (activity!!.application as MainApplication).user
+            val user = (requireActivity().application as MainApplication).user
 
             var userName = user!!.name.replace(" ", "" ).uppercase()
 
@@ -581,7 +581,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
     {
         if (sharedViewModel.createStudyModel.currentStudy == null)
         {
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -691,7 +691,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
 
                             PerformanceManager.startTimer()
 
-                            zipUtils.unzip( activity!!, uri, currentConfig.encryptionPassword ) { result ->
+                            zipUtils.unzip(requireActivity(), uri, currentConfig.encryptionPassword ) { result ->
                                 val config = result.first
                                 val errorCode = result.second
 
@@ -732,7 +732,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
         catch( ex: java.lang.Exception )
         {
             Log.d( "xxx", ex.stackTraceToString())
-            Toast.makeText( activity!!.applicationContext, ex.stackTraceToString(), Toast.LENGTH_LONG).show()
+            Toast.makeText( requireActivity().applicationContext, ex.stackTraceToString(), Toast.LENGTH_LONG).show()
         }
     }
 

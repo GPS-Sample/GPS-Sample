@@ -5,7 +5,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import edu.gtri.gpssample.R
 import edu.gtri.gpssample.ui.GPSSampleComposeTheme
+import androidx.compose.ui.res.stringResource
 
 class ComposableInputDialogHost
 {
@@ -21,6 +24,8 @@ class ComposableInputDialogHost
         inputTypeNumber: Boolean = false,
         isPassword: Boolean = false,
         cancelable: Boolean = true,
+        leftButtonText: String? = null,
+        rightButtonText: String? = null,
         onQrClick: (() -> Unit)? = null,
         onResult: (String) -> Unit
     ) {
@@ -35,6 +40,8 @@ class ComposableInputDialogHost
             inputTypeNumber = inputTypeNumber,
             isPassword = isPassword,
             cancelable = cancelable,
+            leftButtonText = leftButtonText,
+            rightButtonText = rightButtonText,
             onQrClick = onQrClick,
             onResult = onResult
         )
@@ -55,6 +62,8 @@ class ComposableInputDialogHost
                         inputTypeNumber = it.inputTypeNumber,
                         isPassword = it.isPassword,
                         cancelable = it.cancelable,
+                        leftButtonText = it.leftButtonText,
+                        rightButtonText = it.rightButtonText,
                         qrText = qrText,
                         onQrClick = it.onQrClick,
                         onResult = { result ->
@@ -79,6 +88,8 @@ class ComposableInputDialogHost
         val inputTypeNumber: Boolean = false,
         val isPassword: Boolean = false,
         val cancelable: Boolean = true,
+        val leftButtonText: String? = null,
+        val rightButtonText: String? = null,
         val onQrClick: (() -> Unit)?,
         val onResult: (String) -> Unit
     )
