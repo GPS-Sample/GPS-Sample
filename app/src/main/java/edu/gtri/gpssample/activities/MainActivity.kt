@@ -29,6 +29,7 @@ import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.databinding.ActivityMainBinding
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.Date
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainActivity : AppCompatActivity(), ProviderInstaller.ProviderInstallListener
 {
@@ -38,6 +39,8 @@ class MainActivity : AppCompatActivity(), ProviderInstaller.ProviderInstallListe
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?)
     {
+        installSplashScreen()
+
         super.onCreate(savedInstanceState)
 
         // build view models

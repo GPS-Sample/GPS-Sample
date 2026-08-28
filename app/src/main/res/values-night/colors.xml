@@ -14,4 +14,6 @@
     <color name="light_gray">#CCCCCC</color>
     <color name="background">#2F2E2E</color>
     <color name="link_color">#FFFFFF</color>
+    <color name="splash_hh">#FFFFFF</color>
+
 </resources>

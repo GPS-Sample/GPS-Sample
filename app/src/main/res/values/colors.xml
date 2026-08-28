@@ -29,4 +29,6 @@
     <color name="highlight_green">#35eb0d</color>
     <color name="surface_dark">#424242</color>
 
+    <color name="ic_launcher_background">#FFFFFF</color>
+    <color name="splash_hh">#000000</color>
 </resources>
