@@ -29,8 +29,11 @@ import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.ui.compose.ComposableAdditionalInfoDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableDatePickerDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableTimePickerDialogHost
 import edu.gtri.gpssample.utils.CameraUtils
+import edu.gtri.gpssample.utils.DateUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import org.json.JSONObject
 import java.util.*
@@ -48,6 +51,8 @@ class AddHouseholdFragment : Fragment()
     private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
+    private lateinit var composableDatePickerDialogHost: ComposableDatePickerDialogHost
+    private lateinit var composableTimePickerDialogHost: ComposableTimePickerDialogHost
     private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
     private lateinit var composableAdditionalInfoDialogHost: ComposableAdditionalInfoDialogHost
@@ -82,6 +87,9 @@ class AddHouseholdFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
+        composableDatePickerDialogHost = ComposableDatePickerDialogHost()
+        composableTimePickerDialogHost = ComposableTimePickerDialogHost()
+        composableNotificationDialogHost = ComposableNotificationDialogHost()
         composableNotificationDialogHost = ComposableNotificationDialogHost()
         composableConfirmationDialogHost = ComposableConfirmationDialogHost()
         composableAdditionalInfoDialogHost = ComposableAdditionalInfoDialogHost()
@@ -89,6 +97,8 @@ class AddHouseholdFragment : Fragment()
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
         binding.dialogComposeView.setContent {
+            composableDatePickerDialogHost.Content()
+            composableTimePickerDialogHost.Content()
             composableNotificationDialogHost.Content()
             composableConfirmationDialogHost.Content()
             composableAdditionalInfoDialogHost.Content()
@@ -165,7 +175,7 @@ class AddHouseholdFragment : Fragment()
 
         if (!this::enumerationItem.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "Oops! Double tap detected.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireActivity().applicationContext, "Oops! Double tap detected.", Toast.LENGTH_SHORT).show()
             findNavController().popBackStack()
         }
 
@@ -176,7 +186,7 @@ class AddHouseholdFragment : Fragment()
             binding.addMultiButton.setOnClickListener {
                 if (enumerationItem.subAddress.isEmpty())
                 {
-                    Toast.makeText(activity!!.applicationContext, context?.getString(R.string.please_enter_a_subaddress), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity().applicationContext, context?.getString(R.string.please_enter_a_subaddress), Toast.LENGTH_SHORT).show()
                 }
                 else
                 {
@@ -316,7 +326,7 @@ class AddHouseholdFragment : Fragment()
             }
         }
 
-        addHouseholdAdapter = AddHouseholdAdapter( binding.recyclerView, editMode, config, enumerationItem, study.fields, filteredFieldDataList )
+        addHouseholdAdapter = AddHouseholdAdapter( binding.recyclerView, editMode, config, enumerationItem, study.fields, filteredFieldDataList, this::getDate, this::getTime )
         binding.recyclerView.adapter = addHouseholdAdapter
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
@@ -485,7 +495,7 @@ class AddHouseholdFragment : Fragment()
                             field.minimum?.let { minVal ->
                                 if (numberValue < minVal) {
                                     Toast.makeText(
-                                        context!!.applicationContext,
+                                        requireContext().applicationContext,
                                         "${field.name}: " + "The minimum allowed value is" + " ${minVal}",
                                         Toast.LENGTH_LONG
                                     ).show()
@@ -496,7 +506,7 @@ class AddHouseholdFragment : Fragment()
                             field.maximum?.let { maxVal ->
                                 if (numberValue > maxVal) {
                                     Toast.makeText(
-                                        context!!.applicationContext,
+                                        requireContext().applicationContext,
                                         "${field.name}: " + "The maximum allowed value is" + " (${maxVal})",
                                         Toast.LENGTH_LONG
                                     ).show()
@@ -536,7 +546,7 @@ class AddHouseholdFragment : Fragment()
         {
             if (config.subaddressIsrequired && binding.subaddressEditText.text.toString().isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, "Subaddress is required", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, "Subaddress is required", Toast.LENGTH_SHORT).show()
                 return
             }
 
@@ -546,26 +556,26 @@ class AddHouseholdFragment : Fragment()
                         when (field.type) {
                             FieldType.Text -> {
                                 if (fieldData.textValue.isEmpty()) {
-                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}",Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(requireActivity().applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}",Toast.LENGTH_SHORT).show()
                                     return
                                 }
                             }
                             FieldType.Number -> {
                                 if (fieldData.numberValue == null) {
-                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(requireActivity().applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
                                     return
                                 }
                             }
                             FieldType.Date -> {
                                 if (fieldData.dateValue == null) {
-                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(requireActivity().applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
                                     return
                                 }
                             }
                             FieldType.Dropdown -> {
                                 if (fieldData.dropdownIndex == null)
                                 {
-                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(requireActivity().applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
                                     return
                                 }
                             }
@@ -583,7 +593,7 @@ class AddHouseholdFragment : Fragment()
 
                                 if (!somethingChecked)
                                 {
-                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(requireActivity().applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
                                     return
                                 }
                             }
@@ -630,7 +640,7 @@ class AddHouseholdFragment : Fragment()
             }
         }
 
-        (activity!!.application as MainApplication).user?.let { user ->
+        (requireActivity().application as MainApplication).user?.let { user ->
             enumerationItem.enumeratorName = user.name
         }
 
@@ -640,6 +650,20 @@ class AddHouseholdFragment : Fragment()
         DAO.locationDAO.createOrUpdateLocation( location, enumArea, UUID.randomUUID().toString())
 
         findNavController().popBackStack()
+    }
+
+    fun getDate(date: Date, completion: (Date?) -> Unit)
+    {
+        composableDatePickerDialogHost.show(date = date) { date ->
+            completion(date)
+        }
+    }
+
+    fun getTime(date: Date, completion: (Date?) -> Unit)
+    {
+        composableTimePickerDialogHost.show(date = date) { date ->
+            completion(date)
+        }
     }
 
     override fun onDestroyView()

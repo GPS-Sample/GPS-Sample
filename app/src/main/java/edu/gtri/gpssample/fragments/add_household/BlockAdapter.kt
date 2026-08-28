@@ -9,27 +9,26 @@ package edu.gtri.gpssample.fragments.add_household
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.DateFormat
-import edu.gtri.gpssample.constants.FieldType
-import edu.gtri.gpssample.constants.TimeFormat
 import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldData
-import edu.gtri.gpssample.dialogs.DatePickerDialog
-import edu.gtri.gpssample.dialogs.TimePickerDialog
 import java.util.*
 
-class BlockAdapter( val parentFieldIndex: Int, val editMode: Boolean, val config: Config, val listOfLists: ArrayList<ArrayList<FieldData>>) : RecyclerView.Adapter<BlockAdapter.ViewHolder>()
+class BlockAdapter(
+    val parentFieldIndex: Int,
+    val editMode: Boolean,
+    val config: Config,
+    val listOfLists: ArrayList<ArrayList<FieldData>>,
+    val getDate: (date: Date, (Date?) -> Unit) -> Unit,
+    val getTime: (date: Date, (Date?) -> Unit) -> Unit) :
+    RecyclerView.Adapter<BlockAdapter.ViewHolder>()
 {
     private var context: Context? = null
     private lateinit var blockFieldAdapter: BlockFieldAdapter
@@ -61,7 +60,7 @@ class BlockAdapter( val parentFieldIndex: Int, val editMode: Boolean, val config
         val titleTextView = holder.linearLayout.findViewById<TextView>(R.id.title_text_view)
         titleTextView.text = "Item # ${position+1}"
 
-        blockFieldAdapter = BlockFieldAdapter( parentFieldIndex, editMode, config, fieldDataList )
+        blockFieldAdapter = BlockFieldAdapter( parentFieldIndex, editMode, config, fieldDataList, getDate, getTime )
 
         val recyclerView: RecyclerView = holder.linearLayout.findViewById(R.id.recycler_view)
         recyclerView.adapter = blockFieldAdapter

@@ -69,9 +69,9 @@ class ConfigDAO(private var dao: DAO)
         dao.writableDatabase.endTransaction()
     }
 
-    fun nameExists(name: String): Boolean
+    fun nameExists(config: Config): Boolean
     {
-        val cursor = dao.writableDatabase.rawQuery("SELECT 1 FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_CONFIG_NAME} = ? LIMIT 1", arrayOf(name))
+        val cursor = dao.writableDatabase.rawQuery("SELECT 1 FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_CONFIG_NAME} = ? AND ${DAO.COLUMN_UUID} != ? LIMIT 1", arrayOf(config.name, config.uuid))
         return cursor.use { it.moveToFirst() }
     }
 

@@ -133,7 +133,7 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
             items.add( mapEngine.toString() )
         }
 
-        binding.mapEngineSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, items )
+        binding.mapEngineSpinner.adapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, items )
 
         binding.mapEngineSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
         {
@@ -199,7 +199,7 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
             }
 
             sharedViewModel.currentConfiguration?.value?.let { config ->
-                if (DAO.configDAO.nameExists( config.name ))
+                if (DAO.configDAO.nameExists( config ))
                 {
                     Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.config_name_already_exists), Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
@@ -266,7 +266,7 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.CreateConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
 
         manageStudiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
     }

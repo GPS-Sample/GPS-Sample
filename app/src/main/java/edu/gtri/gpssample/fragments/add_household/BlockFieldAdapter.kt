@@ -10,7 +10,6 @@ package edu.gtri.gpssample.fragments.add_household
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,15 +26,17 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldData
-import edu.gtri.gpssample.dialogs.DatePickerDialog
-import edu.gtri.gpssample.dialogs.TimePickerDialog
 import edu.gtri.gpssample.utils.DateUtils
 import java.util.*
 
-class BlockFieldAdapter( val parentFieldIndex: Int, val editMode: Boolean, val config: Config, val fieldDataList: List<FieldData>) :
-    RecyclerView.Adapter<BlockFieldAdapter.ViewHolder>(),
-    DatePickerDialog.DatePickerDialogDelegate,
-    TimePickerDialog.TimePickerDialogDelegate
+class BlockFieldAdapter(
+    val parentFieldIndex: Int,
+    val editMode: Boolean,
+    val config: Config,
+    val fieldDataList: List<FieldData>,
+    val getDate: (date: Date, (Date?) -> Unit) -> Unit,
+    val getTime: (date: Date, (Date?) -> Unit) -> Unit) :
+    RecyclerView.Adapter<BlockFieldAdapter.ViewHolder>()
 {
     private var context: Context? = null
     private lateinit var checkboxOptionAdapter: CheckboxOptionAdapter
@@ -156,13 +157,56 @@ class BlockFieldAdapter( val parentFieldIndex: Int, val editMode: Boolean, val c
                             date = Date( it )
                         }
 
-                        if (!field.date && field.time)
-                        {
-                            TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, fieldData, editText,this )
+                        if (!field.date && field.time) {
+                            getTime(date) { date ->
+                                date?.let { date ->
+                                    fieldData.dateValue = date.time
+                                    fieldData.version = UUID.randomUUID().toString()
+                                    editText?.let { editText ->
+                                        displayDate( date, field, fieldData, editText )
+                                    }
+                                }
+                            }
                         }
                         else
                         {
-                            DatePickerDialog( context!!, context?.getString(R.string.select_date) ?: "Select Date", date, field, fieldData, editText,this )
+                            getDate(date) { date ->
+                                date?.let { date ->
+                                    if (field.date && !field.time)
+                                    {
+                                        if (field.minimum != null && date.time < field.minimum!!)
+                                        {
+                                            val minDate = DateUtils.dateString( Date(field.minimum!!.toLong()), config.dateFormat )
+                                            Toast.makeText(context!!.applicationContext, "The minimum allowed date is ${minDate}", Toast.LENGTH_LONG).show()
+                                        }
+                                        else if (field.maximum != null && date.time > field.maximum!!)
+                                        {
+                                            val maxDate = DateUtils.dateString( Date(field.maximum!!.toLong()), config.dateFormat )
+                                            Toast.makeText(context!!.applicationContext, "The minimum allowed date is ${maxDate}", Toast.LENGTH_LONG).show()
+                                        }
+                                        else
+                                        {
+                                            fieldData.dateValue = date.time
+                                            fieldData.version = UUID.randomUUID().toString()
+                                            editText?.let { editText ->
+                                                displayDate( date, field, fieldData, editText )
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        getTime(date) { date ->
+                                            date?.let { date ->
+                                                fieldData.dateValue = date.time
+                                                fieldData.version = UUID.randomUUID().toString()
+                                                editText?.let { editText ->
+                                                    displayDate( date, field, fieldData, editText )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -301,53 +345,6 @@ class BlockFieldAdapter( val parentFieldIndex: Int, val editMode: Boolean, val c
         else
         {
             editText.setText( date.toString())
-        }
-    }
-
-    override fun didSelectDate(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
-    {
-        if (field.date && !field.time)
-        {
-            field.minimum?.let { minimum ->
-                if (date.time < minimum)
-                {
-                    val minDate = DateUtils.dateString( Date( minimum.toLong()), config.dateFormat )
-                    Toast.makeText(context!!.applicationContext, "The minimum allowed date is ${minDate}", Toast.LENGTH_LONG).show()
-                    return
-                }
-            }
-
-            field.maximum?.let { maximum ->
-                if (date.time > maximum)
-                {
-                    val maxDate = DateUtils.dateString( Date( maximum.toLong()), config.dateFormat )
-                    Toast.makeText(context!!.applicationContext, "The maximum allowed date is ${maxDate}", Toast.LENGTH_LONG).show()
-                    return
-                }
-            }
-
-            fieldData?.let{ fieldData ->
-                fieldData.dateValue = date.time
-                fieldData.version = UUID.randomUUID().toString()
-                editText?.let { editText ->
-                    displayDate( date, field, fieldData, editText )
-                }
-            }
-        }
-        else
-        {
-            TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, fieldData, editText,this )
-        }
-    }
-
-    override fun didSelectTime(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
-    {
-        fieldData?.let { fieldData ->
-            fieldData.dateValue = date.time
-            fieldData.version = UUID.randomUUID().toString()
-            editText?.let { editText ->
-                displayDate( date, field, fieldData, editText )
-            }
         }
     }
 }
