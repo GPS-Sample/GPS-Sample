@@ -23,12 +23,11 @@ import com.mapbox.maps.extension.style.sources.TileSet
 import com.mapbox.maps.extension.style.sources.generated.RasterSource
 import com.mapbox.maps.extension.style.style
 import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import fi.iki.elonen.NanoHTTPD
 import java.io.File
 import java.io.FileOutputStream
 
-class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.BusyIndicatorDialogDelegate
+class TileServer( mbtilesPath: String ) : NanoHTTPD(8080)
 {
     private lateinit var db: SQLiteDatabase
 
@@ -136,7 +135,7 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
 
         fun startServer( activity: Activity, uri: Uri?, tilesPath: String, mapboxMap: MapboxMap, completion: (()->Unit)? )
         {
-            val busyIndicatorDialog = BusyIndicatorDialog( activity, activity.resources.getString(edu.gtri.gpssample.R.string.loading_mapbox_tiles), null, false )
+//            val busyIndicatorDialog = BusyIndicatorDialog( activity, activity.resources.getString(edu.gtri.gpssample.R.string.loading_mapbox_tiles), null, false )
 
             Thread {
                 mbTilesPath = tilesPath
@@ -151,7 +150,7 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
 
                 activity.runOnUiThread {
                     loadMapboxStyle( activity, mapboxMap, completion )
-                    busyIndicatorDialog.alertDialog.cancel()
+  //                  busyIndicatorDialog.alertDialog.cancel()
                 }
             }.start()
         }
@@ -317,9 +316,5 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
                 mapboxMap.setCamera(cameraPosition)
             }
         }
-    }
-
-    override fun didPressCancelButton()
-    {
     }
 }
