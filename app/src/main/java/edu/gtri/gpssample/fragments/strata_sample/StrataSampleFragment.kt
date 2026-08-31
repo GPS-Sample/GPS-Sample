@@ -63,7 +63,7 @@ class StrataSampleFragment : Fragment()
             composableAddStrataDialogHost.Content()
         }
 
-        strataSampleAdapter = StrataSampleAdapter(activity!!)
+        strataSampleAdapter = StrataSampleAdapter(requireActivity())
         strataSampleAdapter.didSelectStrata = this::didSelectStrata
         strataSampleAdapter.didSelectField = this::didSelectField
         strataSampleAdapter.didSelectRule = this::didSelectRule
@@ -113,7 +113,7 @@ class StrataSampleFragment : Fragment()
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.StrataSampleFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.StrataSampleFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     private fun shouldAddStrata()
@@ -138,7 +138,7 @@ class StrataSampleFragment : Fragment()
         sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
             if(study.fields.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_field_rule_message), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.create_field_rule_message), Toast.LENGTH_SHORT).show()
             }
             else
             {
@@ -154,7 +154,7 @@ class StrataSampleFragment : Fragment()
         sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
             if(study.rules.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_rule_filter_message), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.create_rule_filter_message), Toast.LENGTH_SHORT).show()
             }else
             {
                 sharedViewModel.createFilterModel.createNewFilter()

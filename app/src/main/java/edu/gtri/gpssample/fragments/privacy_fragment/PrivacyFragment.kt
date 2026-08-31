@@ -68,7 +68,7 @@ class PrivacyFragment : Fragment()
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PrivacyFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.PrivacyFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onDestroyView()

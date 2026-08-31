@@ -51,7 +51,7 @@ class SubsetSampleFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        subsetSampleAdapter = SubsetSampleAdapter(activity!!)
+        subsetSampleAdapter = SubsetSampleAdapter(requireActivity())
         subsetSampleAdapter.didSelectRule = this::didSelectRule
         subsetSampleAdapter.didSelectFilter = this::didSelectFilter
         subsetSampleAdapter.shouldAddRule = this::shouldAddRule
@@ -100,7 +100,7 @@ class SubsetSampleFragment : Fragment()
 
             if (binding.subsetSampleNameEditText.text.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -110,7 +110,7 @@ class SubsetSampleFragment : Fragment()
 
             if (subsetSampleSize == null || subsetSampleSize == 0)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.sample_size_error), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.sample_size_error), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -133,7 +133,7 @@ class SubsetSampleFragment : Fragment()
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.SubsetSampleFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.SubsetSampleFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     private fun shouldAddRule()
@@ -141,7 +141,7 @@ class SubsetSampleFragment : Fragment()
         sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
             if(study.fields.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_field_rule_message), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.create_field_rule_message), Toast.LENGTH_SHORT).show()
             }
             else
             {
@@ -156,7 +156,7 @@ class SubsetSampleFragment : Fragment()
         sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
             if(study.rules.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_rule_filter_message), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.create_rule_filter_message), Toast.LENGTH_SHORT).show()
             }else
             {
                 val bundle = Bundle()

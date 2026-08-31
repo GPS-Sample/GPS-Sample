@@ -158,7 +158,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
 
         if (!this::config.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_not_found), Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.config_not_found), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -186,10 +186,10 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
             defaultColorList = it
         }
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
+        MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
             this.mapView = mapView
 
-            MapManager.instance().enableLocationUpdates( activity!!, mapView )
+            MapManager.instance().enableLocationUpdates( requireActivity(), mapView )
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
 
             if (config.enumAreas.isNotEmpty())
@@ -240,7 +240,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
         binding.centerOnLocationButton.setOnClickListener {
             if (binding.centerOnLocationButton.backgroundTintList == defaultColorList)
             {
-                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                 binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
@@ -292,7 +292,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                         binding.mapOverlayView.visibility = View.VISIBLE
                         binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
                         binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_boundary), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.define_boundary), Toast.LENGTH_SHORT).show()
                     }
                     else if (selection == resources.getString(R.string.set_location))
                     {
@@ -300,7 +300,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                         droppedPoints.clear()
                         binding.mapOverlayView.visibility = View.VISIBLE
                         binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -326,7 +326,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                 {
                     if (GeoUtils.isSelfIntersectingPolygon1( droppedPoints ))
                     {
-                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_SHORT).show()
                     }
                     else
                     {
@@ -372,7 +372,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                     MapManager.instance().cancelTilePackDownload()
                 }
 
-                MapManager.instance().cacheMapTiles(activity!!, mapView, mapTileRegions, this )
+                MapManager.instance().cacheMapTiles(requireActivity(), mapView, mapTileRegions, this )
             }
         }
 
@@ -382,7 +382,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                 currentTapType = TapType.EditEnumArea
                 binding.mapOverlayView.visibility = View.VISIBLE
                 binding.editLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.select_ea), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.select_ea), Toast.LENGTH_SHORT).show()
             }
             else if (currentTapType == TapType.EditEnumArea)
             {
@@ -438,7 +438,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateOsmEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.CreateOsmEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     private fun refreshMap()
@@ -550,7 +550,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
 
             if (markerProperties.isNotEmpty())
             {
-                MapManager.instance().loadMarkers( activity!!, binding.osmMapView, markerProperties, null )
+                MapManager.instance().loadMarkers( requireActivity(), binding.osmMapView, markerProperties, null )
             }
         }
     }
@@ -764,7 +764,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
 
                     TapType.CreateEnumAreaBoundary -> {
                         droppedPoints.add( point )
-                        MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.location_blue, "" )
+                        MapManager.instance().createMarker( requireActivity(), mapView, point, R.drawable.location_blue, "" )
                     }
 
                     TapType.CreateEnumAreaLocation -> {
@@ -942,7 +942,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
             destructive = false
         ) { selection ->
             if (selection == resources.getString(R.string.yes)) {
-                val cachedFiles = TileServer.getCachedFiles( activity!! )
+                val cachedFiles = TileServer.getCachedFiles( requireActivity() )
                 if (cachedFiles.isNotEmpty())
                 {
                     composableSelectionDialogHost.show(
@@ -950,8 +950,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                         message = null,
                         items = cachedFiles,
                     ) { selection ->
-                        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
-                        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
+                        val mbTilesPath = requireActivity().cacheDir.toString() + "/" + selection
+                        TileServer.startServer( requireActivity(), null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
                             refreshMap()
                             TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
                         }
@@ -988,18 +988,18 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
 
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {
-        activity!!.runOnUiThread {
+        requireActivity().runOnUiThread {
             composableBusyIndicatorDialogHost.updateMessage("${numLoaded}/${numNeeded}")
         }
     }
 
     override fun tilePacksLoaded( error: String )
     {
-        activity!!.runOnUiThread {
+        requireActivity().runOnUiThread {
             composableBusyIndicatorDialogHost.cancel()
             if (error.isNotEmpty())
             {
-                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -1010,7 +1010,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
             if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
             {
                 data?.data?.let { uri ->
-                    activity!!.getContentResolver().openInputStream(uri)?.let {
+                    requireActivity().getContentResolver().openInputStream(uri)?.let {
                         val json = it.bufferedReader().readText()
 
                         val featureCollection = FeatureCollection.fromJson( json )
@@ -1067,7 +1067,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
             }
         } catch( ex: Exception )
         {
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
             Log.d( "xxx", ex.stackTraceToString())
         }
     }
@@ -1101,7 +1101,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
     {
         if (json.isNotEmpty())
         {
-            activity!!.runOnUiThread {
+            requireActivity().runOnUiThread {
                 composableBusyIndicatorDialogHost.show(title = resources.getString(R.string.importing_locations), message = null)
             }
 
@@ -1115,13 +1115,13 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                 }
                 catch( ex: Exception)
                 {
-                    activity!!.runOnUiThread {
-                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                    requireActivity().runOnUiThread {
+                        Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
                     }
                 }
                 finally
                 {
-                    activity!!.runOnUiThread {
+                    requireActivity().runOnUiThread {
                         composableBusyIndicatorDialogHost.cancel()
                     }
                 }
@@ -1207,7 +1207,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                             }
                         }
 
-                        activity!!.runOnUiThread {
+                        requireActivity().runOnUiThread {
                             MapManager.instance().stopCenteringOnLocation( mapView )
                             binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
                             MapManager.instance().centerMap( enumArea, mapView )
@@ -1268,7 +1268,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
 
             for (point in points)
             {
-                activity!!.runOnUiThread {
+                requireActivity().runOnUiThread {
                     composableBusyIndicatorDialogHost.updateMessage("${count}/${points.size}")
                 }
 
@@ -1337,18 +1337,18 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
             {
                 binding.mapOverlayView.visibility = View.VISIBLE
                 currentTapType = TapType.AutoCreateEnumArea
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.tap_the_map), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.tap_the_map), Toast.LENGTH_SHORT).show()
             }
 
             R.id.mapbox_streets ->
             {
                 mapStyle = Style.MAPBOX_STREETS
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, mapStyle )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
                     refreshMap()
                 }
             }
@@ -1356,12 +1356,12 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
             R.id.satellite_streets ->
             {
                 mapStyle = Style.SATELLITE_STREETS
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, mapStyle )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
                     refreshMap()
                 }
             }
@@ -1373,7 +1373,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
 
             R.id.select_map_tiles ->
             {
-                val cachedFiles = TileServer.getCachedFiles( activity!! )
+                val cachedFiles = TileServer.getCachedFiles( requireActivity() )
                 if (cachedFiles.isNotEmpty())
                 {
                     composableSelectionDialogHost.show(
@@ -1381,8 +1381,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                         message = null,
                         items = cachedFiles,
                     ) { selection ->
-                        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
-                        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
+                        val mbTilesPath = requireActivity().cacheDir.toString() + "/" + selection
+                        TileServer.startServer( requireActivity(), null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
                             refreshMap()
                             TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
                         }
@@ -1396,18 +1396,18 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
 
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            val (filePath, fileSize) = TileServer.filePathSize(activity!!, uri)
+            val (filePath, fileSize) = TileServer.filePathSize(requireActivity(), uri)
 
-            if (TileServer.fileExists( activity!!, uri ))
+            if (TileServer.fileExists( requireActivity(), uri ))
             {
-                TileServer.startServer( activity!!, null, filePath, binding.mapboxMapView.getMapboxMap()) {
+                TileServer.startServer( requireActivity(), null, filePath, binding.mapboxMapView.getMapboxMap()) {
 //                    refreshMap()
                     TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
                 }
             }
             else
             {
-                TileServer.startServer( activity!!, uri, "", binding.mapboxMapView.getMapboxMap()) {
+                TileServer.startServer( requireActivity(), uri, "", binding.mapboxMapView.getMapboxMap()) {
 //                    refreshMap()
                     TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
                 }

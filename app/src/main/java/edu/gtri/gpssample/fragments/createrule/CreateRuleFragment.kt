@@ -133,7 +133,7 @@ class CreateRuleFragment : Fragment()
                                         }
                                     }
 
-                                    binding.dropdownValueSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item, items )
+                                    binding.dropdownValueSpinner.adapter = ArrayAdapter<String>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, items )
                                 }
                                 else if (field.type == FieldType.Date)
                                 {
@@ -226,7 +226,7 @@ class CreateRuleFragment : Fragment()
                                     }
                                 }
 
-                                binding.dropdownValueSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item, items )
+                                binding.dropdownValueSpinner.adapter = ArrayAdapter<String>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, items )
                             }
                             else if (field.type == FieldType.Date)
                             {
@@ -366,7 +366,7 @@ class CreateRuleFragment : Fragment()
                     binding.saveButton.setOnClickListener {
                         if (rule.name.isEmpty())
                         {
-                            Toast.makeText(activity!!.applicationContext, context?.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireActivity().applicationContext, context?.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
                             return@setOnClickListener
                         }
 
@@ -384,7 +384,7 @@ class CreateRuleFragment : Fragment()
                                             Operator.LessThanOrEqual,
                                             Operator.GreaterThanOrEqual ->
                                             {
-                                                Toast.makeText(activity!!.applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(requireActivity().applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
                                                 return@setOnClickListener
                                             }
                                             else -> {}
@@ -416,7 +416,7 @@ class CreateRuleFragment : Fragment()
                                     {
                                         if (operator == Operator.Contains)
                                         {
-                                            Toast.makeText(activity!!.applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(requireActivity().applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
                                             return@setOnClickListener
                                         }
                                     }
@@ -431,7 +431,7 @@ class CreateRuleFragment : Fragment()
                                             Operator.LessThanOrEqual,
                                             Operator.GreaterThanOrEqual ->
                                             {
-                                                Toast.makeText(activity!!.applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(requireActivity().applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
                                                 return@setOnClickListener
                                             }
                                             else -> {}
@@ -462,7 +462,7 @@ class CreateRuleFragment : Fragment()
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateRuleFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.CreateRuleFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun getField( uuid: String ) : Field?

@@ -136,7 +136,7 @@ class ManageConfigurationsFragment : Fragment()
         sharedViewModel.minimumGpsPrecisionFormats[0] = resources.getString(R.string.meters)
         sharedViewModel.minimumGpsPrecisionFormats[1] = resources.getString(R.string.feet)
 
-        (activity!!.application as MainApplication).user?.let { user ->
+        (requireActivity().application as MainApplication).user?.let { user ->
             this.user = user
         }
 
@@ -225,7 +225,7 @@ class ManageConfigurationsFragment : Fragment()
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageConfigurationsFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.ManageConfigurationsFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -788,7 +788,7 @@ class ManageConfigurationsFragment : Fragment()
 
                     PerformanceManager.startTimer()
 
-                    zipUtils.unzip( activity!!, uri, encryptionPassword ) { result ->
+                    zipUtils.unzip( requireActivity(), uri, encryptionPassword ) { result ->
                         val config = result.first
                         val errorCode = result.second
 

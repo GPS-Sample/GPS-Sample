@@ -313,7 +313,7 @@ class CreateFieldFragment : Fragment()
         }
 
         // respond to changes to the FieldType dropdown
-        sharedViewModel.createFieldModel.fieldType.observe( this, androidx.lifecycle.Observer { fieldType ->
+        sharedViewModel.createFieldModel.fieldType.observe( viewLifecycleOwner, androidx.lifecycle.Observer { fieldType ->
 
             val textLayout = view.findViewById<LinearLayout>(R.id.layout_field_text)
             val numberLayout = view.findViewById<LinearLayout>(R.id.layout_field_number)
@@ -455,7 +455,7 @@ class CreateFieldFragment : Fragment()
         binding.saveButton.setOnClickListener {
             if (field.type == FieldType.Date && !field.date && !field.time)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString( R.string.select_date_type), Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString( R.string.select_date_type), Toast.LENGTH_LONG).show()
             }
             else
             {
@@ -495,7 +495,7 @@ class CreateFieldFragment : Fragment()
 
                 if (field.minimum != null && field.maximum !=null && field.minimum!! > field.maximum!!)
                 {
-                    Toast.makeText(activity!!.applicationContext, resources.getString( R.string.min_greater_than_max ), Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireActivity().applicationContext, resources.getString( R.string.min_greater_than_max ), Toast.LENGTH_LONG).show()
                     return@setOnClickListener
                 }
 
@@ -530,7 +530,7 @@ class CreateFieldFragment : Fragment()
         binding.addAnotherButton.setOnClickListener {
             if (binding.fieldNameEditText.text.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString( R.string.enter_name), Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString( R.string.enter_name), Toast.LENGTH_LONG).show()
             }
             else
             {
@@ -556,7 +556,7 @@ class CreateFieldFragment : Fragment()
 
                 if (field.minimum != null && field.maximum !=null && field.minimum!! > field.maximum!!)
                 {
-                    Toast.makeText(activity!!.applicationContext, resources.getString( R.string.min_greater_than_max ), Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireActivity().applicationContext, resources.getString( R.string.min_greater_than_max ), Toast.LENGTH_LONG).show()
                 }
                 else
                 {
@@ -593,7 +593,7 @@ class CreateFieldFragment : Fragment()
 
             if (field.minimum != null && field.maximum !=null && field.minimum!! > field.maximum!!)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString( R.string.min_greater_than_max ), Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString( R.string.min_greater_than_max ), Toast.LENGTH_LONG).show()
             }
             else
             {
@@ -605,7 +605,7 @@ class CreateFieldFragment : Fragment()
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateFieldFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.CreateFieldFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     private fun shouldDeleteCheckboxFieldOption(fieldOption: FieldOption)

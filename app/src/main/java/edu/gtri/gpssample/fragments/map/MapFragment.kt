@@ -107,7 +107,7 @@ class MapFragment : Fragment(),
         binding.northUpImageView.visibility = View.GONE
         binding.mapboxMapView.visibility = View.VISIBLE
 
-        MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null ) { mapView ->
+        MapManager.instance().selectMapboxMap( requireActivity(), binding.mapboxMapView, null ) { mapView ->
             this.mapView = mapView
 
             if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
@@ -119,8 +119,8 @@ class MapFragment : Fragment(),
                     {
                         val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
                         MapManager.instance().centerMap( point, mapView )
-                        MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                        MapManager.instance().enableLocationUpdates( requireActivity(), mapView )
+                        MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                         binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                     }
                 }
@@ -147,7 +147,7 @@ class MapFragment : Fragment(),
                 defineMapRegion = true
                 binding.mapOverlayView.visibility = View.VISIBLE
                 binding.defineMapTileRegionButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -164,7 +164,7 @@ class MapFragment : Fragment(),
 
                 val mapTileRegions = ArrayList<MapTileRegion>()
                 mapTileRegions.add(it)
-                MapManager.instance().cacheMapTiles(activity!!, binding.osmMapView, mapTileRegions, this )
+                MapManager.instance().cacheMapTiles(requireActivity(), binding.osmMapView, mapTileRegions, this )
             }
         }
 
@@ -188,7 +188,7 @@ class MapFragment : Fragment(),
 
             if (centerOnLocation)
             {
-                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                 binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
@@ -205,7 +205,7 @@ class MapFragment : Fragment(),
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.MapFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.MapFragment.value.toString() + ": " + this.javaClass.simpleName
     }
     
     override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
@@ -216,7 +216,7 @@ class MapFragment : Fragment(),
                 if (p1.action == MotionEvent.ACTION_DOWN)
                 {
                     val point = MapManager.instance().getLocationFromPixelPoint(mapView, p1 )
-                    MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(point.longitude(), point.latitude()), R.drawable.breadcrumb, "X")
+                    MapManager.instance().createMarker( requireActivity(), mapView, Point.fromLngLat(point.longitude(), point.latitude()), R.drawable.breadcrumb, "X")
 
                     defineMapRegion = false
                     binding.mapOverlayView.visibility = View.GONE
@@ -285,18 +285,18 @@ class MapFragment : Fragment(),
 
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {
-        activity!!.runOnUiThread {
+        requireActivity().runOnUiThread {
             composableBusyIndicatorDialogHost.updateMessage("${numLoaded}/${numNeeded}")
         }
     }
 
     override fun tilePacksLoaded( error: String )
     {
-        activity!!.runOnUiThread {
+        requireActivity().runOnUiThread {
             composableBusyIndicatorDialogHost.cancel()
             if (error.isNotEmpty())
             {
-                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -317,23 +317,23 @@ class MapFragment : Fragment(),
 
             R.id.mapbox_streets ->
             {
-                val editor = activity!!.getSharedPreferences("default", 0).edit()
+                val editor = requireActivity().getSharedPreferences("default", 0).edit()
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
                 if (binding.mapboxMapView.visibility == View.VISIBLE)
                 {
-                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null ) { mapView ->
+                    MapManager.instance().selectMapboxMap( requireActivity(), binding.mapboxMapView, null ) { mapView ->
                         this.mapView = mapView
                         if (centerOnLocation)
                         {
-                            MapManager.instance().startCenteringOnLocation( activity!!, binding.mapboxMapView )
+                            MapManager.instance().startCenteringOnLocation( requireActivity(), binding.mapboxMapView )
                         }
                     }
                 }
                 else
                 {
-                    MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
+                    MapManager.instance().selectOsmMap( requireActivity(), binding.osmMapView, binding.northUpImageView ) { mapView ->
                         this.mapView = mapView
                         mapView.post {
                             binding.osmMapView.tileProvider.clearTileCache()
@@ -350,8 +350,8 @@ class MapFragment : Fragment(),
                                     {
                                         val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
                                         MapManager.instance().centerMap( point, mapView )
-                                        MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                                        MapManager.instance().enableLocationUpdates( requireActivity(), mapView )
+                                        MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                                         binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                                     }
                                 }
@@ -363,23 +363,23 @@ class MapFragment : Fragment(),
 
             R.id.satellite_streets ->
             {
-                val editor = activity!!.getSharedPreferences("default", 0).edit()
+                val editor = requireActivity().getSharedPreferences("default", 0).edit()
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
                 if (binding.mapboxMapView.visibility == View.VISIBLE)
                 {
-                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null ) { mapView ->
+                    MapManager.instance().selectMapboxMap( requireActivity(), binding.mapboxMapView, null ) { mapView ->
                         this.mapView = mapView
                         if (centerOnLocation)
                         {
-                            MapManager.instance().startCenteringOnLocation( activity!!, binding.mapboxMapView )
+                            MapManager.instance().startCenteringOnLocation( requireActivity(), binding.mapboxMapView )
                         }
                     }
                 }
                 else
                 {
-                    MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
+                    MapManager.instance().selectOsmMap( requireActivity(), binding.osmMapView, binding.northUpImageView ) { mapView ->
                         this.mapView = mapView
                         mapView.post {
                             binding.osmMapView.tileProvider.clearTileCache()
@@ -396,8 +396,8 @@ class MapFragment : Fragment(),
                                     {
                                         val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
                                         MapManager.instance().centerMap( point, mapView )
-                                        MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                                        MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                                        MapManager.instance().enableLocationUpdates( requireActivity(), mapView )
+                                        MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                                         binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                                     }
                                 }
@@ -414,7 +414,7 @@ class MapFragment : Fragment(),
 
             R.id.select_map_tiles ->
             {
-                val cachedFiles = TileServer.getCachedFiles( activity!! )
+                val cachedFiles = TileServer.getCachedFiles( requireActivity() )
                 if (cachedFiles.isNotEmpty())
                 {
                     composableSelectionDialogHost.show(
@@ -422,8 +422,8 @@ class MapFragment : Fragment(),
                         message = null,
                         items = cachedFiles,
                     ) { selection ->
-                        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
-                        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
+                        val mbTilesPath = requireActivity().cacheDir.toString() + "/" + selection
+                        TileServer.startServer( requireActivity(), null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
                             TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
                         }
                     }
@@ -447,7 +447,7 @@ class MapFragment : Fragment(),
                 binding.osmLabel.visibility = View.VISIBLE
                 binding.osmMapView.visibility = View.VISIBLE
                 binding.mapboxMapView.visibility = View.GONE
-                MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
+                MapManager.instance().selectOsmMap( requireActivity(), binding.osmMapView, binding.northUpImageView ) { mapView ->
                     this.mapView = mapView
 
                     if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
@@ -459,8 +459,8 @@ class MapFragment : Fragment(),
                             {
                                 val point = com.mapbox.geojson.Point.fromLngLat( location.longitude, location.latitude )
                                 MapManager.instance().centerMap( point, mapView )
-                                MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                                MapManager.instance().enableLocationUpdates( requireActivity(), mapView )
+                                MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                                 binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                             }
                         }
@@ -472,10 +472,10 @@ class MapFragment : Fragment(),
                 binding.osmMapView.visibility = View.GONE
                 binding.northUpImageView.visibility = View.GONE
                 binding.mapboxMapView.visibility = View.VISIBLE
-                MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null ) { mapView ->
+                MapManager.instance().selectMapboxMap( requireActivity(), binding.mapboxMapView, null ) { mapView ->
                     this.mapView = mapView
-                    MapManager.instance().enableLocationUpdates( activity!!, mapView )
-                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                    MapManager.instance().enableLocationUpdates( requireActivity(), mapView )
+                    MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                     binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                     MapManager.instance().setMapZoomLevel( mapView, MapManager.zoomLevel())
                 }

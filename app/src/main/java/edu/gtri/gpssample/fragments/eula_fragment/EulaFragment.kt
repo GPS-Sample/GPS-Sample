@@ -68,7 +68,7 @@ class EulaFragment : Fragment()
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.EulaFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.EulaFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onDestroyView()

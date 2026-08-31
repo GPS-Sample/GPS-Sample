@@ -67,7 +67,7 @@ class SignUpFragment : Fragment()
 
         if (!this::role.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.missing_parameter_rule), Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.missing_parameter_rule), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -79,7 +79,7 @@ class SignUpFragment : Fragment()
             Role.DataCollector.value -> binding.titleTextView.text = resources.getString(R.string.data_collector_sign_up)
         }
 
-        ArrayAdapter.createFromResource(activity!!, R.array.forgot_pin_questions, android.R.layout.simple_spinner_item)
+        ArrayAdapter.createFromResource(requireActivity(), R.array.forgot_pin_questions, android.R.layout.simple_spinner_item)
             .also { adapter ->
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 binding.questionSpinner.adapter = adapter
@@ -125,25 +125,25 @@ class SignUpFragment : Fragment()
 
             if (name == "@test-admin")
             {
-                Toast.makeText(activity!!.applicationContext, "Invalid user name", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, "Invalid user name", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (name.length == 0)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (pin1 == null)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_pin), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.enter_pin), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (pin2 == null)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.reenter_pin), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.reenter_pin), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -153,7 +153,7 @@ class SignUpFragment : Fragment()
 
                 if (question.length == 0)
                 {
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_forgot_pin_question), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.enter_forgot_pin_question), Toast.LENGTH_SHORT).show()
 //                    InputDialog( activity!!, false, resources.getString(R.string.enter_other_question), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
 //                        when (action) {
 //                            InputDialog.Action.DidCancel -> {}
@@ -167,17 +167,17 @@ class SignUpFragment : Fragment()
 
             if (answer.length == 0)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_answer), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.enter_answer), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (pin1 != pin2)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.pin_not_match), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.pin_not_match), Toast.LENGTH_SHORT).show()
             }
             else
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putInt( role, pin1 )
                 editor.putString( Keys.kUserName.value, name )
@@ -197,7 +197,7 @@ class SignUpFragment : Fragment()
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.SignUpFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.SignUpFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onDestroyView()

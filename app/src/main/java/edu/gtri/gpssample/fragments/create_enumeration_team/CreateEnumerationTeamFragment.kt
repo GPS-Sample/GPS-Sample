@@ -100,7 +100,7 @@ class CreateEnumerationTeamFragment : Fragment(), OnTouchListener
             TileServer.startServer( enumArea.mbTilesPath )
         }
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+        MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
             this.mapView = mapView
 
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
@@ -136,7 +136,7 @@ class CreateEnumerationTeamFragment : Fragment(), OnTouchListener
                 binding.mapOverlayView.visibility = View.VISIBLE
                 binding.drawPolygonButton.setBackgroundResource( R.drawable.save_blue )
 
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.draw_boundary), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.draw_boundary), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -169,7 +169,7 @@ class CreateEnumerationTeamFragment : Fragment(), OnTouchListener
                 binding.mapOverlayView.visibility = View.VISIBLE
                 binding.tapPolygonButton.setBackgroundResource( R.drawable.save_blue )
 
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.tap_boundary), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.tap_boundary), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -180,7 +180,7 @@ class CreateEnumerationTeamFragment : Fragment(), OnTouchListener
         binding.saveButton.setOnClickListener {
             if (binding.teamNameEditText.text.toString().length == 0)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.team_name_message), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.team_name_message), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -221,7 +221,7 @@ class CreateEnumerationTeamFragment : Fragment(), OnTouchListener
 
                 DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( enumerationTeam, enumerationTeam.version )
                 enumArea.enumerationTeams.add(enumerationTeam)
-                activity!!.runOnUiThread {
+                requireActivity().runOnUiThread {
                     findNavController().popBackStack()
                 }
             }.start()
@@ -234,7 +234,7 @@ class CreateEnumerationTeamFragment : Fragment(), OnTouchListener
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateEnumerationTeamFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.CreateEnumerationTeamFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun refreshMap()
@@ -292,7 +292,7 @@ class CreateEnumerationTeamFragment : Fragment(), OnTouchListener
 
             if (markerProperties.isNotEmpty())
             {
-                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, null )
+                MapManager.instance().loadMarkers( requireActivity(), mapView, markerProperties, null )
             }
         }
     }
@@ -469,24 +469,24 @@ class CreateEnumerationTeamFragment : Fragment(), OnTouchListener
         {
             R.id.mapbox_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }
 
             R.id.satellite_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }

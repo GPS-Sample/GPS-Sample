@@ -78,7 +78,7 @@ class ManageCollectionTeamsFragment : Fragment()
         activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed()
             {
-                (activity!!.application as? MainApplication)?.user?.let { user ->
+                (requireActivity().application as? MainApplication)?.user?.let { user ->
                     if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
                     {
                         findNavController().popBackStack(R.id.ConfigurationFragment, false)
@@ -125,7 +125,7 @@ class ManageCollectionTeamsFragment : Fragment()
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageCollectionTeamsFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.ManageCollectionTeamsFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun didSelectTeam(collectionTeam: CollectionTeam)
@@ -180,7 +180,7 @@ class ManageCollectionTeamsFragment : Fragment()
         {
             16908332-> // TODO: use R.id.?
             {
-                (activity!!.application as? MainApplication)?.user?.let { user ->
+                (requireActivity().application as? MainApplication)?.user?.let { user ->
                     if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
                     {
                         findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)

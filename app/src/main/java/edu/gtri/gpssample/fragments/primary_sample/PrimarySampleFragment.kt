@@ -136,7 +136,7 @@ class PrimarySampleFragment : Fragment()
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PrimarySampleFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.PrimarySampleFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     private fun shouldAddField()
@@ -151,7 +151,7 @@ class PrimarySampleFragment : Fragment()
         sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
             if(study.fields.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_field_rule_message), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.create_field_rule_message), Toast.LENGTH_SHORT).show()
             }
             else
             {
@@ -167,7 +167,7 @@ class PrimarySampleFragment : Fragment()
         sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
             if(study.rules.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_rule_filter_message), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.create_rule_filter_message), Toast.LENGTH_SHORT).show()
             }else
             {
                 sharedViewModel.createFilterModel.createNewFilter()

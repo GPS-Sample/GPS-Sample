@@ -190,11 +190,11 @@ class PerformCollectionFragment : Fragment(),
                         }
                         else if (!gpsAccuracyIsGood())
                         {
-                            Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
+                            Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
                         }
                         else
                         {
-                            Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
+                            Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
                         }
                     }
                 }
@@ -281,7 +281,7 @@ class PerformCollectionFragment : Fragment(),
 
         binding.progressOverlayView.visibility = View.GONE
 
-        val _user = (activity!!.application as? MainApplication)?.user
+        val _user = (requireActivity().application as? MainApplication)?.user
 
         _user?.let { user ->
             this@PerformCollectionFragment.user = user
@@ -360,10 +360,10 @@ class PerformCollectionFragment : Fragment(),
             TileServer.startServer( enumArea.mbTilesPath )
         }
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+        MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
             this.mapView = mapView
 
-            MapManager.instance().enableLocationUpdates(activity!!, mapView)
+            MapManager.instance().enableLocationUpdates(requireActivity(), mapView)
 
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
 
@@ -376,7 +376,7 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
                 if (centerOnCurrentLocation)
                 {
-                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                    MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                     binding.centerOnLocationButton.setBackgroundTintList( ColorStateList.valueOf( resources.getColor(android.R.color.holo_red_light)));
                 }
                 else
@@ -446,15 +446,15 @@ class PerformCollectionFragment : Fragment(),
             refreshMap()
         }
 
-        if (ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        if (ActivityCompat.checkSelfPermission( requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission( requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
             val locationRequest = LocationRequest.create().apply {
                 interval = 5000
                 fastestInterval = 2000
                 priority = Priority.PRIORITY_HIGH_ACCURACY
             }
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
             fusedLocationClient.requestLocationUpdates( locationRequest, locationCallback, Looper.getMainLooper())
         }
 
@@ -700,7 +700,7 @@ class PerformCollectionFragment : Fragment(),
                     MapManager.instance().cancelTilePackDownload()
                 }
 
-                MapManager.instance().cacheMapTiles(activity!!, mapView, mapTileRegions, this@PerformCollectionFragment )
+                MapManager.instance().cacheMapTiles(requireActivity(), mapView, mapTileRegions, this@PerformCollectionFragment )
             }
         }
 
@@ -727,7 +727,7 @@ class PerformCollectionFragment : Fragment(),
                 else
                 {
                     sharedViewModel.setCenterOnCurrentLocation( true )
-                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                    MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                     binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
                 refreshMap()
@@ -935,7 +935,7 @@ class PerformCollectionFragment : Fragment(),
                             sampledItem.collectionDate = Date().time
                             sampledItem.collectionState = CollectionState.Complete
 
-                            (activity!!.application as MainApplication).user?.let { user ->
+                            (requireActivity().application as MainApplication).user?.let { user ->
                                 sampledItem.collectorName = user.name
                             }
 
@@ -952,7 +952,7 @@ class PerformCollectionFragment : Fragment(),
 
     fun getFileName() : String
     {
-        (activity!!.application as MainApplication).user?.let { user ->
+        (requireActivity().application as MainApplication).user?.let { user ->
             var userName = user.name.replace(" ", "" ).uppercase()
 
             if (userName.length > 3)
@@ -1024,7 +1024,7 @@ class PerformCollectionFragment : Fragment(),
     {
         super.onResume()
         isHandlingTapEvent = false
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformCollectionFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.PerformCollectionFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun refreshMap()
@@ -1086,7 +1086,7 @@ class PerformCollectionFragment : Fragment(),
             {
                 if (location.isVisible)
                 {
-                    MapManager.instance().createMarker( activity!!, mapView, location, R.drawable.location_blue, "" )
+                    MapManager.instance().createMarker( requireActivity(), mapView, location, R.drawable.location_blue, "" )
                 }
             }
 
@@ -1159,7 +1159,7 @@ class PerformCollectionFragment : Fragment(),
 
             if (markerProperties.isNotEmpty())
             {
-                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, mapboxMapClickListener )
+                MapManager.instance().loadMarkers( requireActivity(), mapView, markerProperties, mapboxMapClickListener )
             }
         }
     }
@@ -1179,9 +1179,9 @@ class PerformCollectionFragment : Fragment(),
                     sharedViewModel.currentLocationUuid = item.locationUuid
                     sharedViewModel.currentEnumerationItemUuid = item.uuid
 
-                    (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = item.uuid
-                    (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
-                    (this.activity!!.application as? MainApplication)?.currentSubAddress = item.subAddress
+                    (requireActivity().application as? MainApplication)?.currentEnumerationItemUUID = item.uuid
+                    (requireActivity().application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+                    (requireActivity().application as? MainApplication)?.currentSubAddress = item.subAddress
 
                     val bundle = Bundle()
                     bundle.putBoolean( Keys.kEditMode.value, false )
@@ -1276,7 +1276,7 @@ class PerformCollectionFragment : Fragment(),
                 }
             }
 
-            val mainApplication = activity!!.application as MainApplication
+            val mainApplication = requireActivity().application as MainApplication
 
             mainApplication.currentSubAddress = mainApplication.defaultSubAddress
             mainApplication.currentEnumerationItemUUID = mainApplication.defaultEnumerationItemUUID
@@ -1301,7 +1301,7 @@ class PerformCollectionFragment : Fragment(),
                 enumerationItem.version = UUID.randomUUID().toString()
                 enumerationItem.collectionState = CollectionState.Complete
 
-                (activity!!.application as MainApplication).user?.let { user ->
+                (requireActivity().application as MainApplication).user?.let { user ->
                     enumerationItem.collectorName = user.name
                 }
 
@@ -1371,18 +1371,18 @@ class PerformCollectionFragment : Fragment(),
 
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {
-        activity!!.runOnUiThread {
+        requireActivity().runOnUiThread {
             composableBusyIndicatorDialogHost.updateMessage("${numLoaded}/${numNeeded}")
         }
     }
 
     override fun tilePacksLoaded( error: String )
     {
-        activity!!.runOnUiThread {
+        requireActivity().runOnUiThread {
             composableBusyIndicatorDialogHost.cancel()
             if (error.isNotEmpty())
             {
-                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -1436,7 +1436,7 @@ class PerformCollectionFragment : Fragment(),
                             updateSummaryInfo()
                             performCollectionAdapter.updateItems( performCollectionAdapter.enumerationItems, performCollectionAdapter.locations )
 
-                            Toast.makeText(activity!!.applicationContext,  "Auto Survey Complete.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireActivity().applicationContext,  "Auto Survey Complete.", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -1444,24 +1444,24 @@ class PerformCollectionFragment : Fragment(),
 
             R.id.mapbox_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }
 
             R.id.satellite_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }

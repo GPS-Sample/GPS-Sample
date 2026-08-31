@@ -74,7 +74,7 @@ class SignInFragment : Fragment()
 
         if (!this::expectedRole.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.missing_parameter_rule), Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.missing_parameter_rule), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -90,7 +90,7 @@ class SignInFragment : Fragment()
 
         binding.titleTextView.text = translatedRole
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
         val userName = sharedPreferences.getString( Keys.kUserName.value, null)
 
         userName?.let {
@@ -101,11 +101,11 @@ class SignInFragment : Fragment()
             val userName = binding.nameEditText.text.toString()
             if (userName.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_enter_your_user_name), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.please_enter_your_user_name), Toast.LENGTH_SHORT).show()
             }
             else if (userName == "@test-admin")
             {
-                Toast.makeText(activity!!.applicationContext, "The PIN cannot be recovered for this account", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, "The PIN cannot be recovered for this account", Toast.LENGTH_SHORT).show()
             }
             else
             {
@@ -125,21 +125,21 @@ class SignInFragment : Fragment()
                                     user?.let {
                                         if (text == it.recoveryAnswer)
                                         {
-                                            val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                                            val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                                             val pin = sharedPreferences.getInt( user.role!!, 0 )
                                             composableNotificationDialogHost.show(title = resources.getString(
                                                 R.string.your_pin_is
                                             ), message = pin.toString())                                }
                                         else
                                         {
-                                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.incorrect_answer_message), Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.incorrect_answer_message), Toast.LENGTH_SHORT).show()
                                         }
                                     }
                                 }
                             }
                         }
                     )
-                } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.user_name_not_found), Toast.LENGTH_SHORT).show()
+                } ?: Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.user_name_not_found), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -147,16 +147,16 @@ class SignInFragment : Fragment()
             val userName = binding.nameEditText.text.toString()
             if (userName.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_enter_your_user_name), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.please_enter_your_user_name), Toast.LENGTH_SHORT).show()
             }
             else if (userName == "@test-admin")
             {
-                Toast.makeText(activity!!.applicationContext, "The PIN cannot be reset for this account", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, "The PIN cannot be reset for this account", Toast.LENGTH_SHORT).show()
             }
             else
             {
                 DAO.userDAO.getUser(binding.nameEditText.text.toString())?.let { user ->
-                    val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                    val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                     val pin = sharedPreferences.getInt( user.role!!, 0 )
 
                     composableResetPinDialogHost.show(
@@ -169,14 +169,14 @@ class SignInFragment : Fragment()
                             val user = DAO.userDAO.getUser(userName)
 
                             user?.let {
-                                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                                 sharedPreferences.edit(commit = true) {
                                     putInt(user.role, text.toInt())
                                 }
                             }
                         }
                     }
-                } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.user_name_not_found), Toast.LENGTH_SHORT).show()
+                } ?: Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.user_name_not_found), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -238,14 +238,14 @@ class SignInFragment : Fragment()
                 if (user.role != expectedRole)
                 {
                     Toast.makeText(
-                        activity!!.applicationContext,
+                        requireActivity().applicationContext,
                         "The expected role for User " + userName + " is: " + user.role + ".  Please try again.",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
                 else
                 {
-                    val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                    val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                     val editor = sharedPreferences.edit()
                     val expectedPin = sharedPreferences.getInt( user.role!!, 0 )
 
@@ -261,7 +261,7 @@ class SignInFragment : Fragment()
                         editor.putString(Keys.kUserName.value, userName)
                         editor.commit()
 
-                        (activity!!.application as? MainApplication)?.user = user
+                        (requireActivity().application as? MainApplication)?.user = user
 
                         binding.pinEditText.setText("")
 
@@ -279,17 +279,17 @@ class SignInFragment : Fragment()
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.SignInFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.SignInFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun setTitle( user: User )
     {
         when (user.role)
         {
-            Role.Admin.value -> activity!!.setTitle( "${resources.getString(R.string.admin)}" )
-            Role.Supervisor.value -> activity!!.setTitle( "${resources.getString(R.string.supervisor)}" )
-            Role.Enumerator.value -> activity!!.setTitle( "${resources.getString(R.string.enumerator)}" )
-            Role.DataCollector.value -> activity!!.setTitle( "${resources.getString(R.string.data_collector)}" )
+            Role.Admin.value -> requireActivity().setTitle( "${resources.getString(R.string.admin)}" )
+            Role.Supervisor.value -> requireActivity().setTitle( "${resources.getString(R.string.supervisor)}" )
+            Role.Enumerator.value -> requireActivity().setTitle( "${resources.getString(R.string.enumerator)}" )
+            Role.DataCollector.value -> requireActivity().setTitle( "${resources.getString(R.string.data_collector)}" )
         }
     }
 

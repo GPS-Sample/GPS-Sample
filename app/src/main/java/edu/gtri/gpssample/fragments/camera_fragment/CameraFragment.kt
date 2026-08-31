@@ -128,22 +128,22 @@ class CameraFragment : Fragment()
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CameraFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.CameraFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     private fun getOutputDirectory(): File
     {
-        val mediaDir = this.activity!!.externalMediaDirs.firstOrNull()?.let {
+        val mediaDir = requireActivity().externalMediaDirs.firstOrNull()?.let {
             File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
         }
 
         return if (mediaDir != null && mediaDir.exists())
-            mediaDir else this.activity!!.filesDir
+            mediaDir else requireActivity().filesDir
     }
 
     private fun startCamera()
     {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this.activity!!)
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireActivity())
 
         cameraProviderFuture.addListener(Runnable
         {
@@ -175,7 +175,7 @@ class CameraFragment : Fragment()
                 Log.d("xxx", "Use case binding failed", exc)
             }
 
-        }, ContextCompat.getMainExecutor(this.activity!!))
+        }, ContextCompat.getMainExecutor(requireActivity()))
     }
 
     private fun takePhoto()
@@ -192,7 +192,7 @@ class CameraFragment : Fragment()
         // Set up image capture listener, which is triggered after photo has been taken
         imageCapture.takePicture(
             outputOptions,
-            ContextCompat.getMainExecutor(this.activity!!),
+            ContextCompat.getMainExecutor(requireActivity()),
             object : ImageCapture.OnImageSavedCallback
             {
                 override fun onError(exc: ImageCaptureException)
@@ -207,8 +207,8 @@ class CameraFragment : Fragment()
                 {
                     val uri = Uri.fromFile(photoFile)
 
-                    MediaStore.Images.Media.getBitmap(this@CameraFragment.activity!!.getContentResolver(), uri)?.let {
-                        val angle = CameraUtils.getRotationAngle( this@CameraFragment.activity!!, uri )
+                    MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri)?.let {
+                        val angle = CameraUtils.getRotationAngle( requireActivity(), uri )
                         binding.viewFinder.visibility = View.GONE
                         binding.imageView.visibility = View.VISIBLE
                         binding.cameraButton.text = resources.getString(R.string.retake_photo)

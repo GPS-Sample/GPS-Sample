@@ -108,11 +108,11 @@ class PerformMultiCollectionFragment : Fragment()
                 }
                 else if (!gpsAccuracyIsGood)
                 {
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
                 }
                 else
                 {
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -188,15 +188,15 @@ class PerformMultiCollectionFragment : Fragment()
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformMultiCollectionFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.PerformMultiCollectionFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun didSelectEnumerationItem( enumerationItem: EnumerationItem)
     {
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-            (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
-            (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
-            (this.activity!!.application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
+            (requireActivity().application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
+            (requireActivity().application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+            (requireActivity().application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
             sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
 
             val bundle = Bundle()
@@ -215,7 +215,7 @@ class PerformMultiCollectionFragment : Fragment()
             enumerationItem.version = UUID.randomUUID().toString()
             enumerationItem.collectionState = CollectionState.Complete
 
-            (activity!!.application as MainApplication).user?.let { user ->
+            (requireActivity().application as MainApplication).user?.let { user ->
                 enumerationItem.collectorName = user.name
             }
 
@@ -245,7 +245,7 @@ class PerformMultiCollectionFragment : Fragment()
                 }
             }
 
-            val mainApplication = activity!!.application as MainApplication
+            val mainApplication = requireActivity().application as MainApplication
 
             mainApplication.currentSubAddress = mainApplication.defaultSubAddress
             mainApplication.currentEnumerationItemUUID = mainApplication.defaultEnumerationItemUUID

@@ -118,7 +118,7 @@ class CreateFilterFragment : Fragment()
 
             if (binding.nameEditText.text.toString().length == 0)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
 
                 return@setOnClickListener
             }
@@ -143,7 +143,7 @@ class CreateFilterFragment : Fragment()
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateFilterFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.CreateFilterFragment.value.toString() + ": " + this.javaClass.simpleName
         //val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
        // createFilterAdapter.updateFilterRules(filterRules)
     }

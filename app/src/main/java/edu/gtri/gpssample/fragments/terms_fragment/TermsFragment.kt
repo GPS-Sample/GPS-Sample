@@ -55,7 +55,7 @@ class TermsFragment : Fragment()
         binding.nextButton.setOnClickListener {
             if (isOnBoarding)
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putBoolean(Keys.kTermsAccepted.value, true)
                 editor.commit()
@@ -74,7 +74,7 @@ class TermsFragment : Fragment()
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.TermsFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.TermsFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onDestroyView()

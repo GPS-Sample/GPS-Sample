@@ -130,7 +130,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
 
         if (!this::config.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_not_found), Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.config_not_found), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -153,10 +153,10 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
 
         binding.mapOverlayView.visibility = View.GONE
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
+        MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
             this.mapView = mapView
 
-            MapManager.instance().enableLocationUpdates( activity!!, mapView )
+            MapManager.instance().enableLocationUpdates( requireActivity(), mapView )
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
 
             if (config.enumAreas.isNotEmpty())
@@ -188,15 +188,15 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
             refreshMap()
         }
 
-        if (ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        if (ActivityCompat.checkSelfPermission( requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission( requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
             val locationRequest = LocationRequest.create().apply {
                 interval = 5000
                 fastestInterval = 2000
                 priority = Priority.PRIORITY_HIGH_ACCURACY
             }
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
             fusedLocationClient.requestLocationUpdates( locationRequest, locationCallback, Looper.getMainLooper())
         }
 
@@ -239,7 +239,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                     if (polyLinePoints.size == 1)
                     {
                         startPoint = point
-                        MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.location_blue, "" )
+                        MapManager.instance().createMarker( requireActivity(), mapView, point, R.drawable.location_blue, "" )
                     }
                     else if (polyLinePoints.size > 1)
                     {
@@ -254,7 +254,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                             testPoints.add( polyLinePoints[0])
                             if (GeoUtils.isSelfIntersectingPolygon1( testPoints ))
                             {
-                                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_LONG).show()
+                                Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_LONG).show()
                             } else {}
                         } else {}
                     } else {}
@@ -269,7 +269,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                 }
                 else
                 {
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
                     binding.mapOverlayView.visibility = View.VISIBLE
                     binding.addPointButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
@@ -296,7 +296,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                         if (polyLinePoints.isNotEmpty())
                         {
                             startPoint?.let {
-                                MapManager.instance().createMarker( activity!!, mapView, it, R.drawable.location_blue, "" )
+                                MapManager.instance().createMarker( requireActivity(), mapView, it, R.drawable.location_blue, "" )
                             }
                         }
 
@@ -320,7 +320,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
 
             if (showCurrentLocation)
             {
-                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                 binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
@@ -371,7 +371,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.WalkEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.WalkEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     private fun clearMap()
@@ -622,24 +622,24 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
         {
             R.id.mapbox_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
                     refreshMap()
                 }
             }
 
             R.id.satellite_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null ) { mapView ->
                     refreshMap()
                 }
             }

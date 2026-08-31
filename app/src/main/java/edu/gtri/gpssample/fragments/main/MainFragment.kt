@@ -63,7 +63,7 @@ class MainFragment : Fragment()
     {
         super.onCreate(savedInstanceState)
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
 
         if (sharedPreferences.getString( Keys.kMapStyle.value, null ) == null)
         {
@@ -97,7 +97,7 @@ class MainFragment : Fragment()
         binding.appVersionTextView.text = resources.getString(R.string.app_version) + " " + BuildConfig.VERSION_NAME
         binding.dbVersionTextView.text = resources.getString(R.string.db_version) + " #" + DAO.DATABASE_VERSION
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
 
         val termsAccepted = sharedPreferences.getBoolean( Keys.kTermsAccepted.value, false )
 
@@ -283,7 +283,7 @@ class MainFragment : Fragment()
 
             if (bundle == null)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_select_a_role), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.please_select_a_role), Toast.LENGTH_SHORT).show()
             }
             else
             {
@@ -313,7 +313,7 @@ class MainFragment : Fragment()
 
             if (bundle == null)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_select_a_role), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.please_select_a_role), Toast.LENGTH_SHORT).show()
             }
             else
             {
@@ -335,7 +335,7 @@ class MainFragment : Fragment()
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.MainFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.MainFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onDestroyView()

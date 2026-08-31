@@ -195,7 +195,7 @@ class CreateSampleFragment : Fragment()
             samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.SampleGeneratedPage )
         }
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+        MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
             this.mapView = mapView
 
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
@@ -318,7 +318,7 @@ class CreateSampleFragment : Fragment()
     {
         super.onResume()
         isHandlingTapEvent = false
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateSampleFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.CreateSampleFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun determineIfSampleWasGenerated() : Boolean
@@ -694,7 +694,7 @@ class CreateSampleFragment : Fragment()
         {
             binding.mapboxMapView.gestures.removeOnMapClickListener(mapboxMapClickListener )
 
-            MapManager.instance().loadMarkers( activity!!, mapView!!, markerProperties, null )
+            MapManager.instance().loadMarkers( requireActivity(), mapView!!, markerProperties, null )
         }
     }
 
@@ -781,7 +781,7 @@ class CreateSampleFragment : Fragment()
 
         if (markerProperties.isNotEmpty())
         {
-            MapManager.instance().loadMarkers( activity!!, mapView!!, markerProperties, mapboxMapClickListener )
+            MapManager.instance().loadMarkers( requireActivity(), mapView!!, markerProperties, mapboxMapClickListener )
         }
     }
 
@@ -798,24 +798,24 @@ class CreateSampleFragment : Fragment()
 
             R.id.mapbox_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }
 
             R.id.satellite_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }

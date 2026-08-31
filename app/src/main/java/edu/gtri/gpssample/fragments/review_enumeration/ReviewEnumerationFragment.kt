@@ -113,7 +113,7 @@ class ReviewEnumerationFragment : Fragment()
 
         if (!this::config.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "currentConfiguration was not initialized.", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireActivity().applicationContext, "currentConfiguration was not initialized.", Toast.LENGTH_LONG).show()
             return
         }
 
@@ -122,7 +122,7 @@ class ReviewEnumerationFragment : Fragment()
             enumArea.locations = DAO.locationDAO.getLocations( enumArea )
         }
 
-        (activity!!.application as? MainApplication)?.user?.let {
+        (requireActivity().application as? MainApplication)?.user?.let {
             user = it
         }
 
@@ -139,7 +139,7 @@ class ReviewEnumerationFragment : Fragment()
             TileServer.startServer( enumArea.mbTilesPath )
         }
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+        MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
             this.mapView = mapView
 
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
@@ -161,15 +161,15 @@ class ReviewEnumerationFragment : Fragment()
             refreshMap()
         }
 
-        if (ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        if (ActivityCompat.checkSelfPermission( requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission( requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
             val locationRequest = LocationRequest.create().apply {
                 interval = 5000
                 fastestInterval = 2000
                 priority = Priority.PRIORITY_HIGH_ACCURACY
             }
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
             fusedLocationClient.requestLocationUpdates( locationRequest, locationCallback, Looper.getMainLooper())
         }
 
@@ -305,7 +305,7 @@ class ReviewEnumerationFragment : Fragment()
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ReviewEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.ReviewEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     private fun refreshMap()
@@ -380,7 +380,7 @@ class ReviewEnumerationFragment : Fragment()
         {
             if (location.isLandmark)
             {
-                MapManager.instance().createMarker( activity!!, mapView, location, R.drawable.location_blue, "" )
+                MapManager.instance().createMarker( requireActivity(), mapView, location, R.drawable.location_blue, "" )
             }
         }
 
@@ -428,7 +428,7 @@ class ReviewEnumerationFragment : Fragment()
 
         if (markerProperties.isNotEmpty())
         {
-            MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, mapboxMapClickListener )
+            MapManager.instance().loadMarkers( requireActivity(), mapView, markerProperties, mapboxMapClickListener )
         }
     }
 
@@ -567,24 +567,24 @@ class ReviewEnumerationFragment : Fragment()
             }
             R.id.mapbox_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }
 
             R.id.satellite_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+                MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                     refreshMap()
                 }
             }

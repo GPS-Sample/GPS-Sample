@@ -178,7 +178,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         if (!this::config.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_not_found), Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.config_not_found), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -205,14 +205,14 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             if (enumArea.mbTilesPath.isNotEmpty())
             {
-                TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
+                TileServer.startServer( requireActivity(), null, enumArea.mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
                     initLocationComponent()
                     refreshMap()
                 }
             }
             else
             {
-                TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
+                TileServer.loadMapboxStyle( requireActivity(), binding.mapboxMapView.getMapboxMap()) {
                     initLocationComponent()
                     refreshMap()
                 }
@@ -220,13 +220,13 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
         else
         {
-            TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
+            TileServer.loadMapboxStyle( requireActivity(), binding.mapboxMapView.getMapboxMap()) {
                 initLocationComponent()
                 refreshMap()
             }
         }
 
-        mapboxManager = MapboxManager.instance( activity!! )
+        mapboxManager = MapboxManager.instance( requireActivity() )
 
         if (config.enumAreas.isEmpty())
         {
@@ -321,7 +321,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                         droppedPointAnnotations.clear()
                         binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
                         binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_boundary), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.define_boundary), Toast.LENGTH_SHORT).show()
                     }
                     else if (selection == resources.getString(R.string.set_location))
                     {
@@ -329,7 +329,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                         droppedPointAnnotations.clear()
                         binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                         refreshMap()
-                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -357,7 +357,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                         droppedPointAnnotations.clear()
 
-                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_SHORT).show()
                     }
                     else
                     {
@@ -414,7 +414,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                     MapManager.instance().cancelTilePackDownload()
                 }
 
-                MapManager.instance().cacheMapTiles(activity!!, binding.mapboxMapView, mapTileRegions, this )
+                MapManager.instance().cacheMapTiles(requireActivity(), binding.mapboxMapView, mapTileRegions, this )
             }
         }
 
@@ -428,7 +428,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                 currentTapType = TapType.EditEnumArea
                 binding.mapOverlayView.visibility = View.VISIBLE
                 binding.editLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.select_ea), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.select_ea), Toast.LENGTH_SHORT).show()
             }
             else if (currentTapType == TapType.EditEnumArea)
             {
@@ -493,7 +493,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                     if (debugPressCount == 6)
                     {
                         shouldAutoEnumerateLocations = true
-                        Toast.makeText(activity!!.applicationContext,  "Imported locations will be Auto Enumerated!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireActivity().applicationContext,  "Imported locations will be Auto Enumerated!", Toast.LENGTH_SHORT).show()
                     }
                 }
 
@@ -512,7 +512,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.CreateEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onMapClick(point: com.mapbox.geojson.Point): Boolean
@@ -648,7 +648,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             addPolygon(enumArea)
         }
 
-        MapManager.instance().loadMarkers( activity!!, binding.mapboxMapView, allEnumAreas )
+        MapManager.instance().loadMarkers( requireActivity(), binding.mapboxMapView, allEnumAreas )
 
         binding.mapboxMapView.getMapboxMap().addOnCameraChangeListener(this)
     }
@@ -936,7 +936,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             destructive = false
         ) { selection ->
             if (selection == resources.getString(R.string.yes)) {
-                val cachedFiles = TileServer.getCachedFiles( activity!! )
+                val cachedFiles = TileServer.getCachedFiles( requireActivity() )
                 if (cachedFiles.isNotEmpty())
                 {
                     composableSelectionDialogHost.show(
@@ -944,8 +944,8 @@ class CreateEnumerationAreaFragment : Fragment(),
                         message = null,
                         items = cachedFiles,
                     ) { selection ->
-                        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
-                        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
+                        val mbTilesPath = requireActivity().cacheDir.toString() + "/" + selection
+                        TileServer.startServer( requireActivity(), null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
                             refreshMap()
                             TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
                         }
@@ -982,18 +982,18 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {
-        activity!!.runOnUiThread {
+        requireActivity().runOnUiThread {
             composableBusyIndicatorDialogHost.updateMessage("${numLoaded}/${numNeeded}")
         }
     }
 
     override fun tilePacksLoaded( error: String )
     {
-        activity!!.runOnUiThread {
+        requireActivity().runOnUiThread {
             composableBusyIndicatorDialogHost.cancel()
             if (error.isNotEmpty())
             {
-                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -1004,7 +1004,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
             {
                 data?.data?.let { uri ->
-                    activity!!.getContentResolver().openInputStream(uri)?.let {
+                    requireActivity().getContentResolver().openInputStream(uri)?.let {
                         val json = it.bufferedReader().readText()
 
                         val featureCollection = FeatureCollection.fromJson( json )
@@ -1061,7 +1061,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
         } catch( ex: Exception )
         {
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
             Log.d( "xxx", ex.stackTraceToString())
         }
     }
@@ -1098,7 +1098,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
         else
         {
-            activity!!.runOnUiThread {
+            requireActivity().runOnUiThread {
                 composableBusyIndicatorDialogHost.show(title = resources.getString(R.string.importing_locations), message = null)
             }
 
@@ -1112,7 +1112,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                     if (showCurrentLocation && unsavedEnumAreas.isNotEmpty())
                     {
-                        activity!!.runOnUiThread {
+                        requireActivity().runOnUiThread {
                             showCurrentLocation = false
                             binding.mapboxMapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
                             binding.mapboxMapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
@@ -1123,13 +1123,13 @@ class CreateEnumerationAreaFragment : Fragment(),
                 }
                 catch( ex: Exception)
                 {
-                    activity!!.runOnUiThread {
-                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                    requireActivity().runOnUiThread {
+                        Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
                     }
                 }
                 finally
                 {
-                    activity!!.runOnUiThread {
+                    requireActivity().runOnUiThread {
                         composableBusyIndicatorDialogHost.cancel()
                     }
                 }
@@ -1223,7 +1223,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                         if (!hasBeenCentered)
                         {
                             hasBeenCentered = true
-                            activity!!.runOnUiThread {
+                            requireActivity().runOnUiThread {
                                 MapManager.instance().stopCenteringOnLocation( binding.mapboxMapView )
                                 binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
                                 MapManager.instance().centerMap( enumArea, binding.mapboxMapView )
@@ -1281,7 +1281,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             for (point in points)
             {
-                activity!!.runOnUiThread {
+                requireActivity().runOnUiThread {
                     composableBusyIndicatorDialogHost.updateMessage("${count}/${points.size}")
                 }
 
@@ -1472,12 +1472,12 @@ class CreateEnumerationAreaFragment : Fragment(),
             R.id.mapbox_streets ->
             {
                 val mapStyle = Style.MAPBOX_STREETS
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, mapStyle )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
+                TileServer.loadMapboxStyle( requireActivity(), binding.mapboxMapView.getMapboxMap()) {
                     refreshMap()
                 }
             }
@@ -1485,12 +1485,12 @@ class CreateEnumerationAreaFragment : Fragment(),
             R.id.satellite_streets ->
             {
                 val mapStyle = Style.SATELLITE_STREETS
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val sharedPreferences: SharedPreferences = requireActivity().getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, mapStyle )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
+                TileServer.loadMapboxStyle( requireActivity(), binding.mapboxMapView.getMapboxMap()) {
                     refreshMap()
                 }
             }
@@ -1502,7 +1502,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             R.id.select_map_tiles ->
             {
-                val cachedFiles = TileServer.getCachedFiles( activity!! )
+                val cachedFiles = TileServer.getCachedFiles( requireActivity() )
                 if (cachedFiles.isNotEmpty())
                 {
                     composableSelectionDialogHost.show(
@@ -1510,8 +1510,8 @@ class CreateEnumerationAreaFragment : Fragment(),
                         message = null,
                         items = cachedFiles,
                     ) { selection ->
-                        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
-                        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
+                        val mbTilesPath = requireActivity().cacheDir.toString() + "/" + selection
+                        TileServer.startServer( requireActivity(), null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
                             refreshMap()
                             TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
                         }
@@ -1525,18 +1525,18 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            val (filePath, fileSize) = TileServer.filePathSize(activity!!, uri)
+            val (filePath, fileSize) = TileServer.filePathSize(requireActivity(), uri)
 
-            if (TileServer.fileExists( activity!!, uri ))
+            if (TileServer.fileExists( requireActivity(), uri ))
             {
-                TileServer.startServer( activity!!, null, filePath, binding.mapboxMapView.getMapboxMap()) {
+                TileServer.startServer( requireActivity(), null, filePath, binding.mapboxMapView.getMapboxMap()) {
                     refreshMap()
                     TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
                 }
             }
             else
             {
-                TileServer.startServer( activity!!, uri, "", binding.mapboxMapView.getMapboxMap()) {
+                TileServer.startServer( requireActivity(), uri, "", binding.mapboxMapView.getMapboxMap()) {
                     refreshMap()
                     TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), MapManager.zoomLevel() )
                 }

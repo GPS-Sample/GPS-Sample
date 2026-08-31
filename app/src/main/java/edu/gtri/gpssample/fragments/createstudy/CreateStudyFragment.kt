@@ -92,7 +92,7 @@ class CreateStudyFragment : Fragment()
         }
 
         ArrayAdapter.createFromResource(
-            activity!!,
+            requireActivity(),
             R.array.sampling_methods,
             android.R.layout.simple_spinner_item
         ).also { adapter ->
@@ -106,7 +106,7 @@ class CreateStudyFragment : Fragment()
             binding.deleteImageView.visibility = View.GONE
         }
 
-        sharedViewModel.createStudyModel.samplingMethod.observe( this, androidx.lifecycle.Observer { samplingMethod ->
+        sharedViewModel.createStudyModel.samplingMethod.observe( viewLifecycleOwner, androidx.lifecycle.Observer { samplingMethod ->
             when(study.samplingMethod)
             {
                 SamplingMethod.SimpleRandom -> {
@@ -165,13 +165,13 @@ class CreateStudyFragment : Fragment()
         binding.saveButton.setOnClickListener {
             if (study.name.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (study.sampleSize == 0)
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.sample_size_error), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.sample_size_error), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -187,7 +187,7 @@ class CreateStudyFragment : Fragment()
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateStudyFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.CreateStudyFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

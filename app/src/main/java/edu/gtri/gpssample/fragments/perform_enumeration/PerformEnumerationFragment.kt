@@ -233,7 +233,7 @@ class PerformEnumerationFragment : Fragment(),
             location.isVisible = true
         }
 
-        (activity!!.application as? MainApplication)?.user?.let {
+        (requireActivity().application as? MainApplication)?.user?.let {
             user = it
         }
 
@@ -263,10 +263,10 @@ class PerformEnumerationFragment : Fragment(),
             TileServer.startServer( enumArea.mbTilesPath )
         }
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+        MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
             this.mapView = mapView
 
-            MapManager.instance().enableLocationUpdates( activity!!, mapView )
+            MapManager.instance().enableLocationUpdates( requireActivity(), mapView )
 
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
 
@@ -279,7 +279,7 @@ class PerformEnumerationFragment : Fragment(),
             sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
                 if (centerOnCurrentLocation)
                 {
-                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                    MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                     binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
                 else
@@ -320,14 +320,14 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.mapOverlayView.setOnTouchListener(this)
 
-        if (ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        if (ActivityCompat.checkSelfPermission( requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission( requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
             if (!LocationService.started)
             {
                 LocationService.locationCallback = locationCallback
-                val intent = Intent(activity!!, LocationService::class.java)
-                ContextCompat.startForegroundService(activity!!, intent )
+                val intent = Intent(requireActivity(), LocationService::class.java)
+                ContextCompat.startForegroundService(requireActivity(), intent )
             }
         }
 
@@ -510,7 +510,7 @@ class PerformEnumerationFragment : Fragment(),
                     composableBusyIndicatorDialogHost.cancel()
                     MapManager.instance().cancelTilePackDownload()
                 }
-                MapManager.instance().cacheMapTiles(activity!!, mapView, mapTileRegions, this )
+                MapManager.instance().cacheMapTiles(requireActivity(), mapView, mapTileRegions, this )
             }
         }
 
@@ -524,7 +524,7 @@ class PerformEnumerationFragment : Fragment(),
                 }
                 else
                 {
-                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                    MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                     sharedViewModel.setCenterOnCurrentLocation( true )
                     binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
@@ -563,7 +563,7 @@ class PerformEnumerationFragment : Fragment(),
             }
             else
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
             }
         }
 
@@ -584,12 +584,12 @@ class PerformEnumerationFragment : Fragment(),
                         enumArea.locations.add(location)
                         sharedViewModel.currentLocationUuid = location.uuid
                         findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-                    } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
+                    } ?: Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
                 }
             }
             else
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
             }
         }
 
@@ -901,7 +901,7 @@ class PerformEnumerationFragment : Fragment(),
 
         isHandlingTapEvent = false
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     private fun addHouseholdButtonPress()
@@ -946,7 +946,7 @@ class PerformEnumerationFragment : Fragment(),
             enumerationTeam.locationUuids.add(location.uuid)
             DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
             navigateToAddHouseholdFragment()
-        } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
+        } ?: Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
     }
 
     private fun pointIsTooClose( distance: String, message: String, point: Point )
@@ -1083,7 +1083,7 @@ class PerformEnumerationFragment : Fragment(),
             {
                 if (location.isLandmark && location.isVisible)
                 {
-                    MapManager.instance().createMarker( activity!!, mapView, location, R.drawable.location_blue, "" )
+                    MapManager.instance().createMarker( requireActivity(), mapView, location, R.drawable.location_blue, "" )
                 }
             }
 
@@ -1131,7 +1131,7 @@ class PerformEnumerationFragment : Fragment(),
 
             if (markerProperties.isNotEmpty())
             {
-                MapManager.instance().loadMarkers( activity!!, mapView, markerProperties, mapboxMapClickListener )
+                MapManager.instance().loadMarkers( requireActivity(), mapView, markerProperties, mapboxMapClickListener )
             }
         }
     }
@@ -1193,7 +1193,7 @@ class PerformEnumerationFragment : Fragment(),
                 }
                 else
                 {
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
                 }
             }
             else if (location.enumerationItems.size == 1)
@@ -1237,7 +1237,7 @@ class PerformEnumerationFragment : Fragment(),
 
     fun getFileName() : String
     {
-        (activity!!.application as MainApplication).user?.let { user ->
+        (requireActivity().application as MainApplication).user?.let { user ->
             var userName = user.name.replace(" ", "" ).uppercase()
 
             if (userName.length > 3)
@@ -1337,18 +1337,18 @@ class PerformEnumerationFragment : Fragment(),
 
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {
-        activity!!.runOnUiThread {
+        requireActivity().runOnUiThread {
             composableBusyIndicatorDialogHost.updateMessage("${numLoaded}/${numNeeded}")
         }
     }
 
     override fun tilePacksLoaded( error: String )
     {
-        activity!!.runOnUiThread {
+        requireActivity().runOnUiThread {
             composableBusyIndicatorDialogHost.cancel()
             if (error.isNotEmpty())
             {
-                Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -1645,7 +1645,7 @@ class PerformEnumerationFragment : Fragment(),
                                 refreshMap()
                                 updateSummaryInfo()
                                 performEnumerationAdapter.updateLocations( performEnumerationAdapter.locations )
-                                Toast.makeText(activity!!.applicationContext,  "Auto Enumeration Complete.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(requireActivity().applicationContext,  "Auto Enumeration Complete.", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -1674,7 +1674,7 @@ class PerformEnumerationFragment : Fragment(),
                                 binding.progressOverlayView.visibility = View.GONE
 
                                 refreshMap()
-                                Toast.makeText(activity!!.applicationContext,  "Auto Image Generation Complete.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(requireActivity().applicationContext,  "Auto Image Generation Complete.", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -1703,7 +1703,7 @@ class PerformEnumerationFragment : Fragment(),
                                 binding.progressOverlayView.visibility = View.GONE
 
                                 refreshMap()
-                                Toast.makeText(activity!!.applicationContext,  "Auto Breadcrumb Generation Complete.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(requireActivity().applicationContext,  "Auto Breadcrumb Generation Complete.", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -1726,26 +1726,26 @@ class PerformEnumerationFragment : Fragment(),
 
                 R.id.mapbox_streets ->
                 {
-                    val editor = activity!!.getSharedPreferences("default", 0).edit()
+                    val editor = requireActivity().getSharedPreferences("default", 0).edit()
                     editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                     editor.commit()
 
                     MapManager.instance().clearMap( mapView )
 
-                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+                    MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                         refreshMap()
                     }
                 }
 
                 R.id.satellite_streets ->
                 {
-                    val editor = activity!!.getSharedPreferences("default", 0).edit()
+                    val editor = requireActivity().getSharedPreferences("default", 0).edit()
                     editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                     editor.commit()
 
                     MapManager.instance().clearMap( mapView )
 
-                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
+                    MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
                         refreshMap()
                     }
                 }
@@ -1816,7 +1816,7 @@ class PerformEnumerationFragment : Fragment(),
 
                         if (distance > MIN_BREADCRUMB_METERS)
                         {
-                            MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.breadcrumb, "")
+                            MapManager.instance().createMarker( requireActivity(), mapView, point, R.drawable.breadcrumb, "")
 
                             val breadcrumb = Breadcrumb( enumArea.uuid, enumerationTeam.name, point.latitude(), point.longitude(), lastBreadcrumbGroupId )
                             DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breadcrumb, breadcrumb.version )
@@ -1961,7 +1961,7 @@ class PerformEnumerationFragment : Fragment(),
                         }
                         else
                         {
-                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
+                            Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
                         }
                     }
 
@@ -1989,8 +1989,8 @@ class PerformEnumerationFragment : Fragment(),
 
         if (LocationService.started)
         {
-            val intent = Intent(activity!!, LocationService::class.java)
-            activity!!.stopService( intent )
+            val intent = Intent(requireActivity(), LocationService::class.java)
+            requireActivity().stopService( intent )
         }
 
         _binding = null
