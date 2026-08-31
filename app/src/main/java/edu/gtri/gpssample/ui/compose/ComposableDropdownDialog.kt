@@ -1,8 +1,7 @@
 package edu.gtri.gpssample.ui.compose
 
-import androidx.compose.foundation.clickable
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,13 +9,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -31,6 +33,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import edu.gtri.gpssample.R
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposableDropdownDialog(
     title: String?,
@@ -68,28 +72,38 @@ fun ComposableDropdownDialog(
 
                     var expanded by remember { mutableStateOf(false) }
 
-                    Box(
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = {
+                            expanded = !expanded
+                        },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         OutlinedTextField(
                             value = items.getOrNull(selectedItem) ?: "",
                             onValueChange = {},
                             readOnly = true,
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(
+                                    expanded = expanded
+                                )
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    expanded = true
-                                },
+                                .menuAnchor(
+                                    MenuAnchorType.PrimaryNotEditable
+                                )
                         )
 
-                        DropdownMenu(
+                        ExposedDropdownMenu(
                             expanded = expanded,
                             onDismissRequest = {
                                 expanded = false
-                            },
-                            modifier = Modifier.fillMaxWidth()
+                            }
                         ) {
                             items.forEachIndexed { index, item ->
+                                Log.d("xxx", "$index: $item")
+
                                 DropdownMenuItem(
                                     text = {
                                         Text(item)
