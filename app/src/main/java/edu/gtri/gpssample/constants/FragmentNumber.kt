@@ -45,4 +45,5 @@ enum class FragmentNumber( val value: Int ) {
     PrimarySampleFragment(1035 ),
     StrataSampleFragment(1036 ),
     SubsetSampleFragment(1037 ),
+    ManageArchivesFragment(1038 ),
 }

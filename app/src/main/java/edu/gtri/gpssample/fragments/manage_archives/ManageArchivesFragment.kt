@@ -9,6 +9,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.ui.GPSSampleComposeTheme
 
@@ -43,5 +45,12 @@ class ManageArchivesFragment : Fragment()
                 }
             }
         }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+
+        (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.ManageArchivesFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 }
