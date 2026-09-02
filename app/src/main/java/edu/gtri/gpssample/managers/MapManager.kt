@@ -157,6 +157,9 @@ class MapManager
         var polylineAnnotation: PolylineAnnotation? = null
     }
 
+    val LOCATION_CLUSTER_LAYER = "LOCATION_CLUSTER_LAYER"
+    val LOCATION_UNCLUSTERED__LAYER = "LOCATION_UNCLUSTERED_LAYER"
+
     private val _markerTapped = MutableSharedFlow<Location>( extraBufferCapacity = 1 )
     val markerTapped = _markerTapped.asSharedFlow()
     private val MIN_ZOOM = 8
@@ -1484,14 +1487,14 @@ class MapManager
                 build()
             }
 
-            +circleLayer("LOCATION_CLUSTER_LAYER", "LOCATION_SOURCE_ID") {
+            +circleLayer(LOCATION_CLUSTER_LAYER, "LOCATION_SOURCE_ID") {
                 filter(has("point_count"))
                 circleRadius(15.0)
                 circleColor(Color.BLUE)
                 circleOpacity(0.5)
             }
 
-            unclusteredLayer = symbolLayer("UNCLUSTERED_LOCATION_LAYER", "LOCATION_SOURCE_ID") {
+            unclusteredLayer = symbolLayer(LOCATION_UNCLUSTERED__LAYER, "LOCATION_SOURCE_ID") {
                 filter(not(has("point_count")))
                 iconImage(get("iconName"))
                 iconAllowOverlap(true)
@@ -1527,7 +1530,7 @@ class MapManager
         val screenCoord = mapView.mapboxMap.pixelForCoordinate(point)
         val queryRect = ScreenBox(ScreenCoordinate(screenCoord.x - rectSize / 2, screenCoord.y - rectSize / 2), ScreenCoordinate(screenCoord.x + rectSize / 2, screenCoord.y + rectSize / 2))
 
-        mapView.mapboxMap.queryRenderedFeatures(RenderedQueryGeometry(queryRect), RenderedQueryOptions(listOf("CLUSTER_LAYER", "UNCLUSTERED_LAYER"), null)) { result ->
+        mapView.mapboxMap.queryRenderedFeatures(RenderedQueryGeometry(queryRect), RenderedQueryOptions(listOf(LOCATION_CLUSTER_LAYER, LOCATION_UNCLUSTERED__LAYER), null)) { result ->
             val features = result.value
 
             if (!features.isNullOrEmpty())
