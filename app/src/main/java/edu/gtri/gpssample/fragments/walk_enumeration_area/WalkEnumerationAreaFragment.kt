@@ -350,8 +350,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                 composableInputDialogHost.show(
                     title = null,
                     description = resources.getString(R.string.enter_enum_area_name),
-                    text = "1",
-                    inputTypeNumber = true,
+                    text = "",
                     cancelable = true,
                     onQrClick = {
                         val intent = Intent(context, CameraXLivePreviewActivity::class.java)
@@ -551,7 +550,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                 composableInputDialogHost.show(
                     title = null,
                     description = resources.getString(R.string.map_tile_boundary),
-                    text = "1",
+                    text = "",
                     inputTypeNumber = true,
                     cancelable = true,
                     onResult = { text ->
@@ -586,8 +585,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                                     composableInputDialogHost.show(
                                         title = null,
                                         description = resources.getString(R.string.enter_enum_area_name),
-                                        text = "1",
-                                        inputTypeNumber = true,
+                                        text = "",
                                         cancelable = true,
                                         onQrClick = {
                                             val intent = Intent(context, CameraXLivePreviewActivity::class.java)
