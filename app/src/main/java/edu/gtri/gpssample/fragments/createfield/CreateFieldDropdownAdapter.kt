@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.FieldOption
@@ -53,6 +54,10 @@ class CreateFieldDropdownAdapter(var fieldOptions: List<FieldOption>) : Recycler
         val fieldOption = fieldOptions.get(position)
 
         holder.optionEditText.setText( fieldOption.name )
+
+        holder.optionEditText.doOnTextChanged { text, _, _, _ ->
+            fieldOption.name = text?.toString() ?: ""
+        }
 
         holder.optionDeleteButton.setOnClickListener {
             shouldDeleteDropdownFieldOption( fieldOption )

@@ -103,7 +103,7 @@ class FieldDAO(private var dao: DAO)
 
         val type = FieldTypeConverter.fromIndex(typeIndex)
 
-        return Field( uuid, creationDate, parentUUID, index, name, type, pii, required, integerOnly, numberOfResidents, date, time, minimum, maximum, ArrayList<FieldOption>(), ArrayList<Field>(), studyUuid, version )
+        return Field( uuid, creationDate, parentUUID, index, name, type, pii, required, integerOnly, numberOfResidents, date, time, minimum, maximum, ArrayList<FieldOption>(), null, studyUuid, version )
     }
 
     fun getField( uuid : String ): Field?
