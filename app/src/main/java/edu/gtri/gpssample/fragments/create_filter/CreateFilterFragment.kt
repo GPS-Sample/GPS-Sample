@@ -5,7 +5,7 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.fragments.createfilter
+package edu.gtri.gpssample.fragments.create_filter
 
 import android.os.Bundle
 import android.view.LayoutInflater

@@ -5,7 +5,7 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.fragments.createconfiguration
+package edu.gtri.gpssample.fragments.create_configuration
 
 import android.Manifest
 import android.content.pm.PackageManager

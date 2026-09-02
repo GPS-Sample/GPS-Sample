@@ -5,11 +5,9 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.fragments.manageconfigurations
+package edu.gtri.gpssample.fragments.manage_configurations
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +18,6 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.extensions.toLocalizedDateTimeString
 import java.util.*
-import kotlin.collections.ArrayList
 
 class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerView.Adapter<ManageConfigurationsAdapter.ViewHolder>()
 {

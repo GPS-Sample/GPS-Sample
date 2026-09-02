@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".fragments.createconfiguration.CreateConfigurationFragment">
+    tools:context=".fragments.create_configuration.CreateConfigurationFragment">
     <data>
         <variable
             name="viewModel"
@@ -11,7 +11,7 @@
 
         <variable
             name="createFieldFragment"
-            type="edu.gtri.gpssample.fragments.createfield.CreateFieldFragment" />
+            type="edu.gtri.gpssample.fragments.create_field.CreateFieldFragment" />
     </data>
     <LinearLayout
         android:orientation="vertical"

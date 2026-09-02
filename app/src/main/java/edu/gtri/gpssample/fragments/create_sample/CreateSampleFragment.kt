@@ -5,12 +5,11 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.fragments.createsample
+package edu.gtri.gpssample.fragments.create_sample
 
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment

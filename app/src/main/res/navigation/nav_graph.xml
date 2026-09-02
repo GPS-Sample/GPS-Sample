@@ -61,7 +61,7 @@
 
     <fragment
         android:id="@+id/ManageConfigurationsFragment"
-        android:name="edu.gtri.gpssample.fragments.manageconfigurations.ManageConfigurationsFragment"
+        android:name="edu.gtri.gpssample.fragments.manage_configurations.ManageConfigurationsFragment"
         tools:layout="@layout/fragment_manage_configurations">
 
         <action
@@ -166,7 +166,7 @@
 
     <fragment
         android:id="@+id/CreateConfigurationFragment"
-        android:name="edu.gtri.gpssample.fragments.createconfiguration.CreateConfigurationFragment"
+        android:name="edu.gtri.gpssample.fragments.create_configuration.CreateConfigurationFragment"
         tools:layout="@layout/fragment_create_configuration">
 
         <action
@@ -256,7 +256,7 @@
 
     <fragment
         android:id="@+id/CreateStudyFragment"
-        android:name="edu.gtri.gpssample.fragments.createstudy.CreateStudyFragment"
+        android:name="edu.gtri.gpssample.fragments.create_study.CreateStudyFragment"
         tools:layout="@layout/fragment_create_study">
 
         <action
@@ -413,7 +413,7 @@
 
     <fragment
         android:id="@+id/CreateFieldFragment"
-        android:name="edu.gtri.gpssample.fragments.createfield.CreateFieldFragment"
+        android:name="edu.gtri.gpssample.fragments.create_field.CreateFieldFragment"
         tools:layout="@layout/fragment_create_field">
 
         <action
@@ -425,7 +425,7 @@
 
     <fragment
         android:id="@+id/CreateSampleFragment"
-        android:name="edu.gtri.gpssample.fragments.createsample.CreateSampleFragment"
+        android:name="edu.gtri.gpssample.fragments.create_sample.CreateSampleFragment"
         tools:layout="@layout/fragment_create_sample">
 
         <action
@@ -450,7 +450,7 @@
 
     <fragment
         android:id="@+id/CreateRuleFragment"
-        android:name="edu.gtri.gpssample.fragments.createrule.CreateRuleFragment"
+        android:name="edu.gtri.gpssample.fragments.create_rule.CreateRuleFragment"
         tools:layout="@layout/fragment_create_rule">
     </fragment>
 
@@ -458,7 +458,7 @@
 
     <fragment
         android:id="@+id/CreateFilterFragment"
-        android:name="edu.gtri.gpssample.fragments.createfilter.CreateFilterFragment"
+        android:name="edu.gtri.gpssample.fragments.create_filter.CreateFilterFragment"
         tools:layout="@layout/fragment_create_filter">
         <action
             android:id="@+id/action_navigate_to_SelectRuleDialogFragment"

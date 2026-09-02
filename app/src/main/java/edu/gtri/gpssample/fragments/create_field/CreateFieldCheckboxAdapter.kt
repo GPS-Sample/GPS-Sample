@@ -5,7 +5,7 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.fragments.createfield
+package edu.gtri.gpssample.fragments.create_field
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -14,20 +14,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageView
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.FieldOption
 
-class CreateFieldDropdownAdapter(var fieldOptions: List<FieldOption>) : RecyclerView.Adapter<CreateFieldDropdownAdapter.ViewHolder>()
+class CreateFieldCheckboxAdapter(var fieldOptions: List<FieldOption>) : RecyclerView.Adapter<CreateFieldCheckboxAdapter.ViewHolder>()
 {
     override fun getItemCount() = fieldOptions.size
 
-    lateinit var shouldDeleteDropdownFieldOption: ((fieldOption: FieldOption) -> Unit)
+    private var context: Context? = null
+
+    lateinit var shouldDeleteCheckboxFieldOption: ((fieldOption: FieldOption) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
+        this.context = parent.context
+
         val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_field_option, parent, false))
 
         viewHolder.itemView.isSelected = false
@@ -43,7 +46,7 @@ class CreateFieldDropdownAdapter(var fieldOptions: List<FieldOption>) : Recycler
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
-        var optionEditText: EditText = itemView.findViewById(R.id.option_edit_text);
+        val optionEditText: EditText = itemView.findViewById(R.id.option_edit_text);
         val optionDeleteButton: Button = itemView.findViewById(R.id.option_delete_button);
     }
 
@@ -60,7 +63,7 @@ class CreateFieldDropdownAdapter(var fieldOptions: List<FieldOption>) : Recycler
         }
 
         holder.optionDeleteButton.setOnClickListener {
-            shouldDeleteDropdownFieldOption( fieldOption )
+            shouldDeleteCheckboxFieldOption( fieldOption )
         }
     }
 }

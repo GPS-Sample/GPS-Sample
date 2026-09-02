@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
 
-    tools:context=".fragments.createconfiguration.CreateConfigurationFragment"
+    tools:context=".fragments.create_configuration.CreateConfigurationFragment"
     >
     <data>
         <variable
@@ -14,7 +14,7 @@
 
         <variable
             name="createConfigurationFragment"
-            type="edu.gtri.gpssample.fragments.createconfiguration.CreateConfigurationFragment" />
+            type="edu.gtri.gpssample.fragments.create_configuration.CreateConfigurationFragment" />
     </data>
 
     <FrameLayout

@@ -5,7 +5,7 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.fragments.createstudy
+package edu.gtri.gpssample.fragments.create_study
 
 import android.content.Context
 import android.content.SharedPreferences

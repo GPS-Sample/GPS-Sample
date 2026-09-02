@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".fragments.createfilter.CreateFilterFragment">
+    tools:context=".fragments.create_filter.CreateFilterFragment">
     <data>
         <import type="android.view.View" />
         <variable
@@ -11,7 +11,7 @@
             type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
         <variable
             name="createFilterFragment"
-            type="edu.gtri.gpssample.fragments.createfilter.CreateFilterFragment" />
+            type="edu.gtri.gpssample.fragments.create_filter.CreateFilterFragment" />
     </data>
     <LinearLayout
         android:orientation="vertical"

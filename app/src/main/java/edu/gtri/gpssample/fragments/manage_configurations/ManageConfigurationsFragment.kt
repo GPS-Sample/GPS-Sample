@@ -5,7 +5,7 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.fragments.manageconfigurations
+package edu.gtri.gpssample.fragments.manage_configurations
 
 import android.app.Activity
 import android.content.Intent
@@ -15,7 +15,6 @@ import android.util.Log
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.collection.emptyLongSet
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.*
 import androidx.lifecycle.Lifecycle

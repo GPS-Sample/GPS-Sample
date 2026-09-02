@@ -5,7 +5,7 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.fragments.createrule
+package edu.gtri.gpssample.fragments.create_rule
 
 import android.os.Bundle
 import android.text.InputType

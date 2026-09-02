@@ -5,7 +5,7 @@
  * See the LICENSE file for the full license text.
 */
 
-package edu.gtri.gpssample.fragments.createfield
+package edu.gtri.gpssample.fragments.create_field
 
 import android.os.Bundle
 import android.view.*
