@@ -210,6 +210,7 @@ class ManageConfigurationsFragment : Fragment()
                     title = null,
                     description = resources.getString(R.string.enter_encryption_password),
                     text = encryptionPassword,
+                    isPassword = true,
                     rightButtonText = resources.getString(R.string.next),
                     onResult = { text ->
                         if (text.isNotEmpty())
