@@ -24,6 +24,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
@@ -716,7 +717,6 @@ class PerformEnumerationFragment : Fragment(),
                 title = null,
                 description = resources.getString(R.string.subaddress_start),
                 text = "1",
-                inputTypeNumber = true,
                 cancelable = true,
                 onResult = { text ->
                     if (text.isNotEmpty())
@@ -1361,7 +1361,7 @@ class PerformEnumerationFragment : Fragment(),
             title = null,
             description = "Enter the number of HH's to create",
             text = "",
-            inputTypeNumber = true,
+            keyboardType = KeyboardType.Number,
             onResult = { text ->
                 if (text.isNotEmpty())
                 {
@@ -1715,7 +1715,6 @@ class PerformEnumerationFragment : Fragment(),
                         title = null,
                         description = resources.getString(R.string.subaddress_start),
                         text = "",
-                        inputTypeNumber = true,
                         onResult = { text ->
                             text.toIntOrNull()?.let {
                                 maxSubaddress = it - 1

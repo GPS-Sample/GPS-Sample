@@ -9,6 +9,8 @@ import androidx.compose.ui.res.stringResource
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.ui.GPSSampleComposeTheme
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 
 class ComposableInputDialogHost
 {
@@ -21,7 +23,8 @@ class ComposableInputDialogHost
         text: String,
         description: String?,
         required: Boolean = false,
-        inputTypeNumber: Boolean = false,
+        keyboardType: KeyboardType = KeyboardType.Text,
+        capitalization: KeyboardCapitalization = KeyboardCapitalization.Sentences,
         isPassword: Boolean = false,
         cancelable: Boolean = true,
         leftButtonText: String? = null,
@@ -37,7 +40,8 @@ class ComposableInputDialogHost
             description = description,
             text = text,
             required = required,
-            inputTypeNumber = inputTypeNumber,
+            keyboardType = keyboardType,
+            capitalization = capitalization,
             isPassword = isPassword,
             cancelable = cancelable,
             leftButtonText = leftButtonText,
@@ -59,7 +63,8 @@ class ComposableInputDialogHost
                         description = it.description,
                         text = it.text,
                         required = it.required,
-                        inputTypeNumber = it.inputTypeNumber,
+                        keyboardType = it.keyboardType,
+                        capitalization = it.capitalization,
                         isPassword = it.isPassword,
                         cancelable = it.cancelable,
                         leftButtonText = it.leftButtonText,
@@ -85,7 +90,8 @@ class ComposableInputDialogHost
         val description: String?,
         val text: String,
         val required: Boolean = true,
-        val inputTypeNumber: Boolean = false,
+        val keyboardType: KeyboardType = KeyboardType.Text,
+        val capitalization: KeyboardCapitalization = KeyboardCapitalization.Sentences,
         val isPassword: Boolean = false,
         val cancelable: Boolean = true,
         val leftButtonText: String? = null,

@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -551,7 +552,7 @@ class WalkEnumerationAreaFragment : Fragment(), View.OnTouchListener
                     title = null,
                     description = resources.getString(R.string.map_tile_boundary),
                     text = "",
-                    inputTypeNumber = true,
+                    keyboardType = KeyboardType.Decimal,
                     cancelable = true,
                     onResult = { text ->
                         if (text.isNotEmpty())

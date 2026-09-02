@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -41,7 +42,8 @@ fun ComposableInputDialog(
     description: String?,
     text: String,
     required: Boolean = true,
-    inputTypeNumber: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    capitalization: KeyboardCapitalization = KeyboardCapitalization.Sentences,
     isPassword: Boolean = false,
     cancelable: Boolean = true,
     leftButtonText: String? = null,
@@ -108,7 +110,6 @@ fun ComposableInputDialog(
                     }
 
                     var textValue by remember { mutableStateOf(text) }
-                    val keyboardType = if (inputTypeNumber) KeyboardType.Decimal else KeyboardType.Text
 
                     LaunchedEffect(qrText) {
                         if (qrText != null) {
@@ -119,7 +120,7 @@ fun ComposableInputDialog(
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = textValue,
-                        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, capitalization = capitalization),
                         textStyle = MaterialTheme.typography.bodyLarge,
                         visualTransformation = if (isPassword) { PasswordVisualTransformation() } else { VisualTransformation.None },
                         onValueChange = {

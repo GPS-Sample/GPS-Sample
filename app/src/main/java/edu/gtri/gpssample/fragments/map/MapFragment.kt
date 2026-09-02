@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -225,8 +226,8 @@ class MapFragment : Fragment(),
                     composableInputDialogHost.show(
                         title = null,
                         description = resources.getString(R.string.map_tile_boundary),
-                        text = "1",
-                        inputTypeNumber = true,
+                        text = "",
+                        keyboardType = KeyboardType.Decimal,
                         cancelable = true,
                         onResult = { text ->
                             text.toDoubleOrNull()?.let {
