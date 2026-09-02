@@ -547,6 +547,9 @@
     <string name="supervisor_edit_tip">Allow Supervisors to edit this configuration.</string>
     <string name="config_name_already_exists">That configuration name already exists.</string>
 
+    // This is REALLY new
+    <string name="import_mismatch">The Configuration that you are attempting to import does not match the configuration that is currently open.</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

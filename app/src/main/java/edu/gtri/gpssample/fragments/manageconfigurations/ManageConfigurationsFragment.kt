@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.collection.emptyLongSet
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.*
 import androidx.lifecycle.Lifecycle
@@ -559,28 +560,36 @@ class ManageConfigurationsFragment : Fragment()
                 PerformanceManager.startTimer()
 
                 nearbySessionClientManager?.connect( sessionId ) { config ->
-                    composableNearbySessionStatusDialogHost.updateState(NearbySessionState.Message(resources.getString(R.string.saving_configuration)))
+                    if (config.encryptionPassword == encryptionPassword)
+                    {
+                        composableNearbySessionStatusDialogHost.updateState(NearbySessionState.Message(resources.getString(R.string.saving_configuration)))
 
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        withContext(Dispatchers.IO)
-                        {
-                            DAO.configDAO.createOrUpdateConfig( config,config.version )
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            withContext(Dispatchers.IO)
+                            {
+                                DAO.configDAO.createOrUpdateConfig( config,config.version )
+                            }
+
+                            // back on the main thread...
+
+                            Log.d("xxx", "Transfer time: ${PerformanceManager.elapsedTime()}")
+
+                            composableNearbySessionStatusDialogHost.dismiss()
+
+                            minimalConfigurations.find { it.uuid == config.uuid } ?.let {
+                                minimalConfigurations.remove(it )
+                            }
+
+                            minimalConfigurations.add( config )
+                            manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
+
+                            didReceiveConfiguration( config )
                         }
-
-                        // back on the main thread...
-
-                        Log.d("xxx", "Transfer time: ${PerformanceManager.elapsedTime()}")
-
+                    }
+                    else
+                    {
                         composableNearbySessionStatusDialogHost.dismiss()
-
-                        minimalConfigurations.find { it.uuid == config.uuid } ?.let {
-                            minimalConfigurations.remove(it )
-                        }
-
-                        minimalConfigurations.add( config )
-                        manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
-
-                        didReceiveConfiguration( config )
+                        composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.password_error))
                     }
                 }
             }

@@ -117,6 +117,7 @@ fun ComposableInputDialog(
                     }
 
                     OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
                         value = textValue,
                         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
                         textStyle = MaterialTheme.typography.bodyLarge,
