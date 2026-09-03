@@ -165,7 +165,7 @@ class MapFragment : Fragment(),
 
                 val mapTileRegions = ArrayList<MapTileRegion>()
                 mapTileRegions.add(it)
-                MapManager.instance().cacheMapTiles(requireActivity(), binding.osmMapView, mapTileRegions, this )
+                MapManager.instance().cacheMapTiles(requireActivity(), mapView, mapTileRegions, this )
             }
         }
 
@@ -444,7 +444,8 @@ class MapFragment : Fragment(),
             message = null,
             items = listOf( mapEngines[0].toString(), mapEngines[1].toString()),
         ) { selection ->
-            if (selection == mapEngines[0]) {
+            if (selection == mapEngines[0])
+            {
                 binding.osmLabel.visibility = View.VISIBLE
                 binding.osmMapView.visibility = View.VISIBLE
                 binding.mapboxMapView.visibility = View.GONE
@@ -468,7 +469,8 @@ class MapFragment : Fragment(),
                     }
                 }
             }
-            else if (selection == mapEngines[1]) {
+            else if (selection == mapEngines[1])
+            {
                 binding.osmLabel.visibility = View.GONE
                 binding.osmMapView.visibility = View.GONE
                 binding.northUpImageView.visibility = View.GONE

@@ -1819,6 +1819,7 @@ class MapManager
 
                     for (zoom in MIN_ZOOM..MAX_ZOOM)
                     {
+                        delegate.mapLoadProgress(zoom.toLong(), MAX_ZOOM.toLong())
                         mapView.controller.setCenter(center)
                         mapView.controller.setZoom(zoom)
                         mapView.invalidate()
@@ -1852,6 +1853,7 @@ class MapManager
             mapStyle!!,
             stylePackLoadOptions,
             { progress ->
+                delegate.mapLoadProgress(progress.completedResourceCount, progress.requiredResourceCount )
             },
             { expected ->
                 if (expected.isValue) {
