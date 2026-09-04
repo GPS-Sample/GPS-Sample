@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.extensions.toLocalizedDateTimeString
+import edu.gtri.gpssample.ui.compose.ComposableBusyIndicatorDialog
 import edu.gtri.gpssample.ui.compose.ComposableSelectionDialog
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialog
 import java.util.Date
@@ -52,6 +53,10 @@ fun ManageArchivesScreen(
     }
 
     var showDeleteConfirmation by remember {
+        mutableStateOf(false)
+    }
+
+    var showBusyIndicatorDialog by remember {
         mutableStateOf(false)
     }
 
@@ -191,6 +196,7 @@ fun ManageArchivesScreen(
 
                         "Delete" -> {
                             selectedConfig = null
+                            showBusyIndicatorDialog = true
                             onDelete(config)
                         }
 
@@ -201,5 +207,10 @@ fun ManageArchivesScreen(
                 }
             )
         }
+    }
+
+    if (showBusyIndicatorDialog)
+    {
+        ComposableBusyIndicatorDialog( "Deleting Configuration...", "", null )
     }
 }

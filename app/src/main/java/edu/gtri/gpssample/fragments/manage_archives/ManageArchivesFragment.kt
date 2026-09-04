@@ -8,11 +8,15 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.ui.GPSSampleComposeTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ManageArchivesFragment : Fragment()
 {
@@ -38,8 +42,13 @@ class ManageArchivesFragment : Fragment()
                             findNavController().popBackStack()
                         },
                         onDelete = { config ->
-                            DAO.configDAO.deleteConfig(config)
-                            findNavController().popBackStack()
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                withContext(Dispatchers.IO) {
+                                    DAO.configDAO.deleteConfig(config)
+                                }
+
+                                findNavController().popBackStack()
+                            }
                         }
                     )
                 }
