@@ -7,6 +7,7 @@ import android.content.ContentValues
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Image
@@ -112,6 +113,77 @@ class ZipUtils()
     }
 
     private fun writeImages(zipOut: ZipOutputStream, config: Config, fileName: String)
+    {
+        val entry = ZipEntry("$fileName-img.json")
+
+        zipOut.putNextEntry(entry)
+
+        try
+        {
+            val imageUuids = config.enumAreas
+                .asSequence()
+                .flatMap { it.locations.asSequence() }
+                .mapNotNull { it.imageUuid.takeIf(String::isNotEmpty) }
+                .distinct()
+                .toList()
+
+            if (imageUuids.isEmpty())
+            {
+                writeHeader(0, zipOut)
+                return
+            }
+
+            val placeholders = imageUuids.joinToString(",") { "?" }
+
+            val query = """
+            SELECT ${ImageDAO.COLUMN_UUID}
+            FROM ${ImageDAO.TABLE_IMAGE}
+            WHERE ${ImageDAO.COLUMN_UUID} IN ($placeholders)
+        """.trimIndent()
+
+            ImageDAO.instance().readableDatabase.rawQuery(
+                query,
+                imageUuids.toTypedArray()
+            ).use { cursor ->
+
+                val totalCount = cursor.count
+
+                writeHeader(totalCount, zipOut)
+
+                var count = 1
+
+                while (cursor.moveToNext())
+                {
+                    if (currentJob == null)
+                        break
+
+                    _state.value = NearbySessionState.Message(
+                        "Exporting Image ${count++}/$totalCount"
+                    )
+
+                    val uuid = cursor.getString(
+                        cursor.getColumnIndexOrThrow(ImageDAO.COLUMN_UUID)
+                    )
+
+                    ImageDAO.instance().getImage(uuid)?.let { image ->
+                        val packedImage = image.pack()
+                        zipOut.write(packedImage.toByteArray())
+                        zipOut.write('\n'.code)
+                    }
+                }
+            }
+        }
+        catch (ex: Exception)
+        {
+            Log.d("xxx", ex.stackTraceToString())
+        }
+        finally
+        {
+            zipOut.closeEntry()
+        }
+    }
+
+    private fun writeImagesXXX(zipOut: ZipOutputStream, config: Config, fileName: String)
     {
         val entry = ZipEntry("$fileName-img.json")
 
