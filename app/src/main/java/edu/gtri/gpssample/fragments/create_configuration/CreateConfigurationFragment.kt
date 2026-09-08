@@ -205,7 +205,7 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
             sharedViewModel.currentConfiguration?.value?.let { config ->
                 if (DAO.configDAO.nameExists( config ))
                 {
-                    Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.config_name_already_exists), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.name_already_exists), Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
 
