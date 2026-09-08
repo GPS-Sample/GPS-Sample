@@ -196,7 +196,7 @@
     <string name="simple_random">"Échantillonnage aléatoire simple"</string>
     <string name="cluster_sampling">"Échantillonnage en grappes"</string>
     <string name="subset_overlap">"Sous-ensembles : Peuvent se chevaucher"</string>
-    <string name="strata_exclusive">"Strates : Exclusivité mutuelle"</string>
+    <string name="strata_exclusive">"Échantillonnage stratifié"</string>
     <string name="numberhouseholds">"#  de ménages"</string>
     <string name="percenthouseholds">"% de tous les ménages"</string>
     <string name="percenttotal">"% de la population totale"</string>
@@ -446,7 +446,9 @@
     <string name="strata">"Strata"</string>
     <string name="password_error">"Le mot de passe saisi est incorrect."</string>
     <string name="pin_hint">"Créez un code PIN numérique de 4 à 6 chiffres pour sécuriser votre profil sur cet appareil. Une question de sécurité vous sera posée au cas où vous oublieriez votre code PIN."</string>
-    <string name="gpsaccuracy_hint">""Définit la précision GPS minimale requise avant qu\'un point de localisation puisse être enregistré. Recommandé : 20 mètres pour les enquêtes standard, 30 mètres pour les zones rurales. Des valeurs plus faibles sont plus précises mais plus difficiles à atteindre dans les zones urbaines denses ou sous le couvert des arbres.""</string>
+    <string name="gpsaccuracy_hint1_3">"Définit la précision GPS minimale requise avant qu\'un point de localisation puisse être enregistré."</string>
+    <string name="gpsaccuracy_hint2_3">"Recommandé :"</string>
+    <string name="gpsaccuracy_hint3_3">""20 mètres pour les enquêtes standard, 30 mètres pour les zones rurales. Des valeurs plus faibles sont plus précises mais plus difficiles à atteindre dans les zones urbaines denses ou sous le couvert des arbres.""</string>
     <string name="manual_hint">"Autoriser la saisie manuelle de la localisation. Lorsque cette option est activée : les enquêteurs peuvent appuyer sur un emplacement sur la carte pour ajouter un ménage s'il se trouve à moins de 20 mètres. Utile dans les zones urbaines denses ou en cas de signal GPS faible. Lorsque cette option est désactivée (par défaut) : seule la localisation GPS actuelle est utilisée."</string>
     <string name="autoincrement_hint">""Lorsque cette option est activée (par défaut) : un numéro séquentiel (1, 2, 3...) est automatiquement attribué à chaque ménage. Désactivez cette option si votre enquête utilise des identifiants de ménage pré-attribués.""</string>
     <string name="proximity_hint">"Lorsque cette option est activée : les enquêteurs reçoivent une alerte s'ils tentent d'ajouter un ménage situé à moins de [X] mètres d'un enregistrement existant. Cela permet d'éviter les doublons."</string>
@@ -490,7 +492,7 @@
     <string name="sampling_hint_7_11">"Sélectionner un pourcentage de ménages dans chaque grappe."</string>
     <string name="sampling_hint_8_11">"Échantillon stratifié (nombre de foyers) :"</string>
     <string name="sampling_hint_9_11">""Définissez les strates. Au sein de chaque strate, sélectionnez un nombre fixe de foyers dans chaque grappe""</string>
-    <string name="sampling_hint_10_11">"Échantillon stratifié (% de foyers)"</string>
+    <string name="sampling_hint_10_11">"Échantillon stratifié (% de foyers):"</string>
     <string name="sampling_hint_11_11">""Définissez les strates. Au sein de chaque strate, sélectionnez un pourcentage de foyers dans chaque grappe""</string>
     <string name="enter_forgot_pin_question">"Entrez la question de sécurité pour le code PIN oublié"</string>
     <string name="collection_app">"Application de collecte"</string>
@@ -529,6 +531,22 @@
     <string name="edit">"Modifiez"</string>
     <string name="clone">"Clonez"</string>
     <string name="configuration">"Configuration"</string>
+    <string name="delete_filter_message">"Êtes-vous sûr de vouloir supprimer définitivement ce filtre ?"</string>
+    <string name="info">"Info"</string>
+    <string name="select_an_existing_team">"Sélectionnez une équipe existante"</string>
+    <string name="select_the_file_types_to_export">"Sélectionnez les types de fichiers à exporter"</string>
+    <string name="select_enumeration_teams">"Sélectionnez les équipes d'énumération"</string>
+    <string name="created">"Créé"</string>
+    <string name="archive">"Archiver"</string>
+    <string name="restore">"Restaurer"</string>
+    <string name="archive_config">"Configuration d'archivage"</string>
+    <string name="archive_configuration_message">"Êtes-vous sûr de vouloir archiver cette configuration ?"</string>
+    <string name="allow_supervisor_edits">"Autoriser le superviseur à modifier"</string>
+    <string name="supervisor_edit_tip">"Autoriser les superviseurs à modifier cette configuration."</string>
+    <string name="name_already_exists">"Ce nom de configuration existe déjà."</string>
+
+    <string name="import_mismatch">The Configuration that you are attempting to import does not match the configuration that is currently open.</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>

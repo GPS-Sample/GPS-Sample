@@ -196,7 +196,7 @@
     <string name="simple_random">"Simple Random Sampling"</string>
     <string name="cluster_sampling">"Cluster Sampling"</string>
     <string name="subset_overlap">"Mga Subset: Maaaring Mag-overlap"</string>
-    <string name="strata_exclusive">"Strata: Mutually Exclusive"</string>
+    <string name="strata_exclusive">"Stratified Sampling"</string>
     <string name="numberhouseholds">"Bilang ng mga Sambahayan"</string>
     <string name="percenthouseholds">"% ng lahat ng Sambahayan"</string>
     <string name="percenttotal">"% ng kabuuang populasyon"</string>
@@ -446,7 +446,9 @@
     <string name="strata">"Strata"</string>
     <string name="password_error">"Mali ang password na inilagay."</string>
     <string name="pin_hint">"Gumawa ng numeric PIN na may 4 hanggang 6 na digit upang ma-secure ang iyong profile sa device na ito. Ipapakita sa iyo ang isang tanong sa seguridad kung sakaling makalimutan mo ang iyong PIN."</string>
-    <string name="gpsaccuracy_hint">""Itinatakda ang minimum na katumpakan ng GPS na kinakailangan bago maitala ang isang punto ng lokasyon. Inirerekomenda: 20 metro para sa mga karaniwang survey, 30 metro para sa mga rural na lugar. Mas tumpak ang mas mababang mga halaga ngunit mas mahirap makamit sa mga siksik na urban na lugar o sa ilalim ng takip ng mga puno.""</string>
+    <string name="gpsaccuracy_hint1_3">"Itinatakda ang minimum na katumpakan ng GPS na kinakailangan bago maitala ang isang punto ng lokasyon."</string>
+    <string name="gpsaccuracy_hint2_3">"Inirerekomenda:"</string>
+    <string name="gpsaccuracy_hint3_3">"" 20 metro para sa mga karaniwang survey, 30 metro para sa mga rural na lugar. Mas tumpak ang mas mababang mga halaga ngunit mas mahirap makamit sa mga siksik na urban na lugar o sa ilalim ng takip ng mga puno.""</string>
     <string name="manual_hint">"Payagan ang manu-manong pagpasok ng lokasyon. Kapag naka-on: maaaring mag-tap ang mga enumerator ng lokasyon sa mapa upang magdagdag ng sambahayan kung nasa loob ng 20 metro. Kapaki-pakinabang sa mga siksik na urban area o mahinang signal ng GPS. Kapag naka-off (default): tanging ang kasalukuyang lokasyon ng GPS ang ginagamit."</string>
     <string name="autoincrement_hint">""Kapag naka-on (default): ang bawat sambahayan ay awtomatikong binibigyan ng sunod-sunod na numero (1, 2, 3...). Patayin kung ang iyong survey ay gumagamit ng mga paunang nakatalagang household identifier.""</string>
     <string name="proximity_hint">"Kapag naka-on: makakatanggap ang mga enumerator ng alerto kung susubukan nilang magdagdag ng isang sambahayan sa loob ng [X] metro mula sa isang umiiral na tala. Nakakatulong na maiwasan ang mga dobleng entry."</string>
@@ -490,7 +492,7 @@
     <string name="sampling_hint_7_11">"Pumili ng porsyento ng mga sambahayan mula sa bawat cluster."</string>
     <string name="sampling_hint_8_11">"Stratified Sample (Bilang ng mga sambahayan):"</string>
     <string name="sampling_hint_9_11">""Itakda ang strata. Sa loob ng bawat strata, pumili ng isang takdang bilang ng mga sambahayan mula sa bawat kumpol.""</string>
-    <string name="sampling_hint_10_11">"Stratified sample (% ng mga sambahayan)"</string>
+    <string name="sampling_hint_10_11">"Stratified sample (% ng mga sambahayan):"</string>
     <string name="sampling_hint_11_11">""Itakda ang strata. Sa loob ng bawat strata, pumili ng isang porsyento ng mga sambahayan mula sa bawat kumpol.""</string>
     <string name="enter_forgot_pin_question">"Ilagay ang tanong tungkol sa nakalimutang PIN"</string>
     <string name="collection_app">"App ng Koleksyon"</string>
@@ -529,6 +531,19 @@
     <string name="edit">"I-edit"</string>
     <string name="clone">"I-clone"</string>
     <string name="configuration">"Pag-configure"</string>
+    <string name="delete_filter_message">"Sigurado ka bang gusto mong permanenteng burahin ang filter na ito?"</string>
+    <string name="info">"Impormasyon"</string>
+    <string name="select_an_existing_team">"Pumili ng isang umiiral na Koponan"</string>
+    <string name="select_the_file_types_to_export">"Piliin ang mga uri ng file na ie-export"</string>
+    <string name="select_enumeration_teams">"Piliin ang Mga Koponan ng Pagsusuri"</string>
+    <string name="created">"Nilikha"</string>
+    <string name="archive">"I-archive"</string>
+    <string name="restore">"I-restore"</string>
+    <string name="archive_config">"I-archive ang Configuration"</string>
+    <string name="archive_configuration_message">"Sigurado ka bang gusto mong i-archive ang configuration na ito?"</string>
+    <string name="allow_supervisor_edits">"Payagan ang Supervisor na I-edit"</string>
+    <string name="supervisor_edit_tip">"Payagan ang mga Supervisor na i-edit ang configuration na ito."</string>
+    <string name="name_already_exists">"Umiiral na ang pangalan ng configuration na iyon."</string>
     <string-array name="forgot_pin_questions">
         <item>"Panggitnang pangalan ng ama"</item>
         <item>"Pangalan ng dalaga ng ina"</item>

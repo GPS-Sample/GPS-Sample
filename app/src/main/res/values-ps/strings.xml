@@ -196,7 +196,7 @@
     <string name="simple_random">"ساده تصادفي نمونه"</string>
     <string name="cluster_sampling">"ډله"</string>
     <string name="subset_overlap">"فرعي ټولګي: ممکن یو پر بل پراته وي"</string>
-    <string name="strata_exclusive">"طبقې: یو له بل سره ناساز"</string>
+    <string name="strata_exclusive">"طبقاتي نمونه"</string>
     <string name="numberhouseholds">"د کورنیو شمېر"</string>
     <string name="percenthouseholds">"د ټولو کورنیو سلنه"</string>
     <string name="percenttotal">"د ټول نفوس سلنه"</string>
@@ -446,7 +446,9 @@
     <string name="strata">"پرتونه"</string>
     <string name="password_error">"داخل شوی پټنوم غلط دی."</string>
     <string name="pin_hint">"په دې وسیله کې د خپل پروفایل د خوندي کولو لپاره یو عددي پین (PIN) له ۴ څخه تر ۶ عددی جوړ کړئ. که تاسو خپل پین هېر کړئ، نو تاسو ته به یوه امنیتي پوښتنه وښودل شي."</string>
-    <string name="gpsaccuracy_hint">"د موقعیت نقطې ثبتولو دمخه د GPS لږ تر لږه اړینه دقت ټاکي. سپارښتنه شوې: د معیاري سروې ګانو لپاره ۲۰ متره، د کلیوالي سیمو لپاره ۳۰ متره. ټیټې کچې ډېرې دقیقې دي خو په ګڼو ښاري سیمو یا د ونو لاندې ترلاسه کول یې سخت دي."</string>
+    <string name="gpsaccuracy_hint1_3">"د ځای نښې ثبتولو څخه مخکې د GPS لږ تر لږه اړینه دقت ټاکي."</string>
+    <string name="gpsaccuracy_hint2_3">"وړاندیز شوی:"</string>
+    <string name="gpsaccuracy_hint3_3">"د معیاري سروې لپاره ۲۰ متره، او د کلیوالي سیمو لپاره ۳۰ متره. ټیټې کچې ډېرې دقیقې دي، خو په ګڼو ښاري سیمو یا د ونو لاندې یې ترلاسه کول ګران دي."</string>
     <string name="manual_hint">"د ځای لاسي داخلولو اجازه ورکړئ. کله چې فعال وي: شمېرونکي کولی شي په نقشه کې یو ځای ټپ کړي ترڅو کورنۍ اضافه کړي که چېرې په ۲۰ مترو کې وي. په ګڼو ښاري سیمو یا د GPS کمزوري سګنل کې ګټور دی. کله چې غیر فعال وي (اصلي): یوازې اوسنی GPS ځای کارول کیږي."</string>
     <string name="autoincrement_hint">"کله چې فعال وي (اصلي): هر کورنۍ ته په اتوماتيک ډول یو پرله پسې شمېره (۱، ۲، ۳...) ورکول کیږي. که ستاسو سروې له مخکې ټاکل شوي کورنیو پېژندونکو څخه کار اخلي، نو دا بند کړئ."</string>
     <string name="proximity_hint">"کله چې فعال وي: شمېرونکي هشدار ترلاسه کوي که دوی د یو موجوده ریکارډ څخه په [X] متره کې د کورنۍ اضافه کولو هڅه وکړي. د دوه ګوني داخلونو په مخنیوي کې مرسته کوي."</string>
@@ -529,6 +531,19 @@
     <string name="edit">"سمول"</string>
     <string name="clone">"کاپي کول"</string>
     <string name="configuration">"تنظیمات"</string>
+    <string name="delete_filter_message">"ایا تاسو ډاډه یاست چې غواړئ دا فلټر د تل لپاره حذف کړئ؟"</string>
+    <string name="info">"معلومات"</string>
+    <string name="select_an_existing_team">"یو موجود ټیم وټاکئ"</string>
+    <string name="select_the_file_types_to_export">"د صادرولو لپاره د فایل ډولونه وټاکئ"</string>
+    <string name="select_enumeration_teams">"د شمېرنې ټیمونه وټاکئ"</string>
+    <string name="created">"جوړ شوی"</string>
+    <string name="archive">"آرشیف"</string>
+    <string name="restore">"بیا رغونه"</string>
+    <string name="archive_config">"د آرشیف تشکیلات"</string>
+    <string name="archive_configuration_message">"ایا تاسو ډاډه یاست چې غواړئ دا تشکیلات آرشیف کړئ؟"</string>
+    <string name="allow_supervisor_edits">"سرکار ته د سمون اجازه ورکړئ"</string>
+    <string name="supervisor_edit_tip">"سرکارانو ته اجازه ورکړئ چې دا تشکیلات سم کړي."</string>
+    <string name="name_already_exists">"دا تشکیلات نوم لا دمخه شتون لري."</string>
     <string-array name="forgot_pin_questions">
         <item>"د پلار منځنی نوم"</item>
         <item>"د مور تخلص د واده څخه مخکې"</item>

@@ -196,7 +196,7 @@
     <string name="simple_random">"Simple Random Sampling"</string>
     <string name="cluster_sampling">"Cluster Sampling"</string>
     <string name="subset_overlap">"Subsets: May Overlap"</string>
-    <string name="strata_exclusive">"Strata: Mutually Exclusive"</string>
+    <string name="strata_exclusive">"Stratified Sampling"</string>
     <string name="numberhouseholds">"# of Households"</string>
     <string name="percenthouseholds">"% of all Households"</string>
     <string name="percenttotal">"% of total population"</string>
@@ -230,6 +230,7 @@
     <string name="launch_survey">"Launch Survey"</string>
     <string name="mark_as_incomplete">"Mark as Incomplete"</string>
     <string name="enter_current_pin">"Enter Current Pin"</string>
+    <string name="enter_new_pin">"Re-Enter New PIN"</string>
     <string name="re_enter_new_pin">"Re-Enter New PIN"</string>
     <string name="select_a_time">"Select a Time"</string>
     <string name="UUID">"UUID"</string>
@@ -445,7 +446,9 @@
     <string name="strata">"Strata"</string>
     <string name="password_error">"The password entered is incorrect."</string>
     <string name="pin_hint">"Create a numeric PIN with 4 to 6 digits to secure your profile on this device. You will be shown a security question in case you forget your PIN."</string>
-    <string name="gpsaccuracy_hint">""Sets the minimum GPS accuracy required before a location point can be recorded. Recommended: 20 meters for standard surveys, 30 meters for rural areas. Lower values are more precise but harder to achieve in dense urban areas or under tree cover.""</string>
+    <string name="gpsaccuracy_hint1_3">"Sets the minimum GPS accuracy required before a location point can be recorded."</string>
+    <string name="gpsaccuracy_hint2_3">"Recommended:"</string>
+    <string name="gpsaccuracy_hint3_3">""20 meters for standard surveys, 30 meters for rural areas. Lower values are more precise but harder to achieve in dense urban areas or under tree cover.""</string>
     <string name="manual_hint">"Allow manual location entry. When on: enumerators can tap a location on the map to add a household if within 20 meters. Useful in dense urban areas or poor GPS signal. When off (default): only current GPS location is used."</string>
     <string name="autoincrement_hint">""When on (default): each household is assigned a sequential number (1, 2, 3...) automatically. Turn off if your survey uses pre-assigned household identifiers.""</string>
     <string name="proximity_hint">"When on: enumerators receive an alert if they try to add a household within [X] meters of an existing record. Helps prevent duplicate entries."</string>
@@ -528,26 +531,20 @@
     <string name="edit">"Edit"</string>
     <string name="clone">"Clone"</string>
     <string name="configuration">"Configuration"</string>
-
-    // This needs to be update!
-    <string name="enter_new_pin">Enter New PIN</string>
-
-    // These are new!
-    <string name="delete_filter_message">Are you sure you want to permanently delete this filter?</string>
-    <string name="info">Info</string>
-    <string name="select_an_existing_team">Select an existing Team</string>
-    <string name="select_the_file_types_to_export">Select the file types to export</string>
-    <string name="select_enumeration_teams">Select Enumeration Teams</string>
-    <string name="created">Created</string>
-    <string name="archive">Archive</string>
-    <string name="restore">Restore</string>
+    <string name="delete_filter_message">"Are you sure you want to permanently delete this filter?"</string>
+    <string name="info">"Info"</string>
+    <string name="select_an_existing_team">"Select an existing Team"</string>
+    <string name="select_the_file_types_to_export">"Select the file types to export"</string>
+    <string name="select_enumeration_teams">"Select Enumeration Teams"</string>
+    <string name="created">"Created"</string>
+    <string name="archive">"Archive"</string>
+    <string name="restore">"Restore"</string>
     <string name="archive_config">"Archive Configuration"</string>
     <string name="archive_configuration_message">"Are you sure you want to archive this configuration?"</string>
-    <string name="allow_supervisor_edits">Allow Supervisor Edits</string>
-    <string name="supervisor_edit_tip">Allow Supervisors to edit this configuration.</string>
-    <string name="config_name_already_exists">That configuration name already exists.</string>
+    <string name="allow_supervisor_edits">"Allow Supervisor to Edit"</string>
+    <string name="supervisor_edit_tip">"Allow Supervisors to edit this configuration."</string>
+    <string name="name_already_exists">"That configuration name already exists."</string>
 
-    // This is REALLY new
     <string name="import_mismatch">The Configuration that you are attempting to import does not match the configuration that is currently open.</string>
 
     <string-array name="forgot_pin_questions">

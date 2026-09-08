@@ -196,7 +196,7 @@
     <string name="simple_random">"نمونه گیری تصادفی ساده"</string>
     <string name="cluster_sampling">"نمونه گیری خوشه"</string>
     <string name="subset_overlap">"زیرمجموعه"</string>
-    <string name="strata_exclusive">"طبقات: به"</string>
+    <string name="strata_exclusive">"نمونه گیری طبقاتی"</string>
     <string name="numberhouseholds">"تعداد خانوارها"</string>
     <string name="percenthouseholds">"درصد تمام خانوارها"</string>
     <string name="percenttotal">"درصد کل جمعیت"</string>
@@ -446,7 +446,9 @@
     <string name="strata">"لایه"</string>
     <string name="password_error">"رمز عبور وارد شده نادرست است."</string>
     <string name="pin_hint">"برای ایمن"</string>
-    <string name="gpsaccuracy_hint">"حداقل دقت GPS مورد نیاز برای ثبت یک نقطه مکانی را تعیین می"</string>
+    <string name="gpsaccuracy_hint1_3">"حداقل دقت GPS مورد نیاز را قبل از ثبت یک نقطه موقعیت تعیین می"</string>
+    <string name="gpsaccuracy_hint2_3">"توصیه شده:"</string>
+    <string name="gpsaccuracy_hint3_3">"۲۰ متر برای نقشه"</string>
     <string name="manual_hint">"ورود دستی مکان را مجاز کنید. وقتی روشن باشد: سرشماری"</string>
     <string name="autoincrement_hint">"وقتی روشن است (پیش"</string>
     <string name="proximity_hint">"در صورت فعال بودن: شمارشگران در صورتی که بخواهند خانوار جدیدی را در فاصله [X] متری از یک رکورد موجود اضافه کنند، هشداری دریافت می"</string>
@@ -529,6 +531,19 @@
     <string name="edit">"ویرایش"</string>
     <string name="clone">"کپی"</string>
     <string name="configuration">"پیکربندی"</string>
+    <string name="delete_filter_message">"آیا مطمئن هستید که می"</string>
+    <string name="info">"اطلاعات"</string>
+    <string name="select_an_existing_team">"یک تیم موجود را انتخاب کنید"</string>
+    <string name="select_the_file_types_to_export">"انواع فایل"</string>
+    <string name="select_enumeration_teams">"تیم"</string>
+    <string name="created">"ایجاد شد"</string>
+    <string name="archive">"آرشیو"</string>
+    <string name="restore">"بازیابی"</string>
+    <string name="archive_config">"آرشیو پیکربندی"</string>
+    <string name="archive_configuration_message">"آیا مطمئن هستید که می"</string>
+    <string name="allow_supervisor_edits">"اجازه ویرایش به سرپرست"</string>
+    <string name="supervisor_edit_tip">"اجازه ویرایش این پیکربندی را به سرپرستان بدهید."</string>
+    <string name="name_already_exists">"این نام پیکربندی قبلاً وجود دارد."</string>
     <string-array name="forgot_pin_questions">
         <item>"نام میانی پدر"</item>
         <item>"نام خانوادگی مادر پیش از ازدواج"</item>

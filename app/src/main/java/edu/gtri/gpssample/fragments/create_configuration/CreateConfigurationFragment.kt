@@ -90,7 +90,11 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.minGpsPrecisionTip.setOnClickListener {
-            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.gpsaccuracy_hint))
+            var gpsAccuracyHint = resources.getString( R.string.gpsaccuracy_hint1_3 ) + "\n\n"
+            gpsAccuracyHint += resources.getString( R.string.gpsaccuracy_hint2_3 ) + "\n"
+            gpsAccuracyHint += resources.getString( R.string.gpsaccuracy_hint3_3 )
+
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = gpsAccuracyHint)
         }
 
         binding.encryptionPasswordTip.setOnClickListener {

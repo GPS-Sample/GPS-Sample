@@ -196,7 +196,7 @@
     <string name="simple_random">"Простая случайная выборка"</string>
     <string name="cluster_sampling">"Кластерная выборка"</string>
     <string name="subset_overlap">"Подмножества: Могут пересекаться"</string>
-    <string name="strata_exclusive">"Страты: Взаимоисключающие"</string>
+    <string name="strata_exclusive">"Стратифицированная выборка"</string>
     <string name="numberhouseholds">"Кол-во домохозяйств"</string>
     <string name="percenthouseholds">"% от всех домохозяйств"</string>
     <string name="percenttotal">"% от общей популяции"</string>
@@ -446,7 +446,9 @@
     <string name="strata">"Страта"</string>
     <string name="password_error">"Введенный пароль неверный."</string>
     <string name="pin_hint">""Создайте цифровой PIN-код из 4–6 цифр, чтобы защитить свой профиль на этом устройстве. Вам будет показан контрольный вопрос на случай, если вы забудете PIN-код.""</string>
-    <string name="gpsaccuracy_hint">""Устанавливает минимальную точность GPS, необходимую для записи точки местоположения. Рекомендуется: 20 метров для стандартных опросов, 30 метров для сельских районов. Более низкие значения обеспечивают большую точность, но их сложнее достичь в густонаселенных городских районах или под пологом деревьев.""</string>
+    <string name="gpsaccuracy_hint1_3">""Устанавливает минимальную точность GPS, необходимую для записи точки местоположения.""</string>
+    <string name="gpsaccuracy_hint2_3">"Рекомендуется:"</string>
+    <string name="gpsaccuracy_hint3_3">""20 метров для стандартных опросов, 30 метров для сельских районов. Более низкие значения обеспечивают большую точность, но их сложнее достичь в густонаселенных городских районах или под пологом деревьев.""</string>
     <string name="manual_hint">""Разрешить ручной ввод местоположения. Если включено: анкетеры могут нажать на место на карте, чтобы добавить домохозяйство, если оно находится в пределах 20 метров. Полезно в густонаселенных городских районах или при слабом сигнале GPS. Если выключено (по умолчанию): используется только текущее местоположение по GPS.""</string>
     <string name="autoincrement_hint">""Если включено (по умолчанию): каждому домохозяйству автоматически присваивается порядковый номер (1, 2, 3...). Отключите, если в вашем опросе используются заранее назначенные идентификаторы домохозяйств.""</string>
     <string name="proximity_hint">""Если включено: респонденты получают уведомление, если пытаются добавить домохозяйство, находящееся в пределах [X] метров от уже существующей записи. Помогает предотвратить дублирование записей.""</string>
@@ -490,7 +492,7 @@
     <string name="sampling_hint_7_11">"Из каждого кластера отбирается определенный процент домохозяйств."</string>
     <string name="sampling_hint_8_11">"Стратифицированная выборка (количество домохозяйств):"</string>
     <string name="sampling_hint_9_11">"Задайте страты. Внутри каждой страты выберите фиксированное количество домохозяйств из каждого кластера"</string>
-    <string name="sampling_hint_10_11">"Стратифицированная выборка (процент домохозяйств)"</string>
+    <string name="sampling_hint_10_11">"Стратифицированная выборка (процент домохозяйств):"</string>
     <string name="sampling_hint_11_11">"Задайте страты. Внутри каждой страты выберите определенный процент домохозяйств из каждого кластера"</string>
     <string name="enter_forgot_pin_question">"Введите ответ на секретный вопрос"</string>
     <string name="collection_app">"Приложение для сбора данных"</string>
@@ -529,6 +531,19 @@
     <string name="edit">"Редактировать"</string>
     <string name="clone">"Клонировать"</string>
     <string name="configuration">"Настройки"</string>
+    <string name="delete_filter_message">""Вы уверены, что хотите окончательно удалить этот фильтр?""</string>
+    <string name="info">"Справка"</string>
+    <string name="select_an_existing_team">"Выберите существующую группу"</string>
+    <string name="select_the_file_types_to_export">"Выберите типы файлов для экспорта"</string>
+    <string name="select_enumeration_teams">"Выберите группы перечисления"</string>
+    <string name="created">"Создано"</string>
+    <string name="archive">"Архивировать"</string>
+    <string name="restore">"Восстановить"</string>
+    <string name="archive_config">"Конфигурация архивирования"</string>
+    <string name="archive_configuration_message">""Вы уверены, что хотите заархивировать эту конфигурацию?""</string>
+    <string name="allow_supervisor_edits">"Разрешить редактирование супервизором"</string>
+    <string name="supervisor_edit_tip">"Разрешить супервизорам редактировать эту конфигурацию."</string>
+    <string name="name_already_exists">"Такое имя конфигурации уже существует."</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

@@ -196,7 +196,7 @@
     <string name="simple_random">"Muestreo aleatorio simple"</string>
     <string name="cluster_sampling">"Muestreo por conglomerados"</string>
     <string name="subset_overlap">"Subconjuntos: Se pueden superponer"</string>
-    <string name="strata_exclusive">"Estratos: Mutuamente excluyentes"</string>
+    <string name="strata_exclusive">"Muestreo estratificado"</string>
     <string name="numberhouseholds">"# de hogares"</string>
     <string name="percenthouseholds">"% de todos los hogares"</string>
     <string name="percenttotal">"% de la población total"</string>
@@ -446,7 +446,9 @@
     <string name="strata">"Estratos"</string>
     <string name="password_error">"La contraseña introducida es incorrecta."</string>
     <string name="pin_hint">"Crea un PIN numérico de 4 a 6 dígitos para proteger tu perfil en este dispositivo. Se te mostrará una pregunta de seguridad por si olvidas tu PIN."</string>
-    <string name="gpsaccuracy_hint">""Establece la precisión mínima del GPS necesaria para que se pueda registrar un punto de ubicación. Recomendado: 20 metros para encuestas estándar, 30 metros para zonas rurales. Los valores más bajos son más precisos, pero más difíciles de alcanzar en zonas urbanas densas o bajo la cobertura de árboles.""</string>
+    <string name="gpsaccuracy_hint1_3">"Establece la precisión mínima del GPS necesaria para que se pueda registrar un punto de ubicación."</string>
+    <string name="gpsaccuracy_hint2_3">"Recomendado:"</string>
+    <string name="gpsaccuracy_hint3_3">""20 metros para encuestas estándar, 30 metros para zonas rurales. Los valores más bajos son más precisos, pero más difíciles de alcanzar en zonas urbanas densas o bajo la cobertura de árboles.""</string>
     <string name="manual_hint">"Permitir la introducción manual de la ubicación. Cuando está activada: los encuestadores pueden tocar una ubicación en el mapa para añadir un hogar si se encuentra a menos de 20 metros. Útil en zonas urbanas densas o con mala señal de GPS. Cuando está desactivada (por defecto): solo se utiliza la ubicación GPS actual."</string>
     <string name="autoincrement_hint">""Cuando está activada (por defecto): a cada hogar se le asigna automáticamente un número secuencial (1, 2, 3...). Desactívela si su encuesta utiliza identificadores de hogares preasignados.""</string>
     <string name="proximity_hint">"Cuando está activada: los encuestadores reciben una alerta si intentan añadir un hogar que se encuentre a menos de [X] metros de un registro ya existente. Esto ayuda a evitar entradas duplicadas."</string>
@@ -490,7 +492,7 @@
     <string name="sampling_hint_7_11">"Se selecciona un porcentaje de hogares de cada conglomerado."</string>
     <string name="sampling_hint_8_11">"Muestra estratificada (número de hogares):"</string>
     <string name="sampling_hint_9_11">""Establece los estratos. Dentro de cada estrato, selecciona un número fijo de hogares de cada conglomerado""</string>
-    <string name="sampling_hint_10_11">"Muestra estratificada (% de hogares)"</string>
+    <string name="sampling_hint_10_11">"Muestra estratificada (% de hogares):"</string>
     <string name="sampling_hint_11_11">""Establece los estratos. Dentro de cada estrato, selecciona un porcentaje de hogares de cada conglomerado""</string>
     <string name="enter_forgot_pin_question">"Introduce la pregunta de recuperación de PIN"</string>
     <string name="collection_app">"Aplicación de recopilación"</string>
@@ -529,6 +531,19 @@
     <string name="edit">"Editar"</string>
     <string name="clone">"Clonar"</string>
     <string name="configuration">"Configuración"</string>
+    <string name="delete_filter_message">"¿Estás seguro de que quieres eliminar este filtro de forma permanente?"</string>
+    <string name="info">"Información"</string>
+    <string name="select_an_existing_team">"Selecciona un equipo existente"</string>
+    <string name="select_the_file_types_to_export">"Selecciona los tipos de archivo que deseas exportar"</string>
+    <string name="select_enumeration_teams">"Selecciona equipos de enumeración"</string>
+    <string name="created">"Creado"</string>
+    <string name="archive">"Archivar"</string>
+    <string name="restore">"Restaurar"</string>
+    <string name="archive_config">"Configuración de archivo"</string>
+    <string name="archive_configuration_message">"¿Estás seguro de que quieres archivar esta configuración?"</string>
+    <string name="allow_supervisor_edits">"Permitir que el supervisor edite"</string>
+    <string name="supervisor_edit_tip">"Permitir que los supervisores editen esta configuración."</string>
+    <string name="name_already_exists">"Ese nombre de configuración ya existe."</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>

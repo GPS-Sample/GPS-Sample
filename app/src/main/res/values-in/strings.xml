@@ -196,7 +196,7 @@
     <string name="simple_random">"Contoh acak sederhana"</string>
     <string name="cluster_sampling">"Pengambilan Sampel Klaster"</string>
     <string name="subset_overlap">"Subset: Mungkin Tumpang Tindih"</string>
-    <string name="strata_exclusive">"Strata: Saling Eksklusif"</string>
+    <string name="strata_exclusive">"Pengambilan Sampel Berstrata"</string>
     <string name="numberhouseholds">"# Rumah Tangga"</string>
     <string name="percenthouseholds">"% dari seluruh Rumah Tangga"</string>
     <string name="percenttotal">"% dari total populasi"</string>
@@ -446,7 +446,9 @@
     <string name="strata">"Lapisan"</string>
     <string name="password_error">"Kata sandi yang dimasukkan salah."</string>
     <string name="pin_hint">"Buat PIN numerik dengan 4 hingga 6 digit untuk mengamankan profil Anda pada perangkat ini. Anda akan diberikan pertanyaan keamanan sebagai langkah pemulihan jika Anda lupa PIN Anda."</string>
-    <string name="gpsaccuracy_hint">""Menetapkan akurasi GPS minimum yang diperlukan sebelum sebuah titik lokasi dapat direkam. Disarankan: 20 meter untuk survei standar, 30 meter untuk wilayah pedesaan. Nilai yang lebih rendah memberikan presisi yang lebih tinggi, namun lebih sulit dicapai di area perkotaan yang padat atau di bawah naungan pepohonan.""</string>
+    <string name="gpsaccuracy_hint1_3">"Menetapkan akurasi GPS minimum yang diperlukan sebelum sebuah titik lokasi dapat direkam."</string>
+    <string name="gpsaccuracy_hint2_3">"Disarankan:"</string>
+    <string name="gpsaccuracy_hint3_3">""20 meter untuk survei standar, 30 meter untuk wilayah pedesaan. Nilai yang lebih rendah memberikan presisi yang lebih tinggi, namun lebih sulit dicapai di area perkotaan yang padat atau di bawah naungan pepohonan.""</string>
     <string name="manual_hint">"Izinkan entri lokasi secara manual. Saat aktif: enumerator dapat mengetuk sebuah lokasi pada peta untuk menambahkan rumah tangga jika lokasi tersebut berada dalam jarak 20 meter. Fitur ini berguna di area perkotaan yang padat atau saat sinyal GPS lemah. Saat nonaktif (bawaan): hanya lokasi GPS saat ini yang digunakan."</string>
     <string name="autoincrement_hint">""Saat aktif (bawaan): setiap rumah tangga secara otomatis diberikan nomor urut (1, 2, 3...). Nonaktifkan fitur ini jika survei Anda menggunakan pengidentifikasi rumah tangga yang telah ditetapkan sebelumnya.""</string>
     <string name="proximity_hint">"Saat diaktifkan: enumerator akan menerima peringatan jika mereka mencoba menambahkan rumah tangga yang berada dalam jarak [X] meter dari data yang sudah ada. Fitur ini membantu mencegah entri data ganda."</string>
@@ -529,6 +531,19 @@
     <string name="edit">"Sunting"</string>
     <string name="clone">"Klon"</string>
     <string name="configuration">"Konfigurasi"</string>
+    <string name="delete_filter_message">"Apakah Anda yakin ingin menghapus filter ini secara permanen?"</string>
+    <string name="info">"Info"</string>
+    <string name="select_an_existing_team">"Pilih Tim yang sudah ada"</string>
+    <string name="select_the_file_types_to_export">"Pilih jenis file untuk diekspor"</string>
+    <string name="select_enumeration_teams">"Pilih Tim Enumerasi"</string>
+    <string name="created">"Dibuat"</string>
+    <string name="archive">"Arsipkan"</string>
+    <string name="restore">"Pulihkan"</string>
+    <string name="archive_config">"Arsipkan Konfigurasi"</string>
+    <string name="archive_configuration_message">"Apakah Anda yakin ingin mengarsipkan konfigurasi ini?"</string>
+    <string name="allow_supervisor_edits">"Izinkan Supervisor Mengedit"</string>
+    <string name="supervisor_edit_tip">"Izinkan Supervisor untuk mengedit konfigurasi ini."</string>
+    <string name="name_already_exists">"Nama konfigurasi tersebut sudah ada."</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>
