@@ -45,7 +45,6 @@ class SamplingViewModel : ViewModel()
         object DuplicatePage : SamplePageState
         object GeofenceViolationPage : SamplePageState
         object GenerateSamplePage : SamplePageState
-        object SaveSamplePage : SamplePageState
         object SampleGeneratedPage : SamplePageState
     }
 

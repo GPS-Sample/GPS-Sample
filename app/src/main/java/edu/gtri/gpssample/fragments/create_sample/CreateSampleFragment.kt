@@ -218,7 +218,8 @@ class CreateSampleFragment : Fragment()
 
                                     SamplingViewModel.SampleState.SampleGenerated -> {
                                         binding.progressOverlayView.visibility = View.GONE
-                                        samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.SaveSamplePage )
+                                        saveSample()
+                                        samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.SampleGeneratedPage )
                                         refreshMap()
                                     }
 
@@ -442,9 +443,6 @@ class CreateSampleFragment : Fragment()
                     samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.PreviewPage )
                 }
             }
-            SamplingViewModel.SamplePageState.SaveSamplePage -> {
-                samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.GenerateSamplePage )
-            }
             SamplingViewModel.SamplePageState.SampleGeneratedPage -> {
                 findNavController().popBackStack()
             }
@@ -483,10 +481,6 @@ class CreateSampleFragment : Fragment()
                 samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.GenerateSamplePage )
             }
             SamplingViewModel.SamplePageState.GenerateSamplePage -> {
-                samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.SaveSamplePage )
-            }
-            SamplingViewModel.SamplePageState.SaveSamplePage -> {
-                saveSample()
             }
             SamplingViewModel.SamplePageState.SampleGeneratedPage -> {
                 findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
@@ -535,15 +529,13 @@ class CreateSampleFragment : Fragment()
                 clearSample()
                 refreshMap(false )
             }
-            SamplingViewModel.SamplePageState.SaveSamplePage -> {
+            SamplingViewModel.SamplePageState.SampleGeneratedPage -> {
                 binding.nextButton.isEnabled = true
                 binding.titleTextView.text = resources.getString( R.string.save_sample )
                 binding.generateSampleButton.visibility = View.GONE
                 binding.beginReviewTextView.visibility = View.GONE
-                binding.backButton.text = resources.getString(R.string.back )
-                binding.nextButton.text = resources.getString(R.string.save )
-            }
-            SamplingViewModel.SamplePageState.SampleGeneratedPage -> {
+                binding.backButton.visibility = View.GONE
+                binding.nextButton.text = resources.getString(R.string.next )
             }
         }
     }
@@ -598,8 +590,6 @@ class CreateSampleFragment : Fragment()
 
             // back on the main thread...
             binding.progressOverlayView.visibility = View.GONE
-
-            findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
         }
     }
 
@@ -644,10 +634,9 @@ class CreateSampleFragment : Fragment()
 
                     val currentPage = samplingViewModel.samplePageState.value
                     val generateSamplePage = SamplingViewModel.SamplePageState.GenerateSamplePage
-                    val saveSamplePage = SamplingViewModel.SamplePageState.SaveSamplePage
                     val sampleGeneratedPage = SamplingViewModel.SamplePageState.SampleGeneratedPage
 
-                    if (location.enumerationItems.first().reviewStatus == ReviewStatus.Exclude && (currentPage == generateSamplePage || currentPage == saveSamplePage || currentPage == sampleGeneratedPage))
+                    if (location.enumerationItems.first().reviewStatus == ReviewStatus.Exclude && (currentPage == generateSamplePage || currentPage == sampleGeneratedPage))
                     {
                         continue
                     }
