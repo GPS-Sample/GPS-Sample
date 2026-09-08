@@ -647,7 +647,7 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
 
                         val zipUtils = ZipUtils()
 
-                        composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.import_configuration))
+                        composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
                         {
                             zipUtils.cancel()
                         }
@@ -715,14 +715,42 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                 }
                                 else
                                 {
-                                    DAO.configDAO.createOrUpdateConfig( config,config.version )
-
-                                    DAO.configDAO.getConfig( config.uuid )?.let {
-                                        sharedViewModel.setCurrentConfig( it )
-                                    	refreshView( it )
+                                    // make sure that we're updating the current config!!
+                                    sharedViewModel.currentConfiguration?.value?.let { currentConfig ->
+                                        if (config.uuid != currentConfig.uuid)
+                                        {
+                                            composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.import_mismatch))
+                                            composableNearbySessionStatusDialogHost.dismiss()
+                                            return@unzip
+                                        }
                                     }
 
-                                    composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.import_succeeded))
+                                    composableNearbySessionStatusDialogHost.updateState(NearbySessionState.Message(resources.getString(R.string.saving_configuration)))
+
+                                    var enumAreaSummaries : List<EnumAreaDAO.EnumAreaSummary>? = null
+
+                                    viewLifecycleOwner.lifecycleScope.launch {
+                                        withContext(Dispatchers.IO)
+                                        {
+                                            DAO.configDAO.createOrUpdateConfig( config, config.version )
+
+                                            enumAreaSummaries = DAO.enumAreaDAO.getEnumAreaSummary(config.uuid )
+                                        }
+
+                                        // back on the main thread...
+
+                                        enumAreaSummaries?.let {
+                                            enumerationAreasAdapter.updateEnumAreas(it )
+                                        }
+
+                                        composableNearbySessionStatusDialogHost.dismiss()
+
+                                        sharedViewModel.setCurrentConfig( config )
+
+                                        refreshView( config )
+
+                                        composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.import_succeeded))
+                                    }
                                 }
 
                                 composableNearbySessionStatusDialogHost.dismiss()
