@@ -119,6 +119,21 @@ class ManageCollectionTeamsFragment : Fragment()
                 findNavController().navigate(R.id.action_navigate_to_ReviewCollectionFragment)
             }
         }
+
+        // Get ALL locations for this EA, NOTE! enumArea.locations is cleared of locations
+        // that are not a part of the team when a team is selected for enumeration
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.progressOverlayView.visibility = View.VISIBLE
+
+            withContext(Dispatchers.IO)
+            {
+                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
+            }
+
+            // back on the main thread...
+            binding.progressOverlayView.visibility = View.GONE
+        }
     }
 
     override fun onResume()

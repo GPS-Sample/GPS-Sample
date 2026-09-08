@@ -964,9 +964,8 @@ class PerformEnumerationFragment : Fragment(),
                     accuracy = it
                 }
 
-                val pt = tag as Point
                 val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                val location = Location( timeZone, accuracy, pt.latitude(), pt.longitude(), pt.altitude(), false, "", "")
+                val location = Location( timeZone, accuracy, point.latitude(), point.longitude(), point.altitude(), false, "", "")
 
                 DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
                 enumArea.locations.add(location)
