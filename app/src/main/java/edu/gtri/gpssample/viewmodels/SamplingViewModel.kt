@@ -29,9 +29,6 @@ class SamplingViewModel : ViewModel()
     private var _currentEnumArea : MutableLiveData<EnumArea>? = null
     private var _currentSampledItemsForSampling : ArrayList<EnumerationItem> = ArrayList()
 
-    private val _refreshMap = MutableLiveData<Unit>()
-    val refreshMap: LiveData<Unit> = _refreshMap
-
     sealed interface SampleState
     {
         object Idle : SampleState

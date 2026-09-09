@@ -201,11 +201,6 @@ class CreateSampleFragment : Fragment()
 
             MapManager.instance().centerMap( enumArea.vertices, mapView )
 
-            samplingViewModel.refreshMap.observe(viewLifecycleOwner)
-            {
-                refreshMap()
-            }
-
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     if (!sampleAlreadyGenerated)
@@ -276,8 +271,6 @@ class CreateSampleFragment : Fragment()
                     }
                 }
             }
-
-            refreshMap()
         }
 
         binding.infoButton.setOnClickListener{
