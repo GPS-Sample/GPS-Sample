@@ -11,6 +11,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -220,6 +221,7 @@ class CreateSampleFragment : Fragment()
 
                                     SamplingViewModel.SampleState.NoEligibleSamples -> {
                                         binding.progressOverlayView.visibility = View.GONE
+                                        Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.no_eligible_households), Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             }
