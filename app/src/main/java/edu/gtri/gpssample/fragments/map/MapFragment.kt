@@ -34,10 +34,12 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.MapTileRegion
 import edu.gtri.gpssample.databinding.FragmentMapBinding
 import edu.gtri.gpssample.managers.MapManager
+import edu.gtri.gpssample.managers.MapTileCacheManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.ui.compose.ComposableBusyIndicatorDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
@@ -111,6 +113,8 @@ class MapFragment : Fragment(),
         MapManager.instance().selectMapboxMap( requireActivity(), binding.mapboxMapView, null ) { mapView ->
             this.mapView = mapView
 
+            loadMapTileRegions()
+
             if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             {
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
@@ -126,6 +130,8 @@ class MapFragment : Fragment(),
                     }
                 }
             }
+
+            selectMapEngine()
         }
 
         binding.mapOverlayView.setOnTouchListener(this)
@@ -153,10 +159,14 @@ class MapFragment : Fragment(),
         }
 
         binding.cacheMapTilesButton.setOnClickListener {
-            mapTileRegion?.let {
+            mapTileRegion?.let { mapTileRegion ->
                 defineMapRegion = false
                 binding.mapOverlayView.visibility = View.GONE
                 binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
+
+                val mapEngine = if (mapView is org.osmdroid.views.MapView) MapEngine.OpenStreetMap else MapEngine.MapBox
+
+                MapTileCacheManager.add(requireContext(), mapEngine, mapTileRegion )
 
                 composableBusyIndicatorDialogHost.show(title = resources.getString(R.string.downloading_map_tiles), message = null) {
                     composableBusyIndicatorDialogHost.cancel()
@@ -164,7 +174,7 @@ class MapFragment : Fragment(),
                 }
 
                 val mapTileRegions = ArrayList<MapTileRegion>()
-                mapTileRegions.add(it)
+                mapTileRegions.add( mapTileRegion )
                 MapManager.instance().cacheMapTiles(requireActivity(), mapView, mapTileRegions, this )
             }
         }
@@ -198,8 +208,6 @@ class MapFragment : Fragment(),
                 binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
             }
         }
-
-        selectMapEngine()
     }
 
     override fun onResume()
@@ -247,9 +255,7 @@ class MapFragment : Fragment(),
 
                                     mapTileRegion = MapTileRegion( northEast, southWest, "" )
 
-                                    mapTileRegion?.let {
-                                        addPolygon( it )
-                                    }
+                                    addPolygon( mapTileRegion!! )
                                 }
                             }
                         }
@@ -449,8 +455,10 @@ class MapFragment : Fragment(),
                 binding.osmLabel.visibility = View.VISIBLE
                 binding.osmMapView.visibility = View.VISIBLE
                 binding.mapboxMapView.visibility = View.GONE
+
                 MapManager.instance().selectOsmMap( requireActivity(), binding.osmMapView, binding.northUpImageView ) { mapView ->
                     this.mapView = mapView
+                    loadMapTileRegions()
 
                     if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
                     {
@@ -464,6 +472,7 @@ class MapFragment : Fragment(),
                                 MapManager.instance().enableLocationUpdates( requireActivity(), mapView )
                                 MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                                 binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                                MapManager.instance().setMapZoomLevel( mapView, MapManager.zoomLevel())
                             }
                         }
                     }
@@ -475,8 +484,11 @@ class MapFragment : Fragment(),
                 binding.osmMapView.visibility = View.GONE
                 binding.northUpImageView.visibility = View.GONE
                 binding.mapboxMapView.visibility = View.VISIBLE
+
                 MapManager.instance().selectMapboxMap( requireActivity(), binding.mapboxMapView, null ) { mapView ->
                     this.mapView = mapView
+                    loadMapTileRegions()
+
                     MapManager.instance().enableLocationUpdates( requireActivity(), mapView )
                     MapManager.instance().startCenteringOnLocation( requireActivity(), mapView )
                     binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
@@ -485,6 +497,19 @@ class MapFragment : Fragment(),
             }
         }
     }
+
+    fun loadMapTileRegions()
+    {
+        val mapEngine = if (mapView is org.osmdroid.views.MapView) MapEngine.OpenStreetMap else MapEngine.MapBox
+
+        val mapTileRegions = MapTileCacheManager.load(requireContext(), mapEngine )
+
+        for (mapTileRegion in mapTileRegions)
+        {
+            addPolygon( mapTileRegion )
+        }
+    }
+
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
 //            TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {

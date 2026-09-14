@@ -20,6 +20,8 @@ data class LatLon (
     var longitude: Double,
     var version: String)
 {
+    constructor( latitude: Double, longitude: Double ) : this(UUID.randomUUID().toString(), Date().time, latitude, longitude, UUID.randomUUID().toString())
+
     constructor( creationDate: Long, latitude: Double, longitude: Double ) : this(UUID.randomUUID().toString(), creationDate, latitude, longitude, UUID.randomUUID().toString())
 
     fun toLatLng() : LatLng
