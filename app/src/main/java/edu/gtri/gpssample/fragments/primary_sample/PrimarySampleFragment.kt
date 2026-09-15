@@ -33,7 +33,7 @@ class PrimarySampleFragment : Fragment()
     private lateinit var study: Study
     private var _binding: FragmentPrimarySampleBinding? = null
     private val binding get() = _binding!!
-    private lateinit var primarySampleRecyclerAdapter: PrimarySampleRecyclerAdapter
+    private lateinit var primarySampleRecyclerAdapter: PrimarySampleAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -54,7 +54,7 @@ class PrimarySampleFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        primarySampleRecyclerAdapter = PrimarySampleRecyclerAdapter(requireContext())
+        primarySampleRecyclerAdapter = PrimarySampleAdapter(requireContext())
         primarySampleRecyclerAdapter.didSelectField = this::didSelectField
         primarySampleRecyclerAdapter.didSelectRule = this::didSelectRule
         primarySampleRecyclerAdapter.didSelectFilter = this::didSelectFilter

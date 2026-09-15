@@ -4,212 +4,223 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseExpandableListAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.database.models.Field
-import edu.gtri.gpssample.database.models.Filter
-import edu.gtri.gpssample.database.models.Rule
-import edu.gtri.gpssample.database.models.Study
-import java.util.ArrayList
+import edu.gtri.gpssample.database.models.*
 
-class PrimarySampleAdapter(var context: Context) : BaseExpandableListAdapter()
+class PrimarySampleAdapter(private val context: Context ) : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 {
-    lateinit var didSelectField: ((field: Field) -> Unit)
-    lateinit var didSelectRule: ((rule: Rule) -> Unit)
-    lateinit var didSelectFilter: ((filter: Filter) -> Unit)
-
-    lateinit var shouldAddField: (() -> Unit)
-    lateinit var shouldAddRule: (() -> Unit)
-    lateinit var shouldAddFilter: (() -> Unit)
-
-    var fields = ArrayList<Field>()
-    var rules = ArrayList<Rule>()
-    var filters = ArrayList<Filter>()
-
-    fun updateStudy( study: Study)
+    companion object
     {
-        fields = ArrayList<Field>()
+        private const val TYPE_HEADER = 0
+        private const val TYPE_ITEM = 1
+    }
+
+    lateinit var didSelectField: (Field) -> Unit
+    lateinit var didSelectRule: (Rule) -> Unit
+    lateinit var didSelectFilter: (Filter) -> Unit
+    lateinit var shouldAddField: () -> Unit
+    lateinit var shouldAddRule: () -> Unit
+    lateinit var shouldAddFilter: () -> Unit
+
+    var fields = arrayListOf<Field>()
+    var rules = arrayListOf<Rule>()
+    var filters = arrayListOf<Filter>()
+
+    sealed class PrimaryRow
+    {
+        data class Header(val group: Int, var expanded: Boolean = true) : PrimaryRow()
+        data class FieldRow(val field: Field) : PrimaryRow()
+        data class RuleRow(val rule: Rule) : PrimaryRow()
+        data class FilterRow(val filter: Filter) : PrimaryRow()
+    }
+
+    private val rows = arrayListOf<PrimaryRow>()
+    private val expandedStates = booleanArrayOf(true, true, true)
+
+    fun updateStudy(study: Study)
+    {
+        fields.clear()
 
         for (field in study.fields)
         {
-            fields.add( field )
-            field.fields?.let { childFields ->
-                fields.addAll( childFields )
-            }
+            fields.add(field)
+            field.fields?.let { fields.addAll(it) }
         }
 
-        rules = study.rules
-        filters = study.filters
+        rules = ArrayList(study.rules)
+        filters = ArrayList(study.filters)
+
+        rebuildRows()
+    }
+
+    private fun rebuildRows()
+    {
+        rows.clear()
+
+        for (group in 0..2)
+        {
+            rows.add(PrimaryRow.Header(group, expandedStates[group]))
+
+            if (!expandedStates[group]) continue
+
+            when (group)
+            {
+                0 -> fields.forEach { rows.add(PrimaryRow.FieldRow(it)) }
+                1 -> rules.forEach { rows.add(PrimaryRow.RuleRow(it)) }
+                2 -> filters.forEach { rows.add(PrimaryRow.FilterRow(it)) }
+            }
+        }
 
         notifyDataSetChanged()
     }
 
-    override fun getGroupCount(): Int
+    override fun getItemViewType(position: Int): Int
     {
-        return 3
+        return if (rows[position] is PrimaryRow.Header) TYPE_HEADER else TYPE_ITEM
     }
 
-    override fun getChildrenCount(p0: Int): Int
+    override fun getItemCount() = rows.size
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder
     {
-        when( p0 )
+        return if (viewType == TYPE_HEADER)
         {
-            0-> return fields.size
-            1-> return rules.size
-            2-> return filters.size
-        }
-
-        return 0
-    }
-
-    override fun getChild(p0: Int, p1: Int): Any
-    {
-        when( p0 )
-        {
-            0-> return fields[p1]
-            1-> return rules[p1]
-            2-> return filters[p1]
-        }
-
-        return Any()
-    }
-
-    override fun getChildId(p0: Int, p1: Int): Long
-    {
-        return p1.toLong()
-    }
-
-    override fun getChildView(groupPosition: Int, childPosition: Int, isLastChild: Boolean, childView: View?, viewGroup: ViewGroup?): View
-    {
-        val view: View
-
-        if (childView == null)
-        {
-            view = LayoutInflater.from(context).inflate(R.layout.list_item, viewGroup, false )
+            HeaderHolder(LayoutInflater.from(context).inflate(R.layout.list_item_group, parent, false))
         }
         else
         {
-            view = childView
+            ItemHolder(LayoutInflater.from(context).inflate(R.layout.list_item, parent, false))
         }
-
-        val nameTextView = view.findViewById<View>(R.id.name_text_view) as TextView
-        val dateTextView = view.findViewById<View>(R.id.date_text_view) as TextView
-        dateTextView.visibility = View.GONE
-
-        when( groupPosition )
-        {
-            0 -> nameTextView.text = "${fields[childPosition].index}. ${fields[childPosition].name}"
-            1 -> nameTextView.text = rules[childPosition].name
-            2 -> nameTextView.text = filters[childPosition].name
-        }
-
-        if (groupPosition == 0)
-        {
-            val field = fields[childPosition]
-
-            if (field.parentUUID != null)
-            {
-                var parentIndex = 0
-
-                for (f in fields)
-                {
-                    if (f.uuid == field.parentUUID)
-                    {
-                        parentIndex = f.index
-                    }
-                }
-
-                nameTextView.text = "    ${parentIndex}.${fields[childPosition].index}. ${fields[childPosition].name}"
-            }
-        }
-
-        view.setOnClickListener {
-            when( groupPosition )
-            {
-                0 -> didSelectField( fields[childPosition] )
-                1 -> didSelectRule( rules[childPosition] )
-                2 -> didSelectFilter( filters[childPosition] )
-            }
-        }
-
-        return view
     }
 
-    override fun getGroup(p0: Int): Any
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int)
     {
-        when( p0 )
+        when (val row = rows[position])
         {
-            0 -> return fields
-            1 -> return rules
-            2 -> return filters
+            is PrimaryRow.Header -> bindHeader(holder as HeaderHolder, row)
+            is PrimaryRow.FieldRow -> bindField(holder as ItemHolder, row.field)
+            is PrimaryRow.RuleRow -> bindRule(holder as ItemHolder, row.rule)
+            is PrimaryRow.FilterRow -> bindFilter(holder as ItemHolder, row.filter)
         }
-
-        return Any()
     }
 
-    override fun getGroupId(p0: Int): Long
+    private fun bindHeader(holder: HeaderHolder, header: PrimaryRow.Header)
     {
-        return p0.toLong()
-    }
-
-    override fun hasStableIds(): Boolean
-    {
-        return true
-    }
-
-    override fun getGroupView(groupPosition: Int, isExpanded: Boolean, childView: View?, viewGroup: ViewGroup?): View
-    {
-        val view: View
-
-        if (childView == null)
+        holder.title.text = when (header.group)
         {
-            view = LayoutInflater.from(context).inflate(R.layout.list_item_group, viewGroup, false )
-        }
-        else
-        {
-            view = childView
+            0 -> context.getString(R.string.fields)
+            1 -> context.getString(R.string.rules)
+            else -> context.getString(R.string.filters)
         }
 
-        val listTitleTextView = view.findViewById<TextView>(R.id.listGroupTitle)
+        holder.up.visibility = if (header.expanded) View.VISIBLE else View.GONE
+        holder.down.visibility = if (header.expanded) View.GONE else View.VISIBLE
 
-        when( groupPosition )
-        {
-            0 -> listTitleTextView.text = context.getString(R.string.fields)
-            1 -> listTitleTextView.text = context.getString(R.string.rules)
-            2 -> listTitleTextView.text = context.getString(R.string.filters)
+        holder.itemView.setOnClickListener {
+            expandedStates[header.group] = !expandedStates[header.group]
+            rebuildRows()
         }
 
-        val downImageView = view.findViewById<View>(R.id.arrow_down_image_view) as ImageView
-        val upImageView = view.findViewById<View>(R.id.arrow_up_image_view) as ImageView
-
-        if (isExpanded)
-        {
-            upImageView.visibility = View.VISIBLE
-            downImageView.visibility = View.GONE
-        }
-        else
-        {
-            upImageView.visibility = View.GONE
-            downImageView.visibility = View.VISIBLE
-        }
-
-        val addButton = view.findViewById<ImageView>(R.id.add_button)
-
-        addButton.setOnClickListener {
-            when( groupPosition )
+        holder.addButton.setOnClickListener {
+            when (header.group)
             {
                 0 -> shouldAddField()
                 1 -> shouldAddRule()
                 2 -> shouldAddFilter()
             }
         }
-
-        return view
     }
 
-    override fun isChildSelectable(p0: Int, p1: Int): Boolean
+    private fun bindField(holder: ItemHolder, field: Field)
     {
-        return true
+        holder.date.visibility = View.GONE
+
+        holder.name.text =
+            if (field.parentUUID == null)
+            {
+                "${field.index}. ${field.name}"
+            }
+            else
+            {
+                val parent = fields.firstOrNull { it.uuid == field.parentUUID }
+                "    ${parent?.index ?: 0}.${field.index}. ${field.name}"
+            }
+
+        holder.itemView.setOnClickListener { didSelectField(field) }
+    }
+
+    private fun bindRule(holder: ItemHolder, rule: Rule)
+    {
+        holder.date.visibility = View.GONE
+        holder.name.text = rule.name
+        holder.itemView.setOnClickListener { didSelectRule(rule) }
+    }
+
+    private fun bindFilter(holder: ItemHolder, filter: Filter)
+    {
+        holder.date.visibility = View.GONE
+        holder.name.text = filter.name
+        holder.itemView.setOnClickListener { didSelectFilter(filter) }
+    }
+
+    fun moveField(from: Int, to: Int)
+    {
+        val fromField = rows[from] as? PrimaryRow.FieldRow ?: return
+        val toField = rows[to] as? PrimaryRow.FieldRow ?: return
+
+        val fromIndex = fields.indexOf(fromField.field)
+        val toIndex = fields.indexOf(toField.field)
+
+        java.util.Collections.swap(fields, fromIndex, toIndex)
+
+        var index = 1
+        var groupUuid = ""
+        var primaryIndex = 0
+
+        fields.forEachIndexed { i, field ->
+            if (field.parentUUID != null)
+            {
+                if (groupUuid.isEmpty())
+                {
+                    index = 1
+                    groupUuid = field.parentUUID!!
+                }
+                else
+                {
+                    index = index + 1
+                }
+                field.index = index
+            }
+            else
+            {
+                groupUuid = ""
+                primaryIndex += 1
+                field.index = primaryIndex
+            }
+        }
+
+        rebuildRows()
+    }
+
+    fun isFieldRow(position: Int): Boolean
+    {
+        return rows.getOrNull(position) is PrimaryRow.FieldRow
+    }
+
+    class HeaderHolder(view: View) : RecyclerView.ViewHolder(view)
+    {
+        val title = view.findViewById<TextView>(R.id.listGroupTitle)
+        val up = view.findViewById<ImageView>(R.id.arrow_up_image_view)
+        val down = view.findViewById<ImageView>(R.id.arrow_down_image_view)
+        val addButton = view.findViewById<ImageView>(R.id.add_button)
+    }
+
+    class ItemHolder(view: View) : RecyclerView.ViewHolder(view)
+    {
+        val name = view.findViewById<TextView>(R.id.name_text_view)
+        val date = view.findViewById<TextView>(R.id.date_text_view)
     }
 }
