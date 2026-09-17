@@ -30,8 +30,7 @@ class AddHouseholdAdapter(
     val editMode: Boolean,
     val config: Config,
     val enumerationItem: EnumerationItem,
-    val fields: List<Field>,
-    val filteredFieldDataList: List<FieldData>,
+    val fieldDataList: List<FieldData>,
     val getDate: (date: Date, (Date?) -> Unit) -> Unit,
     val getTime: (date: Date, (Date?) -> Unit) -> Unit)
     : RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>()
@@ -41,7 +40,7 @@ class AddHouseholdAdapter(
     private lateinit var blockAdapter: BlockAdapter
     private lateinit var checkboxOptionAdapter: CheckboxOptionAdapter
 
-    override fun getItemCount() = filteredFieldDataList.size
+    override fun getItemCount() = fieldDataList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -61,7 +60,7 @@ class AddHouseholdAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
     {
-        val fieldData = filteredFieldDataList.get(holder.adapterPosition)
+        val fieldData = fieldDataList.get(holder.adapterPosition)
 
         DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
 

@@ -1979,7 +1979,6 @@ class MapManager
             val sharedPreferences: SharedPreferences = MainApplication.getContext().getSharedPreferences("default", 0)
             try
             {
-                Log.d( "xxx", "zoomLevel = " + sharedPreferences.getFloat( Keys.kZoomLevel.value, 16f ).toDouble())
                 return sharedPreferences.getFloat( Keys.kZoomLevel.value, 16f ).toDouble()
             }
             catch( ex: Exception )

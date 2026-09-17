@@ -53,6 +53,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:layout_marginTop="10dp"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -257,7 +258,7 @@
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/additional_info_layout"
+                            android:id="@+id/status_info_layout"
                             android:orientation="vertical"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
@@ -529,11 +530,125 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view"
-                android:layout_weight="1"
+            <androidx.cardview.widget.CardView
+                android:layout_margin="10dp"
+                android:layout_gravity="center"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"/>
+                android:layout_height="wrap_content"
+                card_view:cardCornerRadius="4dp">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="50dp"
+                            android:layout_weight="1"
+                            android:gravity="start|center_vertical"
+                            android:textAlignment="viewStart"
+                            android:padding="10dp"
+                            android:text="@string/enumeration_fields"
+                            android:textColor="@color/primary_textcolor"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp">
+
+                            <ImageView
+                                android:id="@+id/hide_enumeration_fields_image_view"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginEnd="10dp"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:srcCompat="@drawable/arrow_up_blue"/>
+
+                            <ImageView
+                                android:id="@+id/show_enumeration_fields_image_view"
+                                android:visibility="gone"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginEnd="10dp"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:srcCompat="@drawable/arrow_down_blue"/>
+                        </FrameLayout>
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/enumeration_field_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/collection_card_view"
+                android:visibility="gone"
+                android:layout_margin="10dp"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                card_view:cardCornerRadius="4dp">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="50dp"
+                            android:layout_weight="1"
+                            android:gravity="start|center_vertical"
+                            android:textAlignment="viewStart"
+                            android:padding="10dp"
+                            android:text="@string/collection_fields"
+                            android:textColor="@color/primary_textcolor"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp">
+
+                            <ImageView
+                                android:id="@+id/hide_collection_fields_image_view"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginEnd="10dp"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:srcCompat="@drawable/arrow_up_blue"/>
+
+                            <ImageView
+                                android:id="@+id/show_collection_fields_image_view"
+                                android:visibility="gone"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginEnd="10dp"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:srcCompat="@drawable/arrow_down_blue"/>
+                        </FrameLayout>
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/collection_field_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
     </LinearLayout>
 

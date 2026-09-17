@@ -33,7 +33,6 @@ import edu.gtri.gpssample.ui.compose.ComposableDatePickerDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableTimePickerDialogHost
 import edu.gtri.gpssample.utils.CameraUtils
-import edu.gtri.gpssample.utils.DateUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import org.json.JSONObject
 import java.util.*
@@ -50,7 +49,8 @@ class AddHouseholdFragment : Fragment()
     private var propertyAdapter : PropertyAdapter? = null
     private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
-    private lateinit var addHouseholdAdapter: AddHouseholdAdapter
+    private lateinit var addHouseholdEnumerationFieldAdapter: AddHouseholdAdapter
+    private lateinit var addHouseholdCollectionFieldAdapter: AddHouseholdAdapter
     private lateinit var composableDatePickerDialogHost: ComposableDatePickerDialogHost
     private lateinit var composableTimePickerDialogHost: ComposableTimePickerDialogHost
     private lateinit var composableNotificationDialogHost: ComposableNotificationDialogHost
@@ -225,6 +225,25 @@ class AddHouseholdFragment : Fragment()
                     }
                 }
             }
+
+            for (field in study.collectionFields)
+            {
+                if (field.parentUUID == null)
+                {
+                    val fieldData = FieldData(creationDate++, field.uuid, enumerationItem.uuid )
+                    enumerationItem.fieldDataList.add(fieldData)
+
+                    if (field.type == FieldType.Checkbox || field.type == FieldType.Dropdown)
+                    {
+                        // create a fiedDataOption for each fieldOption
+                        for (fieldOption in field.fieldOptions)
+                        {
+                            val fieldDataOption = FieldDataOption(fieldOption.name, false)
+                            fieldData.fieldDataOptions.add(fieldDataOption)
+                        }
+                    }
+                }
+            }
         }
 
         binding.subaddressTip.setOnClickListener {
@@ -234,7 +253,7 @@ class AddHouseholdFragment : Fragment()
         if (enumerationItem.version.isEmpty())
         {
             binding.uuidLayout.visibility = View.GONE
-            binding.additionalInfoLayout.visibility = View.GONE
+            binding.statusInfoLayout.visibility = View.GONE
         }
         else
         {
@@ -314,23 +333,56 @@ class AddHouseholdFragment : Fragment()
 
         // filteredFieldDataList contains only non-block fields and block field containers
 
-        val filteredFieldDataList = ArrayList<FieldData>()
+        val collectionFieldDataList = ArrayList<FieldData>()
+        val enumerationFieldDataList = ArrayList<FieldData>()
 
         for (fieldData in enumerationItem.fieldDataList)
         {
             DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
                 if (field.parentUUID == null)
                 {
-                    filteredFieldDataList.add( fieldData )
+                    if (field.isCollectionField)
+                    {
+                        collectionFieldDataList.add( fieldData )
+                    }
+                    else
+                    {
+                        enumerationFieldDataList.add( fieldData )
+                    }
                 }
             }
         }
 
-        addHouseholdAdapter = AddHouseholdAdapter( binding.recyclerView, editMode, config, enumerationItem, study.fields, filteredFieldDataList, this::getDate, this::getTime )
-        binding.recyclerView.adapter = addHouseholdAdapter
-        binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.layoutManager = LinearLayoutManager(activity)
-        binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
+        addHouseholdEnumerationFieldAdapter = AddHouseholdAdapter( binding.enumerationFieldRecyclerView, editMode, config, enumerationItem, enumerationFieldDataList, this::getDate, this::getTime )
+
+        binding.enumerationFieldRecyclerView.adapter = addHouseholdEnumerationFieldAdapter
+        binding.enumerationFieldRecyclerView.itemAnimator = DefaultItemAnimator()
+        binding.enumerationFieldRecyclerView.layoutManager = LinearLayoutManager(activity)
+        binding.enumerationFieldRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
+
+        addHouseholdCollectionFieldAdapter = AddHouseholdAdapter( binding.collectionFieldRecyclerView, true, config, enumerationItem, collectionFieldDataList, this::getDate, this::getTime )
+
+        binding.collectionFieldRecyclerView.adapter = addHouseholdCollectionFieldAdapter
+        binding.collectionFieldRecyclerView.itemAnimator = DefaultItemAnimator()
+        binding.collectionFieldRecyclerView.layoutManager = LinearLayoutManager(activity)
+        binding.collectionFieldRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
+
+        var shouldShowCollectionFields = false
+
+        findNavController().previousBackStackEntry?.destination?.let { parent ->
+            if (parent.id == R.id.PerformCollectionFragment || parent.id == R.id.PerformMultiCollectionFragment)
+            {
+                shouldShowCollectionFields = true
+            }
+        }
+
+        if (shouldShowCollectionFields)
+        {
+            binding.collectionCardView.visibility = View.VISIBLE
+            binding.hideEnumerationFieldsImageView.visibility = View.GONE
+            binding.showEnumerationFieldsImageView.visibility = View.VISIBLE
+            binding.enumerationFieldRecyclerView.visibility = View.GONE
+        }
 
         binding.subaddressEditText.setText( enumerationItem.subAddress )
         binding.latitudeEditText.setText( String.format( "%.6f", location.latitude ))
@@ -340,7 +392,7 @@ class AddHouseholdFragment : Fragment()
             binding.hideAdditionalInfoImageView.visibility = View.GONE
             binding.showAdditionalInfoImageView.visibility = View.VISIBLE
             binding.defaultInfoLayout.visibility = View.GONE
-            binding.additionalInfoLayout.visibility = View.GONE
+            binding.statusInfoLayout.visibility = View.GONE
         }
 
         binding.showAdditionalInfoImageView.setOnClickListener {
@@ -350,8 +402,32 @@ class AddHouseholdFragment : Fragment()
 
             if (enumerationItem.version.isNotEmpty())
             {
-                binding.additionalInfoLayout.visibility = View.VISIBLE
+                binding.statusInfoLayout.visibility = View.VISIBLE
             }
+        }
+
+        binding.hideEnumerationFieldsImageView.setOnClickListener {
+            binding.hideEnumerationFieldsImageView.visibility = View.GONE
+            binding.showEnumerationFieldsImageView.visibility = View.VISIBLE
+            binding.enumerationFieldRecyclerView.visibility = View.GONE
+        }
+
+        binding.showEnumerationFieldsImageView.setOnClickListener {
+            binding.hideEnumerationFieldsImageView.visibility = View.VISIBLE
+            binding.showEnumerationFieldsImageView.visibility = View.GONE
+            binding.enumerationFieldRecyclerView.visibility = View.VISIBLE
+        }
+
+        binding.hideCollectionFieldsImageView.setOnClickListener {
+            binding.hideCollectionFieldsImageView.visibility = View.GONE
+            binding.showCollectionFieldsImageView.visibility = View.VISIBLE
+            binding.collectionFieldRecyclerView.visibility = View.GONE
+        }
+
+        binding.showCollectionFieldsImageView.setOnClickListener {
+            binding.hideCollectionFieldsImageView.visibility = View.VISIBLE
+            binding.showCollectionFieldsImageView.visibility = View.GONE
+            binding.collectionFieldRecyclerView.visibility = View.VISIBLE
         }
 
         if (location.properties.isNotEmpty())
@@ -668,7 +744,8 @@ class AddHouseholdFragment : Fragment()
 
     override fun onDestroyView()
     {
-        binding.recyclerView.adapter = null
+        binding.enumerationFieldRecyclerView.adapter = null
+        binding.collectionFieldRecyclerView.adapter = null
         binding.propertyRecyclerView.adapter = null
 
         _binding = null

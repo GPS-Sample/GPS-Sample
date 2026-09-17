@@ -554,6 +554,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_ENUMERATION_ITEM_EXCLUSION_REASON TEXT DEFAULT ''")
                 db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_ENUMERATION_ITEM_EXCLUSION_NOTES TEXT DEFAULT ''")
 
+                // Field
+                db.execSQL("ALTER TABLE $TABLE_FIELD ADD COLUMN $COLUMN_FIELD_IS_COLLECTION_FIELD INTEGER DEFAULT 0")
+
                 // Update dbVersion in Config
                 val newDbVersion = 325
                 val contentValues = ContentValues().apply {
