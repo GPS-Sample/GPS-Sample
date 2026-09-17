@@ -924,10 +924,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FIELD_TIME = "field_time"
         const val COLUMN_FIELD_MINIMUM = "field_minimum"
         const val COLUMN_FIELD_MAXIMUM = "field_maximum"
-        const val COLUMN_FIELD_OPTION_1 = "field_option_1"
-        const val COLUMN_FIELD_OPTION_2 = "field_option_2"
-        const val COLUMN_FIELD_OPTION_3 = "field_option_3"
-        const val COLUMN_FIELD_OPTION_4 = "field_option_4"
+        const val COLUMN_FIELD_IS_COLLECTION_FIELD = "is_collection_field"
 
         const val TABLE_FIELD_OPTION = "field_option"
         const val COLUMN_FIELD_OPTION_NAME = "field_option_name"

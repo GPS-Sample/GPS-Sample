@@ -58,7 +58,9 @@ class PrimarySampleFragment : Fragment()
         primarySampleRecyclerAdapter.didSelectField = this::didSelectField
         primarySampleRecyclerAdapter.didSelectRule = this::didSelectRule
         primarySampleRecyclerAdapter.didSelectFilter = this::didSelectFilter
+        primarySampleRecyclerAdapter.didSelectCollectionField = this::didSelectCollectionField
         primarySampleRecyclerAdapter.shouldAddField = this::shouldAddField
+        primarySampleRecyclerAdapter.shouldAddCollectionField = this::shouldAddCollectionField
         primarySampleRecyclerAdapter.shouldAddRule = this::shouldAddRule
         primarySampleRecyclerAdapter.shouldAddFilter = this::shouldAddFilter
 
@@ -88,14 +90,24 @@ class PrimarySampleFragment : Fragment()
                 if (from == RecyclerView.NO_POSITION || to == RecyclerView.NO_POSITION)
                     return false
 
-                if (!primarySampleRecyclerAdapter.isFieldRow(from) || !primarySampleRecyclerAdapter.isFieldRow(to))
-                    return false
+                if (primarySampleRecyclerAdapter.isFieldRow(from) && primarySampleRecyclerAdapter.isFieldRow(to))
+                {
+                    primarySampleRecyclerAdapter.moveField(from, to)
 
-                primarySampleRecyclerAdapter.moveField(from, to)
+                    study.fields.sortBy { it.index }
 
-                study.fields.sortBy { it.index }
+                    return true
+                }
+                else if (primarySampleRecyclerAdapter.isCollectionFieldRow(from) && primarySampleRecyclerAdapter.isCollectionFieldRow(to))
+                {
+                    primarySampleRecyclerAdapter.moveCollectionField(from, to)
 
-                return true
+                    study.collectionFields.sortBy { it.index }
+
+                    return true
+                }
+
+                return false
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
@@ -146,6 +158,14 @@ class PrimarySampleFragment : Fragment()
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
     }
 
+    private fun shouldAddCollectionField()
+    {
+        val field = Field( null, study.collectionFields.size+1,"", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid )
+        field.isCollectionField = true
+        sharedViewModel.createFieldModel.setCurrentField( field )
+        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+    }
+
     private fun shouldAddRule()
     {
         sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
@@ -178,6 +198,12 @@ class PrimarySampleFragment : Fragment()
     }
 
     private fun didSelectField( field: Field )
+    {
+        sharedViewModel.createFieldModel.setCurrentField(field)
+        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+    }
+
+    private fun didSelectCollectionField( field: Field )
     {
         sharedViewModel.createFieldModel.setCurrentField(field)
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )

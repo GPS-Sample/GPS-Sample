@@ -499,9 +499,19 @@ class CreateFieldFragment : Fragment()
                     return@setOnClickListener
                 }
 
-                if (!study.fields.contains (field))
+                if (field.isCollectionField)
                 {
-                    study.fields.add( field )
+                    if (!study.collectionFields.contains (field))
+                    {
+                        study.collectionFields.add( field )
+                    }
+                }
+                else
+                {
+                    if (!study.fields.contains (field))
+                    {
+                        study.fields.add( field )
+                    }
                 }
 
                 if (field.fields == null)

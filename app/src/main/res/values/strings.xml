@@ -546,6 +546,7 @@
     <string name="name_already_exists">"That configuration name already exists."</string>
 
     <string name="import_mismatch">The Configuration that you are attempting to import does not match the configuration that is currently open.</string>
+    <string name="collection_fields">Collection Fields</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

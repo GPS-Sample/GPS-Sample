@@ -49,32 +49,67 @@ class CreateFieldModel
     fun deleteCurrentField(study : Study)
     {
         _currentField?.value?.let { currentField ->
-            if (study.fields.contains( currentField ))
+            if (currentField.isCollectionField)
             {
-                study.fields.remove( currentField )
-            }
+                if (study.collectionFields.contains( currentField ))
+                {
+                    study.collectionFields.remove( currentField )
+                }
 
-            for (field in study.fields)
-            {
-                field.fields?.let { fields ->
-                    if (fields.contains( currentField ))
-                    {
-                        fields.remove( currentField )
+                for (field in study.collectionFields)
+                {
+                    field.fields?.let { fields ->
+                        if (fields.contains( currentField ))
+                        {
+                            fields.remove( currentField )
+                        }
+                    }
+                }
+
+                DAO.fieldDAO.deleteField( currentField )
+
+                // renumber all fields
+
+                for (i in 1..study.collectionFields.size)
+                {
+                    study.collectionFields[i-1].index = i
+                    study.collectionFields[i-1].fields?.let { fields ->
+                        for (j in 1..fields.size)
+                        {
+                            fields[j-1].index = j
+                        }
                     }
                 }
             }
-
-            DAO.fieldDAO.deleteField( currentField )
-
-            // renumber all fields
-
-            for (i in 1..study.fields.size)
+            else
             {
-                study.fields[i-1].index = i
-                study.fields[i-1].fields?.let { fields ->
-                    for (j in 1..fields.size)
-                    {
-                        fields[j-1].index = j
+                if (study.fields.contains( currentField ))
+                {
+                    study.fields.remove( currentField )
+                }
+
+                for (field in study.fields)
+                {
+                    field.fields?.let { fields ->
+                        if (fields.contains( currentField ))
+                        {
+                            fields.remove( currentField )
+                        }
+                    }
+                }
+
+                DAO.fieldDAO.deleteField( currentField )
+
+                // renumber all fields
+
+                for (i in 1..study.fields.size)
+                {
+                    study.fields[i-1].index = i
+                    study.fields[i-1].fields?.let { fields ->
+                        for (j in 1..fields.size)
+                        {
+                            fields[j-1].index = j
+                        }
                     }
                 }
             }

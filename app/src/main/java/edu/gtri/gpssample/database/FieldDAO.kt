@@ -16,6 +16,7 @@ import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_DATE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_INDEX
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_INTEGER_ONLY
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_IS_COLLECTION_FIELD
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_MAXIMUM
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_MINIMUM
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_FIELD_NAME
@@ -75,6 +76,7 @@ class FieldDAO(private var dao: DAO)
         values.put( DAO.COLUMN_FIELD_TIME, field.time )
         values.put( DAO.COLUMN_FIELD_MINIMUM, field.minimum )
         values.put( DAO.COLUMN_FIELD_MAXIMUM, field.maximum )
+        values.put( DAO.COLUMN_FIELD_IS_COLLECTION_FIELD, field.isCollectionField )
 
         // TODO: use look up tables
         val type = FieldTypeConverter.toIndex(field.type)
@@ -100,10 +102,11 @@ class FieldDAO(private var dao: DAO)
         val minimum = cursor.getDoubleOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_MINIMUM))
         val maximum = cursor.getDoubleOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_MAXIMUM))
         val studyUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_UUID))
+        val isCollectionField = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_IS_COLLECTION_FIELD)).toBoolean()
 
         val type = FieldTypeConverter.fromIndex(typeIndex)
 
-        return Field( uuid, creationDate, parentUUID, index, name, type, pii, required, integerOnly, numberOfResidents, date, time, minimum, maximum, ArrayList<FieldOption>(), null, studyUuid, version )
+        return Field( uuid, creationDate, parentUUID, index, name, type, pii, required, integerOnly, numberOfResidents, date, time, minimum, maximum, ArrayList<FieldOption>(), null, studyUuid, isCollectionField, version )
     }
 
     fun getField( uuid : String ): Field?
@@ -146,7 +149,7 @@ class FieldDAO(private var dao: DAO)
     fun getFields(study : Study): ArrayList<Field>
     {
         val fields = ArrayList<Field>()
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}' ORDER BY ${DAO.COLUMN_FIELD_INDEX} ASC"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}' AND ${DAO.COLUMN_FIELD_IS_COLLECTION_FIELD} = 0 ORDER BY ${DAO.COLUMN_FIELD_INDEX} ASC"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         study.subsetRules.clear()
@@ -189,6 +192,32 @@ class FieldDAO(private var dao: DAO)
         return fields
     }
 
+    fun getCollectionFields(study : Study): ArrayList<Field>
+    {
+        val fields = ArrayList<Field>()
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}' AND ${DAO.COLUMN_FIELD_IS_COLLECTION_FIELD} = 1 ORDER BY ${DAO.COLUMN_FIELD_INDEX} ASC"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val field = buildField( cursor )
+            if (field.parentUUID == null)
+            {
+                getBlockFields( field.uuid )?.let { blockFields ->
+                    field.fields = blockFields
+                }
+
+                field.fieldOptions = DAO.fieldOptionDAO.getFieldOptions( field )
+
+                fields.add( field)
+            }
+        }
+
+        cursor.close()
+
+        return fields
+    }
+
     fun deleteField( field: Field )
     {
         field.fields?.let { fields ->
@@ -212,7 +241,7 @@ class FieldDAO(private var dao: DAO)
             ColumnBinding<Field>(COLUMN_STUDY_UUID,"TEXT",Field::studyUuid ),
             ColumnBinding<Field>(COLUMN_FIELD_PARENT_UUID,"TEXT",Field::parentUUID ),
             ColumnBinding<Field>(COLUMN_FIELD_INDEX,"INTEGER",Field::index ),
-            ColumnBinding<Field>(COLUMN_FIELD_NAME,"TEXT",Field::name ),
+            ColumnBinding<Field>( COLUMN_FIELD_NAME,"TEXT",Field::name ),
             ColumnBinding<Field>(COLUMN_FIELD_TYPE_INDEX,"INTEGER",{FieldTypeConverter.toIndex(it.type)} ),
             ColumnBinding<Field>(COLUMN_FIELD_PII,"INTEGER",Field::pii ),
             ColumnBinding<Field>(COLUMN_FIELD_REQUIRED,"INTEGER",Field::required ),
@@ -222,6 +251,7 @@ class FieldDAO(private var dao: DAO)
             ColumnBinding<Field>(COLUMN_FIELD_TIME,"INTEGER",Field::time ),
             ColumnBinding<Field>(COLUMN_FIELD_MINIMUM,"REAL",Field::minimum ),
             ColumnBinding<Field>(COLUMN_FIELD_MAXIMUM,"REAL",Field::maximum ),
+            ColumnBinding<Field>(COLUMN_FIELD_IS_COLLECTION_FIELD,"INTEGER",Field::isCollectionField ),
         )
     }
 }

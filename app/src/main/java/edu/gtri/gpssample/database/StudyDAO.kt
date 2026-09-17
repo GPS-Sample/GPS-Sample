@@ -39,7 +39,14 @@ class StudyDAO(private var dao: DAO)
         for (field in study.fields)
         {
             field.studyUuid = study.uuid
-            DAO.fieldDAO.createOrUpdateField( field,field.version )
+            DAO.fieldDAO.createOrUpdateField( field, field.version )
+        }
+
+        // add collection fields
+        for (field in study.collectionFields)
+        {
+            field.studyUuid = study.uuid
+            DAO.fieldDAO.createOrUpdateField( field, field.version )
         }
 
         // add primary rules
@@ -126,7 +133,7 @@ class StudyDAO(private var dao: DAO)
             subsetSampleName = ""
         }
 
-        val study = Study( uuid, creationDate, name, samplingMethod, sampleSize, sampleType, subsetSampleName, subsetSampleSize, subsetSampleType, ArrayList<Strata>(), ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<Rule>(), ArrayList<Filter>(), version )
+        val study = Study( uuid, creationDate, name, samplingMethod, sampleSize, sampleType, subsetSampleName, subsetSampleSize, subsetSampleType, ArrayList<Strata>(), ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), version )
 
         return study
     }
@@ -143,8 +150,11 @@ class StudyDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val study = buildStudy( cursor )
+
             studies.add( study )
+
             study.fields = DAO.fieldDAO.getFields(study)
+            study.collectionFields = DAO.fieldDAO.getCollectionFields(study)
             // study.rules is loaded by getFields()
             study.filters.addAll(DAO.filterDAO.getPrimaryFilters(study))
             study.subsetFilters.addAll(DAO.filterDAO.getSubsetFilters(study))
