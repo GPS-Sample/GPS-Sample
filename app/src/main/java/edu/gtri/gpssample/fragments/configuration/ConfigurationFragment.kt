@@ -275,36 +275,46 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                         ) { selection ->
                                             if (selection == resources.getString(R.string.default_location))
                                             {
-                                                config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
-
-                                                val zipUtils = ZipUtils()
-
-                                                composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
-                                                {
-                                                    zipUtils.cancel()
-                                                }
+                                                binding.progressOverlayView.visibility = View.VISIBLE
 
                                                 viewLifecycleOwner.lifecycleScope.launch {
-                                                    zipUtils.state.collect { state ->
-                                                        composableNearbySessionStatusDialogHost.updateState(state)
-                                                    }
-                                                }
-
-                                                PerformanceManager.startTimer()
-
-                                                zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages ) { success ->
-                                                    if (success)
+                                                    withContext(Dispatchers.IO)
                                                     {
-                                                        composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded))
+                                                        config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
                                                     }
-                                                    else
+
+                                                    // back on the main thread...
+                                                    binding.progressOverlayView.visibility = View.GONE
+
+                                                    val zipUtils = ZipUtils()
+
+                                                    composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
                                                     {
-                                                        composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
+                                                        zipUtils.cancel()
                                                     }
 
-                                                    composableNearbySessionStatusDialogHost.dismiss()
+                                                    viewLifecycleOwner.lifecycleScope.launch {
+                                                        zipUtils.state.collect { state ->
+                                                            composableNearbySessionStatusDialogHost.updateState(state)
+                                                        }
+                                                    }
 
-                                                    Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
+                                                    PerformanceManager.startTimer()
+
+                                                    zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages ) { success ->
+                                                        if (success)
+                                                        {
+                                                            composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded))
+                                                        }
+                                                        else
+                                                        {
+                                                            composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
+                                                        }
+
+                                                        composableNearbySessionStatusDialogHost.dismiss()
+
+                                                        Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
+                                                    }
                                                 }
                                             }
                                             else if (selection == resources.getString(R.string.let_me_choose))
@@ -643,36 +653,46 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
             {
                 data?.data?.let { uri ->
                     sharedViewModel.currentConfiguration?.value?.let { config ->
-                        config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
-
-                        val zipUtils = ZipUtils()
-
-                        composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
-                        {
-                            zipUtils.cancel()
-                        }
+                        binding.progressOverlayView.visibility = View.VISIBLE
 
                         viewLifecycleOwner.lifecycleScope.launch {
-                            zipUtils.state.collect { state ->
-                                composableNearbySessionStatusDialogHost.updateState(state)
-                            }
-                        }
-
-                        PerformanceManager.startTimer()
-
-                        zipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { success ->
-                            if (success)
+                            withContext(Dispatchers.IO)
                             {
-                                composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded))
+                                config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
                             }
-                            else
+
+                            // back on the main thread...
+                            binding.progressOverlayView.visibility = View.GONE
+
+                            val zipUtils = ZipUtils()
+
+                            composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
                             {
-                                composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
+                                zipUtils.cancel()
                             }
 
-                            composableNearbySessionStatusDialogHost.dismiss()
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                zipUtils.state.collect { state ->
+                                    composableNearbySessionStatusDialogHost.updateState(state)
+                                }
+                            }
 
-                            Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
+                            PerformanceManager.startTimer()
+
+                            zipUtils.zipToUri( requireActivity(), config, getFileName(), includeConfig, includeImages,uri ) { success ->
+                                if (success)
+                                {
+                                    composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded))
+                                }
+                                else
+                                {
+                                    composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
+                                }
+
+                                composableNearbySessionStatusDialogHost.dismiss()
+
+                                Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
+                            }
                         }
                     }
                 }

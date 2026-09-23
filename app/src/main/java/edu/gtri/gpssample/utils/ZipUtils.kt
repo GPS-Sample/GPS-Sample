@@ -120,12 +120,18 @@ class ZipUtils()
 
         try
         {
-            val imageUuids = config.enumAreas
-                .asSequence()
-                .flatMap { it.locations.asSequence() }
-                .mapNotNull { it.imageUuid.takeIf(String::isNotEmpty) }
-                .distinct()
-                .toList()
+            val imageUuids = ArrayList<String>()
+
+            for (enumArea in config.enumAreas)
+            {
+                for (location in enumArea.locations)
+                {
+                    if (location.imageUuid.isNotEmpty())
+                    {
+                        imageUuids.add( location.imageUuid )
+                    }
+                }
+            }
 
             if (imageUuids.isEmpty())
             {
@@ -177,45 +183,6 @@ class ZipUtils()
         {
             Log.d("xxx", ex.stackTraceToString())
         }
-        finally
-        {
-            zipOut.closeEntry()
-        }
-    }
-
-    private fun writeImagesXXX(zipOut: ZipOutputStream, config: Config, fileName: String)
-    {
-        val entry = ZipEntry("$fileName-img.json")
-
-        zipOut.putNextEntry(entry)
-
-        try
-        {
-            val  query = "SELECT ${ImageDAO.COLUMN_UUID} FROM ${ImageDAO.TABLE_IMAGE}"
-
-            ImageDAO.instance().readableDatabase.rawQuery(query, null ).use { cursor ->
-                var count = 1
-                val totalCount = cursor.count
-
-                writeHeader( totalCount, zipOut )
-
-                while (cursor.moveToNext())
-                {
-                    if (currentJob == null) { break }
-
-                    _state.value = NearbySessionState.Message("Exporting Image ${count++}/${totalCount}" )
-
-                    val uuid = cursor.getString(cursor.getColumnIndexOrThrow(ImageDAO.COLUMN_UUID))
-
-                    ImageDAO.instance().getImage(uuid)?.let { image ->
-                        val packedImage = image.pack()
-                        zipOut.write(packedImage.toByteArray())
-                        zipOut.write('\n'.code)
-                    }
-                }
-            }
-        }
-        catch( ex: Exception ) {}
         finally
         {
             zipOut.closeEntry()
