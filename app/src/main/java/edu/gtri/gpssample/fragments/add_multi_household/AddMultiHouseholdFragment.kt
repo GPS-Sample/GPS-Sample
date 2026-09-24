@@ -33,9 +33,10 @@ class AddMultiHouseholdFragment : Fragment()
     private lateinit var location: Location
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addMultiHouseholdAdapter: AddMultiHouseholdAdapter
-
     private var editMode = true
     private var startSubaddress = 0
+    private var reviewDuplicate = false
+    private var reviewFenceViolation = false
     private var _binding: FragmentAddMultiHouseholdBinding? = null
     private val binding get() = _binding!!
 
@@ -64,6 +65,14 @@ class AddMultiHouseholdFragment : Fragment()
 
         arguments?.getBoolean(Keys.kEditMode.value)?.let { editMode ->
             this.editMode = editMode
+        }
+
+        arguments?.getBoolean( Keys.kReviewDuplicate.value)?.let {
+            this.reviewDuplicate = it
+        }
+
+        arguments?.getBoolean( Keys.kReviewFenceViolation.value)?.let {
+            this.reviewFenceViolation = it
         }
 
         if (!editMode)
@@ -160,6 +169,8 @@ class AddMultiHouseholdFragment : Fragment()
         val bundle = Bundle()
         bundle.putBoolean( Keys.kEditMode.value, editMode )
         bundle.putBoolean( Keys.kIsMultiHousehold.value, true )
+        bundle.putBoolean( Keys.kReviewDuplicate.value, reviewDuplicate )
+        bundle.putBoolean( Keys.kReviewFenceViolation.value, reviewFenceViolation )
 
         findNavController().navigate( R.id.action_navigate_to_AddHouseholdFragment, bundle )
     }
