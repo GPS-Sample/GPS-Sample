@@ -367,21 +367,25 @@ class AddHouseholdFragment : Fragment()
         binding.collectionFieldRecyclerView.layoutManager = LinearLayoutManager(activity)
         binding.collectionFieldRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
-        var shouldShowCollectionFields = false
+//        var shouldShowCollectionFields = false
+//
+//        findNavController().previousBackStackEntry?.destination?.let { parent ->
+//            if (parent.id == R.id.PerformCollectionFragment || parent.id == R.id.PerformMultiCollectionFragment)
+//            {
+//                shouldShowCollectionFields = true
+//            }
+//        }
 
-        findNavController().previousBackStackEntry?.destination?.let { parent ->
-            if (parent.id == R.id.PerformCollectionFragment || parent.id == R.id.PerformMultiCollectionFragment)
-            {
-                shouldShowCollectionFields = true
-            }
-        }
-
-        if (shouldShowCollectionFields)
+        if (collectionMode)
         {
             binding.collectionCardView.visibility = View.VISIBLE
-            binding.hideEnumerationFieldsImageView.visibility = View.GONE
-            binding.showEnumerationFieldsImageView.visibility = View.VISIBLE
-            binding.enumerationFieldRecyclerView.visibility = View.GONE
+            binding.showAdditionalInfoImageView.visibility = View.VISIBLE
+            binding.defaultInfoLayout.visibility = View.GONE
+            binding.statusInfoLayout.visibility = View.GONE
+            binding.hideAdditionalInfoImageView.visibility = View.GONE
+            binding.showEnumerationFieldsImageView.visibility = View.GONE
+            binding.hideEnumerationFieldsImageView.visibility = View.VISIBLE
+            binding.enumerationFieldRecyclerView.visibility = View.VISIBLE
         }
 
         binding.subaddressEditText.setText( enumerationItem.subAddress )
