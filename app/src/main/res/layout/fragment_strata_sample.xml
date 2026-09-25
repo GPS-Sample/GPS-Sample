@@ -29,8 +29,8 @@
             android:textSize="17sp"
             android:textColor="@color/primary_textcolor" />
 
-        <ExpandableListView
-            android:id="@+id/expandable_list_view"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="20dp"

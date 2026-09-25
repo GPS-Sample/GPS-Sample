@@ -33,7 +33,7 @@ class PrimarySampleFragment : Fragment()
     private lateinit var study: Study
     private var _binding: FragmentPrimarySampleBinding? = null
     private val binding get() = _binding!!
-    private lateinit var primarySampleRecyclerAdapter: PrimarySampleAdapter
+    private lateinit var primarySampleAdapter: PrimarySampleAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -54,19 +54,19 @@ class PrimarySampleFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        primarySampleRecyclerAdapter = PrimarySampleAdapter(requireContext())
-        primarySampleRecyclerAdapter.didSelectField = this::didSelectField
-        primarySampleRecyclerAdapter.didSelectRule = this::didSelectRule
-        primarySampleRecyclerAdapter.didSelectFilter = this::didSelectFilter
-        primarySampleRecyclerAdapter.didSelectCollectionField = this::didSelectCollectionField
-        primarySampleRecyclerAdapter.shouldAddField = this::shouldAddField
-        primarySampleRecyclerAdapter.shouldAddCollectionField = this::shouldAddCollectionField
-        primarySampleRecyclerAdapter.shouldAddRule = this::shouldAddRule
-        primarySampleRecyclerAdapter.shouldAddFilter = this::shouldAddFilter
+        primarySampleAdapter = PrimarySampleAdapter(requireContext())
+        primarySampleAdapter.didSelectField = this::didSelectField
+        primarySampleAdapter.didSelectRule = this::didSelectRule
+        primarySampleAdapter.didSelectFilter = this::didSelectFilter
+        primarySampleAdapter.didSelectCollectionField = this::didSelectCollectionField
+        primarySampleAdapter.shouldAddField = this::shouldAddField
+        primarySampleAdapter.shouldAddCollectionField = this::shouldAddCollectionField
+        primarySampleAdapter.shouldAddRule = this::shouldAddRule
+        primarySampleAdapter.shouldAddFilter = this::shouldAddFilter
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let { study->
             this.study = study
-            primarySampleRecyclerAdapter.updateStudy( study )
+            primarySampleAdapter.updateStudy( study )
         }
 
         binding.apply {
@@ -90,17 +90,17 @@ class PrimarySampleFragment : Fragment()
                 if (from == RecyclerView.NO_POSITION || to == RecyclerView.NO_POSITION)
                     return false
 
-                if (primarySampleRecyclerAdapter.isFieldRow(from) && primarySampleRecyclerAdapter.isFieldRow(to))
+                if (primarySampleAdapter.isFieldRow(from) && primarySampleAdapter.isFieldRow(to))
                 {
-                    primarySampleRecyclerAdapter.moveField(from, to)
+                    primarySampleAdapter.moveField(from, to)
 
                     study.fields.sortBy { it.index }
 
                     return true
                 }
-                else if (primarySampleRecyclerAdapter.isCollectionFieldRow(from) && primarySampleRecyclerAdapter.isCollectionFieldRow(to))
+                else if (primarySampleAdapter.isCollectionFieldRow(from) && primarySampleAdapter.isCollectionFieldRow(to))
                 {
-                    primarySampleRecyclerAdapter.moveCollectionField(from, to)
+                    primarySampleAdapter.moveCollectionField(from, to)
 
                     study.collectionFields.sortBy { it.index }
 
@@ -115,7 +115,7 @@ class PrimarySampleFragment : Fragment()
 
         ItemTouchHelper(callback).attachToRecyclerView(binding.recyclerView )
 
-        binding.recyclerView.setAdapter(primarySampleRecyclerAdapter)
+        binding.recyclerView.setAdapter(primarySampleAdapter)
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         binding.enableSubsetCheckbox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener

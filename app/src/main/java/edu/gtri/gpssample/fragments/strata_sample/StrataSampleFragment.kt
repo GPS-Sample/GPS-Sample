@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FieldType
@@ -34,7 +35,7 @@ class StrataSampleFragment : Fragment()
     private lateinit var study: Study
     private var _binding: FragmentStrataSampleBinding? = null
     private val binding get() = _binding!!
-    private lateinit var strataSampleAdapter: StrataSampleAdapter
+    private lateinit var strataSampleAdapter: StrataSampleAdapter2
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var composableAddStrataDialogHost: ComposableAddStrataDialogHost
 
@@ -63,7 +64,7 @@ class StrataSampleFragment : Fragment()
             composableAddStrataDialogHost.Content()
         }
 
-        strataSampleAdapter = StrataSampleAdapter(requireActivity())
+        strataSampleAdapter = StrataSampleAdapter2(requireActivity())
         strataSampleAdapter.didSelectStrata = this::didSelectStrata
         strataSampleAdapter.didSelectField = this::didSelectField
         strataSampleAdapter.didSelectRule = this::didSelectRule
@@ -72,6 +73,7 @@ class StrataSampleFragment : Fragment()
         strataSampleAdapter.shouldAddField = this::shouldAddField
         strataSampleAdapter.shouldAddRule = this::shouldAddRule
         strataSampleAdapter.shouldAddFilter = this::shouldAddFilter
+        strataSampleAdapter.shouldAddCollectionField = this::shouldAddCollectionField
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
             this.study = study
@@ -89,8 +91,8 @@ class StrataSampleFragment : Fragment()
             binding.enableSubsetCheckbox.isChecked = true
         }
 
-        binding.expandableListView.setAdapter(strataSampleAdapter)
-        binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
+        binding.recyclerView.setAdapter(strataSampleAdapter)
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         binding.enableSubsetCheckbox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
@@ -129,6 +131,14 @@ class StrataSampleFragment : Fragment()
     private fun shouldAddField()
     {
         val field = Field( null, study.fields.size+1,"", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid )
+        sharedViewModel.createFieldModel.setCurrentField( field )
+        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+    }
+
+    private fun shouldAddCollectionField()
+    {
+        val field = Field( null, study.fields.size+1,"", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid )
+        field.isCollectionField = true
         sharedViewModel.createFieldModel.setCurrentField( field )
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
     }
@@ -182,6 +192,12 @@ class StrataSampleFragment : Fragment()
     }
 
     private fun didSelectField( field: Field )
+    {
+        sharedViewModel.createFieldModel.setCurrentField(field)
+        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+    }
+
+    private fun didSelectCollectionField( field: Field )
     {
         sharedViewModel.createFieldModel.setCurrentField(field)
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
