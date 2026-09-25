@@ -199,134 +199,32 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
         }
 
         binding.exportButton.setOnClickListener {
+            val admin = "Administrator or\nSupervisor"
+            val enumerator = "Enumerator or\nData Collector"
+
             composableSelectionDialogHost.show(
                 title = resources.getString(R.string.export_configuration),
-                message = resources.getString(R.string.select_export_message),
-                items = listOf(resources.getString(R.string.qr_code), resources.getString(R.string.file_system)),
+                message = "Select the destination role",
+                items = listOf(admin, enumerator),
             ) { selection ->
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    config.selectedEnumAreaUuid = ""
-
-                    sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                        config.selectedStudyUuid = study.uuid
-                    }
-
-                    binding.progressOverlayView.visibility = View.VISIBLE
-
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        withContext(Dispatchers.IO) {
-                            // this may take a while...
-                            for (enumArea in config.enumAreas) {
-                                enumArea.selectedEnumerationTeamUuid = ""
-                                enumArea.selectedCollectionTeamUuid = ""
-                            }
-                        }
-
-                        // back on the main thread...
-
-                        binding.progressOverlayView.visibility = View.GONE
-
-                        if (selection == resources.getString(R.string.qr_code)) {
-                            composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
-                            {
-                                nearbySessionHostManager?.stopHosting()
-                            }
-
-                            config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
-
-                            nearbySessionHostManager = NearbySessionHostManager( requireContext().applicationContext, config )
-
-                            viewLifecycleOwner.lifecycleScope.launch {
-                                repeatOnLifecycle(Lifecycle.State.STARTED )
-                                {
-                                    nearbySessionHostManager?.state?.collect { state ->
-                                        composableNearbySessionStatusDialogHost.updateState(state)
-                                    }
-                                }
-                            }
-
-                            nearbySessionHostManager?.startHosting()
-                        }
-                        else if (selection == resources.getString(R.string.file_system))
+                if (selection == enumerator)
+                {
+                    composableConfirmationDialogHost.show(
+                        title = resources.getString(R.string.please_confirm),
+                        message = "This configuration does not have an Enumeration or Data Collection team associated with it.\n\nAre you sure you want to export this configuration to an Enumerator or Data Collector?",
+                        leftButtonText = resources.getString(R.string.no),
+                        rightButtonText = resources.getString(R.string.yes),
+                        destructive = true
+                    ) { selection ->
+                        if (selection == resources.getString(R.string.yes))
                         {
-                            val items = ArrayList<String>()
-                            items.add( "Configuration Files" )
-                            items.add( "Image Files" )
-
-                            composableCheckboxDialogHost.show(
-                                title = "Select Export Items",
-                                items = items,
-                                isChecked = emptyList(),
-                                onContinue = { selections ->
-                                    includeConfig = false
-                                    includeImages = false
-
-                                    for (selection in selections) {
-                                        if (selection == items[0]) includeConfig = true
-                                        if (selection == items[1]) includeImages = true
-                                    }
-
-                                    if (includeConfig || includeImages)
-                                    {
-                                        composableSelectionDialogHost.show(
-                                            title = resources.getString(R.string.select_file_location),
-                                            message = "",
-                                            items = listOf(resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose)),
-                                        ) { selection ->
-                                            if (selection == resources.getString(R.string.default_location))
-                                            {
-                                                binding.progressOverlayView.visibility = View.VISIBLE
-
-                                                viewLifecycleOwner.lifecycleScope.launch {
-                                                    withContext(Dispatchers.IO)
-                                                    {
-                                                        config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
-                                                    }
-
-                                                    // back on the main thread...
-                                                    binding.progressOverlayView.visibility = View.GONE
-
-                                                    val zipUtils = ZipUtils()
-
-                                                    composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
-                                                    {
-                                                        zipUtils.cancel()
-                                                    }
-
-                                                    viewLifecycleOwner.lifecycleScope.launch {
-                                                        zipUtils.state.collect { state ->
-                                                            composableNearbySessionStatusDialogHost.updateState(state)
-                                                        }
-                                                    }
-
-                                                    PerformanceManager.startTimer()
-
-                                                    zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages ) { success ->
-                                                        if (success)
-                                                        {
-                                                            composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded))
-                                                        }
-                                                        else
-                                                        {
-                                                            composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
-                                                        }
-
-                                                        composableNearbySessionStatusDialogHost.dismiss()
-
-                                                        Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
-                                                    }
-                                                }
-                                            }
-                                            else if (selection == resources.getString(R.string.let_me_choose))
-                                            {
-                                                exportToDevice()
-                                            }
-                                        }
-                                    }
-                                }
-                            )
+                            exportConfig()
                         }
                     }
+                }
+                else
+                {
+                    exportConfig()
                 }
             }
         }
@@ -404,6 +302,140 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
         binding.enumAreasRecycler.layoutManager = LinearLayoutManager(activity )
 
         updateOverview()
+    }
+
+    fun exportConfig()
+    {
+        composableSelectionDialogHost.show(
+            title = resources.getString(R.string.export_configuration),
+            message = resources.getString(R.string.select_export_message),
+            items = listOf(resources.getString(R.string.qr_code), resources.getString(R.string.file_system)),
+        ) { selection ->
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                config.selectedEnumAreaUuid = ""
+
+                sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                    config.selectedStudyUuid = study.uuid
+                }
+
+                binding.progressOverlayView.visibility = View.VISIBLE
+
+                viewLifecycleOwner.lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        // this may take a while...
+                        for (enumArea in config.enumAreas) {
+                            enumArea.selectedEnumerationTeamUuid = ""
+                            enumArea.selectedCollectionTeamUuid = ""
+                        }
+                    }
+
+                    // back on the main thread...
+
+                    binding.progressOverlayView.visibility = View.GONE
+
+                    if (selection == resources.getString(R.string.qr_code)) {
+                        composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
+                        {
+                            nearbySessionHostManager?.stopHosting()
+                        }
+
+                        config.enumAreas.clear() // make sure we don't send EA's with the config, they'll be transferred separately
+
+                        nearbySessionHostManager = NearbySessionHostManager( requireContext().applicationContext, config )
+
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            repeatOnLifecycle(Lifecycle.State.STARTED )
+                            {
+                                nearbySessionHostManager?.state?.collect { state ->
+                                    composableNearbySessionStatusDialogHost.updateState(state)
+                                }
+                            }
+                        }
+
+                        nearbySessionHostManager?.startHosting()
+                    }
+                    else if (selection == resources.getString(R.string.file_system))
+                    {
+                        val items = ArrayList<String>()
+                        items.add( "Configuration Files" )
+                        items.add( "Image Files" )
+
+                        composableCheckboxDialogHost.show(
+                            title = "Select Export Items",
+                            items = items,
+                            isChecked = emptyList(),
+                            onContinue = { selections ->
+                                includeConfig = false
+                                includeImages = false
+
+                                for (selection in selections) {
+                                    if (selection == items[0]) includeConfig = true
+                                    if (selection == items[1]) includeImages = true
+                                }
+
+                                if (includeConfig || includeImages)
+                                {
+                                    composableSelectionDialogHost.show(
+                                        title = resources.getString(R.string.select_file_location),
+                                        message = "",
+                                        items = listOf(resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose)),
+                                    ) { selection ->
+                                        if (selection == resources.getString(R.string.default_location))
+                                        {
+                                            binding.progressOverlayView.visibility = View.VISIBLE
+
+                                            viewLifecycleOwner.lifecycleScope.launch {
+                                                withContext(Dispatchers.IO)
+                                                {
+                                                    config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
+                                                }
+
+                                                // back on the main thread...
+                                                binding.progressOverlayView.visibility = View.GONE
+
+                                                val zipUtils = ZipUtils()
+
+                                                composableNearbySessionStatusDialogHost.show(title = resources.getString(R.string.export_configuration))
+                                                {
+                                                    zipUtils.cancel()
+                                                }
+
+                                                viewLifecycleOwner.lifecycleScope.launch {
+                                                    zipUtils.state.collect { state ->
+                                                        composableNearbySessionStatusDialogHost.updateState(state)
+                                                    }
+                                                }
+
+                                                PerformanceManager.startTimer()
+
+                                                zipUtils.zipToPublicDocuments( requireActivity(), config, getFileName(), "Configurations", includeConfig, includeImages ) { success ->
+                                                    if (success)
+                                                    {
+                                                        composableNotificationDialogHost.show(title = resources.getString(R.string.success), message = resources.getString(R.string.export_succeeded))
+                                                    }
+                                                    else
+                                                    {
+                                                        composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.export_failed))
+                                                    }
+
+                                                    composableNearbySessionStatusDialogHost.dismiss()
+
+                                                    Log.d( "xxx", "Export time : ${PerformanceManager.elapsedTime()}")
+                                                }
+                                            }
+                                        }
+                                        else if (selection == resources.getString(R.string.let_me_choose))
+                                        {
+                                            exportToDevice()
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+        }
     }
 
     fun refreshView( config: Config )
