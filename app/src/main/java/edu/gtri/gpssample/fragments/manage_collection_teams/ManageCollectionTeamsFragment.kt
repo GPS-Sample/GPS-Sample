@@ -149,26 +149,37 @@ class ManageCollectionTeamsFragment : Fragment()
         enumArea.selectedCollectionTeamUuid = collectionTeam.uuid
         sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
 
-        enumArea.locations.clear()
+        // Remove locations that are not in this team
 
-        binding.progressOverlayView.visibility = View.VISIBLE
+        val removeList = ArrayList<Location>()
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            withContext(Dispatchers.IO)
+        for (location in enumArea.locations)
+        {
+            if (!location.isLandmark)
             {
+                var found = false
+
                 for (uuid in collectionTeam.locationUuids)
                 {
-                    DAO.locationDAO.getLocation( uuid )?.let {
-                        enumArea.locations.add( it )
+                    if (location.uuid == uuid)
+                    {
+                        found = true
                     }
                 }
+
+                if (!found)
+                {
+                    removeList.add( location )
+                }
             }
-
-            // back on the main thread...
-            binding.progressOverlayView.visibility = View.GONE
-
-            findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
         }
+
+        for (location in removeList)
+        {
+            enumArea.locations.remove( location )
+        }
+
+        findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
     }
 
     fun shouldDeleteTeam(collectionTeam: CollectionTeam)

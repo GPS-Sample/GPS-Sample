@@ -23,6 +23,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.EnumerationTeam
+import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamsBinding
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -114,26 +115,37 @@ class ManageEnumerationTeamsFragment : Fragment()
         enumArea.selectedEnumerationTeamUuid = enumerationTeam.uuid
         sharedViewModel.currentEnumerationTeamUuid = enumerationTeam.uuid
 
-        enumArea.locations.clear()
+        // Remove locations that are not in this team
 
-        binding.progressOverlayView.visibility = View.VISIBLE
+        val removeList = ArrayList<Location>()
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            withContext(Dispatchers.IO)
+        for (location in enumArea.locations)
+        {
+            if (!location.isLandmark)
             {
+                var found = false
+
                 for (uuid in enumerationTeam.locationUuids)
                 {
-                    DAO.locationDAO.getLocation( uuid )?.let {
-                        enumArea.locations.add( it )
+                    if (location.uuid == uuid)
+                    {
+                        found = true
                     }
                 }
+
+                if (!found)
+                {
+                    removeList.add( location )
+                }
             }
-
-            // back on the main thread...
-            binding.progressOverlayView.visibility = View.GONE
-
-            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
         }
+
+        for (location in removeList)
+        {
+            enumArea.locations.remove( location )
+        }
+
+        findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
     }
 
     private fun shouldDeleteTeam(enumerationTeam: EnumerationTeam)
