@@ -525,6 +525,7 @@ class CreateFieldFragment : Fragment()
 
                     field.fields?.let { fields ->
                         val childField = Field( field.uuid, fields.size+1,"", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid )
+                        childField.isCollectionField = field.isCollectionField
                         fields.add( childField )
                         sharedViewModel.createFieldModel.setCurrentField( childField )
                         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
@@ -573,6 +574,7 @@ class CreateFieldFragment : Fragment()
                     sharedViewModel.createFieldModel.parentField?.value?.let { parentField ->
                         parentField.fields?.let { fields ->
                             val childField = Field( parentField.uuid, fields.size+1, "", FieldType.Text, false, false, false, false, false, false, null, null,study.uuid )
+                            childField.isCollectionField = parentField.isCollectionField
                             fields.add( childField )
                             sharedViewModel.createFieldModel.setCurrentField( childField )
                             findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
