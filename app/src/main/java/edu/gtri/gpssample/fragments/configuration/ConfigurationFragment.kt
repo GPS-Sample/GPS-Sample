@@ -154,29 +154,6 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
             findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
         }
 
-//        binding.deleteImageView.setOnClickListener {
-//            ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_configuration_message),
-//                resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-//                when( buttonPressed )
-//                {
-//                    ConfirmationDialog.ButtonPress.Left -> {
-//                    }
-//                    ConfirmationDialog.ButtonPress.Right -> {
-//                        sharedViewModel.currentConfiguration?.value?.let { config ->
-//                            Thread {
-//                                DAO.configDAO.deleteConfig( config )
-//                                activity!!.runOnUiThread {
-//                                    findNavController().popBackStack()
-//                                }
-//                            }.start()
-//                        }
-//                    }
-//                    ConfirmationDialog.ButtonPress.None -> {
-//                    }
-//                }
-//            }
-//        }
-
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.importButton.setOnClickListener {
@@ -787,6 +764,8 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                                             DAO.configDAO.createOrUpdateConfig( config, config.version )
 
                                             enumAreaSummaries = DAO.enumAreaDAO.getEnumAreaSummary(config.uuid )
+
+                                            // TODO!!! re-fetch the config from the db
                                         }
 
                                         // back on the main thread...
