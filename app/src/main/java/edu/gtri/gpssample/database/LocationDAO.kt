@@ -134,6 +134,44 @@ class LocationDAO(private var dao: DAO)
         return location
     }
 
+    fun getLocations(uuids: ArrayList<String>): ArrayList<Location>
+    {
+        val locations = ArrayList<Location>()
+
+        if (uuids.isEmpty())
+        {
+            return locations
+        }
+
+        val chunkSize = 500
+
+        for (chunk in uuids.chunked(chunkSize))
+        {
+            val placeholders = chunk.joinToString(",") { "?" }
+
+            val query = """
+            SELECT *
+            FROM ${DAO.TABLE_LOCATION}
+            WHERE ${DAO.COLUMN_UUID} IN ($placeholders)
+        """.trimIndent()
+
+            val cursor = dao.writableDatabase.rawQuery(query,chunk.toTypedArray())
+
+            cursor.use {
+                while (it.moveToNext())
+                {
+                    val location = buildLocation(it)
+
+                    location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems(location)
+
+                    locations.add(location)
+                }
+            }
+        }
+
+        return locations
+    }
+
     @SuppressLint("Range")
     fun getEnumerationTeamLocationUuids( enumerationTeam: EnumerationTeam ) : ArrayList<String>
     {

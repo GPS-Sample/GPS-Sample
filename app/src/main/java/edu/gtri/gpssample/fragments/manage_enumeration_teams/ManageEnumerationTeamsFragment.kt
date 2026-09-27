@@ -115,37 +115,19 @@ class ManageEnumerationTeamsFragment : Fragment()
         enumArea.selectedEnumerationTeamUuid = enumerationTeam.uuid
         sharedViewModel.currentEnumerationTeamUuid = enumerationTeam.uuid
 
-        // Remove locations that are not in this team
+        binding.progressOverlayView.visibility = View.VISIBLE
 
-        val removeList = ArrayList<Location>()
-
-        for (location in enumArea.locations)
-        {
-            if (!location.isLandmark)
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO)
             {
-                var found = false
-
-                for (uuid in enumerationTeam.locationUuids)
-                {
-                    if (location.uuid == uuid)
-                    {
-                        found = true
-                    }
-                }
-
-                if (!found)
-                {
-                    removeList.add( location )
-                }
+                enumArea.locations = DAO.locationDAO.getLocations( enumerationTeam.locationUuids )
             }
-        }
 
-        for (location in removeList)
-        {
-            enumArea.locations.remove( location )
-        }
+            // back on the main thread...
+            binding.progressOverlayView.visibility = View.GONE
 
-        findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment )
+        }
     }
 
     private fun shouldDeleteTeam(enumerationTeam: EnumerationTeam)
