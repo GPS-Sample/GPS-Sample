@@ -155,10 +155,10 @@ class CreateSampleFragment : Fragment()
                 {
                     config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
                 }
-            }
 
-            sampleHasDuplicates = doesSampleHaveDuplicates(config.enumAreas )
-            sampleHasGeofenceViolations = doesSampleHaveGeofenceViolations(config.enumAreas )
+                sampleHasDuplicates = doesSampleHaveDuplicates(config.enumAreas )
+                sampleHasGeofenceViolations = doesSampleHaveGeofenceViolations(config.enumAreas )
+            }
 
             // back on the main thread...
             binding.progressOverlayView.visibility = View.GONE
