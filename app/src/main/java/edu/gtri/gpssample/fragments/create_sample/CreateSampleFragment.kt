@@ -48,6 +48,7 @@ import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.constants.ReviewStatus
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableMapLegendDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 
 class CreateSampleFragment : Fragment()
 {
@@ -302,7 +303,12 @@ class CreateSampleFragment : Fragment()
                 rightButtonText = resources.getString(R.string.yes),
                 destructive = true
             ) { selection ->
-                if (selection == resources.getString(R.string.yes)) {
+                if (selection == resources.getString(R.string.no ))
+                {
+                    binding.nextButton.isEnabled = false
+                }
+                else
+                {
                     redefineEnumerationAreaBoundary()
                 }
             }

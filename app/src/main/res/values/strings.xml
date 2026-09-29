@@ -366,7 +366,6 @@
     <string name="select_file_location">"Select the file location"</string>
     <string name="default_location">"Default location"</string>
     <string name="let_me_choose">"Let me choose"</string>
-    <string name="boundary_is_self_intersecting">"The boundary of this Enumeration Area is self-intersecting. Would you like to correct the boundary?"</string>
     <string name="select_the_property_identifier">"Select the cluster name variable"</string>
     <string name="select_the_hh_identifiers">"Select the household variables to import"</string>
     <string name="app_version">"Application Version"</string>
@@ -547,6 +546,7 @@
     <string name="import_mismatch">The Configuration that you are attempting to import does not match the configuration that is currently open.</string>
     <string name="collection_fields">Collection Fields</string>
     <string name="filters">"Filters (applies rules)"</string>
+    <string name="boundary_is_self_intersecting">"The boundary of this Enumeration Area is self-intersecting.\n\nThe boundary will need to be corrected in order to continue.\n\nWould you like to correct the boundary?"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
