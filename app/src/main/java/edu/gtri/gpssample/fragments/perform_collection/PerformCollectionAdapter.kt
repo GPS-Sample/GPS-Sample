@@ -110,10 +110,7 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var 
         {
             holder.secondTextView.setText( item.uuid )
 
-            if (item.subAddress.isNotEmpty())
-            {
-                holder.firstTextView.setText( "${enumAreaName} : ${item.subAddress}" )
-            }
+            holder.firstTextView.setText( "${enumAreaName} : ${item.subAddress}" )
 
             holder.thirdTextView.setText("")
 

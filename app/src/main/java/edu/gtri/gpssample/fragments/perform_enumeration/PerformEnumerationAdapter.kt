@@ -65,9 +65,13 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
 
         val location = locations.get(holder.adapterPosition)
 
-        if (location.enumerationItems.isNotEmpty() && location.enumerationItems.last().subAddress.isNotEmpty())
+        if (location.enumerationItems.isNotEmpty())
         {
             holder.firstTextView.setText( "${enumAreaName} : ${location.enumerationItems.last().subAddress}" )
+        }
+        else
+        {
+            holder.firstTextView.setText( "${enumAreaName} :" )
         }
 
         holder.secondTextView.setText( location.uuid )

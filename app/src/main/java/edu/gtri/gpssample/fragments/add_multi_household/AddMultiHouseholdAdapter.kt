@@ -52,11 +52,7 @@ class AddMultiHouseholdAdapter( var enumerationItems: List<EnumerationItem>, val
         val enumerationItem = enumerationItems.get(holder.adapterPosition)
 
         holder.dateTextView.setText( enumerationItem.uuid )
-
-        if (enumerationItem.subAddress.isNotEmpty())
-        {
-            holder.nameTextView.setText( "${enumAreaName} : ${enumerationItem.subAddress}" )
-        }
+        holder.nameTextView.setText( "${enumAreaName} : ${enumerationItem.subAddress}" )
 
         if (enumerationItem.enumerationState == EnumerationState.Enumerated)
         {
