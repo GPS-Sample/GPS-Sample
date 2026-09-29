@@ -510,7 +510,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
                             val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
                             if (finalSelectedPolygon.contains(geometry3))
                             {
-                                if (!locationBelongsToTeam( location ))
+                                if (!location.isLandmark && !locationBelongsToTeam( location ))
                                 {
                                     locationUuids.add( location.uuid )
                                 }
@@ -525,7 +525,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
                             val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
                             if (selectionPolygon.contains(geometry3))
                             {
-                                if (!locationBelongsToTeam( location ))
+                                if (!location.isLandmark && !locationBelongsToTeam( location ))
                                 {
                                     if (!locationUuids.contains( location.uuid ))
                                     {

@@ -260,7 +260,6 @@
     <string name="dismiss">"Dismiss"</string>
     <string name="delete">"Delete"</string>
     <string name="launching_odk_collect_application">"Launching ODK Collect Application..."</string>
-    <string name="filters">"Filters (combines rules)"</string>
     <string name="new_location">"Identify Location"</string>
     <string name="delete_configuration">"The current configuration will be replaced by the import.  Would you like to proceed?"</string>
     <string name="total_population">"Total Population Size"</string>
@@ -547,6 +546,7 @@
 
     <string name="import_mismatch">The Configuration that you are attempting to import does not match the configuration that is currently open.</string>
     <string name="collection_fields">Collection Fields</string>
+    <string name="filters">"Filters (applies rules)"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

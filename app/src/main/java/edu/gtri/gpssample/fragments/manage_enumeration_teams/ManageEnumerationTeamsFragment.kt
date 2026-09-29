@@ -8,6 +8,7 @@
 package edu.gtri.gpssample.fragments.manage_enumeration_teams
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
@@ -121,6 +122,8 @@ class ManageEnumerationTeamsFragment : Fragment()
             withContext(Dispatchers.IO)
             {
                 enumArea.locations = DAO.locationDAO.getLocations( enumerationTeam.locationUuids )
+
+                enumArea.locations.addAll(DAO.locationDAO.getLandmarks( enumArea ))
             }
 
             // back on the main thread...

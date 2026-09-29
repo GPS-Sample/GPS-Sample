@@ -169,6 +169,20 @@ class LocationDAO(private var dao: DAO)
             }
         }
 
+        Log.d( "xxx", "before sort..." )
+        for (location in locations)
+        {
+            Log.d( "xxx", location.creationDate.toString() + " : " + location.enumerationItems[0].subAddress)
+        }
+
+        locations.sortBy { it.creationDate }
+
+        Log.d( "xxx", "\nafter sort..." )
+        for (location in locations)
+        {
+            Log.d( "xxx", location.creationDate.toString()  + " : " + location.enumerationItems[0].subAddress)
+        }
+
         return locations
     }
 
@@ -216,6 +230,27 @@ class LocationDAO(private var dao: DAO)
 
         val query = "SELECT location.*, conn.${DAO.COLUMN_LOCATION_UUID}, conn.${DAO.COLUMN_ENUM_AREA_UUID} FROM ${DAO.TABLE_LOCATION} AS location, " +
                 "${DAO.CONNECTOR_TABLE_LOCATION__ENUM_AREA} AS conn WHERE location.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LOCATION_UUID} AND conn.${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}'"
+
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val location = buildLocation( cursor )
+            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+            locations.add( location )
+        }
+
+        cursor.close()
+
+        return locations
+    }
+
+    fun getLandmarks( enumArea: EnumArea ): ArrayList<Location>
+    {
+        val locations = ArrayList<Location>()
+
+        val query = "SELECT location.*, conn.${DAO.COLUMN_LOCATION_UUID}, conn.${DAO.COLUMN_ENUM_AREA_UUID} FROM ${DAO.TABLE_LOCATION} AS location, ${DAO.CONNECTOR_TABLE_LOCATION__ENUM_AREA} AS conn " +
+                "WHERE location.${DAO.COLUMN_LOCATION_IS_LANDMARK} = 1 AND location.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LOCATION_UUID} AND conn.${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}'"
 
         val cursor = dao.writableDatabase.rawQuery(query, null)
 

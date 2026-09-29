@@ -359,17 +359,23 @@ class CreateSampleFragment : Fragment()
         {
             for (location1 in enumArea.locations)
             {
-                for (location2 in enumArea.locations)
+                if (!location1.isLandmark)
                 {
-                    if (location1.uuid == location2.uuid) continue
-                    var distance = GeoUtils.distanceBetween( LatLng( location1.latitude, location1.longitude ), LatLng( location2.latitude, location2.longitude ))
-                    if (config.distanceFormat == DistanceFormat.Feet)
+                    for (location2 in enumArea.locations)
                     {
-                        distance *= 0.3048
-                    }
-                    if (distance < config.proximityWarningValue)
-                    {
-                        duplicateLocations.add( location1 )
+                        if (!location2.isLandmark)
+                        {
+                            if (location1.uuid == location2.uuid) continue
+                            var distance = GeoUtils.distanceBetween( LatLng( location1.latitude, location1.longitude ), LatLng( location2.latitude, location2.longitude ))
+                            if (config.distanceFormat == DistanceFormat.Feet)
+                            {
+                                distance *= 0.3048
+                            }
+                            if (distance < config.proximityWarningValue)
+                            {
+                                duplicateLocations.add( location1 )
+                            }
+                        }
                     }
                 }
             }
@@ -386,17 +392,20 @@ class CreateSampleFragment : Fragment()
         {
             for (location in enumArea.locations)
             {
-                val point = Point.fromLngLat( location.longitude, location.latitude, 0.0 )
-                var distance = GeoUtils.distance( point, enumArea )
-
-                if (config.distanceFormat == DistanceFormat.Feet)
+                if (!location.isLandmark)
                 {
-                    distance *= 0.3048
-                }
+                    val point = Point.fromLngLat( location.longitude, location.latitude, 0.0 )
+                    var distance = GeoUtils.distance( point, enumArea )
 
-                if (distance > config.geofenceBufferValue)
-                {
-                    geofenceViolations.add( location )
+                    if (config.distanceFormat == DistanceFormat.Feet)
+                    {
+                        distance *= 0.3048
+                    }
+
+                    if (distance > config.geofenceBufferValue)
+                    {
+                        geofenceViolations.add( location )
+                    }
                 }
             }
         }

@@ -96,7 +96,6 @@ class PerformEnumerationFragment : Fragment(),
     private var dropMode = false
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
-    private val enumerationTeamLocations = ArrayList<Location>()
     private var includeConfig = false
     private var includeImages = false
     private var maxSubaddress = 0
@@ -213,24 +212,7 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.progressOverlayView.visibility = View.GONE
 
-        enumerationTeamLocations.clear()
-
-        for (teamLocationUuid in enumerationTeam.locationUuids)
-        {
-            enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
-                enumerationTeamLocations.add( location )
-            }
-        }
-
-        for (location in enumArea.locations)
-        {
-            if (location.isLandmark)
-            {
-                enumerationTeamLocations.add( location )
-            }
-        }
-
-        for (location in enumerationTeamLocations) {
+        for (location in enumArea.locations) {
             location.isVisible = true
         }
 
@@ -238,7 +220,7 @@ class PerformEnumerationFragment : Fragment(),
             user = it
         }
 
-        performEnumerationAdapter = PerformEnumerationAdapter( enumerationTeamLocations, enumArea.name )
+        performEnumerationAdapter = PerformEnumerationAdapter( enumArea.locations, enumArea.name )
         performEnumerationAdapter.didSelectLocation = this::didSelectLocation
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -395,12 +377,12 @@ class PerformEnumerationFragment : Fragment(),
                     when( position )
                     {
                         0-> { // nothing
-                            for (location in enumerationTeamLocations) {
+                            for (location in enumArea.locations) {
                                 location.isVisible = true
                             }
                         }
                         1-> { // undefined
-                            for (location in enumerationTeamLocations)
+                            for (location in enumArea.locations)
                             {
                                 location.isVisible = false
                                 if (!location.isLandmark)
@@ -424,7 +406,7 @@ class PerformEnumerationFragment : Fragment(),
                             }
                         }
                         2-> { // incomplete
-                            for (location in enumerationTeamLocations)
+                            for (location in enumArea.locations)
                             {
                                 location.isVisible = false
                                 if (!location.isLandmark)
@@ -441,7 +423,7 @@ class PerformEnumerationFragment : Fragment(),
                             }
                         }
                         3-> { // complete
-                            for (location in enumerationTeamLocations)
+                            for (location in enumArea.locations)
                             {
                                 location.isVisible = false
                                 if (!location.isLandmark)
@@ -458,14 +440,14 @@ class PerformEnumerationFragment : Fragment(),
                             }
                         }
                         4-> { // points of interest
-                            for (location in enumerationTeamLocations)
+                            for (location in enumArea.locations)
                             {
                                 location.isVisible = if (location.isLandmark) true else false
                             }
                         }
                     }
 
-                    performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+                    performEnumerationAdapter.updateLocations( enumArea.locations )
                     refreshMap()
                 }
 
@@ -869,7 +851,7 @@ class PerformEnumerationFragment : Fragment(),
         var surveyedCount = 0
         var enumerationCount = 0
 
-        for (location in enumerationTeamLocations)
+        for (location in enumArea.locations)
         {
             for (enumItem in location.enumerationItems)
             {
@@ -942,7 +924,6 @@ class PerformEnumerationFragment : Fragment(),
 
             sharedViewModel.currentLocationUuid = location.uuid
 
-            enumerationTeamLocations.add(location)
             enumerationTeam.locationUuids.add(location.uuid)
             DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
             navigateToAddHouseholdFragment()
@@ -972,7 +953,6 @@ class PerformEnumerationFragment : Fragment(),
 
                 sharedViewModel.currentLocationUuid = location.uuid
 
-                enumerationTeamLocations.add(location)
                 enumerationTeam.locationUuids.add(location.uuid)
                 DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
                 navigateToAddHouseholdFragment()
@@ -1088,7 +1068,7 @@ class PerformEnumerationFragment : Fragment(),
 
             val markerProperties = ArrayList<MapManager.MarkerProperty>()
 
-            for (location in enumerationTeamLocations)
+            for (location in enumArea.locations)
             {
                 if (!location.isLandmark && location.isVisible)
                 {
@@ -1384,7 +1364,6 @@ class PerformEnumerationFragment : Fragment(),
                                     DAO.locationDAO.createOrUpdateLocation(location, enumArea, location.version)
                                     enumArea.locations.add(location)
                                     sharedViewModel.currentLocationUuid = location.uuid
-                                    enumerationTeamLocations.add(location)
                                     enumerationTeam.locationUuids.add(location.uuid)
                                     DAO.enumerationTeamDAO.updateConnectorTable(enumerationTeam)
                                 }
@@ -1411,7 +1390,7 @@ class PerformEnumerationFragment : Fragment(),
 
         DAO.instance().writableDatabase.beginTransaction()
 
-        for (location in enumerationTeamLocations)
+        for (location in enumArea.locations)
         {
             if (!location.isLandmark && location.enumerationItems.isEmpty())
             {
@@ -1486,7 +1465,7 @@ class PerformEnumerationFragment : Fragment(),
         DAO.instance().writableDatabase.beginTransaction()
         ImageDAO.instance().writableDatabase.beginTransaction()
 
-        for (location in enumerationTeamLocations)
+        for (location in enumArea.locations)
         {
             if (!location.isLandmark && location.imageUuid.isEmpty())
             {
@@ -1517,7 +1496,7 @@ class PerformEnumerationFragment : Fragment(),
 
         var count = 0
 
-        for (location in enumerationTeamLocations)
+        for (location in enumArea.locations)
         {
             if (lastLocation == null)
             {
@@ -1835,7 +1814,7 @@ class PerformEnumerationFragment : Fragment(),
                         loc.distanceUnits = distanceUnits
                     }
 
-                    performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+                    performEnumerationAdapter.updateLocations( enumArea.locations )
                 }
             }
         }
@@ -1952,7 +1931,6 @@ class PerformEnumerationFragment : Fragment(),
 
                             sharedViewModel.currentLocationUuid = location.uuid
 
-                            enumerationTeamLocations.add(location)
                             enumerationTeam.locationUuids.add(location.uuid)
                             DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
                             navigateToAddHouseholdFragment()

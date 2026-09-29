@@ -669,9 +669,9 @@ class ManageConfigurationsFragment : Fragment()
                         {
                             val collectionTeam = collectionTeams[0]
 
-                            // remove locations that are not in the selected team
-                            val locationUuids = collectionTeam.locationUuids.toHashSet()
-                            enumArea.locations.retainAll { it.uuid in locationUuids }
+//                            // remove all locations that are not in the selected team, except for locations that are landmarks
+//                            val locationUuids = collectionTeam.locationUuids.toHashSet()
+//                            enumArea.locations.retainAll { it.uuid in locationUuids || it.isLandmark }
 
                             sharedViewModel.createStudyModel.setCurrentStudy( study )
                             sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
@@ -684,9 +684,9 @@ class ManageConfigurationsFragment : Fragment()
                         {
                             val enumTeam = enumTeams[0]
 
-                            // remove locations that are not in the selected team
-                            val locationUuids = enumTeam.locationUuids.toHashSet()
-                            enumArea.locations.retainAll { it.uuid in locationUuids }
+//                            // remove all locations that are not in the selected team, except for locations that are landmarks
+//                            val locationUuids = enumTeam.locationUuids.toHashSet()
+//                            enumArea.locations.retainAll { it.uuid in locationUuids || it.isLandmark }
 
                             sharedViewModel.createStudyModel.setCurrentStudy( study )
                             sharedViewModel.currentEnumerationTeamUuid = enumTeam.uuid
@@ -722,9 +722,9 @@ class ManageConfigurationsFragment : Fragment()
                         {
                             val collectionTeam = collectionTeams[0]
 
-                            // remove locations that are not in the selected team
-                            val locationUuids = collectionTeam.locationUuids.toHashSet()
-                            enumArea.locations.retainAll { it.uuid in locationUuids }
+//                            // remove all locations that are not in the selected team, except for locations that are landmarks
+//                            val locationUuids = collectionTeam.locationUuids.toHashSet()
+//                            enumArea.locations.retainAll { it.uuid in locationUuids || it.isLandmark }
 
                             sharedViewModel.createStudyModel.setCurrentStudy( study )
                             sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid

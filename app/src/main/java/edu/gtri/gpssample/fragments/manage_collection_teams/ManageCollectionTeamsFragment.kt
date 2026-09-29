@@ -155,6 +155,8 @@ class ManageCollectionTeamsFragment : Fragment()
             withContext(Dispatchers.IO)
             {
                 enumArea.locations = DAO.locationDAO.getLocations( collectionTeam.locationUuids )
+
+                enumArea.locations.addAll(DAO.locationDAO.getLandmarks( enumArea ))
             }
 
             // back on the main thread...
