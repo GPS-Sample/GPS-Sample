@@ -547,6 +547,7 @@
     <string name="collection_fields">Collection Fields</string>
     <string name="filters">"Filters (applies rules)"</string>
     <string name="boundary_is_self_intersecting">"The boundary of this Enumeration Area is self-intersecting.\n\nThe boundary will need to be corrected in order to continue.\n\nWould you like to correct the boundary?"</string>
+    <string name="collection_team_creation_error">"You have not assigned any households"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

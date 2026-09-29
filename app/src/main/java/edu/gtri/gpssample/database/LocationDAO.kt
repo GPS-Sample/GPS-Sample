@@ -169,19 +169,7 @@ class LocationDAO(private var dao: DAO)
             }
         }
 
-        Log.d( "xxx", "before sort..." )
-        for (location in locations)
-        {
-            Log.d( "xxx", location.creationDate.toString() + " : " + location.enumerationItems[0].subAddress)
-        }
-
         locations.sortBy { it.creationDate }
-
-        Log.d( "xxx", "\nafter sort..." )
-        for (location in locations)
-        {
-            Log.d( "xxx", location.creationDate.toString()  + " : " + location.enumerationItems[0].subAddress)
-        }
 
         return locations
     }

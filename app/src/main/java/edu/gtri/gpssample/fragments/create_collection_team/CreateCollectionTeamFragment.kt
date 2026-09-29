@@ -244,6 +244,12 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
                 return@setOnClickListener
             }
 
+            if (locationUuids.isEmpty())
+            {
+                Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.collection_team_creation_error), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             binding.saveButton.isEnabled = false
             binding.cancelButton.isEnabled = false
             binding.busyView.visibility = View.VISIBLE
