@@ -46,7 +46,6 @@ class AddHouseholdFragment : Fragment()
     private lateinit var location: Location
     private lateinit var enumArea : EnumArea
     private lateinit var enumerationTeam: EnumerationTeam
-    private var propertyAdapter : PropertyAdapter? = null
     private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdEnumerationFieldAdapter: AddHouseholdAdapter
@@ -60,8 +59,10 @@ class AddHouseholdFragment : Fragment()
     private var collectionMode = false
     private var reviewDuplicate = false
     private var isMultiHousehold = false
+    private var collectionEditMode = false
     private var fragmentResultListener = ""
     private var reviewFenceViolation = false
+    private var propertyAdapter : PropertyAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -106,6 +107,10 @@ class AddHouseholdFragment : Fragment()
 
         arguments?.getBoolean( Keys.kEditMode.value)?.let { editMode ->
             this.editMode = editMode
+        }
+
+        arguments?.getBoolean( Keys.kCollectionEditMode.value)?.let { collectionEditMode ->
+            this.collectionEditMode = collectionEditMode
         }
 
         arguments?.getBoolean( Keys.kReviewDuplicate.value)?.let {
@@ -360,7 +365,7 @@ class AddHouseholdFragment : Fragment()
         binding.enumerationFieldRecyclerView.layoutManager = LinearLayoutManager(activity)
         binding.enumerationFieldRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
-        addHouseholdCollectionFieldAdapter = AddHouseholdAdapter( binding.collectionFieldRecyclerView, true, config, enumerationItem, collectionFieldDataList, this::getDate, this::getTime )
+        addHouseholdCollectionFieldAdapter = AddHouseholdAdapter( binding.collectionFieldRecyclerView, collectionEditMode, config, enumerationItem, collectionFieldDataList, this::getDate, this::getTime )
 
         binding.collectionFieldRecyclerView.adapter = addHouseholdCollectionFieldAdapter
         binding.collectionFieldRecyclerView.itemAnimator = DefaultItemAnimator()

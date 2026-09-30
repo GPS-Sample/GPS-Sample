@@ -1187,6 +1187,7 @@ class PerformCollectionFragment : Fragment(),
                     bundle.putBoolean( Keys.kEditMode.value, false )
                     bundle.putBoolean( Keys.kCollectionMode.value, true )
                     bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
+                    bundle.putBoolean( Keys.kCollectionEditMode.value, gpsLocationIsGood(location))
 
                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                 } ?: run {isHandlingTapEvent = false}

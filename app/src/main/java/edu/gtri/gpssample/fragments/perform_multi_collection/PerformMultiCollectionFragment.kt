@@ -203,6 +203,7 @@ class PerformMultiCollectionFragment : Fragment()
             bundle.putBoolean( Keys.kEditMode.value, false )
             bundle.putBoolean( Keys.kCollectionMode.value, true )
             bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
+            bundle.putBoolean( Keys.kCollectionEditMode.value, gpsLocationIsGood )
             findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
         }
     }

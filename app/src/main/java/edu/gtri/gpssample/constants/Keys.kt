@@ -30,6 +30,7 @@ enum class Keys( val value: String ) {
     kIsMultiHousehold("IsMultiHousehold"),
     kGpsAccuracyIsGood("GpsAccuracyIsGood"),
     kGpsLocationIsGood("GpsLocationIsGood"),
+    kCollectionEditMode("CollectionEditMode"),
     kLaunchSurveyRequest("LaunchSurveyRequest"),
     kReviewFenceViolation("ReviewFenceViolation"),
     kAdditionalInfoRequest("AdditionalInfoRequest"),
