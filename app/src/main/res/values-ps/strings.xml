@@ -367,7 +367,6 @@
     <string name="select_file_location">"د فایل ځای وټاکئ"</string>
     <string name="default_location">"اصلي موقعیت"</string>
     <string name="let_me_choose">"ما ته انتخاب راکړئ"</string>
-    <string name="boundary_is_self_intersecting">"د دې شمېرنې ساحې پوله په خپله سره تقاطع لري. ایا غواړئ پوله سمه کړئ؟"</string>
     <string name="select_the_property_identifier">"د کلسټر نوم متغیر وټاکئ"</string>
     <string name="select_the_hh_identifiers">"د واردولو لپاره د کورنۍ متغیرونه وټاکئ"</string>
     <string name="app_version">"د اپلیکیشن نسخه"</string>

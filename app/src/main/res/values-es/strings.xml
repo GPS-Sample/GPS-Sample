@@ -367,7 +367,6 @@
     <string name="select_file_location">"Seleccione la ubicación del archivo"</string>
     <string name="default_location">"Ubicación por defecto"</string>
     <string name="let_me_choose">"Permítame elegir"</string>
-    <string name="boundary_is_self_intersecting">"El límite de esta zona de enumeración es auto-intersecante. Desea corregir el límite?"</string>
     <string name="select_the_property_identifier">"Seleccione la variable del nombre del conglomerado"</string>
     <string name="select_the_hh_identifiers">"Seleccione las variables domésticas a importar"</string>
     <string name="app_version">"Versión de la aplicación"</string>

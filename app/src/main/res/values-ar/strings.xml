@@ -367,7 +367,6 @@
     <string name="select_file_location">"حدد موقع الملف"</string>
     <string name="default_location">"الموقع الافتراضي"</string>
     <string name="let_me_choose">"دعني أختار"</string>
-    <string name="boundary_is_self_intersecting">"حدود منطقة التعداد هذه متقاطعة. هل ترغب في تصحيح الحدود؟"</string>
     <string name="select_the_property_identifier">"حدد متغير اسم المجموعة"</string>
     <string name="select_the_hh_identifiers">"حدد متغيرات الأسرة المراد استيرادها"</string>
     <string name="app_version">"إصدار التطبيق"</string>

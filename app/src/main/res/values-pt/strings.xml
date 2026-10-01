@@ -367,7 +367,6 @@
     <string name="select_file_location">"Selecionar a localização do ficheiro"</string>
     <string name="default_location">"Localização predefinida"</string>
     <string name="let_me_choose">"Deixem-me escolher"</string>
-    <string name="boundary_is_self_intersecting">"O limite desta Área de Enumeração é auto-intersectado. Gostaria de corrigir o limite?"</string>
     <string name="select_the_property_identifier">"Selecione a variável do nome do agregado"</string>
     <string name="select_the_hh_identifiers">"Selecione as variáveis do agregado familiar a importar"</string>
     <string name="app_version">"Versão da aplicação"</string>

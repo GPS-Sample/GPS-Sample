@@ -367,7 +367,6 @@
     <string name="select_file_location">"مکان فایل را انتخاب کنید"</string>
     <string name="default_location">"مکان پیش"</string>
     <string name="let_me_choose">"بگذار انتخاب کنم"</string>
-    <string name="boundary_is_self_intersecting">"مرز این ناحیه شمارش خودبه"</string>
     <string name="select_the_property_identifier">"متغیر نام خوشه را انتخاب کنید"</string>
     <string name="select_the_hh_identifiers">"متغیرهای خانوار را برای وارد کردن انتخاب کنید"</string>
     <string name="app_version">"نسخهٔ برنامه"</string>

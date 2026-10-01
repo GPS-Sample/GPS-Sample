@@ -367,7 +367,6 @@
     <string name="select_file_location">"Piliin ang lokasyon ng file"</string>
     <string name="default_location">"Default na lokasyon"</string>
     <string name="let_me_choose">"Hayaan akong pumili"</string>
-    <string name="boundary_is_self_intersecting">"Ang hangganan ng Enumeration Area na ito ay nagsalubong sa sarili. Gusto mo bang itama ang hangganan?"</string>
     <string name="select_the_property_identifier">"Piliin ang variable ng pangalan ng cluster"</string>
     <string name="select_the_hh_identifiers">"Piliin ang mga variable ng sambahayan na ii-import"</string>
     <string name="app_version">"Bersyon ng Application"</string>
