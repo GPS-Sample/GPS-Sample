@@ -545,9 +545,17 @@
 
     <string name="import_mismatch">The Configuration that you are attempting to import does not match the configuration that is currently open.</string>
     <string name="collection_fields">Collection Fields</string>
-    <string name="filters">"Filters (applies rules)"</string>
-    <string name="boundary_is_self_intersecting">"The boundary of this Enumeration Area is self-intersecting.\n\nThe boundary will need to be corrected in order to continue.\n\nWould you like to correct the boundary?"</string>
-    <string name="collection_team_creation_error">"You have not assigned any households"</string>
+    <string name="filters">Filters (applies rules)</string>
+    <string name="boundary_is_self_intersecting_1_3">The boundary of this Enumeration Area is self-intersecting.</string>
+    <string name="boundary_is_self_intersecting_2_3">The boundary will need to be corrected in order to continue.</string>
+    <string name="boundary_is_self_intersecting_3_3">Would you like to correct the boundary?</string>
+    <string name="collection_team_creation_error">You have not assigned any households</string>
+    <string name="select_export_items">Select Export Items</string>
+    <string name="configuration_files">Configuration Files</string>
+    <string name="image_files">Image Files</string>
+    <string name="export_confirmation_1_3">This configuration does not have a specific Enumeration Area selected.</string>
+    <string name="export_confirmation_2_3">Unless the Enumerator(s) will be creating the Enumeration Area(s), you should probably select an existing Enumeration Area and export the configuration from either the Enumeration or Data Collection page.</string>
+    <string name="export_confirmation_3_3">Are you sure you want to export this configuration to an Enumerator or Data Collector?</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

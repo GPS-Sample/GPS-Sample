@@ -189,9 +189,13 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
             ) { selection ->
                 if (selection == enumerator)
                 {
+                    var message = resources.getString( R.string.export_confirmation_1_3 ) + "\n\n"
+                    message += resources.getString( R.string.export_confirmation_2_3 ) + "\n\n"
+                    message += resources.getString( R.string.export_confirmation_3_3 )
+
                     composableConfirmationDialogHost.show(
                         title = resources.getString(R.string.please_confirm),
-                        message = "This configuration does not have a specific Enumeration Area associated with it.\n\nUnless the Enumerator(s) will be creating the Enumeration Area(s), you should probably select an existing Enumeration Area and export the configuration from either the Enumeration or Data Collection page.\n\nAre you sure you want to export this configuration to an Enumerator or Data Collector?",
+                        message = message,
                         leftButtonText = resources.getString(R.string.no),
                         rightButtonText = resources.getString(R.string.yes),
                         destructive = true
@@ -328,11 +332,11 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                 else if (selection == resources.getString(R.string.file_system))
                 {
                     val items = ArrayList<String>()
-                    items.add( "Configuration Files" )
-                    items.add( "Image Files" )
+                    items.add( resources.getString(R.string.configuration_files ))
+                    items.add( resources.getString(R.string.image_files ))
 
                     composableCheckboxDialogHost.show(
-                        title = "Select Export Items",
+                        title = resources.getString(R.string.select_export_items ),
                         items = items,
                         isChecked = emptyList(),
                         onContinue = { selections ->

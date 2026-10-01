@@ -296,9 +296,13 @@ class CreateSampleFragment : Fragment()
 
         if (GeoUtils.isSelfIntersectingPolygon3( enumArea.vertices))
         {
+            var message = resources.getString( R.string.boundary_is_self_intersecting_1_3 ) + "\n\n"
+            message += resources.getString( R.string.boundary_is_self_intersecting_2_3 ) + "\n\n"
+            message += resources.getString( R.string.boundary_is_self_intersecting_3_3 )
+
             composableConfirmationDialogHost.show(
                 title = resources.getString(R.string.oops),
-                message = resources.getString(R.string.boundary_is_self_intersecting),
+                message = message,
                 leftButtonText = resources.getString(R.string.no),
                 rightButtonText = resources.getString(R.string.yes),
                 destructive = true
