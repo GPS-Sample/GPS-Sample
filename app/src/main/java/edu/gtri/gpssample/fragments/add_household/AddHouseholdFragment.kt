@@ -161,6 +161,11 @@ class AddHouseholdFragment : Fragment()
             }
         }
 
+        if (!this::enumerationItem.isInitialized)
+        {
+            this.enumerationItem = EnumerationItem()
+        }
+
         if (reviewDuplicate || reviewFenceViolation)
         {
             binding.cancelButton.text = resources.getString(R.string.keep_or_exclude_this_location )

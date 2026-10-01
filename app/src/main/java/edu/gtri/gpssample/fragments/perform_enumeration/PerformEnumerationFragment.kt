@@ -1172,7 +1172,10 @@ class PerformEnumerationFragment : Fragment(),
                 }
                 else
                 {
-                    Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
+                    didNavigate = true
+                    val bundle = Bundle()
+                    bundle.putBoolean( Keys.kEditMode.value, false)
+                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                 }
             }
             else if (location.enumerationItems.size == 1)
