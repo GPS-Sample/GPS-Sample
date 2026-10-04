@@ -669,30 +669,48 @@ class ManageConfigurationsFragment : Fragment()
                         {
                             val collectionTeam = collectionTeams[0]
 
-//                            // remove all locations that are not in the selected team, except for locations that are landmarks
-//                            val locationUuids = collectionTeam.locationUuids.toHashSet()
-//                            enumArea.locations.retainAll { it.uuid in locationUuids || it.isLandmark }
+                            binding.progressOverlayView.visibility = View.VISIBLE
 
-                            sharedViewModel.createStudyModel.setCurrentStudy( study )
-                            sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
-                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
-                            samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                withContext(Dispatchers.IO)
+                                {
+                                    enumArea.locations = DAO.locationDAO.getLocations( collectionTeam.locationUuids )
+                                    enumArea.locations.addAll(DAO.locationDAO.getLandmarks( enumArea ))
+                                }
 
-                            findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment )
+                                // back on the main thread...
+                                binding.progressOverlayView.visibility = View.GONE
+
+                                sharedViewModel.createStudyModel.setCurrentStudy( study )
+                                sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
+                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+                                samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+
+                                findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment )
+                            }
                         }
                         else if (enumTeams.isNotEmpty())
                         {
                             val enumTeam = enumTeams[0]
 
-//                            // remove all locations that are not in the selected team, except for locations that are landmarks
-//                            val locationUuids = enumTeam.locationUuids.toHashSet()
-//                            enumArea.locations.retainAll { it.uuid in locationUuids || it.isLandmark }
+                            binding.progressOverlayView.visibility = View.VISIBLE
 
-                            sharedViewModel.createStudyModel.setCurrentStudy( study )
-                            sharedViewModel.currentEnumerationTeamUuid = enumTeam.uuid
-                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                withContext(Dispatchers.IO)
+                                {
+                                    enumArea.locations = DAO.locationDAO.getLocations( enumTeam.locationUuids )
+                                    enumArea.locations.addAll(DAO.locationDAO.getLandmarks( enumArea ))
+                                }
 
-                            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment )
+                                // back on the main thread...
+                                binding.progressOverlayView.visibility = View.GONE
+
+                                sharedViewModel.createStudyModel.setCurrentStudy( study )
+                                sharedViewModel.currentEnumerationTeamUuid = enumTeam.uuid
+                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+
+                                findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment )
+                            }
                         }
                     }
                 }
@@ -722,16 +740,25 @@ class ManageConfigurationsFragment : Fragment()
                         {
                             val collectionTeam = collectionTeams[0]
 
-//                            // remove all locations that are not in the selected team, except for locations that are landmarks
-//                            val locationUuids = collectionTeam.locationUuids.toHashSet()
-//                            enumArea.locations.retainAll { it.uuid in locationUuids || it.isLandmark }
+                            binding.progressOverlayView.visibility = View.VISIBLE
 
-                            sharedViewModel.createStudyModel.setCurrentStudy( study )
-                            sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
-                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
-                            samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                withContext(Dispatchers.IO)
+                                {
+                                    enumArea.locations = DAO.locationDAO.getLocations( collectionTeam.locationUuids )
+                                    enumArea.locations.addAll(DAO.locationDAO.getLandmarks( enumArea ))
+                                }
 
-                            findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment )
+                                // back on the main thread...
+                                binding.progressOverlayView.visibility = View.GONE
+
+                                sharedViewModel.createStudyModel.setCurrentStudy( study )
+                                sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
+                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+                                samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+
+                                findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment )
+                            }
                         }
                     }
                 }

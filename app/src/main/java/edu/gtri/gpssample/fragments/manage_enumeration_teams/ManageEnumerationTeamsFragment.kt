@@ -122,7 +122,6 @@ class ManageEnumerationTeamsFragment : Fragment()
             withContext(Dispatchers.IO)
             {
                 enumArea.locations = DAO.locationDAO.getLocations( enumerationTeam.locationUuids )
-
                 enumArea.locations.addAll(DAO.locationDAO.getLandmarks( enumArea ))
             }
 
