@@ -145,9 +145,9 @@ class ManageConfigurationsFragment : Fragment()
             binding.addButton.visibility = View.GONE
         }
 
-        binding.progressOverlayView.visibility = View.VISIBLE
-
         viewLifecycleOwner.lifecycleScope.launch {
+            binding.progressOverlayView.visibility = View.VISIBLE
+
             withContext(Dispatchers.IO) {
                 minimalConfigurations = DAO.configDAO.getMinimalConfigs()
             }
@@ -325,9 +325,9 @@ class ManageConfigurationsFragment : Fragment()
     {
         sharedViewModel.setCurrentConfig( config )
 
-        binding.progressOverlayView.visibility= View.VISIBLE
-
         viewLifecycleOwner.lifecycleScope.launch {
+            binding.progressOverlayView.visibility= View.VISIBLE
+
             withContext(Dispatchers.IO)
             {
                 if (config.studies.isEmpty())
@@ -384,9 +384,9 @@ class ManageConfigurationsFragment : Fragment()
         ) { selection ->
             if (selection == resources.getString(R.string.yes))
             {
-                binding.progressOverlayView.visibility = View.VISIBLE
-
                 viewLifecycleOwner.lifecycleScope.launch {
+                    binding.progressOverlayView.visibility = View.VISIBLE
+
                     withContext(Dispatchers.IO) {
                         val newConfig = config.copy()
 
@@ -608,9 +608,9 @@ class ManageConfigurationsFragment : Fragment()
 
     fun navigateBasedOnRole( config: Config )
     {
-        binding.progressOverlayView.visibility = View.VISIBLE
-
         viewLifecycleOwner.lifecycleScope.launch {
+            binding.progressOverlayView.visibility = View.VISIBLE
+
             withContext(Dispatchers.IO) {
                 if (config.studies.isEmpty())
                 {
@@ -669,9 +669,9 @@ class ManageConfigurationsFragment : Fragment()
                         {
                             val collectionTeam = collectionTeams[0]
 
-                            binding.progressOverlayView.visibility = View.VISIBLE
-
                             viewLifecycleOwner.lifecycleScope.launch {
+                                binding.progressOverlayView.visibility = View.VISIBLE
+
                                 withContext(Dispatchers.IO)
                                 {
                                     enumArea.locations = DAO.locationDAO.getLocations( collectionTeam.locationUuids )
@@ -693,9 +693,9 @@ class ManageConfigurationsFragment : Fragment()
                         {
                             val enumTeam = enumTeams[0]
 
-                            binding.progressOverlayView.visibility = View.VISIBLE
-
                             viewLifecycleOwner.lifecycleScope.launch {
+                                binding.progressOverlayView.visibility = View.VISIBLE
+
                                 withContext(Dispatchers.IO)
                                 {
                                     enumArea.locations = DAO.locationDAO.getLocations( enumTeam.locationUuids )
@@ -740,9 +740,9 @@ class ManageConfigurationsFragment : Fragment()
                         {
                             val collectionTeam = collectionTeams[0]
 
-                            binding.progressOverlayView.visibility = View.VISIBLE
-
                             viewLifecycleOwner.lifecycleScope.launch {
+                                binding.progressOverlayView.visibility = View.VISIBLE
+
                                 withContext(Dispatchers.IO)
                                 {
                                     enumArea.locations = DAO.locationDAO.getLocations( collectionTeam.locationUuids )
