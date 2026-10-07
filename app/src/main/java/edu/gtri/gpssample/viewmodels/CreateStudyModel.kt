@@ -48,6 +48,7 @@ class CreateStudyModel
                     0 -> MainApplication.getContext().getString(R.string.cluster_sampling)
                     1 -> MainApplication.getContext().getString(R.string.simple_random)
                     2 -> MainApplication.getContext().getString(R.string.strata_exclusive)
+                    3 -> MainApplication.getContext().getString(R.string.weighted_sampling)
                     else -> String()
                 }
             }
@@ -180,20 +181,22 @@ class CreateStudyModel
 
                 _samplingTypes.clear()
 
+                strataVisibility.set(false)
                 sampleTypesVisibility.set(false)
 
                 when(study.samplingMethod)
                 {
                     SamplingMethod.SimpleRandom -> {
-                        strataVisibility.set(false)
                         sampleTypesVisibility.set(true)
                     }
                     SamplingMethod.Cluster -> {
-                        strataVisibility.set(false)
                         sampleTypesVisibility.set(true)
                     }
                     SamplingMethod.Strata -> {
                         strataVisibility.set( true )
+                    }
+                    SamplingMethod.Weighted -> {
+                        ;
                     }
                     else -> {}
                 }

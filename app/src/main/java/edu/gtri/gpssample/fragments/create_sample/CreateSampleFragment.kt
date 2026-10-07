@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -47,6 +48,7 @@ import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.constants.ReviewStatus
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableMapLegendDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 
@@ -58,6 +60,7 @@ class CreateSampleFragment : Fragment()
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var mapboxMapClickListener: OnMapClickListener
+    private lateinit var composableInputDialogHost: ComposableInputDialogHost
     private lateinit var composableMapLegendDialogHost: ComposableMapLegendDialogHost
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
     private var mapView: View? = null
@@ -104,12 +107,14 @@ class CreateSampleFragment : Fragment()
             createSampleFragment = this@CreateSampleFragment
         }
 
+        composableInputDialogHost = ComposableInputDialogHost()
         composableMapLegendDialogHost = ComposableMapLegendDialogHost()
         composableConfirmationDialogHost = ComposableConfirmationDialogHost()
 
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
         binding.dialogComposeView.setContent {
+            composableInputDialogHost.Content()
             composableMapLegendDialogHost.Content()
             composableConfirmationDialogHost.Content()
         }
@@ -177,7 +182,7 @@ class CreateSampleFragment : Fragment()
         {
             SamplingMethod.SimpleRandom-> binding.titleTextView.text = resources.getString(R.string.simple_random)
             SamplingMethod.Cluster -> binding.titleTextView.text = resources.getString(R.string.cluster_sampling)
-            SamplingMethod.Subsets -> binding.titleTextView.text = resources.getString(R.string.subset_overlap)
+            SamplingMethod.Weighted -> binding.titleTextView.text = resources.getString(R.string.weighted_sampling)
             SamplingMethod.Strata -> binding.titleTextView.text = resources.getString(R.string.strata_exclusive)
             SamplingMethod.None -> TODO()
         }
@@ -285,9 +290,30 @@ class CreateSampleFragment : Fragment()
         }
 
         binding.generateSampleButton.setOnClickListener {
-            binding.progressOverlayView.visibility = View.VISIBLE
-
-            samplingViewModel.beginSampling()
+            if (study.samplingMethod == SamplingMethod.Weighted)
+            {
+                composableInputDialogHost.show(
+                    title = null,
+                    description = resources.getString(R.string.enter_sample_weight),
+                    text = "",
+                    keyboardType = KeyboardType.Number,
+                    onResult = { text ->
+                        text.toIntOrNull()?.let { sampleSize ->
+                            if (sampleSize > 0)
+                            {
+                                study.sampleSize = sampleSize
+                                binding.progressOverlayView.visibility = View.VISIBLE
+                                samplingViewModel.beginSampling()
+                            }
+                        }
+                    }
+                )
+            }
+            else
+            {
+                binding.progressOverlayView.visibility = View.VISIBLE
+                samplingViewModel.beginSampling()
+            }
         }
 
         binding.nextButton.setOnClickListener {

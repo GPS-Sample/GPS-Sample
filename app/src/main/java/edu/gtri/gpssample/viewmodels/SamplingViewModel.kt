@@ -372,6 +372,12 @@ class SamplingViewModel : ViewModel()
                 {
                     performClusterSampling()
                 }
+
+                SamplingMethod.Weighted ->
+                {
+                    performClusterSampling()
+                }
+
                 SamplingMethod.Strata ->
                 {
                     performStrataSampling()

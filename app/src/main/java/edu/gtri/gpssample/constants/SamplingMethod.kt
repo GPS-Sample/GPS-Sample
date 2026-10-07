@@ -14,18 +14,19 @@ enum class SamplingMethod(val format : String) {
     None("None"),
     SimpleRandom("Simple Random Sampling"),
     Cluster("Cluster Sampling"),
-    Subsets("Subsets: May Overlap"),
+    Weighted("Weighted Sampling"),
     Strata("Strata: Mutually Exclusive"),
 }
 
 object SamplingMethodConverter
 {
-    val array : Array<String> = Array(3){ i ->
+    val array : Array<String> = Array(4){ i ->
         when(i)
         {
             0 -> SamplingMethod.Cluster.format
             1 -> SamplingMethod.SimpleRandom.format
             2 -> SamplingMethod.Strata.format
+            3 -> SamplingMethod.Weighted.format
             else -> String()
         }
     }
@@ -37,7 +38,7 @@ object SamplingMethodConverter
             SamplingMethod.None         -> 0
             SamplingMethod.SimpleRandom -> 1
             SamplingMethod.Cluster      -> 2
-            SamplingMethod.Subsets      -> 3
+            SamplingMethod.Weighted     -> 3
             SamplingMethod.Strata       -> 4
         }
     }
@@ -49,7 +50,7 @@ object SamplingMethodConverter
             0 -> SamplingMethod.None
             1 -> SamplingMethod.SimpleRandom
             2 -> SamplingMethod.Cluster
-            3 -> SamplingMethod.Subsets
+            3 -> SamplingMethod.Weighted
             4 -> SamplingMethod.Strata
             else -> SamplingMethod.None
         }
@@ -62,6 +63,7 @@ object SamplingMethodConverter
             0 -> SamplingMethod.Cluster
             1 -> SamplingMethod.SimpleRandom
             2 -> SamplingMethod.Strata
+            3 -> SamplingMethod.Weighted
             else -> SamplingMethod.None
         }
     }
@@ -73,6 +75,7 @@ object SamplingMethodConverter
             SamplingMethod.Cluster      -> 0
             SamplingMethod.SimpleRandom -> 1
             SamplingMethod.Strata       -> 2
+            SamplingMethod.Weighted     -> 3
             else -> 0
         }
     }
