@@ -182,7 +182,7 @@ class CreateSampleFragment : Fragment()
         {
             SamplingMethod.SimpleRandom-> binding.titleTextView.text = resources.getString(R.string.simple_random)
             SamplingMethod.Cluster -> binding.titleTextView.text = resources.getString(R.string.cluster_sampling)
-            SamplingMethod.Weighted -> binding.titleTextView.text = resources.getString(R.string.weighted_sampling)
+            SamplingMethod.SelfWeighted -> binding.titleTextView.text = "Self Weighted Sampling" //resources.getString(R.string.weighted_sampling)
             SamplingMethod.Strata -> binding.titleTextView.text = resources.getString(R.string.strata_exclusive)
             SamplingMethod.None -> TODO()
         }
@@ -290,11 +290,11 @@ class CreateSampleFragment : Fragment()
         }
 
         binding.generateSampleButton.setOnClickListener {
-            if (study.samplingMethod == SamplingMethod.Weighted)
+            if (study.samplingMethod == SamplingMethod.SelfWeighted)
             {
                 composableInputDialogHost.show(
                     title = null,
-                    description = resources.getString(R.string.enter_sample_weight),
+                    description = "Enter the sample weight", //resources.getString(R.string.enter_sample_weight),
                     text = "",
                     keyboardType = KeyboardType.Number,
                     onResult = { text ->

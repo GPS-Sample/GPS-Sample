@@ -373,7 +373,7 @@ class SamplingViewModel : ViewModel()
                     performClusterSampling()
                 }
 
-                SamplingMethod.Weighted ->
+                SamplingMethod.SelfWeighted ->
                 {
                     performClusterSampling()
                 }

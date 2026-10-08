@@ -48,7 +48,7 @@ class CreateStudyModel
                     0 -> MainApplication.getContext().getString(R.string.cluster_sampling)
                     1 -> MainApplication.getContext().getString(R.string.simple_random)
                     2 -> MainApplication.getContext().getString(R.string.strata_exclusive)
-                    3 -> MainApplication.getContext().getString(R.string.weighted_sampling)
+                    3 -> "Self weighted sampling" //MainApplication.getContext().getString(R.string.weighted_sampling)
                     else -> String()
                 }
             }
@@ -195,7 +195,7 @@ class CreateStudyModel
                     SamplingMethod.Strata -> {
                         strataVisibility.set( true )
                     }
-                    SamplingMethod.Weighted -> {
+                    SamplingMethod.SelfWeighted -> {
                         ;
                     }
                     else -> {}

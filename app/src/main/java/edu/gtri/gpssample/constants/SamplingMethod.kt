@@ -14,7 +14,7 @@ enum class SamplingMethod(val format : String) {
     None("None"),
     SimpleRandom("Simple Random Sampling"),
     Cluster("Cluster Sampling"),
-    Weighted("Weighted Sampling"),
+    SelfWeighted("Self Weighted Sampling"),
     Strata("Strata: Mutually Exclusive"),
 }
 
@@ -26,7 +26,7 @@ object SamplingMethodConverter
             0 -> SamplingMethod.Cluster.format
             1 -> SamplingMethod.SimpleRandom.format
             2 -> SamplingMethod.Strata.format
-            3 -> SamplingMethod.Weighted.format
+            3 -> SamplingMethod.SelfWeighted.format
             else -> String()
         }
     }
@@ -38,7 +38,7 @@ object SamplingMethodConverter
             SamplingMethod.None         -> 0
             SamplingMethod.SimpleRandom -> 1
             SamplingMethod.Cluster      -> 2
-            SamplingMethod.Weighted     -> 3
+            SamplingMethod.SelfWeighted -> 3
             SamplingMethod.Strata       -> 4
         }
     }
@@ -50,7 +50,7 @@ object SamplingMethodConverter
             0 -> SamplingMethod.None
             1 -> SamplingMethod.SimpleRandom
             2 -> SamplingMethod.Cluster
-            3 -> SamplingMethod.Weighted
+            3 -> SamplingMethod.SelfWeighted
             4 -> SamplingMethod.Strata
             else -> SamplingMethod.None
         }
@@ -63,7 +63,7 @@ object SamplingMethodConverter
             0 -> SamplingMethod.Cluster
             1 -> SamplingMethod.SimpleRandom
             2 -> SamplingMethod.Strata
-            3 -> SamplingMethod.Weighted
+            3 -> SamplingMethod.SelfWeighted
             else -> SamplingMethod.None
         }
     }
@@ -75,7 +75,7 @@ object SamplingMethodConverter
             SamplingMethod.Cluster      -> 0
             SamplingMethod.SimpleRandom -> 1
             SamplingMethod.Strata       -> 2
-            SamplingMethod.Weighted     -> 3
+            SamplingMethod.SelfWeighted -> 3
             else -> 0
         }
     }
