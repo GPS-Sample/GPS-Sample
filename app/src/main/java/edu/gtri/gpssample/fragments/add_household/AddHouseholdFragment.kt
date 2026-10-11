@@ -212,6 +212,11 @@ class AddHouseholdFragment : Fragment()
         //     enumerationItem.fieldDataList.clear()
         // }
 
+        if (study.fields.isEmpty())
+        {
+            binding.enumerationFieldsCardView.visibility = View.GONE
+        }
+
         // create field data for every field that is not a block field
         if (enumerationItem.fieldDataList.isEmpty())
         {
@@ -388,7 +393,6 @@ class AddHouseholdFragment : Fragment()
 
         if (collectionMode)
         {
-            binding.collectionCardView.visibility = View.VISIBLE
             binding.showAdditionalInfoImageView.visibility = View.VISIBLE
             binding.defaultInfoLayout.visibility = View.GONE
             binding.statusInfoLayout.visibility = View.GONE
@@ -396,6 +400,10 @@ class AddHouseholdFragment : Fragment()
             binding.showEnumerationFieldsImageView.visibility = View.GONE
             binding.hideEnumerationFieldsImageView.visibility = View.VISIBLE
             binding.enumerationFieldRecyclerView.visibility = View.VISIBLE
+            if (study.collectionFields.isNotEmpty())
+            {
+                binding.collectionCardView.visibility = View.VISIBLE
+            }
         }
 
         binding.subaddressEditText.setText( enumerationItem.subAddress )

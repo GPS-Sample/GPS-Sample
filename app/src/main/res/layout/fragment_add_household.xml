@@ -531,6 +531,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/enumeration_fields_card_view"
                 android:layout_margin="10dp"
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
