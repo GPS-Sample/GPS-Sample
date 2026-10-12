@@ -1058,18 +1058,23 @@ class PerformEnumerationFragment : Fragment(),
                 }
             }
 
-            for (location in enumArea.locations)
-            {
-                if (location.isLandmark && location.isVisible)
-                {
-                    MapManager.instance().createMarker( requireActivity(), mapView, location, R.drawable.location_blue, "" )
-                }
-            }
+//            for (location in enumArea.locations)
+//            {
+//                if (location.isLandmark && location.isVisible)
+//                {
+//                    MapManager.instance().createMarker( requireActivity(), mapView, location, R.drawable.location_blue, "" )
+//                }
+//            }
 
             val markerProperties = ArrayList<MapManager.MarkerProperty>()
 
             for (location in enumArea.locations)
             {
+                if (location.isLandmark && location.isVisible)
+                {
+                    markerProperties.add( MapManager.MarkerProperty( location, R.drawable.location_blue, location.description ))
+                }
+
                 if (!location.isLandmark && location.isVisible)
                 {
                     var resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_black else R.drawable.home_black

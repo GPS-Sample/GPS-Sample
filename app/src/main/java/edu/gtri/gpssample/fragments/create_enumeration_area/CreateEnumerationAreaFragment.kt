@@ -1025,28 +1025,46 @@ class CreateEnumerationAreaFragment : Fragment(),
                                                 composableDropdownDialogHost.show(title = resources.getString(R.string.select_the_strata_identifier), items) { strataSelection ->
                                                     if (strataSelection.isNotEmpty())
                                                     {
-                                                        processGeoJson( json, propertySelection, strataSelection )
+                                                        processGeoJson( json, false, propertySelection, strataSelection )
                                                     }
                                                     else
                                                     {
-                                                        processGeoJson( json, propertySelection )
+                                                        processGeoJson( json, false,propertySelection )
                                                     }
                                                 }
                                             }
                                             else
                                             {
-                                                processGeoJson( json, propertySelection )
+                                                processGeoJson( json, false,propertySelection )
                                             }
                                         }
                                     }
                                     is Point -> {
-                                        composableCheckboxDialogHost.show(
-                                            title = resources.getString(R.string.select_the_hh_identifiers),
-                                            items = items,
-                                            isChecked = emptyList()
-                                        ) { selections ->
-                                            propertySelections = selections
-                                            processGeoJson( json, "" )
+                                        composableConfirmationDialogHost.show(
+                                            title = resources.getString(R.string.please_confirm),
+                                            message = "Are these locations HH's?",
+                                            leftButtonText = resources.getString(R.string.no),
+                                            rightButtonText = resources.getString(R.string.yes),
+                                            destructive = false
+                                        ) { selection ->
+                                            if (selection == resources.getString(R.string.yes)) {
+                                                composableCheckboxDialogHost.show(
+                                                    title = resources.getString(R.string.select_the_hh_identifiers),
+                                                    items = items,
+                                                    isChecked = emptyList()
+                                                ) { selections ->
+                                                    propertySelections = selections
+                                                    processGeoJson( json, false,"" )
+                                                }
+                                            }
+                                            else
+                                            {
+                                                composableDropdownDialogHost.show(title = "Select the location name", items) { selection ->
+                                                    propertySelections.clear()
+                                                    propertySelections.add( selection )
+                                                    processGeoJson( json, true,"" )
+                                                }
+                                            }
                                         }
                                     }
                                     else -> {}
@@ -1055,7 +1073,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                         }
                         else
                         {
-                            processGeoJson( json, "" )
+                            processGeoJson( json, false, "" )
                         }
                     }
                 }
@@ -1067,7 +1085,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
     }
 
-    fun processGeoJson( json: String, nameKey: String, strataKey: String = "" )
+    fun processGeoJson( json: String, isLandmark: Boolean, nameKey: String, strataKey: String = "" )
     {
         val hash = PreferencesManager.computeHash( json )
 
@@ -1081,18 +1099,18 @@ class CreateEnumerationAreaFragment : Fragment(),
                 destructive = false
             ) { selection ->
                 if (selection == resources.getString(R.string.yes)) {
-                    finishProcessGeoJson( json, nameKey, strataKey )
+                    finishProcessGeoJson( json, isLandmark, nameKey, strataKey )
                 }
             }
         }
         else
         {
             PreferencesManager.saveHash(config.uuid, hash )
-            finishProcessGeoJson( json, nameKey, strataKey )
+            finishProcessGeoJson( json, isLandmark, nameKey, strataKey )
         }
     }
 
-    fun finishProcessGeoJson( json: String, nameKey: String, strataKey: String = "" )
+    fun finishProcessGeoJson( json: String, isLandmark: Boolean, nameKey: String, strataKey: String = "" )
     {
         if (json.isEmpty())
         {
@@ -1107,7 +1125,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                 try
                 {
                     DAO.instance().writableDatabase.beginTransaction()
-                    parseGeoJson( json, nameKey, strataKey )
+                    parseGeoJson( json, isLandmark, nameKey, strataKey )
                     DAO.instance().writableDatabase.setTransactionSuccessful()
                     DAO.instance().writableDatabase.endTransaction()
 
@@ -1142,7 +1160,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
     }
 
-    fun parseGeoJson( text: String, nameKey: String, strataKey: String )
+    fun parseGeoJson( text: String, isLandmark: Boolean, nameKey: String, strataKey: String )
     {
         var hasBeenCentered = false
         var creationDate = Date().time
@@ -1306,7 +1324,18 @@ class CreateEnumerationAreaFragment : Fragment(),
                 }
 
                 val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                val location = Location( timeZone, -1, point.point.coordinates.latitude, point.point.coordinates.longitude, altitude, false, "", point.property )
+                val location = Location( timeZone, -1, point.point.coordinates.latitude, point.point.coordinates.longitude, altitude, isLandmark, "", point.property )
+
+                if (isLandmark)
+                {
+                    val jsonObject = JSONObject( location.properties )
+
+                    for (key in jsonObject.keys())
+                    {
+                        location.description = jsonObject.getString(key)
+                        break
+                    }
+                }
 
                 if (shouldAutoEnumerateLocations)
                 {

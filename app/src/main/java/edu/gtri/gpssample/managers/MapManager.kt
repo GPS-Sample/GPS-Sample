@@ -1273,6 +1273,7 @@ class MapManager
     fun getResourceName( id: Int ) : String
     {
         when (id) {
+            R.drawable.location_blue -> return "location_blue"
             R.drawable.home_black -> return "home_black"
             R.drawable.home_red -> return "home_red"
             R.drawable.home_green -> return "home_green"
@@ -1390,7 +1391,7 @@ class MapManager
         {
             for (location in enumArea.locations)
             {
-                features.put(instance().createFeature(location, MapManager.instance().getResourceName(location)))
+                features.put(instance().createFeature(location,getResourceName(location)))
             }
         }
 
@@ -1434,7 +1435,7 @@ class MapManager
                 // Create the base feature
                 val feature = MapManager.instance().createFeature(
                     markerProperty.location,
-                    MapManager.instance().getResourceName(markerProperty.resourceId)
+                    getResourceName(markerProperty.resourceId)
                 )
 
                 // Get the properties JSONObject
@@ -1466,11 +1467,9 @@ class MapManager
             TileServer.rasterLayer?.let { +it }
 
             val iconNames = listOf(
-                "home_black", "home_blue", "home_green", "home_light_blue",
-                "home_orange", "home_purple", "home_red",
-                "multi_home_black", "multi_home_blue", "multi_home_green",
-                "multi_home_light_blue", "multi_home_orange",
-                "multi_home_purple", "multi_home_red"
+                "location_blue",
+                "home_black", "home_blue", "home_green", "home_light_blue", "home_orange", "home_purple", "home_red",
+                "multi_home_black", "multi_home_blue", "multi_home_green", "multi_home_light_blue", "multi_home_orange", "multi_home_purple", "multi_home_red"
             )
 
             iconNames.forEach { name ->

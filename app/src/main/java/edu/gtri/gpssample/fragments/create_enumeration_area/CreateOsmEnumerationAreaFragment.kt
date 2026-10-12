@@ -1048,7 +1048,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                                     is Point -> {
                                         composableConfirmationDialogHost.show(
                                             title = resources.getString(R.string.please_confirm),
-                                            message = "Are these points HH's?",
+                                            message = "Are these locations HH's?",
                                             leftButtonText = resources.getString(R.string.no),
                                             rightButtonText = resources.getString(R.string.yes),
                                             destructive = false
@@ -1065,7 +1065,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                                             }
                                             else
                                             {
-                                                composableDropdownDialogHost.show(title = "Select the point name", items) { selection ->
+                                                composableDropdownDialogHost.show(title = "Select the location name", items) { selection ->
                                                     propertySelections.clear()
                                                     propertySelections.add( selection )
                                                     processGeoJson( json, true,"" )
@@ -1320,7 +1320,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                     for (key in jsonObject.keys())
                     {
                         location.description = jsonObject.getString(key)
-                        Log.d( "xxx", location.description )
                         break
                     }
                 }
@@ -1329,7 +1328,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                     enumArea.locations.add( location )
                 }
 
-                if (enumArea == null && allEnumAreas.size == 1)
+                if (enumArea == null && allEnumAreas.isNotEmpty())
                 {
                     allEnumAreas.first().locations.add( location )
                 }

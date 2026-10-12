@@ -1082,15 +1082,15 @@ class PerformCollectionFragment : Fragment(),
                 }
             }
 
+            val markerProperties = ArrayList<MapManager.MarkerProperty>()
+
             for (location in landmarkLocations)
             {
                 if (location.isVisible)
                 {
-                    MapManager.instance().createMarker( requireActivity(), mapView, location, R.drawable.location_blue, "" )
+                    markerProperties.add( MapManager.MarkerProperty( location, R.drawable.location_blue, location.description ))
                 }
             }
-
-            val markerProperties = ArrayList<MapManager.MarkerProperty>()
 
             for (location in collectionTeamLocations)
             {
