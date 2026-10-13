@@ -395,11 +395,11 @@ class CreateSampleFragment : Fragment()
         {
             for (location1 in enumArea.locations)
             {
-                if (!location1.isLandmark)
+                if (!location1.isLandmark && location1.enumerationItems.isNotEmpty())
                 {
                     for (location2 in enumArea.locations)
                     {
-                        if (!location2.isLandmark)
+                        if (!location2.isLandmark  && location2.enumerationItems.isNotEmpty())
                         {
                             if (location1.uuid == location2.uuid) continue
                             var distance = GeoUtils.distanceBetween( LatLng( location1.latitude, location1.longitude ), LatLng( location2.latitude, location2.longitude ))
@@ -428,7 +428,7 @@ class CreateSampleFragment : Fragment()
         {
             for (location in enumArea.locations)
             {
-                if (!location.isLandmark)
+                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
                     val point = Point.fromLngLat( location.longitude, location.latitude, 0.0 )
                     var distance = GeoUtils.distance( point, enumArea )
