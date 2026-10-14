@@ -20,13 +20,13 @@ enum class SamplingMethod(val format : String) {
 
 object SamplingMethodConverter
 {
-    val array : Array<String> = Array(4){ i ->
+    val array : Array<String> = Array(3){ i ->
         when(i)
         {
             0 -> SamplingMethod.Cluster.format
             1 -> SamplingMethod.SimpleRandom.format
             2 -> SamplingMethod.Strata.format
-            3 -> SamplingMethod.SelfWeighted.format
+//            3 -> SamplingMethod.SelfWeighted.format
             else -> String()
         }
     }
