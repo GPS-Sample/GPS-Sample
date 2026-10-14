@@ -1049,39 +1049,6 @@ class PerformCollectionFragment : Fragment(),
         {
             MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20, Color.RED, enumArea.name )
 
-            if (isShowingBreadcrumbs && selectedBreadcrumbs.isNotEmpty())
-            {
-                MapManager.instance().loadBreadcrumbs(requireContext(), mapView, selectedBreadcrumbs, selectedTeamNames )
-
-                var groupId = ""
-                val breadcrumbs = ArrayList<Breadcrumb>()
-
-                for (breadcrumb in selectedBreadcrumbs)
-                {
-                    if (breadcrumbs.isEmpty())
-                    {
-                        groupId = breadcrumb.groupId
-                    }
-
-                    if (breadcrumb.groupId == groupId)
-                    {
-                        breadcrumbs.add( breadcrumb )
-                    }
-                    else
-                    {
-                        MapManager.instance().createPolyline( mapView, breadcrumbs )
-                        groupId = breadcrumb.groupId
-                        breadcrumbs.clear()
-                        breadcrumbs.add( breadcrumb )
-                    }
-                }
-
-                if (breadcrumbs.isNotEmpty())
-                {
-                    MapManager.instance().createPolyline( mapView, breadcrumbs )
-                }
-            }
-
             val markerProperties = ArrayList<MapManager.MarkerProperty>()
 
             for (location in landmarkLocations)
@@ -1160,6 +1127,39 @@ class PerformCollectionFragment : Fragment(),
             if (markerProperties.isNotEmpty())
             {
                 MapManager.instance().loadMarkers( requireActivity(), mapView, markerProperties, mapboxMapClickListener )
+            }
+
+            if (isShowingBreadcrumbs && selectedBreadcrumbs.isNotEmpty())
+            {
+                MapManager.instance().loadBreadcrumbs(requireContext(), mapView, selectedBreadcrumbs, selectedTeamNames )
+
+                var groupId = ""
+                val breadcrumbs = ArrayList<Breadcrumb>()
+
+                for (breadcrumb in selectedBreadcrumbs)
+                {
+                    if (breadcrumbs.isEmpty())
+                    {
+                        groupId = breadcrumb.groupId
+                    }
+
+                    if (breadcrumb.groupId == groupId)
+                    {
+                        breadcrumbs.add( breadcrumb )
+                    }
+                    else
+                    {
+                        MapManager.instance().createPolyline( mapView, breadcrumbs )
+                        groupId = breadcrumb.groupId
+                        breadcrumbs.clear()
+                        breadcrumbs.add( breadcrumb )
+                    }
+                }
+
+                if (breadcrumbs.isNotEmpty())
+                {
+                    MapManager.instance().createPolyline( mapView, breadcrumbs )
+                }
             }
         }
     }

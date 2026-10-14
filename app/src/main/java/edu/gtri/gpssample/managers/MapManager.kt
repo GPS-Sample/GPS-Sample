@@ -1228,48 +1228,6 @@ class MapManager
         }
     }
 
-    fun loadBreadcrumbsXXX( context: Context, mapView: MapView, geoJson: String )
-    {
-        val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
-        val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
-
-        mapView.getMapboxMap().loadStyle(style(mapStyle!!) {
-
-            val iconNames = listOf("breadcrumb", "start_breadcrumb", "end_breadcrumb")
-
-            iconNames.forEach { name ->
-                +image(name ) {
-                    bitmap( BitmapFactory.decodeResource(context.resources, context.resources.getIdentifier( name, "drawable", context.packageName )))
-                }
-            }
-
-            +geoJsonSource("BREADCRUMB_SOURCE_ID") {
-                data(geoJson)
-                cluster(true)
-                clusterRadius(20)
-                clusterMaxZoom(16)
-                build()
-            }
-
-            +circleLayer("BREADCRUMB_CLUSTER_LAYER", "BREADCRUMB_SOURCE_ID") {
-                filter(has("point_count"))
-                circleRadius(15.0)
-                circleColor(Color.BLUE)
-                circleOpacity(0.5)
-            }
-
-            +symbolLayer("UNCLUSTERED_BREADCRUMB_LAYER", "BREADCRUMB_SOURCE_ID") {
-                filter(not(has("point_count"))) // only single points
-
-                // Icon
-                iconImage(get("iconName"))       // your property in GeoJSON
-                iconAllowOverlap(true)
-                iconIgnorePlacement(true)
-                iconAnchor(IconAnchor.CENTER)
-            }
-        })
-    }
-
     fun getResourceName( id: Int ) : String
     {
         when (id) {

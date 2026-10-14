@@ -1010,62 +1010,6 @@ class PerformEnumerationFragment : Fragment(),
         {
             MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20, Color.RED, enumArea.name )
 
-            if (breadcrumbRecordingState == BreadcrumbRecordingState.RECORDING)
-            {
-                selectedTeamNames.clear()
-                selectedBreadcrumbs.clear()
-                selectedBreadcrumbs.addAll( enumArea.breadcrumbs )
-                selectedTeamNames.add( enumerationTeam.name )
-            }
-
-            if (isShowingBreadcrumbs && selectedBreadcrumbs.isNotEmpty())
-            {
-                MapManager.instance().loadBreadcrumbs(requireContext(), mapView, selectedBreadcrumbs, selectedTeamNames )
-
-                var groupId = ""
-
-                val breadcrumbs = ArrayList<Breadcrumb>()
-
-                for (teamName in selectedTeamNames)
-                {
-                    for (breadcrumb in selectedBreadcrumbs)
-                    {
-                        if (breadcrumb.enumTeamName == teamName)
-                        {
-                            if (breadcrumbs.isEmpty())
-                            {
-                                groupId = breadcrumb.groupId
-                            }
-
-                            if (breadcrumb.groupId == groupId)
-                            {
-                                breadcrumbs.add( breadcrumb )
-                            }
-                            else
-                            {
-                                MapManager.instance().createPolyline( mapView, breadcrumbs )
-                                groupId = breadcrumb.groupId
-                                breadcrumbs.clear()
-                                breadcrumbs.add( breadcrumb )
-                            }
-                        }
-                    }
-
-                    if (breadcrumbs.isNotEmpty())
-                    {
-                        MapManager.instance().createPolyline( mapView, breadcrumbs )
-                    }
-                }
-            }
-
-//            for (location in enumArea.locations)
-//            {
-//                if (location.isLandmark && location.isVisible)
-//                {
-//                    MapManager.instance().createMarker( requireActivity(), mapView, location, R.drawable.location_blue, "" )
-//                }
-//            }
-
             val markerProperties = ArrayList<MapManager.MarkerProperty>()
 
             for (location in enumArea.locations)
@@ -1116,6 +1060,54 @@ class PerformEnumerationFragment : Fragment(),
             if (markerProperties.isNotEmpty())
             {
                 MapManager.instance().loadMarkers( requireActivity(), mapView, markerProperties, mapboxMapClickListener )
+            }
+
+            if (breadcrumbRecordingState == BreadcrumbRecordingState.RECORDING)
+            {
+                selectedTeamNames.clear()
+                selectedBreadcrumbs.clear()
+                selectedBreadcrumbs.addAll( enumArea.breadcrumbs )
+                selectedTeamNames.add( enumerationTeam.name )
+            }
+
+            if (isShowingBreadcrumbs && selectedBreadcrumbs.isNotEmpty())
+            {
+                MapManager.instance().loadBreadcrumbs(requireContext(), mapView, selectedBreadcrumbs, selectedTeamNames )
+
+                var groupId = ""
+
+                val breadcrumbs = ArrayList<Breadcrumb>()
+
+                for (teamName in selectedTeamNames)
+                {
+                    for (breadcrumb in selectedBreadcrumbs)
+                    {
+                        if (breadcrumb.enumTeamName == teamName)
+                        {
+                            if (breadcrumbs.isEmpty())
+                            {
+                                groupId = breadcrumb.groupId
+                            }
+
+                            if (breadcrumb.groupId == groupId)
+                            {
+                                breadcrumbs.add( breadcrumb )
+                            }
+                            else
+                            {
+                                MapManager.instance().createPolyline( mapView, breadcrumbs )
+                                groupId = breadcrumb.groupId
+                                breadcrumbs.clear()
+                                breadcrumbs.add( breadcrumb )
+                            }
+                        }
+                    }
+
+                    if (breadcrumbs.isNotEmpty())
+                    {
+                        MapManager.instance().createPolyline( mapView, breadcrumbs )
+                    }
+                }
             }
         }
     }
