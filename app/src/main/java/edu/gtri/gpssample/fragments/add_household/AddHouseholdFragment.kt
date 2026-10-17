@@ -650,7 +650,7 @@ class AddHouseholdFragment : Fragment()
 
             for (fieldData in enumerationItem.fieldDataList) {
                 DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
-                    if (field.required) {
+                    if (!field.isCollectionField && field.required) {
                         when (field.type) {
                             FieldType.Text -> {
                                 if (fieldData.textValue.isEmpty()) {
