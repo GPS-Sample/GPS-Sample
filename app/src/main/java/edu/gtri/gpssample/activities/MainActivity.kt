@@ -30,6 +30,9 @@ import edu.gtri.gpssample.databinding.ActivityMainBinding
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.Date
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 
 class MainActivity : AppCompatActivity(), ProviderInstaller.ProviderInstallListener
 {
@@ -51,6 +54,16 @@ class MainActivity : AppCompatActivity(), ProviderInstaller.ProviderInstallListe
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val initialBottomPadding = binding.root.paddingBottom
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root ) { view, insets ->
+            val bottomInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+
+            view.updatePadding(bottom = initialBottomPadding + bottomInset)
+
+            insets
+        }
 
         setSupportActionBar(binding.toolbar)
 
