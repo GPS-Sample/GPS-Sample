@@ -58,11 +58,7 @@ class PerformMultiCollectionAdapter( var enumerationItems: List<EnumerationItem>
         val enumerationItem = enumerationItems.get(holder.adapterPosition)
 
         holder.dateTextView.setText( enumerationItem.uuid )
-
-        if (enumerationItem.subAddress.isNotEmpty())
-        {
-            holder.nameTextView.setText( "${enumAreaName} : ${enumerationItem.subAddress}" )
-        }
+        holder.nameTextView.setText( "${enumAreaName} : ${enumerationItem.subAddress}" )
 
         if (enumerationItem.collectionState == CollectionState.Complete)
         {
