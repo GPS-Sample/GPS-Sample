@@ -2,6 +2,7 @@ package edu.gtri.gpssample.ui.compose
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -75,7 +76,7 @@ fun ComposableSelectionDialog(
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(50.dp)
+                                .defaultMinSize(minHeight = 50.dp)
                         ) {
                             Text(item)
                         }
