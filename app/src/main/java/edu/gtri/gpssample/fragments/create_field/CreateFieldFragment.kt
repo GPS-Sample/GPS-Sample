@@ -21,6 +21,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldOption
@@ -609,7 +610,14 @@ class CreateFieldFragment : Fragment()
             }
             else
             {
-                findNavController().popBackStack( R.id.PrimarySampleFragment, false )
+                if (study.samplingMethod == SamplingMethod.Strata)
+                {
+                    findNavController().popBackStack( R.id.StrataSampleFragment, false )
+                }
+                else
+                {
+                    findNavController().popBackStack( R.id.PrimarySampleFragment, false )
+                }
             }
         }
     }
