@@ -117,8 +117,7 @@ class PerformEnumerationFragment : Fragment(),
     enum class BreadcrumbRecordingState
     {
         OFF,
-        RECORDING,
-        PAUSE,
+        ON,
     }
 
     private var breadcrumbRecordingState = BreadcrumbRecordingState.OFF
@@ -721,20 +720,16 @@ class PerformEnumerationFragment : Fragment(),
                 binding.recordBreadcrumbsButton.setBackgroundResource(R.drawable.record)
                 binding.recordBreadcrumbsButton.setBackgroundTintList(defaultColorList);
             }
-            BreadcrumbRecordingState.RECORDING -> {
+            BreadcrumbRecordingState.ON -> {
                 binding.recordBreadcrumbsButton.setBackgroundResource(R.drawable.record)
                 binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            }
-            BreadcrumbRecordingState.PAUSE -> {
-                binding.recordBreadcrumbsButton.setBackgroundResource(R.drawable.pause)
-                binding.recordBreadcrumbsButton.setBackgroundTintList(defaultColorList);
             }
         }
 
         binding.recordBreadcrumbsButton.setOnClickListener {
             if (breadcrumbRecordingState == BreadcrumbRecordingState.OFF)
             {
-                breadcrumbRecordingState = BreadcrumbRecordingState.RECORDING
+                breadcrumbRecordingState = BreadcrumbRecordingState.ON
                 isShowingBreadcrumbs = true
 
                 lastBreadcrumbGroupId = UUID.randomUUID().toString()
@@ -743,14 +738,7 @@ class PerformEnumerationFragment : Fragment(),
                 binding.showBreadcrumbsButton.setBackgroundResource( R.drawable.navigate2 )
                 binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)))
             }
-            else if (breadcrumbRecordingState == BreadcrumbRecordingState.RECORDING)
-            {
-                breadcrumbRecordingState = BreadcrumbRecordingState.PAUSE
-
-                binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.pause )
-                binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            }
-            else if (breadcrumbRecordingState == BreadcrumbRecordingState.PAUSE)
+            else if (breadcrumbRecordingState == BreadcrumbRecordingState.ON)
             {
                 breadcrumbRecordingState = BreadcrumbRecordingState.OFF
                 isShowingBreadcrumbs = false
@@ -1010,6 +998,52 @@ class PerformEnumerationFragment : Fragment(),
         {
             MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20, Color.RED, enumArea.name )
 
+            if (breadcrumbRecordingState == BreadcrumbRecordingState.ON)
+            {
+                selectedTeamNames.clear()
+                selectedBreadcrumbs.clear()
+                selectedBreadcrumbs.addAll( enumArea.breadcrumbs )
+                selectedTeamNames.add( enumerationTeam.name )
+            }
+
+            if (isShowingBreadcrumbs && selectedBreadcrumbs.isNotEmpty())
+            {
+                var groupId = ""
+
+                val breadcrumbs = ArrayList<Breadcrumb>()
+
+                for (teamName in selectedTeamNames)
+                {
+                    for (breadcrumb in selectedBreadcrumbs)
+                    {
+                        if (breadcrumb.enumTeamName == teamName)
+                        {
+                            if (breadcrumbs.isEmpty())
+                            {
+                                groupId = breadcrumb.groupId
+                            }
+
+                            if (breadcrumb.groupId == groupId)
+                            {
+                                breadcrumbs.add( breadcrumb )
+                            }
+                            else
+                            {
+                                MapManager.instance().createPolyline( mapView, breadcrumbs )
+                                groupId = breadcrumb.groupId
+                                breadcrumbs.clear()
+                                breadcrumbs.add( breadcrumb )
+                            }
+                        }
+                    }
+
+                    if (breadcrumbs.isNotEmpty())
+                    {
+                        MapManager.instance().createPolyline( mapView, breadcrumbs )
+                    }
+                }
+            }
+
             val markerProperties = ArrayList<MapManager.MarkerProperty>()
 
             for (location in enumArea.locations)
@@ -1057,57 +1091,13 @@ class PerformEnumerationFragment : Fragment(),
                 }
             }
 
-            if (markerProperties.isNotEmpty())
-            {
-                MapManager.instance().loadMarkers( requireActivity(), mapView, markerProperties, mapboxMapClickListener )
-            }
-
-            if (breadcrumbRecordingState == BreadcrumbRecordingState.RECORDING)
-            {
-                selectedTeamNames.clear()
-                selectedBreadcrumbs.clear()
-                selectedBreadcrumbs.addAll( enumArea.breadcrumbs )
-                selectedTeamNames.add( enumerationTeam.name )
-            }
-
             if (isShowingBreadcrumbs && selectedBreadcrumbs.isNotEmpty())
             {
-                MapManager.instance().loadBreadcrumbs(requireContext(), mapView, selectedBreadcrumbs, selectedTeamNames )
-
-                var groupId = ""
-
-                val breadcrumbs = ArrayList<Breadcrumb>()
-
-                for (teamName in selectedTeamNames)
-                {
-                    for (breadcrumb in selectedBreadcrumbs)
-                    {
-                        if (breadcrumb.enumTeamName == teamName)
-                        {
-                            if (breadcrumbs.isEmpty())
-                            {
-                                groupId = breadcrumb.groupId
-                            }
-
-                            if (breadcrumb.groupId == groupId)
-                            {
-                                breadcrumbs.add( breadcrumb )
-                            }
-                            else
-                            {
-                                MapManager.instance().createPolyline( mapView, breadcrumbs )
-                                groupId = breadcrumb.groupId
-                                breadcrumbs.clear()
-                                breadcrumbs.add( breadcrumb )
-                            }
-                        }
-                    }
-
-                    if (breadcrumbs.isNotEmpty())
-                    {
-                        MapManager.instance().createPolyline( mapView, breadcrumbs )
-                    }
-                }
+                MapManager.instance().loadMarkers(requireActivity(), mapView, markerProperties, mapboxMapClickListener, selectedBreadcrumbs, selectedTeamNames )
+            }
+            else
+            {
+                MapManager.instance().loadMarkers(requireActivity(), mapView, markerProperties, mapboxMapClickListener )
             }
         }
     }
@@ -1125,7 +1115,7 @@ class PerformEnumerationFragment : Fragment(),
             {
                 if (gpsLocationIsGood( location ))
                 {
-                    if (breadcrumbRecordingState == BreadcrumbRecordingState.RECORDING && enumArea.breadcrumbs.isNotEmpty())
+                    if (breadcrumbRecordingState == BreadcrumbRecordingState.ON && enumArea.breadcrumbs.isNotEmpty())
                     {
                         enumArea.breadcrumbs.add(Breadcrumb(enumArea.uuid, enumerationTeam.name, location.latitude, location.longitude, enumArea.breadcrumbs.last().groupId))
                     }
@@ -1779,7 +1769,7 @@ class PerformEnumerationFragment : Fragment(),
                 {
                     lastLocationUpdateTime = Date().time
 
-                    if (breadcrumbRecordingState == BreadcrumbRecordingState.RECORDING)
+                    if (breadcrumbRecordingState == BreadcrumbRecordingState.ON)
                     {
                         var distance = 10.1;
                         val currentLatLng = LatLng( point.latitude(), point.longitude())

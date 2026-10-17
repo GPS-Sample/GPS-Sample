@@ -157,8 +157,13 @@ class MapManager
         var polylineAnnotation: PolylineAnnotation? = null
     }
 
+    val LOCATION_SOURCE_ID = "LOCATION_SOURCE_ID"
     val LOCATION_CLUSTER_LAYER = "LOCATION_CLUSTER_LAYER"
-    val LOCATION_UNCLUSTERED__LAYER = "LOCATION_UNCLUSTERED_LAYER"
+    val LOCATION_UNCLUSTERED_LAYER = "LOCATION_UNCLUSTERED_LAYER"
+
+    val BREADCRUMB_SOURCE_ID = "BREADCRUMB_SOURCE_ID"
+    val BREADCRUMB_CLUSTER_LAYER = "BREADCRUMB_CLUSTER_LAYER"
+    val BREADCRUMB_UNCLUSTERED_LAYER = "BREADCRUMB_UNCLUSTERED_LAYER"
 
     private val _markerTapped = MutableSharedFlow<Location>( extraBufferCapacity = 1 )
     val markerTapped = _markerTapped.asSharedFlow()
@@ -914,82 +919,6 @@ class MapManager
         }
     }
 
-    fun createBreadcrumb( context: Context, mapView: View, point: Point, @DrawableRes resourceId: Int, title: String = "" )
-    {
-        if (mapView is org.osmdroid.views.MapView)
-        {
-            val marker = org.osmdroid.views.overlay.Marker(mapView)
-            marker.position = GeoPoint( point.latitude(), point.longitude())
-            marker.setAnchor( org.osmdroid.views.overlay.Marker.ANCHOR_CENTER, org.osmdroid.views.overlay.Marker.ANCHOR_CENTER)
-
-            val icon: Drawable? = ContextCompat.getDrawable(context, resourceId)
-            val paddedIcon = InsetDrawable(icon, 36, 36, 36, 36)
-
-            marker.title = title
-            marker.icon = paddedIcon
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-            mapView.overlays.add(marker)
-
-            if (title.isNotEmpty())
-            {
-                val textOverlay = object : TextOverlay()
-                {
-                    override fun draw( canvas: Canvas, mapView: org.osmdroid.views.MapView, shadow: Boolean)
-                    {
-                        if (!shadow)
-                        {
-                            val point = GeoPoint(point.latitude(), point.longitude())
-                            val screenPoint = android.graphics.Point()
-                            mapView.projection.toPixels(point, screenPoint)
-
-                            val paint = Paint().apply {
-                                color = android.graphics.Color.BLACK
-                                textSize = 30f
-                                isAntiAlias = true
-                                textAlign = Paint.Align.LEFT
-                            }
-
-                            val textBounds = Rect()
-                            paint.getTextBounds(title, 0, title.length, textBounds)
-                            val textWidth = textBounds.width()
-                            val textHeight = textBounds.height()
-
-                            val x = screenPoint.x.toFloat() - textWidth / 2
-                            val y = screenPoint.y.toFloat() + textHeight / 2
-
-                            canvas.drawText(title, x, y, paint)
-                        }
-                    }
-                }
-
-                mapView.overlays.add(textOverlay)
-            }
-
-            mapView.invalidate()
-        }
-        else if (mapView is com.mapbox.maps.MapView)
-        {
-            mapView.getMapboxMap().getStyle { style ->
-                val iconId = "custom-marker-${resourceId}"
-
-                if (style.getStyleImage(iconId) == null)
-                {
-                    val bitmap = convertDrawableToBitmap(AppCompatResources.getDrawable(context,resourceId))!!
-                    style.addImage(iconId, bitmap)
-                }
-
-                mapboxBreadcrumbAnnotationManager?.let { pointAnnotationManager ->
-                    val pointAnnotationOptions = PointAnnotationOptions()
-                        .withPoint( point )
-                        .withIconImage( iconId )
-                        .withTextField( title )
-
-                    pointAnnotationManager.create( pointAnnotationOptions )
-                }
-            }
-        }
-    }
-
     private fun getBreadcrumbPaths( breadcrumbs: ArrayList<Breadcrumb>, teamNames: ArrayList<String> ) : ArrayList<ArrayList<Breadcrumb>>
     {
         var numPaths = 1
@@ -1053,7 +982,6 @@ class MapManager
             val zoom = mapView.zoomLevelDouble.roundToInt()
 
             if (zoom != lastZoom) {
-                Log.d( "xxx", zoom.toString())
                 clusterer(mapView)
                 lastZoom = zoom
             }
@@ -1062,173 +990,43 @@ class MapManager
         }
     }
 
-    fun loadBreadcrumbs( context: Context, mapView: View, breadcrumbs: ArrayList<Breadcrumb>, teamNames: ArrayList<String> )
+    private fun loadOsmBreadcrumbs( context: Context, mapView: org.osmdroid.views.MapView, breadcrumbs: ArrayList<Breadcrumb>, teamNames: ArrayList<String> )
     {
-        if (mapView is org.osmdroid.views.MapView)
+        val clusterer = BreadcrumbRadiusMarkerClusterer(context)
+        clusterer.textPaint.color = Color.TRANSPARENT
+        val icon = BitmapFactory.decodeResource(context.resources, context.resources.getIdentifier("breadcrumb", "drawable", context.packageName))
+        clusterer.setIcon( icon )
+
+        val paths = getBreadcrumbPaths( breadcrumbs, teamNames )
+
+        for (path in paths)
         {
-            val clusterer = BreadcrumbRadiusMarkerClusterer(context)
-            clusterer.textPaint.color = Color.TRANSPARENT
-            val icon = BitmapFactory.decodeResource(context.resources, context.resources.getIdentifier("breadcrumb", "drawable", context.packageName))
-            clusterer.setIcon( icon )
-
-            val paths = getBreadcrumbPaths( breadcrumbs, teamNames )
-
-            for (path in paths)
+            if (path.size > 1)
             {
-                if (path.size == 1)
-                {
-                    addBreadcrumb( context, mapView, clusterer, path.first(), R.drawable.start_breadcrumb )
-                    addBreadcrumb( context, mapView, clusterer, path.first(), R.drawable.breadcrumb )
-                }
-                else if (path.size > 1)
-                {
-                    addBreadcrumb( context, mapView, clusterer, path.first(), R.drawable.start_breadcrumb )
-                    addBreadcrumb( context, mapView, clusterer, path.first(), R.drawable.breadcrumb )
-                    addBreadcrumb( context, mapView, clusterer, path.last(), R.drawable.end_breadcrumb )
-                    addBreadcrumb( context, mapView, clusterer, path.last(), R.drawable.breadcrumb )
-                }
+                addBreadcrumb( context, mapView, clusterer, path.first(), R.drawable.start_breadcrumb )
+                addBreadcrumb( context, mapView, clusterer, path.last(), R.drawable.end_breadcrumb )
 
                 for (breadcrumb in path)
                 {
-                    if (breadcrumb != path.first() && breadcrumb != path.last())
-                    {
-                        addBreadcrumb( context, mapView, clusterer, breadcrumb, R.drawable.breadcrumb )
-                    }
+                    addBreadcrumb( context, mapView, clusterer, breadcrumb, R.drawable.breadcrumb )
                 }
             }
-
-            var index = 0
-
-            mapView.overlays.forEachIndexed { i, overlay ->
-                if (overlay is RotationGestureOverlay)
-                {
-                    index = i
-                }
-            }
-
-            mapView.overlays.add(index,clusterer)
-            mapView.invalidate()
         }
-        else if (mapView is com.mapbox.maps.MapView)
-        {
-            val geoJson = JSONObject()
-            geoJson.put("type", "FeatureCollection")
 
-            val features = JSONArray()
+        var index = 0
 
-            val paths = getBreadcrumbPaths( breadcrumbs, teamNames )
-
-            for (path in paths)
+        mapView.overlays.forEachIndexed { i, overlay ->
+            if (overlay is RotationGestureOverlay)
             {
-                if (path.size > 1)
-                {
-                    features.put(instance().createBreadcrumbFeature( path.first(), "start_breadcrumb" ))
-                    features.put(instance().createBreadcrumbFeature( path.first(), "breadcrumb" ))
-                    features.put(instance().createBreadcrumbFeature( path.last(), "end_breadcrumb" ))
-                    features.put(instance().createBreadcrumbFeature( path.last(), "breadcrumb" ))
-                }
-
-                for (breadcrumb in path)
-                {
-                    if (breadcrumb != path.first() && breadcrumb != path.last())
-                    {
-                        features.put(instance().createBreadcrumbFeature( breadcrumb, "breadcrumb" ))
-                    }
-                }
-            }
-
-            geoJson.put("features", features)
-
-            loadBreadcrumbs( context, mapView, geoJson.toString())
-        }
-    }
-
-    fun createBreadcrumbFeature( breadcrumb: Breadcrumb, icon: String ) : JSONObject
-    {
-        val geometry = JSONObject()
-        geometry.put( "type", "Point" )
-
-        val coordinates = JSONArray()
-        coordinates.put( breadcrumb.longitude )
-        coordinates.put( breadcrumb.latitude )
-
-        geometry.put( "coordinates", coordinates )
-
-        val properties = JSONObject()
-        properties.put("iconName", icon )
-        properties.put("POI", icon )
-
-        val feature = JSONObject()
-        feature.put( "type", "Feature" )
-        feature.put( "geometry", geometry )
-        feature.put( "properties", properties )
-
-        return feature
-    }
-
-    fun loadBreadcrumbs(context: Context, mapView: MapView, geoJson: String) {
-
-        mapView.getMapboxMap().getStyle { style ->
-
-            val iconNames = listOf("breadcrumb", "start_breadcrumb", "end_breadcrumb")
-
-            iconNames.forEach { name ->
-                style.addImage(name, BitmapFactory.decodeResource(context.resources,context.resources.getIdentifier(name, "drawable", context.packageName)))
-            }
-
-            // Update existing source if it exists
-            val source = style.getSource("BREADCRUMB_SOURCE_ID") as? GeoJsonSource
-
-            if (source != null)
-            {
-                source.data(geoJson)
-                return@getStyle
-            }
-
-            // Otherwise create everything
-            style.addSource(
-                geoJsonSource("BREADCRUMB_SOURCE_ID") {
-                    data(geoJson)
-                    cluster(true)
-                    clusterRadius(20)
-                    clusterMaxZoom(16)
-                }
-            )
-
-            style.addLayer(
-                circleLayer("BREADCRUMB_CLUSTER_LAYER", "BREADCRUMB_SOURCE_ID") {
-                    filter(has("point_count"))
-                    circleRadius(5.0)
-                    circleColor(Color.BLUE)
-                    circleOpacity(0.5)
-                }
-            )
-
-            unclusteredLayer?.let { unclusteredLayer
-                style.addLayerBelow(
-                    symbolLayer("UNCLUSTERED_BREADCRUMB_LAYER", "BREADCRUMB_SOURCE_ID") {
-                        filter(not(has("point_count")))
-                        iconImage(get("iconName"))
-                        iconAllowOverlap(true)
-                        iconIgnorePlacement(true)
-                        iconAnchor(IconAnchor.CENTER)
-                    }, unclusteredLayer!!.layerId
-                )
-            } ?: run {
-                style.addLayer(
-                    symbolLayer("UNCLUSTERED_BREADCRUMB_LAYER", "BREADCRUMB_SOURCE_ID") {
-                        filter(not(has("point_count")))
-                        iconImage(get("iconName"))
-                        iconAllowOverlap(true)
-                        iconIgnorePlacement(true)
-                        iconAnchor(IconAnchor.CENTER)
-                    }
-                )
+                index = i
             }
         }
+
+        mapView.overlays.add(index,clusterer)
+        mapView.invalidate()
     }
 
-    fun getResourceName( id: Int ) : String
+    private fun getResourceName( id: Int ) : String
     {
         when (id) {
             R.drawable.location_blue -> return "location_blue"
@@ -1249,7 +1047,7 @@ class MapManager
         return ""
     }
 
-    fun getResourceName(location: Location) : String
+    private fun getResourceName(location: Location) : String
     {
         var resourceName = "home_black"
 
@@ -1307,7 +1105,7 @@ class MapManager
         return resourceName
     }
 
-    fun createFeature( location: Location, icon: String ) : JSONObject
+    private fun createLocationFeature( location: Location, icon: String ) : JSONObject
     {
         val geometry = JSONObject()
         geometry.put( "type", "Point" )
@@ -1338,6 +1136,59 @@ class MapManager
         return feature
     }
 
+    private fun createBreadcrumbFeature( breadcrumb: Breadcrumb, icon: String ) : JSONObject
+    {
+        val geometry = JSONObject()
+        geometry.put( "type", "Point" )
+
+        val coordinates = JSONArray()
+        coordinates.put( breadcrumb.longitude )
+        coordinates.put( breadcrumb.latitude )
+
+        geometry.put( "coordinates", coordinates )
+
+        val properties = JSONObject()
+        properties.put("iconName", icon )
+        properties.put("POI", icon )
+
+        val feature = JSONObject()
+        feature.put( "type", "Feature" )
+        feature.put( "geometry", geometry )
+        feature.put( "properties", properties )
+
+        return feature
+    }
+
+    private fun getBreadcrumbJson( breadcrumbs: ArrayList<Breadcrumb>, teamNames: ArrayList<String> ) : String
+    {
+        if (breadcrumbs.isEmpty() || teamNames.isEmpty()) return ""
+
+        val geoJson = JSONObject()
+        geoJson.put("type", "FeatureCollection")
+
+        val features = JSONArray()
+
+        val paths = getBreadcrumbPaths( breadcrumbs, teamNames )
+
+        for (path in paths)
+        {
+            if (path.size > 1)
+            {
+                features.put(instance().createBreadcrumbFeature( path.first(), "start_breadcrumb" ))
+                features.put(instance().createBreadcrumbFeature( path.last(), "end_breadcrumb" ))
+
+                for (breadcrumb in path)
+                {
+                    features.put(instance().createBreadcrumbFeature( breadcrumb, "breadcrumb" ))
+                }
+            }
+        }
+
+        geoJson.put("features", features)
+
+        return geoJson.toString()
+    }
+
     fun loadMarkers( activity: Activity, mapView: MapView, enumAreas: ArrayList<EnumArea> )
     {
         val geoJson = JSONObject()
@@ -1349,19 +1200,27 @@ class MapManager
         {
             for (location in enumArea.locations)
             {
-                features.put(instance().createFeature(location,getResourceName(location)))
+                features.put( createLocationFeature(location,getResourceName(location)))
             }
         }
 
         geoJson.put("features", features)
 
-        loadMarkers( activity, mapView, geoJson.toString(), null )
+        loadMarkers( activity, mapView, geoJson.toString(), "",null )
     }
 
-    fun loadMarkers( context: Context, mapView: View, markerProperties: ArrayList<MarkerProperty>, mapboxMapClickListener: OnMapClickListener? )
+    fun loadMarkers(
+        context: Context,
+        mapView: View,
+        markerProperties: ArrayList<MarkerProperty>,
+        mapboxMapClickListener: OnMapClickListener?,
+        breadcrumbs: ArrayList<Breadcrumb> = ArrayList<Breadcrumb>(),
+        teamNames: ArrayList<String> = ArrayList<String>())
     {
         if (mapView is org.osmdroid.views.MapView)
         {
+            loadOsmBreadcrumbs( context, mapView, breadcrumbs, teamNames )
+
             val clusterer = MyRadiusMarkerClusterer(context)
             clusterer.textPaint.color = Color.WHITE
 
@@ -1391,7 +1250,7 @@ class MapManager
 
             for (markerProperty in markerProperties) {
                 // Create the base feature
-                val feature = MapManager.instance().createFeature(
+                val feature = MapManager.instance().createLocationFeature(
                     markerProperty.location,
                     getResourceName(markerProperty.resourceId)
                 )
@@ -1406,15 +1265,17 @@ class MapManager
                 features.put(feature)
             }
 
-            val geoJson = JSONObject()
-            geoJson.put("type", "FeatureCollection")
-            geoJson.put("features", features)
+            val locationJson = JSONObject()
+            locationJson.put("type", "FeatureCollection")
+            locationJson.put("features", features)
 
-            loadMarkers( context, mapView, geoJson.toString(), mapboxMapClickListener )
+            val breadcrumbJson = getBreadcrumbJson( breadcrumbs, teamNames )
+
+            loadMarkers( context, mapView, locationJson.toString(), breadcrumbJson, mapboxMapClickListener )
         }
     }
 
-    fun loadMarkers( context: Context, mapView: MapView, geoJson: String, mapboxMapClickListener: OnMapClickListener? )
+    fun loadMarkers( context: Context, mapView: MapView, locationJson: String, breadcrumbJson: String, mapboxMapClickListener: OnMapClickListener? )
     {
         val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
         val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
@@ -1424,46 +1285,78 @@ class MapManager
             TileServer.rasterSource?.let { +it }
             TileServer.rasterLayer?.let { +it }
 
-            val iconNames = listOf(
+            if (breadcrumbJson.isNotEmpty())
+            {
+                val breadcrumbIconNames = listOf("breadcrumb", "start_breadcrumb", "end_breadcrumb")
+
+                breadcrumbIconNames.forEach { name ->
+                    +image(name) {
+                        bitmap( BitmapFactory.decodeResource(context.resources, context.resources.getIdentifier(name, "drawable", context.packageName)))
+                    }
+                }
+
+                +geoJsonSource(BREADCRUMB_SOURCE_ID) {
+                    data(breadcrumbJson)
+                    cluster(true)
+                    clusterRadius(20)
+                    clusterMaxZoom(16)
+                    build()
+                }
+
+                +circleLayer(BREADCRUMB_CLUSTER_LAYER,BREADCRUMB_SOURCE_ID ) {
+                    filter(has("point_count"))
+                    circleRadius(5.0)
+                    circleColor(Color.BLUE)
+                    circleOpacity(0.5)
+                }
+
+                +symbolLayer(BREADCRUMB_UNCLUSTERED_LAYER,BREADCRUMB_SOURCE_ID) {
+                    filter(not(has("point_count")))
+                    iconImage(get("iconName"))
+                    iconAllowOverlap(true)
+                    iconIgnorePlacement(true)
+                    iconAnchor(IconAnchor.CENTER)
+                }
+            }
+
+            val locationIconNames = listOf(
                 "location_blue",
                 "home_black", "home_blue", "home_green", "home_light_blue", "home_orange", "home_purple", "home_red",
                 "multi_home_black", "multi_home_blue", "multi_home_green", "multi_home_light_blue", "multi_home_orange", "multi_home_purple", "multi_home_red"
             )
 
-            iconNames.forEach { name ->
+            locationIconNames.forEach { name ->
                 +image(name) {
                     bitmap(BitmapFactory.decodeResource(context.resources, context.resources.getIdentifier(name, "drawable", context.packageName)))
                 }
             }
 
-            +geoJsonSource("LOCATION_SOURCE_ID") {
-                data(geoJson)
+            +geoJsonSource(LOCATION_SOURCE_ID) {
+                data(locationJson)
                 cluster(true)
                 clusterRadius(20)
                 clusterMaxZoom(16)
                 build()
             }
 
-            +circleLayer(LOCATION_CLUSTER_LAYER, "LOCATION_SOURCE_ID") {
+            +circleLayer(LOCATION_CLUSTER_LAYER,LOCATION_SOURCE_ID ) {
                 filter(has("point_count"))
                 circleRadius(15.0)
                 circleColor(Color.BLUE)
                 circleOpacity(0.5)
             }
 
-            unclusteredLayer = symbolLayer(LOCATION_UNCLUSTERED__LAYER, "LOCATION_SOURCE_ID") {
+            +symbolLayer(LOCATION_UNCLUSTERED_LAYER,LOCATION_SOURCE_ID ) {
                 filter(not(has("point_count")))
                 iconImage(get("iconName"))
                 iconAllowOverlap(true)
                 iconIgnorePlacement(true)
                 iconAnchor(IconAnchor.CENTER)
             }
-
-            +unclusteredLayer!!
         }) { style ->
             mapboxMapClickListener?.let {
                 mapView.gestures.removeOnMapClickListener( mapboxMapClickListener )
-                mapView.gestures.addOnMapClickListener(mapboxMapClickListener )
+                mapView.gestures.addOnMapClickListener( mapboxMapClickListener )
             }
         }
     }
@@ -1487,7 +1380,7 @@ class MapManager
         val screenCoord = mapView.mapboxMap.pixelForCoordinate(point)
         val queryRect = ScreenBox(ScreenCoordinate(screenCoord.x - rectSize / 2, screenCoord.y - rectSize / 2), ScreenCoordinate(screenCoord.x + rectSize / 2, screenCoord.y + rectSize / 2))
 
-        mapView.mapboxMap.queryRenderedFeatures(RenderedQueryGeometry(queryRect), RenderedQueryOptions(listOf(LOCATION_CLUSTER_LAYER, LOCATION_UNCLUSTERED__LAYER), null)) { result ->
+        mapView.mapboxMap.queryRenderedFeatures(RenderedQueryGeometry(queryRect), RenderedQueryOptions(listOf(LOCATION_CLUSTER_LAYER, LOCATION_UNCLUSTERED_LAYER), null)) { result ->
             val features = result.value
 
             if (!features.isNullOrEmpty())
