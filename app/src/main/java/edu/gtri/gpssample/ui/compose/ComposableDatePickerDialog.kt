@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.ui.compose
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,7 +28,9 @@ import java.util.Date
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.window.DialogProperties
-
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposableDatePickerDialog(
@@ -96,7 +99,7 @@ fun ComposableDatePickerDialog(
                     Button(
                         onClick = {
                             datePickerState.selectedDateMillis?.let { millis ->
-                                onSelect(Date(millis))
+                                onSelect(Date(utcMillisToLocalMillis(millis)))
                             }
                         }
                     ) {
@@ -109,4 +112,16 @@ fun ComposableDatePickerDialog(
             }
         }
     }
+}
+
+fun utcMillisToLocalMillis(utcMillis: Long): Long
+{
+    val localDate = Instant.ofEpochMilli(utcMillis)
+        .atZone(ZoneId.of("UTC"))
+        .toLocalDate()
+
+    return localDate
+        .atStartOfDay(ZoneId.systemDefault())
+        .toInstant()
+        .toEpochMilli()
 }

@@ -8,6 +8,7 @@
 package edu.gtri.gpssample.fragments.create_field
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -285,12 +286,7 @@ class CreateFieldFragment : Fragment()
             composableDatePickerDialogHost.show(date = Date()) { date ->
                 date?.let {
                     sharedViewModel.currentConfiguration?.value?.let { config ->
-                        val calendar = Calendar.getInstance()
-                        calendar.time = date
-                        calendar[Calendar.HOUR] = 0
-                        calendar[Calendar.MINUTE] = 0
-                        calendar[Calendar.SECOND] = 0
-                        calendar[Calendar.AM_PM] = Calendar.AM
+                        field.minimum = date.time.toDouble()
                         minimumDateEditText.setText( DateUtils.dateString( date, config.dateFormat ))
                     }
                 }
@@ -301,14 +297,32 @@ class CreateFieldFragment : Fragment()
             composableDatePickerDialogHost.show(date = Date()) { date ->
                 date?.let {
                     sharedViewModel.currentConfiguration?.value?.let { config ->
-                        val calendar = Calendar.getInstance()
-                        calendar.time = date
-                        calendar[Calendar.HOUR] = 0
-                        calendar[Calendar.MINUTE] = 0
-                        calendar[Calendar.SECOND] = 0
-                        calendar[Calendar.AM_PM] = Calendar.AM
+                        field.maximum = date.time.toDouble()
                         maximumDateEditText.setText( DateUtils.dateString( date, config.dateFormat ))
                     }
+                }
+            }
+        }
+
+        if (field.type == FieldType.Date)
+        {
+            field.minimum?.let {
+                val date = Date( it.toLong())
+                minimumDateCheckBox.isChecked = true
+                minimumDateCheckBox.visibility = View.VISIBLE
+                minimumDateLayout.visibility = View.VISIBLE
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    minimumDateEditText.setText( DateUtils.dateString( date, config.dateFormat ))
+                }
+            }
+
+            field.maximum?.let {
+                val date = Date( it.toLong())
+                maximumDateCheckBox.isChecked = true
+                maximumDateCheckBox.visibility = View.VISIBLE
+                maximumDateLayout.visibility = View.VISIBLE
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    maximumDateEditText.setText( DateUtils.dateString( date, config.dateFormat ))
                 }
             }
         }
@@ -462,36 +476,41 @@ class CreateFieldFragment : Fragment()
             {
                 field.studyUuid = study.uuid
 
-                if (minimumNumberCheckBox.isChecked)
+                if (field.type == FieldType.Number)
                 {
-                    minimumNumberEditText.text.toString().toDoubleOrNull()?.let {
-                        field.minimum = it
+                    if (minimumNumberCheckBox.isChecked)
+                    {
+                        minimumNumberEditText.text.toString().toDoubleOrNull()?.let {
+                            field.minimum = it
+                        }
+                    }
+                    else
+                    {
+                        field.minimum = null
+                    }
+
+                    if (maximumNumberCheckBox.isChecked)
+                    {
+                        maximumNumberEditText.text.toString().toDoubleOrNull()?.let {
+                            field.maximum = it
+                        }
+                    }
+                    else
+                    {
+                        field.maximum = null
                     }
                 }
-                else
-                {
-                    field.minimum = null
-                }
 
-                if (maximumNumberCheckBox.isChecked)
+                if (field.type == FieldType.Date)
                 {
-                    maximumNumberEditText.text.toString().toDoubleOrNull()?.let {
-                        field.maximum = it
+                    if (!minimumDateCheckBox.isChecked)
+                    {
+                        field.minimum = null
                     }
-                }
-                else
-                {
-                    field.maximum = null
-                }
-
-                if (minimumDateEditText.tag is Double)
-                {
-                    field.minimum = minimumDateEditText.tag as Double
-                }
-
-                if (maximumDateEditText.tag is Double)
-                {
-                    field.maximum = maximumDateEditText.tag as Double
+                    if (!maximumDateCheckBox.isChecked)
+                    {
+                        field.maximum = null
+                    }
                 }
 
                 if (field.minimum != null && field.maximum !=null && field.minimum!! > field.maximum!!)
