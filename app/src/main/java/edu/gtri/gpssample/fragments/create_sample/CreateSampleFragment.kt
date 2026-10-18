@@ -64,8 +64,6 @@ class CreateSampleFragment : Fragment()
     private lateinit var composableMapLegendDialogHost: ComposableMapLegendDialogHost
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
     private var mapView: View? = null
-    private var sampleHasDuplicates = false
-    private var sampleHasGeofenceViolations = false
     private var duplicateLocations = ArrayList<Location>()
     private var geofenceViolations = ArrayList<Location>()
     private var isHandlingTapEvent = false
@@ -162,8 +160,8 @@ class CreateSampleFragment : Fragment()
                     config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
                 }
 
-                sampleHasDuplicates = doesSampleHaveDuplicates(config.enumAreas )
-                sampleHasGeofenceViolations = doesSampleHaveGeofenceViolations(config.enumAreas )
+                getNumDuplicates( config.enumAreas )
+                getNumGeofenceViolations( config.enumAreas )
             }
 
             // back on the main thread...
@@ -387,7 +385,7 @@ class CreateSampleFragment : Fragment()
         return false
     }
 
-    fun doesSampleHaveDuplicates( enumAreas: ArrayList<EnumArea> ) : Boolean
+    fun getNumDuplicates( enumAreas: ArrayList<EnumArea> ) : Int
     {
         duplicateLocations.clear()
 
@@ -417,10 +415,10 @@ class CreateSampleFragment : Fragment()
             }
         }
 
-        return duplicateLocations.isNotEmpty()
+        return duplicateLocations.count()
     }
 
-    fun doesSampleHaveGeofenceViolations( enumAreas: ArrayList<EnumArea> ) : Boolean
+    fun getNumGeofenceViolations( enumAreas: ArrayList<EnumArea> ) : Int
     {
         geofenceViolations.clear()
 
@@ -446,7 +444,7 @@ class CreateSampleFragment : Fragment()
             }
         }
 
-        return geofenceViolations.isNotEmpty()
+        return geofenceViolations.count()
     }
 
     fun handleBackButtonPress()
@@ -460,7 +458,7 @@ class CreateSampleFragment : Fragment()
                 samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.PreviewPage )
             }
             SamplingViewModel.SamplePageState.GeofenceViolationPage -> {
-                if (sampleHasDuplicates)
+                if (duplicateLocations.isNotEmpty())
                 {
                     samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.DuplicatePage )
                 }
@@ -470,11 +468,11 @@ class CreateSampleFragment : Fragment()
                 }
             }
             SamplingViewModel.SamplePageState.GenerateSamplePage -> {
-                if (sampleHasGeofenceViolations)
+                if (geofenceViolations.isNotEmpty())
                 {
                     samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.GeofenceViolationPage )
                 }
-                else if (sampleHasDuplicates)
+                else if (duplicateLocations.isNotEmpty())
                 {
                     samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.DuplicatePage )
                 }
@@ -494,11 +492,11 @@ class CreateSampleFragment : Fragment()
         when (samplingViewModel.samplePageState.value)
         {
             SamplingViewModel.SamplePageState.PreviewPage -> {
-                if (sampleHasDuplicates)
+                if (duplicateLocations.isNotEmpty())
                 {
                     samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.DuplicatePage )
                 }
-                else if (sampleHasGeofenceViolations)
+                else if (geofenceViolations.isNotEmpty())
                 {
                     samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.GeofenceViolationPage )
                 }
@@ -508,7 +506,7 @@ class CreateSampleFragment : Fragment()
                 }
             }
             SamplingViewModel.SamplePageState.DuplicatePage -> {
-                if (sampleHasGeofenceViolations)
+                if (geofenceViolations.isNotEmpty())
                 {
                     samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.GeofenceViolationPage )
                 }
@@ -543,7 +541,7 @@ class CreateSampleFragment : Fragment()
             }
             SamplingViewModel.SamplePageState.DuplicatePage -> {
                 binding.nextButton.isEnabled = true
-                binding.titleTextView.text = resources.getString( R.string.review_possible_duplicates )
+                binding.titleTextView.text = resources.getString( R.string.review_possible_duplicates ) + " (${duplicateLocations.count()})"
                 binding.generateSampleButton.visibility = View.GONE
                 binding.beginReviewTextView.visibility = View.GONE
                 binding.backButton.text = resources.getString(R.string.back )
@@ -552,7 +550,7 @@ class CreateSampleFragment : Fragment()
             }
             SamplingViewModel.SamplePageState.GeofenceViolationPage -> {
                 binding.nextButton.isEnabled = true
-                binding.titleTextView.text = resources.getString( R.string.review_boundary_violations )
+                binding.titleTextView.text = resources.getString( R.string.review_boundary_violations ) + " (${geofenceViolations.count()})"
                 binding.generateSampleButton.visibility = View.GONE
                 binding.beginReviewTextView.visibility = View.GONE
                 binding.backButton.text = resources.getString(R.string.back )
