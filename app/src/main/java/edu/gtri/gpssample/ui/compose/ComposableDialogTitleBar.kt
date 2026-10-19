@@ -2,6 +2,7 @@ package edu.gtri.gpssample.ui.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,7 +22,7 @@ fun ComposableDialogTitleBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
+            .defaultMinSize(minHeight = 60.dp)
             .background(MaterialTheme.colorScheme.secondary)
     ) {
         title?.let {
