@@ -180,6 +180,7 @@ class CreateFieldFragment : Fragment()
         createFieldDropdownAdapter = CreateFieldDropdownAdapter( field.fieldOptions )
         createFieldDropdownAdapter.shouldDeleteDropdownFieldOption = this::shouldDeleteDropdownFieldOption
         dropdownRecyclerView.adapter = createFieldDropdownAdapter
+        dropdownRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
         dropdownRecyclerView.layoutManager = LinearLayoutManager(activity)
 
         val minimumNumberCheckBox = view.findViewById<CheckBox>(R.id.minimum_number_checkBox)
