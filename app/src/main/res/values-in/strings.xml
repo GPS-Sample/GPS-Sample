@@ -260,7 +260,6 @@
     <string name="dismiss">"Membubarkan"</string>
     <string name="delete">"Menghapus"</string>
     <string name="launching_odk_collect_application">"Meluncurkan Aplikasi ODK Collect..."</string>
-    <string name="filters">"Filter (menggabungkan aturan)"</string>
     <string name="new_location">"Identifikasi Lokasi"</string>
     <string name="delete_configuration">"Impor data akan menggantikan konfigurasi saat ini. Apakah Anda ingin melanjutkan?"</string>
     <string name="total_population">"Jumlah Populasi Total"</string>
@@ -543,6 +542,24 @@
     <string name="allow_supervisor_edits">"Izinkan Supervisor Mengedit"</string>
     <string name="supervisor_edit_tip">"Izinkan Supervisor untuk mengedit konfigurasi ini."</string>
     <string name="name_already_exists">"Nama konfigurasi tersebut sudah ada."</string>
+    <string name="import_mismatch">"Konfigurasi yang ingin Anda impor tidak sesuai dengan konfigurasi yang sedang terbuka."</string>
+    <string name="collection_fields">"Kolom Pengumpulan"</string>
+    <string name="filters">"Filter (menerapkan aturan)"</string>
+    <string name="boundary_is_self_intersecting_1_3">"Batas Area Pencacahan ini saling berpotongan."</string>
+    <string name="boundary_is_self_intersecting_2_3">"Batas tersebut perlu diperbaiki agar proses dapat dilanjutkan."</string>
+    <string name="boundary_is_self_intersecting_3_3">"Apakah Anda ingin memperbaiki batas tersebut?"</string>
+    <string name="collection_team_creation_error">"Anda belum menetapkan rumah tangga mana pun."</string>
+    <string name="select_export_items">"Pilih Item Ekspor"</string>
+    <string name="configuration_files">"Berkas Konfigurasi"</string>
+    <string name="image_files">"Gambar"</string>
+    <string name="export_confirmation_1_3">"Konfigurasi ini tidak memiliki Area Pencacahan tertentu yang dipilih."</string>
+    <string name="export_confirmation_2_3">""Kecuali jika Enumerator akan membuat Area Pencacahan, sebaiknya Anda memilih Area Pencacahan yang sudah ada dan mengekspor konfigurasi dari halaman Pencacahan atau Pengumpulan Data.""</string>
+    <string name="export_confirmation_3_3">"Apakah Anda yakin ingin mengekspor konfigurasi ini kepada Enumerator atau Pengumpul Data?"</string>
+    <string name="weighted_sampling">"Pengambilan sampel dengan pembobotan mandiri"</string>
+    <string name="enter_sample_weight">"Masukkan jumlah rumah tangga yang akan disampel"</string>
+    <string name="weighted_sample_error_1_3">"Anda ingin mengambil sampel"</string>
+    <string name="weighted_sample_error_2_3">""rumah tangga, namun Anda hanya memiliki""</string>
+    <string name="weighted_sample_error_3_3">"rumah tangga. Harap masukkan angka yang sama dengan atau kurang dari total rumah tangga."</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>

@@ -260,7 +260,6 @@
     <string name="dismiss">"Descartar"</string>
     <string name="delete">"Borrar"</string>
     <string name="launching_odk_collect_application">"Lanzamiento de la aplicación ODK Collect..."</string>
-    <string name="filters">"Filtros (Combinación de reglas)"</string>
     <string name="new_location">"Identificar ubicación"</string>
     <string name="delete_configuration">"La configuración actual será reemplazada por la importación.  ¿Desea continuar?"</string>
     <string name="total_population">"Tamaño total de la población"</string>
@@ -543,6 +542,24 @@
     <string name="allow_supervisor_edits">"Permitir que el supervisor edite"</string>
     <string name="supervisor_edit_tip">"Permitir que los supervisores editen esta configuración."</string>
     <string name="name_already_exists">"Ese nombre de configuración ya existe."</string>
+    <string name="import_mismatch">"La configuración que está intentando importar no coincide con la configuración que está abierta actualmente."</string>
+    <string name="collection_fields">"Campos de recopilación"</string>
+    <string name="filters">"Filtros (aplica reglas)"</string>
+    <string name="boundary_is_self_intersecting_1_3">"El límite de esta zona de censo se superpone a sí mismo."</string>
+    <string name="boundary_is_self_intersecting_2_3">"Será necesario corregir el límite para poder continuar."</string>
+    <string name="boundary_is_self_intersecting_3_3">"¿Desea corregir el límite?"</string>
+    <string name="collection_team_creation_error">"No ha asignado ningún hogar"</string>
+    <string name="select_export_items">"Seleccionar elementos de exportación"</string>
+    <string name="configuration_files">"Archivos de configuración"</string>
+    <string name="image_files">"Imágenes"</string>
+    <string name="export_confirmation_1_3">"Esta configuración no tiene seleccionada ninguna zona de censo específica."</string>
+    <string name="export_confirmation_2_3">""A menos que sean los encuestadores quienes vayan a crear las zonas de censo, probablemente debería seleccionar una zona de censo existente y exportar la configuración desde la página «Censo» o «Recopilación de datos».""</string>
+    <string name="export_confirmation_3_3">"¿Está seguro de que desea exportar esta configuración a un encuestador o a un recopilador de datos?"</string>
+    <string name="weighted_sampling">"Muestreo autoponderado"</string>
+    <string name="enter_sample_weight">"Introduce el número de hogares que se van a incluir en la muestra"</string>
+    <string name="weighted_sample_error_1_3">"Querías realizar un muestreo de"</string>
+    <string name="weighted_sample_error_2_3">""hogares, pero solo dispones de""</string>
+    <string name="weighted_sample_error_3_3">"hogares. Introduce un número igual o inferior al número total de hogares."</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>

@@ -260,7 +260,6 @@
     <string name="dismiss">"Supprimer"</string>
     <string name="delete">"Supprimer"</string>
     <string name="launching_odk_collect_application">"Lancement de l'application ODK Collect..."</string>
-    <string name="filters">"Filtres (combinent des règles)"</string>
     <string name="new_location">"Identifier le lieu"</string>
     <string name="delete_configuration">"La configuration actuelle sera remplacée par l'importation.  Souhaitez-vous continuer ?"</string>
     <string name="total_population">"Taille totale de la population"</string>
@@ -543,9 +542,24 @@
     <string name="allow_supervisor_edits">"Autoriser le superviseur à modifier"</string>
     <string name="supervisor_edit_tip">"Autoriser les superviseurs à modifier cette configuration."</string>
     <string name="name_already_exists">"Ce nom de configuration existe déjà."</string>
-
-    <string name="import_mismatch">The Configuration that you are attempting to import does not match the configuration that is currently open.</string>
-
+    <string name="import_mismatch">"La configuration que vous essayez d'importer ne correspond pas à celle qui est actuellement ouverte."</string>
+    <string name="collection_fields">"Champs de collecte"</string>
+    <string name="filters">"Filtres (application de règles)"</string>
+    <string name="boundary_is_self_intersecting_1_3">"Le périmètre de cette zone de recensement présente des intersections."</string>
+    <string name="boundary_is_self_intersecting_2_3">"Le périmètre doit être corrigé pour pouvoir continuer."</string>
+    <string name="boundary_is_self_intersecting_3_3">"Souhaitez-vous corriger le périmètre ?"</string>
+    <string name="collection_team_creation_error">"Vous n'avez attribué aucun foyer"</string>
+    <string name="select_export_items">"Sélectionnez les éléments à exporter"</string>
+    <string name="configuration_files">"Fichiers de configuration"</string>
+    <string name="image_files">"Images"</string>
+    <string name="export_confirmation_1_3">"Cette configuration ne comporte aucune zone de recensement spécifique sélectionnée."</string>
+    <string name="export_confirmation_2_3">""À moins que le ou les recenseurs ne créent eux-mêmes la ou les zones de recensement, vous devriez probablement sélectionner une zone de recensement existante et exporter la configuration depuis la page « Recensement » ou « Collecte de données ».""</string>
+    <string name="export_confirmation_3_3">"Êtes-vous sûr de vouloir exporter cette configuration vers un recenseur ou un collecteur de données ?"</string>
+    <string name="weighted_sampling">"Échantillonnage auto-pondéré"</string>
+    <string name="enter_sample_weight">"Indiquez le nombre de ménages à inclure dans l'échantillon"</string>
+    <string name="weighted_sample_error_1_3">"Vous souhaitiez effectuer un échantillonnage"</string>
+    <string name="weighted_sample_error_2_3">""parmi les ménages, mais vous ne disposez que""</string>
+    <string name="weighted_sample_error_3_3">"de ménages. Veuillez saisir un nombre inférieur ou égal au nombre total de ménages."</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>

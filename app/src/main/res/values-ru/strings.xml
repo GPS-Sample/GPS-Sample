@@ -260,7 +260,6 @@
     <string name="dismiss">"Пропустить"</string>
     <string name="delete">"Удалить"</string>
     <string name="launching_odk_collect_application">"Запуск приложения ODK Collect..."</string>
-    <string name="filters">"Фильтры (объединяет правила)"</string>
     <string name="new_location">"Идентифицировать местоположение"</string>
     <string name="delete_configuration">"Текущая конфигурация будет заменена импортом.  Хотите продолжить?"</string>
     <string name="total_population">"Общий размер популяции"</string>
@@ -543,6 +542,24 @@
     <string name="allow_supervisor_edits">"Разрешить редактирование супервизором"</string>
     <string name="supervisor_edit_tip">"Разрешить супервизорам редактировать эту конфигурацию."</string>
     <string name="name_already_exists">"Такое имя конфигурации уже существует."</string>
+    <string name="import_mismatch">""Конфигурация, которую вы пытаетесь импортировать, не соответствует конфигурации, открытой в данный момент.""</string>
+    <string name="collection_fields">"Поля сбора данных"</string>
+    <string name="filters">"Фильтры (применяют правила)"</string>
+    <string name="boundary_is_self_intersecting_1_3">"Граница данного района переписи пересекает саму себя."</string>
+    <string name="boundary_is_self_intersecting_2_3">"Для продолжения необходимо исправить границу."</string>
+    <string name="boundary_is_self_intersecting_3_3">"Хотите исправить границу?"</string>
+    <string name="collection_team_creation_error">"Вы не назначили ни одного домохозяйства"</string>
+    <string name="select_export_items">"Выберите элементы для экспорта"</string>
+    <string name="configuration_files">"Файлы настроек"</string>
+    <string name="image_files">"Изображения"</string>
+    <string name="export_confirmation_1_3">"Для этой конфигурации не выбрана конкретная область переписи."</string>
+    <string name="export_confirmation_2_3">""Если переписчики не будут создавать области переписи, вам, вероятно, следует выбрать существующую область переписи и экспортировать конфигурацию со страницы «Перепись» или «Сбор данных».""</string>
+    <string name="export_confirmation_3_3">""Вы уверены, что хотите экспортировать эту конфигурацию для переписчика или сборщика данных?""</string>
+    <string name="weighted_sampling">"Выборка с учетом собственной весовой оценки"</string>
+    <string name="enter_sample_weight">"Укажите количество домохозяйств для выборки"</string>
+    <string name="weighted_sample_error_1_3">"Вы хотели провести выборку"</string>
+    <string name="weighted_sample_error_2_3">""домохозяйств, но у вас есть только""</string>
+    <string name="weighted_sample_error_3_3">""домохозяйства. Пожалуйста, введите число, не превышающее общее количество домохозяйств.""</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

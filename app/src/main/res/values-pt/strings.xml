@@ -260,7 +260,6 @@
     <string name="dismiss">"Excluir"</string>
     <string name="delete">"Eliminar"</string>
     <string name="launching_odk_collect_application">"Iniciar a aplicação ODK Collect..."</string>
-    <string name="filters">"Filtros (combina regras)"</string>
     <string name="new_location">"Identificar a localização"</string>
     <string name="delete_configuration">"A configuração atual será substituída pela importação. Deseja prosseguir?"</string>
     <string name="total_population">"Tamanho total da população"</string>
@@ -543,6 +542,24 @@
     <string name="allow_supervisor_edits">"Permitir que o supervisor edite"</string>
     <string name="supervisor_edit_tip">"Permitir que os supervisores editem esta configuração."</string>
     <string name="name_already_exists">"Esse nome de configuração já existe."</string>
+    <string name="import_mismatch">"A configuração que está a tentar importar não corresponde à configuração que está atualmente aberta."</string>
+    <string name="collection_fields">"Campos de recolha"</string>
+    <string name="filters">"Filtros (aplicam regras)"</string>
+    <string name="boundary_is_self_intersecting_1_3">"O limite desta área de recenseamento intersecta-se a si próprio."</string>
+    <string name="boundary_is_self_intersecting_2_3">"O limite terá de ser corrigido para que seja possível continuar."</string>
+    <string name="boundary_is_self_intersecting_3_3">"Deseja corrigir o limite?"</string>
+    <string name="collection_team_creation_error">"Não atribuiu nenhum agregado familiar"</string>
+    <string name="select_export_items">"Selecionar itens de exportação"</string>
+    <string name="configuration_files">"Ficheiros de configuração"</string>
+    <string name="image_files">"Imagens"</string>
+    <string name="export_confirmation_1_3">"Esta configuração não tem uma área de recenseamento específica selecionada."</string>
+    <string name="export_confirmation_2_3">""A menos que o(s) recenseador(es) vá(m) criar a(s) área(s) de recenseamento, deverá provavelmente selecionar uma área de recenseamento existente e exportar a configuração a partir da página «Recenseamento» ou «Recolha de dados».""</string>
+    <string name="export_confirmation_3_3">"Tem a certeza de que pretende exportar esta configuração para um recenseador ou um recolhedor de dados?"</string>
+    <string name="weighted_sampling">"Amostragem auto-ponderada"</string>
+    <string name="enter_sample_weight">"Introduza o número de agregados familiares a incluir na amostra"</string>
+    <string name="weighted_sample_error_1_3">"Queria fazer uma amostragem de"</string>
+    <string name="weighted_sample_error_2_3">""agregados familiares, mas só dispõe de""</string>
+    <string name="weighted_sample_error_3_3">"agregados familiares. Introduza um número igual ou inferior ao total de agregados familiares."</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>

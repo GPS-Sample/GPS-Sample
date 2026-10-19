@@ -66,7 +66,7 @@
     <string name="enumeration_fields">"ساحه های شمارش"</string>
     <string name="enter_config_name">"نام پیکربندی را وارد کنید"</string>
     <string name="enter_study_name">"نام مطالعه را وارد کنید"</string>
-    <string name="enter_field_name">"نام رشته را وارد کنید"</string>
+    <string name="enter_field_name">"نام ساحه را وارد کنید"</string>
     <string name="preferred_units">"واحدهای ترجیحی"</string>
     <string name="date_format">"قالب تاریخ"</string>
     <string name="time_format">"قالب زمان"</string>
@@ -196,7 +196,7 @@
     <string name="simple_random">"نمونه گیری تصادفی ساده"</string>
     <string name="cluster_sampling">"نمونه گیری خوشه"</string>
     <string name="subset_overlap">"زیرمجموعه"</string>
-    <string name="strata_exclusive">"نمونه گیری طبقاتی"</string>
+    <string name="strata_exclusive">"طبقات: به"</string>
     <string name="numberhouseholds">"تعداد خانوارها"</string>
     <string name="percenthouseholds">"درصد تمام خانوارها"</string>
     <string name="percenttotal">"درصد کل جمعیت"</string>
@@ -260,7 +260,6 @@
     <string name="dismiss">"رد کردن"</string>
     <string name="delete">"حذف"</string>
     <string name="launching_odk_collect_application">"اجرای برنامه جمع"</string>
-    <string name="filters">"فیلترها (ترکیب قوانین)"</string>
     <string name="new_location">"مکان را شناسایی کنید"</string>
     <string name="delete_configuration">"پیکربندی فعلی با واردات جایگزین خواهد شد.  آیا مایل به ادامه هستید؟"</string>
     <string name="total_population">"اندازه کل جمعیت"</string>
@@ -282,19 +281,19 @@
     <string name="import_enumeration_area">"وارد کردن منطقه شمارش"</string>
     <string name="create_enumeration_area">"ایجاد منطقه شمارش"</string>
     <string name="add_household">"افزودن خانوار"</string>
-    <string name="define_map_tile_cache_region">"تعریف ناحیهٔ کش کاشی نقشه"</string>
+    <string name="define_map_tile_cache_region">"تعریف منطقه ذخیره کاشی نقشه"</string>
     <string name="download_map_tiles">"دانلود کاشی"</string>
     <string name="center_on_location">"مرکز بر روی مکان"</string>
     <string name="less_than_equal">"کمتر یا مساوی"</string>
     <string name="gps_accuracy_error">"دقت GPS کمتر از دقت مورد نیاز است"</string>
     <string name="gps_location_error">"شما در حال حاضر از این مکان بسیار دور هستید"</string>
     <string name="good">"خوب"</string>
-    <string name="poor">"بد"</string>
+    <string name="poor">"ضعیف"</string>
     <string name="unknown">"نامعلوم"</string>
-    <string name="legend">"افسانه"</string>
+    <string name="legend">"راهنمای نقشه"</string>
     <string name="select_date_type">"لطفاً نوع تاریخ را انتخاب کنید"</string>
     <string name="contains">"حاوی"</string>
-    <string name="collection_saved_doc">"مجموعه در دایرکتوری اسناد ذخیره شد"</string>
+    <string name="collection_saved_doc">"مجموعه در پوشه اسناد ذخیره شد"</string>
     <string name="invalid_operator">"عملگر انتخاب"</string>
     <string name="about_gpssample">"درباره GPSSample"</string>
     <string name="privacy_statement">"بیانیه حریم خصوصی"</string>
@@ -337,25 +336,25 @@
     <string name="success">"موفقیت!"</string>
     <string name="error">"خطا!"</string>
     <string name="import_succeeded">"واردات با موفقیت انجام شد."</string>
-    <string name="clear_map_tile_region">"منطقهٔ کش کاشی نقشه را پاک کنید"</string>
+    <string name="clear_map_tile_region">"منطقهٔ ذخیره کاشی نقشه را پاک کنید"</string>
     <string name="import_request_failed">"در حال انتظار برای درخواست واردات، درخواست صادرات دریافت شد"</string>
     <string name="export_request_failed">"در حال انتظار برای درخواست صادرات، درخواست واردات دریافت شد"</string>
     <string name="network_connection">"اتصال شبکه"</string>
     <string name="enumerated">"شمارش"</string>
-    <string name="surveyed">"پیمایش"</string>
-    <string name="meters">"مترها"</string>
+    <string name="surveyed">"بررسی شده"</string>
+    <string name="meters">"متر"</string>
     <string name="feet">"پا"</string>
     <string name="kilometers">"کیلومتر"</string>
     <string name="miles">"مایل"</string>
     <string name="importing_locations">"در حال وارد کردن مکان"</string>
     <string name="saving_configuration">"در حال ذخیره پیکربندی…"</string>
-    <string name="polygon_is_self_intersecting">"چندضلعی که بر اساس این نقاط ساخته شود، خودبه"</string>
+    <string name="polygon_is_self_intersecting">"چندضلعی"</string>
     <string name="no_eligible_households">"هیچ خانوار واجد شرایط برای نمونه"</string>
     <string name="walk_enumeration_area">"پیمایش ناحیه شمارش"</string>
     <string name="mark_current_location">"علامت"</string>
     <string name="delete_last_location">"حذف آخرین موقعیت"</string>
     <string name="clear_map_and_start_over">"نقشه را پاک کنید و دوباره شروع کنید"</string>
-    <string name="image_size_warning">"شما بیش از ۲۵ مگابایت دادهٔ تصویر را فراتر برده"</string>
+    <string name="image_size_warning">"حجم داده"</string>
     <string name="subaddress_start">"شمارهٔ اولیهٔ زیرآدرس را وارد کنید"</string>
     <string name="creation_options">"گزینه"</string>
     <string name="set_location">"محدودیت"</string>
@@ -383,7 +382,7 @@
     <string name="min_greater_than_max">"ارزش حداقل از ارزش حداکثر بزرگ"</string>
     <string name="enumeration_status">"وضعیت شمارش"</string>
     <string name="collection_status">"وضعیت جمع"</string>
-    <string name="enumeration_reason_incomplete_label">"دلیل شمارش ناقص"</string>
+    <string name="enumeration_reason_incomplete_label">"دلیل شمارش ناتکمیل"</string>
     <string name="collection_reason_incomplete_label">"دلیل جمع"</string>
     <string name="enumeration_notes">"یادداشت"</string>
     <string name="collection_notes">"یادداشت"</string>
@@ -399,8 +398,8 @@
     <string name="select_file_type">"نوع فایل وارداتی را انتخاب کنید"</string>
     <string name="attach_mbtiles">"وصل کردن کاشی"</string>
     <string name="detach_mbtiles">"جدا کردن کاشی"</string>
-    <string name="take_photo">"عکس بگیر"</string>
-    <string name="retake_photo">"عکس را دوباره بگیر"</string>
+    <string name="take_photo">"گرفتن عکس"</string>
+    <string name="retake_photo">"دوباره گرفتن عکس"</string>
     <string name="min_password_required">"حداقل طول رمز عبور ۶ کاراکتر است"</string>
     <string name="street_map">"نقشه خیابان"</string>
     <string name="satellite_map">"نقشه ماهواره"</string>
@@ -441,28 +440,28 @@
     <string name="define_boundary">"برای تعریف مرز، روی نقشه ضربه بزنید"</string>
     <string name="select_the_strata_identifier">"متغیر نام لایه را انتخاب کنید"</string>
     <string name="strata_name">"نام لایه"</string>
-    <string name="add_strata">"افزودن طبقه"</string>
+    <string name="add_strata">"افزودن لایه"</string>
     <string name="strata">"لایه"</string>
     <string name="password_error">"رمز عبور وارد شده نادرست است."</string>
     <string name="pin_hint">"برای ایمن"</string>
-    <string name="gpsaccuracy_hint1_3">"حداقل دقت GPS مورد نیاز را قبل از ثبت یک نقطه موقعیت تعیین می"</string>
-    <string name="gpsaccuracy_hint2_3">"توصیه شده:"</string>
-    <string name="gpsaccuracy_hint3_3">"۲۰ متر برای نقشه"</string>
-    <string name="manual_hint">"ورود دستی مکان را مجاز کنید. وقتی روشن باشد: سرشماری"</string>
+    <string name="gpsaccuracy_hint1_3">"حداقل دقت GPS مورد نیاز برای ثبت یک نقطه مکانی را تعیین می"</string>
+    <string name="gpsaccuracy_hint2_3">"می"</string>
+    <string name="gpsaccuracy_hint3_3">"۲۰ متر برای نظرسنجی"</string>
+    <string name="manual_hint">"ورود دستی مکان را مجاز کنید. وقتی روشن باشد: شمارشگران می"</string>
     <string name="autoincrement_hint">"وقتی روشن است (پیش"</string>
     <string name="proximity_hint">"در صورت فعال بودن: شمارشگران در صورتی که بخواهند خانوار جدیدی را در فاصله [X] متری از یک رکورد موجود اضافه کنند، هشداری دریافت می"</string>
     <string name="encryption_hint">"یک رمز عبور ایجاد کنید که با تمام سرپرستان، شمارشگران و گردآورندگان داده در این پروژه به اشتراک گذاشته شود. این رمز عبور برای وارد کردن پیکربندی بر روی هر دستگاهی الزامی است. فقط از حروف و اعداد استفاده کنید - بدون فاصله یا کاراکترهای ویژه."</string>
     <string name="pii_hint">"این فیلد را در صورتی که بتواند یک فرد خاص را شناسایی کند، به عنوان PII (اطلاعات شخصی قابل شناسایی) علامت"</string>
-    <string name="field_block_hint">"از یک بلوک فیلد برای تکرار مجموعه"</string>
-    <string name="rule_hint">"برای ارجاع خود، یک نام توصیفی کوتاه به این قاعده بدهید (مثلاً، «دارای فرزند ۱۲-۲۳ ماهه»، «یک خانوار» می"</string>
-    <string name="filter_hint">"فیلترها با استفاده از منطق AND (و)، OR (یا) یا NOT (نه) یک یا چند قاعده را ترکیب می"</string>
+    <string name="field_block_hint">"از یک ساحه بلوک برای تکرار مجموعه"</string>
+    <string name="rule_hint">"برای ارجاع خود، یک نام توصیفی کوتاه به این قاعده بدهید (مثال، «دارای فرزند ۱۲-۲۳ ماهه»، «یک خانوار» می"</string>
+    <string name="filter_hint">"فیلترها با استفاده از منطق AND «و»، OR «یا» یا NOT «نه» یک یا چند قاعده را ترکیب می"</string>
     <string name="team_draw_hint">"منطقه را که هر تیم میدانی آن را سرشماری خواهد کرد، تعریف کنید. برای هر تیم یک مرز روی نقشه رسم کنید."</string>
     <string name="subaddress_hint">"یک شناسه یکتا برای هر خانوار در این خوشه. آن را به صورت خودافزا (۱، ۲، ۳...) باقی بگذارید، مگر اینکه نظرسنجی شما از شناسه"</string>
     <string name="back2">"انجام شد - بازگشت به نقشه"</string>
     <string name="dbsize_alert">"پایگاه داده GPSSample شما به محدودیت ۳۵ مگابایتی خود نزدیک می"</string>
-    <string name="footer">"gpssample.org | gpssample23@gmail.com | ویدیوهای آموزشی"</string>
+    <string name="footer">"gpssample.org | gpssample23@gmail.com | Training Videos"</string>
     <string name="duplicate_import">"فایل GeoJson انتخاب شده قبلاً وارد شده است. آیا می"</string>
-    <string name="enumerator_import_error">"این پیکربندی هیچ تیم انومره"</string>
+    <string name="enumerator_import_error">"این پیکربندی هیچ تیم شمارشگر ندارد."</string>
     <string name="proximity_warning_value">"مقدار هشدار نزدیکی؟"</string>
     <string name="menu_team_review_show">"نمایش مسیر طی"</string>
     <string name="menu_team_review_hide">"پنهان کردن مسیر طی"</string>
@@ -494,8 +493,8 @@
     <string name="sampling_hint_10_11">"نمونه طبقاتی (درصد خانوارها):"</string>
     <string name="sampling_hint_11_11">"طبقات را مشخص کنید. در هر طبقه، درصدی از خانوارها را از هر خوشه انتخاب کنید."</string>
     <string name="enter_forgot_pin_question">"سؤال رمز PIN فراموش"</string>
-    <string name="collection_app">"اپلیکیشن کلکشن"</string>
-    <string name="clone_configuration">"کپی پیکربندی"</string>
+    <string name="collection_app">"برنامه جمع"</string>
+    <string name="clone_configuration">"کلون پیکربندی"</string>
     <string name="confirm_clone_configuration">"آیا مطمئن هستید که می"</string>
     <string name="collector_import_error">"این پیکربندی هیچ تیم جمع"</string>
     <string name="missing_enumeration_area">"این پیکربندی هیچ ناحیه شمارش مرتبطی ندارد."</string>
@@ -508,12 +507,12 @@
     <string name="draw_boundary">"کشیدن مرز تیم روی نقشه"</string>
     <string name="tap_boundary">"روی نقاط مرزی تیم روی نقشه ضربه بزنید"</string>
     <string name="distance">"فاصله"</string>
-    <string name="enforce_geofence_boundary">"اجرای مرز فنس جغرافیایی"</string>
-    <string name="enter_the_geofence_buffer_value">"مقدار بافر فنس جغرافیایی را وارد کنید"</string>
+    <string name="enforce_geofence_boundary">"اعمال محدوده حصار جغرافیایی"</string>
+    <string name="enter_the_geofence_buffer_value">"مقدار حریم جغرافیایی را وارد کنید"</string>
     <string name="geofence_hint">"حصار جغرافیایی یک حاشیه خطا در اطراف مناطق سرشماری شما است. تیم"</string>
-    <string name="geofence_error">""</string>
-    <string name="begin_sample_review">"شما در حال حاضر خارج از حصار جغرافیایی هستید"</string>
-    <string name="review_sample">"شروع بازبینی نمونه"</string>
+    <string name="geofence_error">"شما در حال حاضر خارج از حصار جغرافیایی هستید."</string>
+    <string name="begin_sample_review">"شروع بازبینی نمونه"</string>
+    <string name="review_sample">"بازبینی نمونه"</string>
     <string name="review_possible_duplicates">"بازبینی موارد تکراری احتمالی"</string>
     <string name="review_boundary_violations">"بازبینی موارد نقض مرز"</string>
     <string name="save_sample">"ذخیره نمونه"</string>
@@ -528,7 +527,7 @@
     <string name="delete_location_message">"آیا همچنین می"</string>
     <string name="open">"باز کردن"</string>
     <string name="edit">"ویرایش"</string>
-    <string name="clone">"کپی"</string>
+    <string name="clone">"کلون"</string>
     <string name="configuration">"پیکربندی"</string>
     <string name="delete_filter_message">"آیا مطمئن هستید که می"</string>
     <string name="info">"اطلاعات"</string>
@@ -543,6 +542,24 @@
     <string name="allow_supervisor_edits">"اجازه ویرایش به سرپرست"</string>
     <string name="supervisor_edit_tip">"اجازه ویرایش این پیکربندی را به سرپرستان بدهید."</string>
     <string name="name_already_exists">"این نام پیکربندی قبلاً وجود دارد."</string>
+    <string name="import_mismatch">"پیکربندی"</string>
+    <string name="collection_fields">"ساحه های مجموعه"</string>
+    <string name="filters">"فیلترها (قوانین را اعمال می"</string>
+    <string name="boundary_is_self_intersecting_1_3">"مرز این ناحیه شمارش خودتداخل است."</string>
+    <string name="boundary_is_self_intersecting_2_3">"برای ادامه باید مرز اصلاح شود."</string>
+    <string name="boundary_is_self_intersecting_3_3">"آیا می"</string>
+    <string name="collection_team_creation_error">"شما هیچ خانوار را اختصاص نداده"</string>
+    <string name="select_export_items">"موارد صدور را انتخاب کنید"</string>
+    <string name="configuration_files">"فایل"</string>
+    <string name="image_files">"تصاویر"</string>
+    <string name="export_confirmation_1_3">"این پیکربندی هیچ ناحیه شمارش مشخصی را انتخاب نکرده است."</string>
+    <string name="export_confirmation_2_3">"مگر اینکه شمارشگر(ها) ناحیه(های) شمارش را ایجاد کنند، در غیر این صورت احتمالاً باید یک ناحیه شمارش موجود را انتخاب کرده و پیکربندی را از صفحه شمارش یا جمع"</string>
+    <string name="export_confirmation_3_3">"آیا مطمئن هستید که می"</string>
+    <string name="weighted_sampling">"نمونه"</string>
+    <string name="enter_sample_weight">"تعداد خانوارهای نمونه را وارد کنید"</string>
+    <string name="weighted_sample_error_1_3">"شما می خواستید"</string>
+    <string name="weighted_sample_error_2_3">"خانوارها را نمونه برداری کنید اما شما فقط"</string>
+    <string name="weighted_sample_error_3_3">"خانوارها را دارید. لطفاً عددی وارد کنید که مساوی یا کمتر از مجموع خانوارها باشد."</string>
     <string-array name="forgot_pin_questions">
         <item>"نام میانی پدر"</item>
         <item>"نام خانوادگی مادر پیش از ازدواج"</item>
@@ -583,7 +600,7 @@
         <item>"نمونه گیری تصادفی ساده"</item>
         <item>"نمونه گیری خوشه"</item>
         <item>"زیرمجموعه"</item>
-        <item>"نمونه گیری طبقاتی"</item>
+        <item>"نمونه گیری طبقه بندی شده"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"روز/ماه/سال"</item>
@@ -591,7 +608,7 @@
         <item>"سال/ماه/روز"</item>
     </string-array>
     <string-array name="map_engines">
-        <item>"نقشهٔ خیابان"</item>
+        <item>"بازکردن نقشه خیابان"</item>
         <item>"مپ"</item>
     </string-array>
     <string-array name="sort_filters">
@@ -599,7 +616,7 @@
         <item>"تعریف"</item>
         <item>"نامکمل"</item>
         <item>"مکمل"</item>
-        <item>"نقاط دیدنی"</item>
+        <item>"نقاط مورد نظر"</item>
     </string-array>
     <string-array name="show_views">
         <item>"نمایش پیش"</item>

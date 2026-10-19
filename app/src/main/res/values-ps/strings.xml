@@ -196,7 +196,7 @@
     <string name="simple_random">"ساده تصادفي نمونه"</string>
     <string name="cluster_sampling">"ډله"</string>
     <string name="subset_overlap">"فرعي ټولګي: ممکن یو پر بل پراته وي"</string>
-    <string name="strata_exclusive">"طبقاتي نمونه"</string>
+    <string name="strata_exclusive">"طبقې: یو له بل سره ناساز"</string>
     <string name="numberhouseholds">"د کورنیو شمېر"</string>
     <string name="percenthouseholds">"د ټولو کورنیو سلنه"</string>
     <string name="percenttotal">"د ټول نفوس سلنه"</string>
@@ -260,7 +260,6 @@
     <string name="dismiss">"رد کول"</string>
     <string name="delete">"ړنګول"</string>
     <string name="launching_odk_collect_application">"د ODK Collect اپلیکیشن پیلېږي..."</string>
-    <string name="filters">"فلټرونه (قواعد یوځای کوي)"</string>
     <string name="new_location">"موقعیت وپیژنئ"</string>
     <string name="delete_configuration">"اوسنۍ تشکیلات به د واردولو له لارې بدل شي.  ایا غواړئ پرمخ لاړ شئ؟"</string>
     <string name="total_population">"د ټول نفوس اندازه"</string>
@@ -282,26 +281,26 @@
     <string name="import_enumeration_area">"د شمېرنې ساحې واردول"</string>
     <string name="create_enumeration_area">"د شمېرنې ساحه جوړول"</string>
     <string name="add_household">"کورنۍ اضافه کړئ"</string>
-    <string name="define_map_tile_cache_region">"د نقشې ټایلونو د کیش سیمې تعریفول"</string>
+    <string name="define_map_tile_cache_region">"د نقشې ټایلونو د ذخیره کولو سیمې تعریفول"</string>
     <string name="download_map_tiles">"د نقشې ټایلونه ډاونلوډ کړئ"</string>
     <string name="center_on_location">"پر موقعیت مرکز کړئ"</string>
-    <string name="less_than_equal">"له یا مساوي کم"</string>
+    <string name="less_than_equal">"مساوي یا له کم"</string>
     <string name="gps_accuracy_error">"د GPS دقت له اړین دقت څخه کم دی"</string>
     <string name="gps_location_error">"تاسو اوسمهال له دې ځایه ډېر لرې یاست"</string>
     <string name="good">"ښه"</string>
-    <string name="poor">"خراب"</string>
+    <string name="poor">"کمزوری"</string>
     <string name="unknown">"نامعلوم"</string>
-    <string name="legend">"نښان"</string>
+    <string name="legend">"د نقشې لارښود"</string>
     <string name="select_date_type">"مهرباني وکړئ د نېټې ډول وټاکئ"</string>
     <string name="contains">"لري"</string>
-    <string name="collection_saved_doc">"ټولګه د اسنادو ډایرکټرۍ ته خوندي شوه"</string>
-    <string name="invalid_operator">"ټاکل شوی آپریټر د ټاکل شوي قانون لپاره معتبر نه دی"</string>
+    <string name="collection_saved_doc">"ټولګه د اسنادو پوښۍ ته خوندي شوه"</string>
+    <string name="invalid_operator">"ټاکل شوی عملګر د ټاکل شوي قانون لپاره معتبر نه دی"</string>
     <string name="about_gpssample">"د GPSSample په اړه"</string>
     <string name="privacy_statement">"د محرمیت بیانیه"</string>
     <string name="terms_and_conditions">"اصول او شرایط"</string>
     <string name="show_map">"نقشه وښایاست"</string>
     <string name="number_of_residents">"د اوسیدونکو شمېر"</string>
-    <string name="end_user_license_agreement">"د وروستي کارونکي د جواز تړون"</string>
+    <string name="end_user_license_agreement">"د وروستي کاروونکي د جواز تړون"</string>
     <string name="code_of_conduct">"د چلند اصول"</string>
     <string name="clear_map">"ایا تاسو ډاډه یاست چې غواړئ نقشه پاکه کړئ؟"</string>
     <string name="delete_point">"ایا تاسو ډاډه یاست چې غواړئ وروستی ټکی لرې کړئ؟"</string>
@@ -316,7 +315,7 @@
     <string name="not_visited">"نه لیدل شوی"</string>
     <string name="incomplete_collection">"نیمګړی سروې"</string>
     <string name="completed_collection">"بشپړ شوی سروې"</string>
-    <string name="accuracy">"دقیقوالی :"</string>
+    <string name="accuracy">"دقیقوالی:"</string>
     <string name="subaddress_is_required">"فرعي پته اړینه ده"</string>
     <string name="auto_increment_subaddress">"خودکاره زیاتیدونکې فرعي پته"</string>
     <string name="allow_manual_identification_of_locations">"د ځایونو لاسي پیژندنه اجازه ورکړئ"</string>
@@ -334,12 +333,12 @@
     <string name="rename_or_delete">"ایا غواړئ د شمېرنې ساحه نوم بدل کړئ یا یې حذف کړئ؟"</string>
     <string name="rename">"نوم بدل کړئ"</string>
     <string name="map_tile_boundary">"د مطلوب نقشې ټایل سیمې اوږدوالی/پراخوالی (کیلومتره) داخل کړئ"</string>
-    <string name="success">"بریالی!"</string>
+    <string name="success">"بریالیتوب!"</string>
     <string name="error">"تېروتنه!"</string>
     <string name="import_succeeded">"واردول بریالي شول."</string>
-    <string name="clear_map_tile_region">"د نقشې ټایل کیش سیمه پاک کړئ"</string>
-    <string name="import_request_failed">"د صادراتو غوښتنې ته په تمه د وارداتو غوښتنه ترلاسه شوه"</string>
-    <string name="export_request_failed">"د صادراتو غوښتنې ته په تمه د وارداتو غوښتنه ترلاسه شوه"</string>
+    <string name="clear_map_tile_region">"د نقشې ټایل ذخیره کولو سیمه پاک کړئ"</string>
+    <string name="import_request_failed">"د وارداتو غوښتنې ته د انتظار په وخت کې د صادراتو غوښتنه ترلاسه کړه"</string>
+    <string name="export_request_failed">"د صادراتو غوښتنې ته په انتظار کې د وارداتو غوښتنه ترلاسه کړه"</string>
     <string name="network_connection">"شبکويي اتصال"</string>
     <string name="enumerated">"شمار شوي"</string>
     <string name="surveyed">"سروې شوي"</string>
@@ -349,13 +348,13 @@
     <string name="miles">"مایلونه"</string>
     <string name="importing_locations">"د ځایونو واردول..."</string>
     <string name="saving_configuration">"د تشکیلاتو خوندي کول..."</string>
-    <string name="polygon_is_self_intersecting">"د دې نقطو پر بنسټ جوړ شوی پولیګون به په خپل ځان کې تقاطع کوونکی وي."</string>
+    <string name="polygon_is_self_intersecting">"د دې ټکو پر بنسټ ولاړ ډیرواړخیز (پولیګون) به په خپل ځان کې تقاطع کونکی وي."</string>
     <string name="no_eligible_households">"د نمونې اخیستلو لپاره کوم وړ کورنۍ نشته."</string>
     <string name="walk_enumeration_area">"د پیاده شمېرنې ساحه"</string>
     <string name="mark_current_location">"اوسنۍ موقعیت نښه کړئ"</string>
     <string name="delete_last_location">"وروستۍ موقعیت حذف کړئ"</string>
     <string name="clear_map_and_start_over">"نقشه پاکه کړئ او له سره یې پیل کړئ"</string>
-    <string name="image_size_warning">"تاسو د انځور له ۲۵ میګابایټه ډیټا څخه زیات مصرف کړی دی. د نورو انځورونو اضافه کول به د ډیټا لیږد پر فعالیت باندې ډېر اغېز ولري."</string>
+    <string name="image_size_warning">"تاسو د انځور ډیټا ۲۵ میګا بایټه څخه زیاته کړې ده. د نورو انځورونو اضافه کول به د معلوماتو لیږد فعالیت باندې ډیره اغیزه وکړي."</string>
     <string name="subaddress_start">"د سب اډریس لپاره د پیل شمېره داخل کړئ"</string>
     <string name="creation_options">"د جوړولو انتخابونه"</string>
     <string name="set_location">"حدود تعریف کړئ (اوږدوالی x پلنوالی)"</string>
@@ -388,14 +387,14 @@
     <string name="enumeration_notes">"د شمېرنې یادښتونه"</string>
     <string name="collection_notes">"د راټولولو یادښتونه"</string>
     <string name="select_map_tiles">"د نقشې ټایل سیټ وټاکئ"</string>
-    <string name="loading_mapbox_tiles">"د مپ"</string>
-    <string name="mapbox_streets">"د مپ باکس د سړکونو نقشه"</string>
+    <string name="loading_mapbox_tiles">"د Mapbox ټایلونه بارېږي..."</string>
+    <string name="mapbox_streets">"د Mapbox د سړکونو نقشه"</string>
     <string name="satellite_streets">"د سپوږمکۍ د سړکونو نقشه"</string>
     <string name="import_map_tiles">"د نقشې ټایلونه واردول"</string>
     <string name="re_import">"غوره شوې فایل لا دمخه وارد شوی دی. ایا غواړئ چې اوس یې بیا وارد کړئ؟"</string>
     <string name="attach_mbtiles_question">"ایا غواړئ چې دې سیمې ته MBTiles ضمیمه کړئ؟"</string>
-    <string name="import_geojson">"د جیو جی"</string>
-    <string name="import_mbtiles">"د اېم"</string>
+    <string name="import_geojson">"د GeoJSON فایل وارد کړئ"</string>
+    <string name="import_mbtiles">"د MBTiles فایل وارد کړئ"</string>
     <string name="select_file_type">"د فایل واردولو ډول وټاکئ"</string>
     <string name="attach_mbtiles">"د MB ټایلونه وصل کړئ"</string>
     <string name="detach_mbtiles">"د MB ټایلونه جلا کړئ"</string>
@@ -403,7 +402,7 @@
     <string name="retake_photo">"عکس بیا واخلئ"</string>
     <string name="min_password_required">"د پټنوم لږ تر لږه اوږدوالی ۶ نښې دی"</string>
     <string name="street_map">"د سړک نقشه"</string>
-    <string name="satellite_map">"مصنوعي ماهواره نقشه"</string>
+    <string name="satellite_map">"د ماهواره نقشه"</string>
     <string name="map_engine">"نقشې انجن"</string>
     <string name="define_center">"د مرکز نقطې د ټاکلو لپاره پر نقشه ټپ وکړئ"</string>
     <string name="select_ea">"د یوې شمېرنې ساحې د انتخاب لپاره پرې ټپ وکړئ"</string>
@@ -419,10 +418,10 @@
     <string name="select_map_engine">"نقشې انجن وټاکئ"</string>
     <string name="import_failed">"تېروتنه. واردول ناکام شول. ډاډ ترلاسه کړئ چې د GPSSample نسخې یو شان دي."</string>
     <string name="privacy_policy_statement_1_5">"GPSSample ستاسو لاره (د تېرېدو نښې) ثبتوي کله چې تاسو د کورونو ترمنځ سفر کوئ او کورونه نقشه کوئ."</string>
-    <string name="privacy_policy_statement_2_5">"ثبتول یوازې هغه وخت پیل کیږي کله چې تاسو په اپلیکیشن کې د ثبت (RECODE) تڼۍ فشار ورکړئ او هغه وخت بندیږي کله چې تاسو د بندولو (STOP) تڼۍ فشار ورکړئ."</string>
-    <string name="privacy_policy_statement_3_5">"موقعیت د ثبتولو پرمهال په دوامداره توګه راټولیږي، حتی که اپلیکیشن په شالید (background) کې وي یا ستاسو وسیله قلف وي."</string>
-    <string name="privacy_policy_statement_4_5">"ستاسو د موقعیت معلومات په خوندي توګه ستاسو په وسیله کې ذخیره کیږي او یوازې هغه وخت صادر (export) کیږي که تاسو داسې وغواړئ."</string>
-    <string name="privacy_policy_statement_5_5">"تاسو کولی شئ هر وخت د انډرایډ په ترتیباتو (Settings) کې د شالید موقعیت ته لاسرسی لغوه کړئ."</string>
+    <string name="privacy_policy_statement_2_5">"ثبتول یوازې هغه وخت پیل کیږي کله چې تاسو په اپلیکیشن کې د «ثبت» تڼۍ فشار ورکړئ او هغه وخت بندیږي کله چې تاسو د «بندول»و تڼۍ فشار ورکړئ."</string>
+    <string name="privacy_policy_statement_3_5">"موقعیت د ثبتولو پرمهال په دوامداره توګه راټولیږي، حتی که اپلیکیشن په شالید کې وي یا ستاسو وسیله قلف وي."</string>
+    <string name="privacy_policy_statement_4_5">"ستاسو د موقعیت معلومات په خوندي توګه ستاسو په وسیله کې ذخیره کیږي او یوازې هغه وخت صادر کیږي که تاسو داسې وغواړئ."</string>
+    <string name="privacy_policy_statement_5_5">"تاسو کولی شئ هر وخت د «انډرایډ په ترتیباتو» کې د شالید موقعیت ته لاسرسی لغوه کړئ."</string>
     <string name="accept_privacy_policy_1_2">"پټه موقعیت فعال کړئ:"</string>
     <string name="accept_privacy_policy_2_2">"تل یې اجازه ورکړئ"</string>
     <string name="decline_privacy_policy_1_2">"اوس نه:"</string>
@@ -431,37 +430,37 @@
     <string name="enable_background_activity_title">"پټ فعالیت فعال کړئ"</string>
     <string name="enable_background_activity_body_1_4">"۱. د 'تنظیمات خلاص کړئ' تڼۍ وټکوئ."</string>
     <string name="enable_background_activity_body_2_4">"۲. په لیست کې GPSSample ومومئ."</string>
-    <string name="enable_background_activity_body_3_4">"۳. 'په پس منظر کې فعالیت ته اجازه ورکړئ' فعال کړئ"</string>
+    <string name="enable_background_activity_body_3_4">"۳. 'په پس منظر کې فعالیت ته اجازه ورکړئ' فعال کړئ."</string>
     <string name="enable_background_activity_body_4_4">"۴. دې اپلیکیشن ته بېرته ورشئ."</string>
     <string name="open_settings">"تنظیمات خلاص کړئ"</string>
     <string name="note">"یادښت"</string>
     <string name="edit_location">"موقعیت ایډیټ کړئ"</string>
-    <string name="select_strata">"سټراټا وټاکئ"</string>
-    <string name="delete_strata_message">"ایا تاسو ډاډه یاست چې غواړئ دا سټراټا د تل لپاره حذف کړئ؟"</string>
+    <string name="select_strata">"د طبقې وټاکئ"</string>
+    <string name="delete_strata_message">"ایا تاسو ډاډه یاست چې غواړئ دا طبقې د تل لپاره حذف کړئ؟"</string>
     <string name="define_boundary">"د پولې ټاکلو لپاره پر نقشه ټپ کړئ"</string>
-    <string name="select_the_strata_identifier">"د سټراټا د نوم متغیر وټاکئ"</string>
-    <string name="strata_name">"د سټراټا نوم"</string>
-    <string name="add_strata">"سټراټا اضافه کړئ"</string>
-    <string name="strata">"پرتونه"</string>
+    <string name="select_the_strata_identifier">"د طبقې د نوم متغیر وټاکئ"</string>
+    <string name="strata_name">"د طبقې نوم"</string>
+    <string name="add_strata">"طبقې اضافه کړئ"</string>
+    <string name="strata">"طبقې"</string>
     <string name="password_error">"داخل شوی پټنوم غلط دی."</string>
     <string name="pin_hint">"په دې وسیله کې د خپل پروفایل د خوندي کولو لپاره یو عددي پین (PIN) له ۴ څخه تر ۶ عددی جوړ کړئ. که تاسو خپل پین هېر کړئ، نو تاسو ته به یوه امنیتي پوښتنه وښودل شي."</string>
-    <string name="gpsaccuracy_hint1_3">"د ځای نښې ثبتولو څخه مخکې د GPS لږ تر لږه اړینه دقت ټاکي."</string>
-    <string name="gpsaccuracy_hint2_3">"وړاندیز شوی:"</string>
-    <string name="gpsaccuracy_hint3_3">"د معیاري سروې لپاره ۲۰ متره، او د کلیوالي سیمو لپاره ۳۰ متره. ټیټې کچې ډېرې دقیقې دي، خو په ګڼو ښاري سیمو یا د ونو لاندې یې ترلاسه کول ګران دي."</string>
+    <string name="gpsaccuracy_hint1_3">"د موقعیت نقطې ثبتولو دمخه د GPS لږ تر لږه اړینه دقت ټاکي."</string>
+    <string name="gpsaccuracy_hint2_3">"سپارښتنه شوې:"</string>
+    <string name="gpsaccuracy_hint3_3">"د معیاري سروې ګانو لپاره ۲۰ متره، د کلیوالي سیمو لپاره ۳۰ متره. ټیټې کچې ډېرې دقیقې دي خو په ګڼو ښاري سیمو یا د ونو لاندې ترلاسه کول یې سخت دي."</string>
     <string name="manual_hint">"د ځای لاسي داخلولو اجازه ورکړئ. کله چې فعال وي: شمېرونکي کولی شي په نقشه کې یو ځای ټپ کړي ترڅو کورنۍ اضافه کړي که چېرې په ۲۰ مترو کې وي. په ګڼو ښاري سیمو یا د GPS کمزوري سګنل کې ګټور دی. کله چې غیر فعال وي (اصلي): یوازې اوسنی GPS ځای کارول کیږي."</string>
     <string name="autoincrement_hint">"کله چې فعال وي (اصلي): هر کورنۍ ته په اتوماتيک ډول یو پرله پسې شمېره (۱، ۲، ۳...) ورکول کیږي. که ستاسو سروې له مخکې ټاکل شوي کورنیو پېژندونکو څخه کار اخلي، نو دا بند کړئ."</string>
     <string name="proximity_hint">"کله چې فعال وي: شمېرونکي هشدار ترلاسه کوي که دوی د یو موجوده ریکارډ څخه په [X] متره کې د کورنۍ اضافه کولو هڅه وکړي. د دوه ګوني داخلونو په مخنیوي کې مرسته کوي."</string>
     <string name="encryption_hint">"یوه پټنوم جوړ کړئ چې په دې پروژه کې به له ټولو څارونکو، شمېرونکو، او د معلوماتو راټولوونکو سره شریک شي. دا پټنوم په هره وسیله کې د تشکیلاتو د واردولو لپاره اړین دی. یوازې له تورو او عددونو څخه کار واخلئ - تشې یا ځانګړي توري مه کاروئ."</string>
     <string name="pii_hint">"دا ساحه د PII په توګه نښه کړئ که دا کولی شي یو ځانګړی فرد وپیژني. مثالونه: بشپړ نوم، د تلیفون شمېره، د ملي پېژندپاڼې شمېره."</string>
-    <string name="field_block_hint">"د دې شمېرې پر بنسټ د پوښتنو د یوې ټولګې د تکرار لپاره د فیلډ بلاک وکاروئ. د بېلګې په توګه: که دا فیلډ د ماشومانو شمېر ثبتوي، نو په بلاک کې پوښتنې به د هر ماشوم لپاره یو ځل وپوښتل شي. په ډله کې وروستۍ پوښتنه د End Field Block سره نښه کړئ."</string>
+    <string name="field_block_hint">"د دې شمېرې پر بنسټ د پوښتنو د یوې ټولګې د تکرار لپاره د ساحې بلاک وکاروئ. د بېلګې په توګه: که دا فیلډ د ماشومانو شمېر ثبتوي، نو په بلاک کې پوښتنې به د هر ماشوم لپاره یو ځل وپوښتل شي. په ډله کې وروستۍ پوښتنه د «د ساحې د پای بلاک» سره نښه کړئ."</string>
     <string name="rule_hint">"د خپلې مراجعې لپاره دې قانون ته یو لنډ تشریحي نوم ورکړئ (د بېلګې په توګه، '12-23 میاشتني ماشوم لري'، 'یو کور دی' کیدای شي child_household وي). دا نوم د فلټر تنظیم کولو په ګام کې ښکاري چیرې چې اصول سره یوځای کیږي."</string>
-    <string name="filter_hint">"فلټرونه د AND، OR، یا NOT منطق په کارولو سره یو یا ډیر اصول سره یوځای کوي ترڅو دا تعریف کړي چې کوم کورنۍ د نمونې اخیستنې لپاره وړ دي. فلټر اړین دی حتی که تاسو یوازې یو اصول ولرئ."</string>
+    <string name="filter_hint">"فلټرونه د  AND «و»، OR «یا» یا NOT «نه» منطق په کارولو سره یو یا ډیر اصول سره یوځای کوي ترڅو دا تعریف کړي چې کوم کورنۍ د نمونې اخیستنې لپاره وړ دي. فلټر اړین دی حتی که تاسو یوازې یو اصول ولرئ."</string>
     <string name="team_draw_hint">"هغه ساحه تعریف کړئ چې هر فیلډ ټیم به یې شمېرنه کوي. د هر ټیم لپاره په نقشه کې یوه پوله رسم کړئ."</string>
     <string name="subaddress_hint">"په دې ګڼه کې د هر کورنۍ لپاره یو ځانګړی پېژندونکی. دا د اتوماتیک زیاتوالي (۱، ۲، ۳...) په توګه پرېږدئ، مګر دا چې ستاسو سروې له مخکې ټاکل شوي کورنیو پېژندونکي وکاروي."</string>
     <string name="back2">"تکمیل شو - نقشې ته بېرته ستنېدل"</string>
     <string name="dbsize_alert">"ستاسو د GPSSample ډیټابیس خپل ۳۵MB حد ته نږدې کیږي. د دوام ورکولو دمخه د ډیټا صادرولو په اړه فکر وکړئ."</string>
-    <string name="footer">"gpssample.org | gpssample23@gmail.com | روزنیزې ویډیوګانې"</string>
-    <string name="duplicate_import">"ټاکل شوی جیو جی ایس اون فایل لا دمخه وارد شوی دی. ایا تاسو غواړئ چې دا واردول جاري وساتئ؟"</string>
+    <string name="footer">"gpssample.org | gpssample23@gmail.com | Training Videos"</string>
+    <string name="duplicate_import">"ټاکل شوی GeoJson فایل لا دمخه وارد شوی دی. ایا تاسو غواړئ چې دا واردول جاري وساتئ؟"</string>
     <string name="enumerator_import_error">"دا تشکیلات د شمېرنې ټیم نلري."</string>
     <string name="proximity_warning_value">"د نږدېوالي د خبرداري ارزښت؟"</string>
     <string name="menu_team_review_show">"تېر شوی لار وښایاست"</string>
@@ -510,7 +509,7 @@
     <string name="distance">"واټن"</string>
     <string name="enforce_geofence_boundary">"د جیوفینس پولې پلي کړئ"</string>
     <string name="enter_the_geofence_buffer_value">"د جیوفینس بفر ارزښت داخل کړئ"</string>
-    <string name="geofence_hint">"جیوفینس ستاسو د شمېرنې ساحو شاوخوا د تېروتنې مخنیوي لپاره یو حصار دی. ټیمونه د جیوفینس څخه بهر معلومات راټولولی نشي. د شمېرنې ساحې له څنډې او د جیوفینس حصار ترمنځ هر څه به د څارونکو لخوا د بیاکتنې لپاره په نښه شي. د بېلګې په توګه، د ۵ متره جیوفینس لپاره، هر هغه موقعیت چې له ۵ متره څخه کم واټن ولري، د څارونکي د بیاکتنې لپاره په نښه به شي."</string>
+    <string name="geofence_hint">"جیوفینس ستاسو د شمېرنې سیمو شاوخوا د تېروتنې لپاره یو حدمحسوبېږي. ټیمونه کولی شي د جیوفینس څخه بهر معلومات راټول کړي، خو هر هغه څه چې د تېروتنې له حدمحسوبې څخه واوړي، د څارونکو لخوا د بیاکتنې لپاره به په نښه شي. د بېلګې په توګه: د ۵ متره جیوفینس لپاره، هر هغه موقعیت چې په ۶ متره یا ډېر واټن کې راټول شي، د څارونکي د بیاکتنې لپاره به په نښه شي."</string>
     <string name="geofence_error">"تاسو اوسمهال له جیوفینس څخه بهر یاست"</string>
     <string name="begin_sample_review">"د نمونې بیاکتنه پیل کړئ"</string>
     <string name="review_sample">"د نمونې بیاکتنه"</string>
@@ -528,7 +527,7 @@
     <string name="delete_location_message">"ایا تاسو غواړئ دا موقعیت د تل لپاره هم حذف کړئ؟"</string>
     <string name="open">"پرانیستل"</string>
     <string name="edit">"سمول"</string>
-    <string name="clone">"کاپي کول"</string>
+    <string name="clone">"کلون"</string>
     <string name="configuration">"تنظیمات"</string>
     <string name="delete_filter_message">"ایا تاسو ډاډه یاست چې غواړئ دا فلټر د تل لپاره حذف کړئ؟"</string>
     <string name="info">"معلومات"</string>
@@ -543,6 +542,24 @@
     <string name="allow_supervisor_edits">"سرکار ته د سمون اجازه ورکړئ"</string>
     <string name="supervisor_edit_tip">"سرکارانو ته اجازه ورکړئ چې دا تشکیلات سم کړي."</string>
     <string name="name_already_exists">"دا تشکیلات نوم لا دمخه شتون لري."</string>
+    <string name="import_mismatch">"هغه تشکیلات چې تاسو یې د واردولو هڅه کوئ، له هغو تشکیلاتو سره سمون نه خوري چې اوسمهال خلاص دي."</string>
+    <string name="collection_fields">"د راټولولو ساحې"</string>
+    <string name="filters">"فلټرونه (قواعد پلي کوي)"</string>
+    <string name="boundary_is_self_intersecting_1_3">"د دې شمېرنې ساحې پوله په خپل ځان کې ننوځي."</string>
+    <string name="boundary_is_self_intersecting_2_3">"د دوام لپاره به د پولې سمولو ته اړتیا وي."</string>
+    <string name="boundary_is_self_intersecting_3_3">"ایا تاسو غواړئ پوله سمه کړئ؟"</string>
+    <string name="collection_team_creation_error">"تاسو هیڅ کورنۍ نه دي ټاکلې"</string>
+    <string name="select_export_items">"د صادرولو توکي وټاکئ"</string>
+    <string name="configuration_files">"د تشکیلاتو فایلونه"</string>
+    <string name="image_files">"انځورونه"</string>
+    <string name="export_confirmation_1_3">"دا تشکیلات کوم ځانګړی د شمېرنې ساحه نه لري."</string>
+    <string name="export_confirmation_2_3">"مګر دا چې شمېرونکي (و) به د شمېرنې ساحه(ې) جوړوي، نو تاسو باید یوه موجوده د شمېرنې ساحه وټاکئ او تشکیلات د شمېرنې یا د معلوماتو راټولولو پاڼې څخه صادر کړئ."</string>
+    <string name="export_confirmation_3_3">"ایا تاسو ډاډه یاست چې غواړئ دا تشکیلات یو شمېرونکي (و) یا د معلوماتو راټولونکي ته صادر کړئ؟"</string>
+    <string name="weighted_sampling">"د ځان وزن لرونکی نمونه اخیستل"</string>
+    <string name="enter_sample_weight">"د نمونې کورنیو شمیر دننه کړئ."</string>
+    <string name="weighted_sample_error_1_3">"تاسو غوښتل"</string>
+    <string name="weighted_sample_error_2_3">"کورنۍ  نمونه واخلئ خو تاسو یوازې"</string>
+    <string name="weighted_sample_error_3_3">"کورنۍ. لرې. مهرباني وکړئ د کورنیو له ټولې شمېرې سره مساوي یا لږ شمېر داخل کړئ."</string>
     <string-array name="forgot_pin_questions">
         <item>"د پلار منځنی نوم"</item>
         <item>"د مور تخلص د واده څخه مخکې"</item>
@@ -583,7 +600,7 @@
         <item>"ساده تصادفي نمونه"</item>
         <item>"ډله"</item>
         <item>"فرعي ټولګي: ممکن تداخل ولري"</item>
-        <item>"طبقاتي نمونه"</item>
+        <item>"طبقه بندي شوې نمونه اخیستل"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"ورځ/میاشت/کال"</item>
@@ -591,7 +608,7 @@
         <item>"کال/میاشت/ورځ"</item>
     </string-array>
     <string-array name="map_engines">
-        <item>"اوپن سټریټ مپ"</item>
+        <item>"د سړک نقشه پرانیستل"</item>
         <item>"مپ باکس"</item>
     </string-array>
     <string-array name="sort_filters">

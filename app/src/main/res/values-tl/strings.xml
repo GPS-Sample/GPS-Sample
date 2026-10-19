@@ -260,7 +260,6 @@
     <string name="dismiss">"I-dismiss"</string>
     <string name="delete">"Tanggalin"</string>
     <string name="launching_odk_collect_application">"Inilunsad ang ODK Collect Application..."</string>
-    <string name="filters">"Mga Filter (pinagsasama ang mga panuntunan)"</string>
     <string name="new_location">"Tukuyin ang Lokasyon"</string>
     <string name="delete_configuration">"Ang kasalukuyang configuration ay papalitan ng import. Gusto mo bang magpatuloy?"</string>
     <string name="total_population">"Kabuuang Laki ng Populasyon"</string>
@@ -543,6 +542,24 @@
     <string name="allow_supervisor_edits">"Payagan ang Supervisor na I-edit"</string>
     <string name="supervisor_edit_tip">"Payagan ang mga Supervisor na i-edit ang configuration na ito."</string>
     <string name="name_already_exists">"Umiiral na ang pangalan ng configuration na iyon."</string>
+    <string name="import_mismatch">"Ang Configuration na sinusubukan mong i-import ay hindi tumutugma sa configuration na kasalukuyang bukas."</string>
+    <string name="collection_fields">"Mga Patlang ng Koleksyon"</string>
+    <string name="filters">"Mga Filter (nalalapat ang mga panuntunan)"</string>
+    <string name="boundary_is_self_intersecting_1_3">"Ang hangganan ng Enumeration Area na ito ay kusang nagsasalubong."</string>
+    <string name="boundary_is_self_intersecting_2_3">"Kailangang itama ang hangganan upang magpatuloy."</string>
+    <string name="boundary_is_self_intersecting_3_3">"Gusto mo bang itama ang hangganan?"</string>
+    <string name="collection_team_creation_error">"Wala kang itinalagang anumang sambahayan"</string>
+    <string name="select_export_items">"Piliin ang I-export ang mga Item"</string>
+    <string name="configuration_files">"Mga File ng Konpigurasyon"</string>
+    <string name="image_files">"Mga Larawan"</string>
+    <string name="export_confirmation_1_3">"Ang configuration na ito ay walang napiling partikular na Enumeration Area."</string>
+    <string name="export_confirmation_2_3">""Maliban kung ang Enumerator(s) ang gagawa ng Enumeration Area(s), dapat kang pumili ng isang umiiral na Enumeration Area at i-export ang configuration mula sa alinman sa pahina ng Enumeration o Data Collection.""</string>
+    <string name="export_confirmation_3_3">"Sigurado ka bang gusto mong i-export ang configuration na ito sa isang Enumerator o Data Collector?"</string>
+    <string name="weighted_sampling">"Pagsample na may sariling timbang"</string>
+    <string name="enter_sample_weight">"Ilagay ang bilang ng mga sambahayan na sasamplehan"</string>
+    <string name="weighted_sample_error_1_3">"Gusto mong kumuha ng sample"</string>
+    <string name="weighted_sample_error_2_3">"ng mga sambahayan ngunit mayroon ka lamang"</string>
+    <string name="weighted_sample_error_3_3">"ng mga sambahayan. Mangyaring maglagay ng numero na katumbas o mas mababa sa kabuuang bilang ng mga sambahayan."</string>
     <string-array name="forgot_pin_questions">
         <item>"Panggitnang pangalan ng ama"</item>
         <item>"Pangalan ng dalaga ng ina"</item>
