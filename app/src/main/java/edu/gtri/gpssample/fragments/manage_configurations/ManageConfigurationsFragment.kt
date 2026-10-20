@@ -187,11 +187,38 @@ class ManageConfigurationsFragment : Fragment()
 
                 if (minimalConfigurations.isNotEmpty())
                 {
-                    DAO.configDAO.getConfig( minimalConfigurations[0].uuid )?.let { config ->
-                        sharedViewModel.setCurrentConfig( config )
-                        val bundle = Bundle()
-                        bundle.putBoolean( Keys.kEditMode.value, true )
-                        findNavController().navigate(R.id.action_navigate_to_WalkEnumerationAreaFragment, bundle)
+                    if (minimalConfigurations.count() == 1)
+                    {
+                        DAO.configDAO.getConfig( minimalConfigurations[0].uuid )?.let { config ->
+                            sharedViewModel.setCurrentConfig( config )
+                            val bundle = Bundle()
+                            bundle.putBoolean( Keys.kEditMode.value, true )
+                            findNavController().navigate(R.id.action_navigate_to_WalkEnumerationAreaFragment, bundle)
+                        }
+                    }
+                    else
+                    {
+                        val items = ArrayList<String>()
+
+                        for (minimalConfig in minimalConfigurations)
+                        {
+                            items.add( minimalConfig.name )
+                        }
+
+                        composableSelectionDialogHost.show(
+                            title = resources.getString(R.string.select_configuration),
+                            message = null,
+                            items = items,
+                        ) { selection ->
+                            minimalConfigurations.find {it.name == selection} ?.let {
+                                DAO.configDAO.getConfig( it.uuid )?.let { config ->
+                                    sharedViewModel.setCurrentConfig( config )
+                                    val bundle = Bundle()
+                                    bundle.putBoolean( Keys.kEditMode.value, true )
+                                    findNavController().navigate(R.id.action_navigate_to_WalkEnumerationAreaFragment, bundle)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -646,9 +673,23 @@ class ManageConfigurationsFragment : Fragment()
 
                 if (user.role == Role.Enumerator.toString())
                 {
-                    if (enumAreas.isEmpty())
+                    if (enumAreas.isEmpty()) // an enumArea has not been selected
                     {
-                        composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.missing_enumeration_area))
+                        composableConfirmationDialogHost.show(
+                            title = resources.getString(R.string.please_confirm),
+                            message = resources.getString(R.string.create_missing_enumeration_area),
+                            leftButtonText = resources.getString(R.string.no),
+                            rightButtonText = resources.getString(R.string.yes),
+                            destructive = true
+                        ) { selection ->
+                            if (selection == resources.getString(R.string.yes))
+                            {
+                                sharedViewModel.setCurrentConfig( config )
+                                val bundle = Bundle()
+                                bundle.putBoolean( Keys.kEditMode.value, true )
+                                findNavController().navigate(R.id.action_navigate_to_WalkEnumerationAreaFragment, bundle)
+                            }
+                        }
                     }
                     else if (studies.isEmpty())
                     {
