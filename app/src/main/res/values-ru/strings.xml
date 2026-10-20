@@ -560,6 +560,7 @@
     <string name="weighted_sample_error_1_3">"Вы хотели провести выборку"</string>
     <string name="weighted_sample_error_2_3">""домохозяйств, но у вас есть только""</string>
     <string name="weighted_sample_error_3_3">""домохозяйства. Пожалуйста, введите число, не превышающее общее количество домохозяйств.""</string>
+    <string name="create_missing_enumeration_area">"С этой конфигурацией не связана ни одна зона переписи. Хотите создать его прямо сейчас?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

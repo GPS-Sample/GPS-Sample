@@ -560,6 +560,7 @@
     <string name="weighted_sample_error_1_3">"شما می خواستید"</string>
     <string name="weighted_sample_error_2_3">"خانوارها را نمونه برداری کنید اما شما فقط"</string>
     <string name="weighted_sample_error_3_3">"خانوارها را دارید. لطفاً عددی وارد کنید که مساوی یا کمتر از مجموع خانوارها باشد."</string>
+    <string name="create_missing_enumeration_area">"این پیکربندی هیچ ناحیه شمارش مرتبطی ندارد. آیا مایلید همین حالا یکی بسازید؟"</string>
     <string-array name="forgot_pin_questions">
         <item>"نام میانی پدر"</item>
         <item>"نام خانوادگی مادر پیش از ازدواج"</item>

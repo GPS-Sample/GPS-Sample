@@ -560,6 +560,7 @@
     <string name="weighted_sample_error_1_3">"Gusto mong kumuha ng sample"</string>
     <string name="weighted_sample_error_2_3">"ng mga sambahayan ngunit mayroon ka lamang"</string>
     <string name="weighted_sample_error_3_3">"ng mga sambahayan. Mangyaring maglagay ng numero na katumbas o mas mababa sa kabuuang bilang ng mga sambahayan."</string>
+    <string name="create_missing_enumeration_area">"Ang configuration na ito ay walang nauugnay na Enumeration Area. Gusto mo bang gumawa ng isa ngayon?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Panggitnang pangalan ng ama"</item>
         <item>"Pangalan ng dalaga ng ina"</item>

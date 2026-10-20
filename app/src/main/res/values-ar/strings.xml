@@ -560,6 +560,7 @@
     <string name="weighted_sample_error_1_3">"تريد ان تجمع ---"</string>
     <string name="weighted_sample_error_2_3">"ولكن لديك فقط ---"</string>
     <string name="weighted_sample_error_3_3">"من المنازل يرجى إدخال عدد يساوي أو أقل من مجموع عدد المنازل"</string>
+    <string name="create_missing_enumeration_area">"لا توجد منطقة تعداد مرتبطة بهذا التكوين المكاني . هل ترغب في إنشاء واحد الآن؟"</string>
     <string-array name="forgot_pin_questions">
         <item>"الاسم الأوسط للأب"</item>
         <item>"اسم العائلة للأم"</item>

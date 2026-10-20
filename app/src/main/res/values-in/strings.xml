@@ -560,6 +560,7 @@
     <string name="weighted_sample_error_1_3">"Anda ingin mengambil sampel"</string>
     <string name="weighted_sample_error_2_3">""rumah tangga, namun Anda hanya memiliki""</string>
     <string name="weighted_sample_error_3_3">"rumah tangga. Harap masukkan angka yang sama dengan atau kurang dari total rumah tangga."</string>
+    <string name="create_missing_enumeration_area">"Konfigurasi ini tidak memiliki Area Enumerasi yang terkait dengannya. Apakah Anda ingin membuatnya sekarang?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>

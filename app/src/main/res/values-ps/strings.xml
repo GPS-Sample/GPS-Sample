@@ -560,6 +560,7 @@
     <string name="weighted_sample_error_1_3">"تاسو غوښتل"</string>
     <string name="weighted_sample_error_2_3">"کورنۍ  نمونه واخلئ خو تاسو یوازې"</string>
     <string name="weighted_sample_error_3_3">"کورنۍ. لرې. مهرباني وکړئ د کورنیو له ټولې شمېرې سره مساوي یا لږ شمېر داخل کړئ."</string>
+    <string name="create_missing_enumeration_area">"دا تشکیلات له ځان سره تړلی شمېرنیه ساحه نه لري. ایا تاسو غواړئ چې همدا اوس یو جوړ کړئ؟"</string>
     <string-array name="forgot_pin_questions">
         <item>"د پلار منځنی نوم"</item>
         <item>"د مور تخلص د واده څخه مخکې"</item>

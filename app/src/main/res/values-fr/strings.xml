@@ -560,6 +560,7 @@
     <string name="weighted_sample_error_1_3">"Vous souhaitiez effectuer un échantillonnage"</string>
     <string name="weighted_sample_error_2_3">""parmi les ménages, mais vous ne disposez que""</string>
     <string name="weighted_sample_error_3_3">"de ménages. Veuillez saisir un nombre inférieur ou égal au nombre total de ménages."</string>
+    <string name="create_missing_enumeration_area">"Aucune zone de recensement n'est associée à cette configuration. Souhaitez-vous en créer un dès maintenant ?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>

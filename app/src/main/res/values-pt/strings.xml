@@ -560,6 +560,7 @@
     <string name="weighted_sample_error_1_3">"Queria fazer uma amostragem de"</string>
     <string name="weighted_sample_error_2_3">""agregados familiares, mas só dispõe de""</string>
     <string name="weighted_sample_error_3_3">"agregados familiares. Introduza um número igual ou inferior ao total de agregados familiares."</string>
+    <string name="create_missing_enumeration_area">"Esta configuração não tem nenhuma área de recenseamento associada. Gostaria de criar um agora?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>

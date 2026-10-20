@@ -560,6 +560,7 @@
     <string name="weighted_sample_error_1_3">"Querías realizar un muestreo de"</string>
     <string name="weighted_sample_error_2_3">""hogares, pero solo dispones de""</string>
     <string name="weighted_sample_error_3_3">"hogares. Introduce un número igual o inferior al número total de hogares."</string>
+    <string name="create_missing_enumeration_area">"Esta configuración no tiene ninguna zona de recuento asociada. ¿Te gustaría crear uno ahora?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>

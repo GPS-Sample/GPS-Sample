@@ -561,7 +561,6 @@
     <string name="weighted_sample_error_2_3">"households but you only have"</string>
     <string name="weighted_sample_error_3_3">"households. Please enter a number equal to or less than the total households."</string>
     <string name="create_missing_enumeration_area">"This configuration does not have an Enumeration Area associated with it.  Would you like to create one now?"</string>
-
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
