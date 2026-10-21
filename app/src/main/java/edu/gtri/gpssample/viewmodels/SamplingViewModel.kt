@@ -74,8 +74,6 @@ class SamplingViewModel : ViewModel()
             _currentEnumArea = MutableLiveData(value?.value)
         }
 
-    val fieldCache = HashMap<String, Field>()
-
     fun setSampleState( state: SampleState )
     {
         _sampleState.value = state
@@ -86,30 +84,11 @@ class SamplingViewModel : ViewModel()
         _samplePageState.value = state
     }
 
-    fun loadFieldCache()
-    {
-        if (fieldCache.isEmpty())
-        {
-            currentStudy?.value?.let { study ->
-                val fields = DAO.fieldDAO.getFields( study )
-                for (field in fields)
-                {
-                    fieldCache[field.uuid] = field
-                }
-            }
-        }
-    }
-
-    fun getField( uuid: String ) : Field?
-    {
-        return fieldCache[uuid]
-    }
-
     fun validateRule(rule : Rule, fieldData : FieldData) : Boolean
     {
         var validRule = false
 
-        getField( fieldData.fieldUuid )?.let { field ->
+        DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
             when (field.type) {
                 FieldType.Checkbox ->
                 {
@@ -336,8 +315,6 @@ class SamplingViewModel : ViewModel()
     {
         _sampleState.value = SampleState.Idle
 
-        loadFieldCache()
-
         currentStudy?.value?.let { study ->
             when( study.samplingMethod )
             {
@@ -414,9 +391,9 @@ class SamplingViewModel : ViewModel()
                         var validRule = false
 
                         filter.rule?.let { rule ->
-                            getField( rule.fieldUuid )?.let { field ->
+                            DAO.fieldDAO.getField( rule.fieldUuid )?.let { field ->
                                 for (fieldData in sampleItem.fieldDataList) {
-                                    getField( fieldData.fieldUuid )?.let { f ->
+                                    DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { f ->
                                         if (field.name.equals( f.name )) {
                                             validRule = validateRule( rule, fieldData )
                                         }
@@ -433,10 +410,10 @@ class SamplingViewModel : ViewModel()
                             while (filterOperator != null)
                             {
                                 filterOperator.rule?.let { nextRule ->
-                                    getField( nextRule.fieldUuid )?.let { nextField ->
+                                    DAO.fieldDAO.getField( nextRule.fieldUuid )?.let { nextField ->
                                         for (fieldData in sampleItem.fieldDataList)
                                         {
-                                            getField( fieldData.fieldUuid )?.let { f ->
+                                            DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { f ->
                                                 if (nextField.name.equals( f.name ))
                                                 {
                                                     val nextRuleValid = validateRule( nextRule, fieldData )
@@ -555,9 +532,9 @@ class SamplingViewModel : ViewModel()
                         var validRule = false
 
                         filter.rule?.let { rule ->
-                            getField( rule.fieldUuid )?.let { field ->
+                            DAO.fieldDAO.getField( rule.fieldUuid )?.let { field ->
                                 for (fieldData in sampleItem.fieldDataList) {
-                                    getField( fieldData.fieldUuid )?.let { f ->
+                                    DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { f ->
                                         if (field.name.equals( f.name )) {
                                             validRule = validateRule( rule, fieldData )
                                         }
@@ -574,10 +551,10 @@ class SamplingViewModel : ViewModel()
                             while (filterOperator != null)
                             {
                                 filterOperator.rule?.let { nextRule ->
-                                    getField( nextRule.fieldUuid )?.let { nextField ->
+                                    DAO.fieldDAO.getField( nextRule.fieldUuid )?.let { nextField ->
                                         for (fieldData in sampleItem.fieldDataList)
                                         {
-                                            getField( fieldData.fieldUuid )?.let { f ->
+                                            DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { f ->
                                                 if (nextField.name.equals( f.name ))
                                                 {
                                                     val nextRuleValid = validateRule( nextRule, fieldData )
