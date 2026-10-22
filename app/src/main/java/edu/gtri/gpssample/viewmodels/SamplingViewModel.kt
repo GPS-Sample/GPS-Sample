@@ -341,8 +341,17 @@ class SamplingViewModel : ViewModel()
                         }
                     }
 
-                    performSimpleRandomSampling( study.sampleSize, study.sampleType )
-                    performSimpleRandomSamplingForSubset( study.sampleSize, study.sampleType )
+                    val numSamples = performSimpleRandomSampling( study.sampleSize, study.sampleType )
+                    val numSubsetSamples = performSimpleRandomSamplingForSubset( study.subsetSampleSize, study.subsetSampleType )
+
+                    if (numSamples + numSubsetSamples > 0)
+                    {
+                        _sampleState.value = SampleState.SampleGenerated
+                    }
+                    else
+                    {
+                        _sampleState.value = SampleState.NoEligibleSamples
+                    }
                 }
 
                 SamplingMethod.Cluster ->
@@ -364,8 +373,9 @@ class SamplingViewModel : ViewModel()
         }
     }
 
-    fun performSimpleRandomSampling( studySampleSize: Int, studySampleType: SampleType, isPrimarySample: Boolean = true )
+    fun performSimpleRandomSampling( studySampleSize: Int, studySampleType: SampleType, isPrimarySample: Boolean = true ) : Int
     {
+        var sampleSize = 0
         val validSamples : ArrayList<EnumerationItem> = ArrayList()
 
         currentStudy?.value?.let { study ->
@@ -458,8 +468,6 @@ class SamplingViewModel : ViewModel()
                 }
             }
 
-            var sampleSize = 0
-
             when (studySampleType)
             {
                 SampleType.NumberHouseholds ->
@@ -473,11 +481,7 @@ class SamplingViewModel : ViewModel()
                 else -> {}
             }
 
-            if (sampleSize == 0)
-            {
-                _sampleState.value = SampleState.NoEligibleSamples
-            }
-            else
+            if (sampleSize > 0)
             {
                 val sampledIndices = ArrayList<Int>()
 
@@ -494,20 +498,21 @@ class SamplingViewModel : ViewModel()
                     validSamples[rnds].samplingState = SamplingState.Sampled
                     validSamples[rnds].version = UUID.randomUUID().toString()
                 }
-
-                _sampleState.value = SampleState.SampleGenerated
             }
         }
+
+        return sampleSize
     }
 
-    fun performSimpleRandomSamplingForSubset( studySampleSize: Int, studySampleType: SampleType, isPrimarySample: Boolean = true )
+    fun performSimpleRandomSamplingForSubset( studySampleSize: Int, studySampleType: SampleType, isPrimarySample: Boolean = true ) : Int
     {
+        var sampleSize = 0
         val validSamples : ArrayList<EnumerationItem> = ArrayList()
 
         currentStudy?.value?.let { study ->
             if (study.subsetRules.isEmpty() || study.subsetFilters.isEmpty())
             {
-                return
+                return 0
             }
 
             for (sampleItem in _currentSampledItemsForSampling)
@@ -599,8 +604,6 @@ class SamplingViewModel : ViewModel()
                 }
             }
 
-            var sampleSize = 0
-
             when (studySampleType)
             {
                 SampleType.NumberHouseholds ->
@@ -631,10 +634,10 @@ class SamplingViewModel : ViewModel()
                     validSamples[rnds].version = UUID.randomUUID().toString()
                     validSamples[rnds].subsetSamplingState = SamplingState.Sampled
                 }
-
-                _sampleState.value = SampleState.SampleGenerated
             }
         }
+
+        return sampleSize
     }
 
     fun performClusterSampling()
@@ -658,8 +661,17 @@ class SamplingViewModel : ViewModel()
             }
 
             currentStudy?.value?.let { study ->
-                performSimpleRandomSampling( study.sampleSize, study.sampleType )
-                performSimpleRandomSamplingForSubset( study.subsetSampleSize, study.subsetSampleType )
+                val numSamples = performSimpleRandomSampling( study.sampleSize, study.sampleType )
+                val numSubsetSamples = performSimpleRandomSamplingForSubset( study.subsetSampleSize, study.subsetSampleType )
+
+                if (numSamples + numSubsetSamples > 0)
+                {
+                    _sampleState.value = SampleState.SampleGenerated
+                }
+                else
+                {
+                    _sampleState.value = SampleState.NoEligibleSamples
+                }
             }
         }
     }
@@ -685,9 +697,18 @@ class SamplingViewModel : ViewModel()
             }
 
             DAO.strataDAO.getStrata( enumArea.strataUuid )?.let { strata ->
-                performSimpleRandomSampling(strata.sampleSize, strata.sampleType )
                 currentStudy?.value?.let { study ->
-                    performSimpleRandomSamplingForSubset( study.subsetSampleSize, study.subsetSampleType )
+                    val numSamples = performSimpleRandomSampling(strata.sampleSize, strata.sampleType )
+                    val numSubsetSamples = performSimpleRandomSamplingForSubset( study.subsetSampleSize, study.subsetSampleType )
+
+                    if (numSamples + numSubsetSamples > 0)
+                    {
+                        _sampleState.value = SampleState.SampleGenerated
+                    }
+                    else
+                    {
+                        _sampleState.value = SampleState.NoEligibleSamples
+                    }
                 }
             }
         }
