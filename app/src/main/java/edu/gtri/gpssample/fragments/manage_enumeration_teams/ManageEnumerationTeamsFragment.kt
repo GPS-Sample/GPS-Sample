@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
@@ -27,6 +28,7 @@ import edu.gtri.gpssample.database.models.EnumerationTeam
 import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamsBinding
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
+import edu.gtri.gpssample.ui.compose.ComposableDropdownDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,6 +41,7 @@ class ManageEnumerationTeamsFragment : Fragment()
     private lateinit var manageEnumerationTeamsAdapter: ManageEnumerationTeamsAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
+    private lateinit var composableDropdownDialogHost: ComposableDropdownDialogHost
     private var _binding: FragmentManageEnumerationTeamsBinding? = null
     private val binding get() = _binding!!
 
@@ -61,11 +64,13 @@ class ManageEnumerationTeamsFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
+        composableDropdownDialogHost = ComposableDropdownDialogHost()
         composableConfirmationDialogHost = ComposableConfirmationDialogHost()
 
         binding.dialogComposeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
         binding.dialogComposeView.setContent {
+            composableDropdownDialogHost.Content()
             composableConfirmationDialogHost.Content()
         }
 
@@ -92,7 +97,30 @@ class ManageEnumerationTeamsFragment : Fragment()
         binding.titleTextView.text = enumArea.name + " " + resources.getString(R.string.teams)
 
         binding.addButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_CreateEnumerationTeamFragment)
+            if (study.samplingMethod == SamplingMethod.Strata && enumArea.strataUuid.isEmpty())
+            {
+                composableDropdownDialogHost.showStrata(title = resources.getString(R.string.select_strata), strataList = study.stratas) { strata ->
+                    strata?.let { strata ->
+                        enumArea.strataUuid = strata.uuid
+
+                        if (enumArea.name.contains("[") && enumArea.name.contains("]"))
+                        {
+                            enumArea.name = enumArea.name.replace(Regex("\\[.*?]"), "[" + strata.name + "]")
+                        }
+                        else
+                        {
+                            enumArea.name = enumArea.name + "-[" + strata.name + "]"
+                        }
+
+                        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, enumArea.version )
+                        findNavController().navigate(R.id.action_navigate_to_CreateEnumerationTeamFragment)
+                    }
+                }
+            }
+            else
+            {
+                findNavController().navigate(R.id.action_navigate_to_CreateEnumerationTeamFragment)
+            }
         }
 
         binding.reviewAllTeamsButton.setOnClickListener {

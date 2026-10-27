@@ -696,7 +696,14 @@ class SamplingViewModel : ViewModel()
                 }
             }
 
-            DAO.strataDAO.getStrata( enumArea.strataUuid )?.let { strata ->
+            val strata = DAO.strataDAO.getStrata( enumArea.strataUuid )
+
+            if (strata == null)
+            {
+                _sampleState.value = SampleState.NoEligibleSamples
+            }
+            else
+            {
                 currentStudy?.value?.let { study ->
                     val numSamples = performSimpleRandomSampling(strata.sampleSize, strata.sampleType )
                     val numSubsetSamples = performSimpleRandomSamplingForSubset( study.subsetSampleSize, study.subsetSampleType )
