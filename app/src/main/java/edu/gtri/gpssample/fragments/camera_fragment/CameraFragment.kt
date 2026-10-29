@@ -182,6 +182,9 @@ class CameraFragment : Fragment()
     {
         val imageCapture = imageCapture ?: return
 
+        binding.saveButton.isEnabled = false
+        binding.cancelButton.isEnabled = false
+
         val photoFile = File(
             outputDirectory,
             SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US).format(System.currentTimeMillis()) + ".jpg"
@@ -201,6 +204,8 @@ class CameraFragment : Fragment()
                     binding.imageView.visibility = View.GONE
                     binding.cameraButton.text = resources.getString(R.string.take_photo)
                     binding.cameraButton.isEnabled = true
+                    binding.saveButton.isEnabled = true
+                    binding.cancelButton.isEnabled = true
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults)
@@ -215,6 +220,8 @@ class CameraFragment : Fragment()
                         bitmap = CameraUtils.rotate( it, angle )
                         binding.imageView.setImageBitmap( bitmap )
                         binding.cameraButton.isEnabled = true
+                        binding.saveButton.isEnabled = true
+                        binding.cancelButton.isEnabled = true
                     }
                 }
             }

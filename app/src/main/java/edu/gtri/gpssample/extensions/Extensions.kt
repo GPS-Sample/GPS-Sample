@@ -8,6 +8,9 @@
 package edu.gtri.gpssample.extensions
 
 import android.database.sqlite.SQLiteStatement
+import android.os.SystemClock
+import android.util.Log
+import android.view.View
 import java.text.DateFormat
 import java.util.Date
 
@@ -40,5 +43,18 @@ fun SQLiteStatement.bind(index: Int, value: Any?)
         is Double -> bindDouble(index, value)
         is Float -> bindDouble(index, value.toDouble())
         else -> throw IllegalArgumentException("Unsupported type ${value::class}")
+    }
+}
+
+fun View.setOnSingleClickListener( onClick: (View) -> Unit )
+{
+    var clicked = false
+
+    setOnClickListener { view ->
+        if (!clicked)
+        {
+            clicked = true
+            onClick(view)
+        }
     }
 }
