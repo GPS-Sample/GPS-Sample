@@ -50,7 +50,6 @@ import edu.gtri.gpssample.constants.ReviewStatus
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableInputDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableMapLegendDialogHost
-import edu.gtri.gpssample.ui.compose.ComposableNotificationDialogHost
 
 class CreateSampleFragment : Fragment()
 {
@@ -190,21 +189,22 @@ class CreateSampleFragment : Fragment()
             TileServer.startServer( enumArea.mbTilesPath )
         }
 
-        val sampleAlreadyGenerated = determineIfSampleWasGenerated()
-
-        if (sampleAlreadyGenerated)
-        {
-            binding.generateSampleButton.visibility = View.GONE
-            binding.beginReviewTextView.visibility = View.GONE
-            samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.SampleGeneratedPage )
-        }
-
         MapManager.instance().selectMap( requireActivity(), config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea ) { mapView ->
             this.mapView = mapView
 
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
 
             MapManager.instance().centerMap( enumArea.vertices, mapView )
+
+            val sampleAlreadyGenerated = determineIfSampleWasGenerated()
+
+            if (sampleAlreadyGenerated)
+            {
+                binding.generateSampleButton.visibility = View.GONE
+                binding.beginReviewTextView.visibility = View.GONE
+                samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.SampleGeneratedPage )
+                updatePageForState( samplingViewModel.samplePageState.value )
+            }
 
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -368,7 +368,7 @@ class CreateSampleFragment : Fragment()
                 }
             }
         }
-        else if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata)
+        else if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata || study.samplingMethod == SamplingMethod.SelfWeighted)
         {
             for (location in enumArea.locations)
             {
@@ -574,6 +574,7 @@ class CreateSampleFragment : Fragment()
                 binding.beginReviewTextView.visibility = View.GONE
                 binding.backButton.visibility = View.GONE
                 binding.nextButton.text = resources.getString(R.string.next )
+                refreshMap()
             }
         }
     }
@@ -653,7 +654,7 @@ class CreateSampleFragment : Fragment()
 
         for (enumArea in config.enumAreas)
         {
-            if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata)
+            if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata || study.samplingMethod == SamplingMethod.SelfWeighted)
             {
                 if (enumArea.uuid != config.selectedEnumAreaUuid)
                 {
@@ -746,7 +747,7 @@ class CreateSampleFragment : Fragment()
 
         for (enumArea in config.enumAreas)
         {
-            if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata)
+            if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata || study.samplingMethod == SamplingMethod.SelfWeighted)
             {
                 if (enumArea.uuid != config.selectedEnumAreaUuid)
                 {
