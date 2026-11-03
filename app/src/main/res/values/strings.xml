@@ -602,6 +602,7 @@
         <item>"Cluster Sampling"</item>
         <item>"Subsets: May Overlap"</item>
         <item>"Stratified Sampling"</item>
+        <item>"Self Weighted Sampling"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"dd/mm/yyyy"</item>

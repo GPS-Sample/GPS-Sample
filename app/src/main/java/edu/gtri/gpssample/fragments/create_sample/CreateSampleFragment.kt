@@ -180,7 +180,7 @@ class CreateSampleFragment : Fragment()
         {
             SamplingMethod.SimpleRandom-> binding.titleTextView.text = resources.getString(R.string.simple_random)
             SamplingMethod.Cluster -> binding.titleTextView.text = resources.getString(R.string.cluster_sampling)
-            SamplingMethod.SelfWeighted -> binding.titleTextView.text = "Self Weighted Sampling" //resources.getString(R.string.weighted_sampling)
+            SamplingMethod.SelfWeighted -> binding.titleTextView.text = resources.getString(R.string.weighted_sampling)
             SamplingMethod.Strata -> binding.titleTextView.text = resources.getString(R.string.strata_exclusive)
             SamplingMethod.None -> TODO()
         }
