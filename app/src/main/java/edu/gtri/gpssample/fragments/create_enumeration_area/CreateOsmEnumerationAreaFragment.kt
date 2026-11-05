@@ -446,6 +446,13 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
     {
         MapManager.instance().clearMap( mapView )
 
+        val markerProperties = ArrayList<MapManager.MarkerProperty>()
+
+        for (location in config.landmarks)
+        {
+            markerProperties.add( MapManager.MarkerProperty( location, R.drawable.location_blue,"" ))
+        }
+
         val allEnumAreas = getAllEnumAreas()
 
         for (enumArea in allEnumAreas)
@@ -455,8 +462,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
             }
 
             addPolygon(enumArea)
-
-            val markerProperties = ArrayList<MapManager.MarkerProperty>()
 
             for (location in enumArea.locations)
             {
@@ -548,11 +553,11 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
 
                 markerProperties.add( MapManager.MarkerProperty( location, resourceId, title ))
             }
+        }
 
-            if (markerProperties.isNotEmpty())
-            {
-                MapManager.instance().loadMarkers( requireActivity(), binding.osmMapView, markerProperties, null )
-            }
+        if (markerProperties.isNotEmpty())
+        {
+            MapManager.instance().loadMarkers( requireActivity(), binding.osmMapView, markerProperties, null )
         }
     }
 
@@ -1048,7 +1053,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                                     is Point -> {
                                         composableConfirmationDialogHost.show(
                                             title = resources.getString(R.string.please_confirm),
-                                            message = "Are these locations HH's?",
+                                            message = resources.getString( R.string.are_these_locations_hhs ),
                                             leftButtonText = resources.getString(R.string.no),
                                             rightButtonText = resources.getString(R.string.yes),
                                             destructive = false
@@ -1322,15 +1327,19 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                         location.description = jsonObject.getString(key)
                         break
                     }
-                }
 
-                val enumArea = findEnumAreaOfLocation( allEnumAreas, LatLng( point.point.coordinates.latitude, point.point.coordinates.longitude ))?.let { enumArea ->
-                    enumArea.locations.add( location )
+                    config.landmarks.add( location )
                 }
-
-                if (enumArea == null && allEnumAreas.isNotEmpty())
+                else
                 {
-                    allEnumAreas.first().locations.add( location )
+                    val enumArea = findEnumAreaOfLocation( allEnumAreas, LatLng( point.point.coordinates.latitude, point.point.coordinates.longitude ))?.let { enumArea ->
+                        enumArea.locations.add( location )
+                    }
+
+                    if (enumArea == null && allEnumAreas.isNotEmpty())
+                    {
+                        allEnumAreas.first().locations.add( location )
+                    }
                 }
             }
         }

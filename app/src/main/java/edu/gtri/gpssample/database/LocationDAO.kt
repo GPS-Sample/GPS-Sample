@@ -10,6 +10,7 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
@@ -64,6 +65,23 @@ class LocationDAO(private var dao: DAO)
         }
     }
 
+    fun createOrUpdateLocation( location: Location, config : Config, version: String )
+    {
+        location.version = version
+
+        if (location.altitude.isNaN())
+        {
+            location.altitude = 0.0
+        }
+
+        val values = ContentValues()
+        putLocation( location, values )
+
+        dao.upsert(DAO.TABLE_LOCATION, values )
+
+        updateConnectorTable( location, config )
+    }
+
     private fun updateConnectorTable( location : Location, enumArea : EnumArea )
     {
         val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_LOCATION__ENUM_AREA} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${location.uuid}' AND ${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}'"
@@ -76,6 +94,14 @@ class LocationDAO(private var dao: DAO)
             dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_LOCATION__ENUM_AREA, null, values)
         }
         cursor.close()
+    }
+
+    private fun updateConnectorTable( location : Location, config : Config )
+    {
+        val values = ContentValues()
+        values.put( DAO.COLUMN_LOCATION_UUID, location.uuid )
+        values.put( DAO.COLUMN_CONFIG_UUID, config.uuid )
+        dao.writableDatabase.insertWithOnConflict(DAO.CONNECTOR_TABLE_LOCATION__CONFIG, null, values, SQLiteDatabase.CONFLICT_IGNORE )
     }
 
     fun putLocation( location: Location, values: ContentValues)
@@ -246,6 +272,26 @@ class LocationDAO(private var dao: DAO)
         {
             val location = buildLocation( cursor )
             location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+            locations.add( location )
+        }
+
+        cursor.close()
+
+        return locations
+    }
+
+    fun getLandmarks( config: Config ): ArrayList<Location>
+    {
+        val locations = ArrayList<Location>()
+
+        val query = "SELECT location.*, conn.${DAO.COLUMN_LOCATION_UUID}, conn.${DAO.COLUMN_CONFIG_UUID} FROM ${DAO.TABLE_LOCATION} AS location, " +
+                "${DAO.CONNECTOR_TABLE_LOCATION__CONFIG} AS conn WHERE location.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LOCATION_UUID} AND conn.${DAO.COLUMN_CONFIG_UUID} = '${config.uuid}'"
+
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val location = buildLocation( cursor )
             locations.add( location )
         }
 

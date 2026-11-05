@@ -209,6 +209,17 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createConnectorTableLocationEnumArea)
 
+            val createConnectorTableLocationConfig = ("CREATE TABLE " +
+                    CONNECTOR_TABLE_LOCATION__CONFIG + "(" +
+                    COLUMN_CID + COLUMN_CID_TYPE + "," +
+                    COLUMN_LOCATION_UUID + " TEXT" + "," +
+                    COLUMN_CONFIG_UUID + " TEXT" + "," +
+                    "FOREIGN KEY($COLUMN_LOCATION_UUID) REFERENCES $TABLE_LOCATION($COLUMN_UUID)" + "," +
+                    "FOREIGN KEY($COLUMN_CONFIG_UUID) REFERENCES $TABLE_CONFIG($COLUMN_UUID)" + "," +
+                    "UNIQUE ($COLUMN_LOCATION_UUID, $COLUMN_CONFIG_UUID)" +
+                    ")")
+            db.execSQL(createConnectorTableLocationConfig)
+
             val createConnectorTableLocationEnumerationTeam = ("CREATE TABLE " +
                     CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM + "(" +
                     COLUMN_CID + COLUMN_CID_TYPE + "," +
@@ -411,6 +422,16 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 migrateFrom324To325( db )
                 Log.d( "xxx", "migrated from 314 to 325" )
             }
+            else if (newVersion == 326)
+            {
+                migrateFrom314To321( db )
+                migrateFrom321To322( db )
+                migrateFrom322To323( db )
+                migrateFrom323To324( db )
+                migrateFrom324To325( db )
+                migrateFrom325To326( db )
+                Log.d( "xxx", "migrated from 314 to 326" )
+            }
             else
             {
                 dropAllTables( db )
@@ -444,6 +465,15 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 migrateFrom324To325( db )
                 Log.d( "xxx", "migrated from 321 to 325" )
             }
+            else if (newVersion == 326)
+            {
+                migrateFrom321To322( db )
+                migrateFrom322To323( db )
+                migrateFrom323To324( db )
+                migrateFrom324To325( db )
+                migrateFrom325To326( db )
+                Log.d( "xxx", "migrated from 321 to 326" )
+            }
             else
             {
                 dropAllTables( db )
@@ -469,6 +499,14 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 migrateFrom324To325( db )
                 Log.d( "xxx", "migrated from 322 to 325" )
             }
+            else if (newVersion == 326)
+            {
+                migrateFrom322To323( db )
+                migrateFrom323To324( db )
+                migrateFrom324To325( db )
+                migrateFrom325To326( db )
+                Log.d( "xxx", "migrated from 322 to 326" )
+            }
             else
             {
                 dropAllTables( db )
@@ -487,6 +525,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 migrateFrom324To325( db )
                 Log.d( "xxx", "migrated from 323 to 325" )
             }
+            else if (newVersion == 326)
+            {
+                migrateFrom323To324( db )
+                migrateFrom324To325( db )
+                migrateFrom325To326( db )
+                Log.d( "xxx", "migrated from 323 to 326" )
+            }
             else
             {
                 dropAllTables( db )
@@ -499,6 +544,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 migrateFrom324To325( db )
                 Log.d( "xxx", "migrated from 324 to 325" )
             }
+            if (newVersion == 326)
+            {
+                migrateFrom324To325( db )
+                migrateFrom325To326( db )
+                Log.d( "xxx", "migrated from 324 to 326" )
+            }
             else
             {
                 dropAllTables( db )
@@ -507,6 +558,37 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         else
         {
             dropAllTables( db )
+        }
+    }
+
+    fun migrateFrom325To326(db: SQLiteDatabase)
+    {
+        db.transaction {
+            try
+            {
+                val createConnectorTableLocationConfig = ("CREATE TABLE " +
+                        CONNECTOR_TABLE_LOCATION__CONFIG + "(" +
+                        COLUMN_CID + COLUMN_CID_TYPE + "," +
+                        COLUMN_LOCATION_UUID + " TEXT" + "," +
+                        COLUMN_CONFIG_UUID + " TEXT" + "," +
+                        "FOREIGN KEY($COLUMN_LOCATION_UUID) REFERENCES $TABLE_LOCATION($COLUMN_UUID)" + "," +
+                        "FOREIGN KEY($COLUMN_CONFIG_UUID) REFERENCES $TABLE_CONFIG($COLUMN_UUID)" + "," +
+                        "UNIQUE ($COLUMN_LOCATION_UUID, $COLUMN_CONFIG_UUID)" +
+                        ")")
+                db.execSQL(createConnectorTableLocationConfig)
+
+                // Update dbVersion in Config
+                val newDbVersion = 326
+                val contentValues = ContentValues().apply {
+                    put(COLUMN_CONFIG_DB_VERSION, newDbVersion)
+                }
+
+                update(TABLE_CONFIG, contentValues, null, null)
+            }
+            catch (ex: Exception) {
+                Log.d("xxx", "Migration from DB 325 to 326 FAILED: ${ex.message}")
+                throw ex // optional: rethrow so Android knows migration failed
+            }
         }
     }
 
@@ -813,6 +895,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION")
             db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION")
             db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_LOCATION__ENUM_AREA")
+            db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_LOCATION__CONFIG")
             db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM")
             db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM")
 
@@ -859,6 +942,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val CONNECTOR_TABLE_CONFIG__STUDY = "config__study"
         const val CONNECTOR_TABLE_FIELD__FIELD_OPTION = "field__field_option"
         const val CONNECTOR_TABLE_LOCATION__ENUM_AREA = "location__enum_area"
+        const val CONNECTOR_TABLE_LOCATION__CONFIG = "location__config"
         const val CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM = "location__enumeration_team"
         const val CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM = "location__collection_team"
         const val CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION = "field_data__field_data_option"
@@ -1100,6 +1184,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM $TABLE_COLLECTION_TEAM")
                 db.execSQL("DELETE FROM $TABLE_LOCATION")
                 db.execSQL("DELETE FROM $CONNECTOR_TABLE_LOCATION__ENUM_AREA")
+                db.execSQL("DELETE FROM $CONNECTOR_TABLE_LOCATION__CONFIG")
                 db.execSQL("DELETE FROM $CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM")
                 db.execSQL("DELETE FROM $CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM")
                 db.execSQL("DELETE FROM $TABLE_ENUMERATION_ITEM")
@@ -1128,6 +1213,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_COLLECTION_TEAM'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_LOCATION'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_LOCATION__ENUM_AREA'")
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_LOCATION__CONFIG'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUMERATION_ITEM'")
@@ -1196,6 +1282,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             Log.d( "xxx", msg )
         }
 
-        const val DATABASE_VERSION = 325
+        const val DATABASE_VERSION = 326
     }
 }

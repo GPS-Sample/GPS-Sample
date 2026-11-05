@@ -649,7 +649,111 @@ class CreateEnumerationAreaFragment : Fragment(),
             addPolygon(enumArea)
         }
 
-        MapManager.instance().loadMarkers( requireActivity(), binding.mapboxMapView, allEnumAreas )
+        val markerProperties = ArrayList<MapManager.MarkerProperty>()
+
+        for (location in config.landmarks)
+        {
+            markerProperties.add( MapManager.MarkerProperty( location, R.drawable.location_blue,"" ))
+        }
+
+        for (enumArea in allEnumAreas)
+        {
+            for (location in enumArea.locations)
+            {
+                var resourceId = R.drawable.home_black
+
+                if (location.isLandmark)
+                {
+                    resourceId = R.drawable.location_blue
+                }
+                else if (location.enumerationItems.size == 1)
+                {
+                    if (location.enumerationItems.isNotEmpty())
+                    {
+                        val enumerationItem = location.enumerationItems[0]
+
+                        if (enumerationItem.samplingState == SamplingState.Sampled || enumerationItem.subsetSamplingState == SamplingState.Sampled)
+                        {
+                            when( enumerationItem.collectionState )
+                            {
+                                CollectionState.Undefined -> resourceId = R.drawable.home_light_blue
+                                CollectionState.Incomplete -> resourceId = R.drawable.home_orange
+                                CollectionState.Complete -> resourceId = R.drawable.home_purple
+                            }
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                        {
+                            resourceId = R.drawable.home_black
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                        {
+                            resourceId = R.drawable.home_red
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                        {
+                            resourceId = R.drawable.home_green
+                        }
+                    }
+                }
+                else
+                {
+                    for (enumerationItem in location.enumerationItems)
+                    {
+                        if ((enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined)
+                            || (enumerationItem.subsetSamplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined))
+                        {
+                            resourceId = R.drawable.multi_home_light_blue
+                            break
+                        }
+                    }
+
+                    if (resourceId == R.drawable.home_black)
+                    {
+                        for (enumerationItem in location.enumerationItems)
+                        {
+                            if (enumerationItem.samplingState == SamplingState.Sampled || enumerationItem.subsetSamplingState == SamplingState.Sampled)
+                            {
+                                if (enumerationItem.collectionState == CollectionState.Incomplete)
+                                {
+                                    resourceId = R.drawable.multi_home_orange
+                                    break
+                                }
+                                else if (enumerationItem.collectionState == CollectionState.Complete)
+                                {
+                                    resourceId = R.drawable.multi_home_purple
+                                }
+                            }
+                            else if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                            {
+                                resourceId = R.drawable.multi_home_black
+                            }
+                            else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                            {
+                                resourceId = R.drawable.multi_home_red
+                                break
+                            }
+                            else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                            {
+                                resourceId = R.drawable.home_green
+                            }
+                        }
+                    }
+                }
+
+                var title = ""
+                if (location.enumerationItems.isNotEmpty())
+                {
+                    title = location.enumerationItems[0].subAddress
+                }
+
+                markerProperties.add( MapManager.MarkerProperty( location, resourceId, title ))
+            }
+        }
+
+        if (markerProperties.isNotEmpty())
+        {
+            MapManager.instance().loadMarkers( requireActivity(), binding.mapboxMapView, markerProperties, null )
+        }
 
         binding.mapboxMapView.getMapboxMap().addOnCameraChangeListener(this)
     }
@@ -1042,7 +1146,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                                     is Point -> {
                                         composableConfirmationDialogHost.show(
                                             title = resources.getString(R.string.please_confirm),
-                                            message = "Are these locations HH's?",
+                                            message = resources.getString( R.string.are_these_locations_hhs ),
                                             leftButtonText = resources.getString(R.string.no),
                                             rightButtonText = resources.getString(R.string.yes),
                                             destructive = false
@@ -1335,20 +1439,24 @@ class CreateEnumerationAreaFragment : Fragment(),
                         location.description = jsonObject.getString(key)
                         break
                     }
-                }
 
-                if (shouldAutoEnumerateLocations)
+                    config.landmarks.add( location )
+                }
+                else
                 {
-                    autoEnumerate( location )
-                }
+                    if (shouldAutoEnumerateLocations)
+                    {
+                        autoEnumerate( location )
+                    }
 
-                val enumArea = findEnumAreaOfLocation( allEnumAreas, LatLng( point.point.coordinates.latitude, point.point.coordinates.longitude ))?.let { enumArea ->
-                    enumArea.locations.add( location )
-                }
+                    val enumArea = findEnumAreaOfLocation( allEnumAreas, LatLng( point.point.coordinates.latitude, point.point.coordinates.longitude ))?.let { enumArea ->
+                        enumArea.locations.add( location )
+                    }
 
-                if (enumArea == null && allEnumAreas.size == 1)
-                {
-                    allEnumAreas.first().locations.add( location )
+                    if (enumArea == null && allEnumAreas.size == 1)
+                    {
+                        allEnumAreas.first().locations.add( location )
+                    }
                 }
             }
         }

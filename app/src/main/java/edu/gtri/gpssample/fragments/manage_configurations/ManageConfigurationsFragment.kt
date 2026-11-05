@@ -360,6 +360,7 @@ class ManageConfigurationsFragment : Fragment()
                 if (config.studies.isEmpty())
                 {
                     config.studies = DAO.studyDAO.getStudies( config )
+                    config.landmarks = DAO.locationDAO.getLandmarks( config )
                 }
 
                 if (config.enumAreas.isEmpty())
@@ -420,6 +421,7 @@ class ManageConfigurationsFragment : Fragment()
                         if (newConfig.studies.isEmpty())
                         {
                             newConfig.studies = DAO.studyDAO.getStudies( newConfig )
+                            newConfig.landmarks = DAO.locationDAO.getLandmarks( newConfig )
                         }
 
                         if (newConfig.enumAreas.isEmpty())
@@ -642,6 +644,7 @@ class ManageConfigurationsFragment : Fragment()
                 if (config.studies.isEmpty())
                 {
                     config.studies = DAO.studyDAO.getStudies( config )
+                    config.landmarks = DAO.locationDAO.getLandmarks( config )
                 }
 
                 if ((user.role == Role.Enumerator.value || user.role == Role.DataCollector.value) && (config.selectedEnumAreaUuid.isNotEmpty()))

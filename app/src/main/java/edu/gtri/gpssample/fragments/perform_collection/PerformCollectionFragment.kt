@@ -319,8 +319,12 @@ class PerformCollectionFragment : Fragment(),
             }
         }
 
+        val locations = ArrayList<Location>()
+        locations.addAll( config.landmarks )
+        locations.addAll( landmarkLocations )
+
         performCollectionAdapter = PerformCollectionAdapter( ArrayList<EnumerationItem>(), ArrayList<Location>(), enumArea.name )
-        performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+        performCollectionAdapter.updateItems( enumerationItems, locations )
 
         performCollectionAdapter.didSelectItem = this::didSelectItem
 
@@ -532,12 +536,21 @@ class PerformCollectionFragment : Fragment(),
                         {
                             enumerationItem.isVisible = true
                         }
+                        for (location in config.landmarks)
+                        {
+                            location.isVisible = true
+                        }
                         for (location in collectionTeamLocations) // includes landmarks!
                         {
                             location.isVisible = true
                         }
                     }
                     1-> { // undefined
+                        for (location in config.landmarks)
+                        {
+                            location.isVisible = false
+                        }
+
                         for (location in collectionTeamLocations)
                         {
                             location.isVisible = false
@@ -565,6 +578,11 @@ class PerformCollectionFragment : Fragment(),
                         }
                     }
                     2-> { // incomplete
+                        for (location in config.landmarks)
+                        {
+                            location.isVisible = false
+                        }
+
                         for (location in collectionTeamLocations)
                         {
                             location.isVisible = false
@@ -592,6 +610,11 @@ class PerformCollectionFragment : Fragment(),
                         }
                     }
                     3-> { // complete
+                        for (location in config.landmarks)
+                        {
+                            location.isVisible = false
+                        }
+
                         for (location in collectionTeamLocations)
                         {
                             location.isVisible = false
@@ -619,6 +642,11 @@ class PerformCollectionFragment : Fragment(),
                         }
                     }
                     4-> { // points of interest
+                        for (location in config.landmarks)
+                        {
+                            location.isVisible = true
+                        }
+
                         for (location in collectionTeamLocations)
                         {
                             location.isVisible = if (location.isLandmark) true else false
@@ -629,6 +657,10 @@ class PerformCollectionFragment : Fragment(),
                         }
                     }
                     5 -> { // Primary Sample
+                        for (location in config.landmarks)
+                        {
+                            location.isVisible = false
+                        }
                         for (location in collectionTeamLocations)
                         {
                             location.isVisible = false
@@ -656,6 +688,10 @@ class PerformCollectionFragment : Fragment(),
                         }
                     }
                     6 -> { // Subset Sample
+                        for (location in config.landmarks)
+                        {
+                            location.isVisible = false
+                        }
                         for (location in collectionTeamLocations)
                         {
                             location.isVisible = false
@@ -684,7 +720,11 @@ class PerformCollectionFragment : Fragment(),
                     }
                 }
 
-                performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+                val locations = ArrayList<Location>()
+                locations.addAll( config.landmarks )
+                locations.addAll( landmarkLocations )
+
+                performCollectionAdapter.updateItems( enumerationItems, locations )
                 refreshMap()
             }
 
@@ -1082,6 +1122,16 @@ class PerformCollectionFragment : Fragment(),
 
             val markerProperties = ArrayList<MapManager.MarkerProperty>()
 
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                for (location in config.landmarks)
+                {
+                    if (location.isVisible)
+                    {
+                        markerProperties.add( MapManager.MarkerProperty( location, R.drawable.location_blue,"" ))
+                    }
+                }
+            }
+
             for (location in landmarkLocations)
             {
                 if (location.isVisible)
@@ -1333,7 +1383,7 @@ class PerformCollectionFragment : Fragment(),
                     }
                 }
 
-                performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+                performCollectionAdapter.updateItems( enumerationItems, performCollectionAdapter.locations )
 
                 performCollectionAdapter.notifyDataSetChanged()
 

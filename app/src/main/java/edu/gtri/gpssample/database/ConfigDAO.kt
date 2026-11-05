@@ -65,6 +65,11 @@ class ConfigDAO(private var dao: DAO)
         createOrUpdateEnumAreas(config)
         createOrUpdateStudies(config)
 
+        for (location in config.landmarks)
+        {
+            DAO.locationDAO.createOrUpdateLocation( location, config, location.version )
+        }
+
         dao.writableDatabase.setTransactionSuccessful()
         dao.writableDatabase.endTransaction()
     }
@@ -187,6 +192,7 @@ class ConfigDAO(private var dao: DAO)
         {
             config = buildConfig( cursor )
             config.studies = DAO.studyDAO.getStudies( config )
+            config.landmarks = DAO.locationDAO.getLandmarks( config )
         }
 
         cursor.close()

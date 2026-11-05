@@ -211,6 +211,10 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.progressOverlayView.visibility = View.GONE
 
+        for (location in config.landmarks) {
+            location.isVisible = true
+        }
+
         for (location in enumArea.locations) {
             location.isVisible = true
         }
@@ -219,7 +223,11 @@ class PerformEnumerationFragment : Fragment(),
             user = it
         }
 
-        performEnumerationAdapter = PerformEnumerationAdapter( enumArea.locations, enumArea.name )
+        val locations = ArrayList<Location>()
+        locations.addAll( config.landmarks )
+        locations.addAll( enumArea.locations )
+
+        performEnumerationAdapter = PerformEnumerationAdapter( locations,enumArea.name )
         performEnumerationAdapter.didSelectLocation = this::didSelectLocation
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -376,11 +384,18 @@ class PerformEnumerationFragment : Fragment(),
                     when( position )
                     {
                         0-> { // nothing
+                            for (location in config.landmarks) {
+                                location.isVisible = true
+                            }
                             for (location in enumArea.locations) {
                                 location.isVisible = true
                             }
                         }
                         1-> { // undefined
+                            for (location in config.landmarks) {
+                                location.isVisible = false
+                            }
+
                             for (location in enumArea.locations)
                             {
                                 location.isVisible = false
@@ -405,6 +420,10 @@ class PerformEnumerationFragment : Fragment(),
                             }
                         }
                         2-> { // incomplete
+                            for (location in config.landmarks) {
+                                location.isVisible = false
+                            }
+
                             for (location in enumArea.locations)
                             {
                                 location.isVisible = false
@@ -422,6 +441,10 @@ class PerformEnumerationFragment : Fragment(),
                             }
                         }
                         3-> { // complete
+                            for (location in config.landmarks) {
+                                location.isVisible = false
+                            }
+
                             for (location in enumArea.locations)
                             {
                                 location.isVisible = false
@@ -439,6 +462,10 @@ class PerformEnumerationFragment : Fragment(),
                             }
                         }
                         4-> { // points of interest
+                            for (location in config.landmarks) {
+                                location.isVisible = true
+                            }
+
                             for (location in enumArea.locations)
                             {
                                 location.isVisible = if (location.isLandmark) true else false
@@ -446,7 +473,11 @@ class PerformEnumerationFragment : Fragment(),
                         }
                     }
 
-                    performEnumerationAdapter.updateLocations( enumArea.locations )
+                    val locations = ArrayList<Location>()
+                    locations.addAll( config.landmarks )
+                    locations.addAll( enumArea.locations )
+
+                    performEnumerationAdapter.updateLocations( locations )
                     refreshMap()
                 }
 
@@ -1046,6 +1077,16 @@ class PerformEnumerationFragment : Fragment(),
 
             val markerProperties = ArrayList<MapManager.MarkerProperty>()
 
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                for (location in config.landmarks)
+                {
+                    if (location.isVisible)
+                    {
+                        markerProperties.add( MapManager.MarkerProperty( location, R.drawable.location_blue,"" ))
+                    }
+                }
+            }
+
             for (location in enumArea.locations)
             {
                 if (location.isLandmark && location.isVisible)
@@ -1612,6 +1653,7 @@ class PerformEnumerationFragment : Fragment(),
 
                                 refreshMap()
                                 updateSummaryInfo()
+
                                 performEnumerationAdapter.updateLocations( performEnumerationAdapter.locations )
                                 Toast.makeText(requireActivity().applicationContext,  "Auto Enumeration Complete.", Toast.LENGTH_SHORT).show()
                             }
@@ -1804,7 +1846,11 @@ class PerformEnumerationFragment : Fragment(),
                         loc.distanceUnits = distanceUnits
                     }
 
-                    performEnumerationAdapter.updateLocations( enumArea.locations )
+                    val locations = ArrayList<Location>()
+                    locations.addAll( config.landmarks )
+                    locations.addAll( enumArea.locations )
+
+                    performEnumerationAdapter.updateLocations( locations )
                 }
             }
         }
