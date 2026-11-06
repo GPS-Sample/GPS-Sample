@@ -9,6 +9,7 @@ package edu.gtri.gpssample.fragments.perform_collection
 
 import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -182,7 +183,14 @@ class PerformCollectionFragment : Fragment(),
 
                                             val intent = Intent(Intent.ACTION_VIEW)
                                             intent.type = "vnd.android.cursor.dir/vnd.odk.form"
-                                            odk_result.launch(intent)
+                                            try
+                                            {
+                                                odk_result.launch(intent)
+                                            }
+                                            catch( ex: ActivityNotFoundException )
+                                            {
+                                                composableNotificationDialogHost.show(title = resources.getString(R.string.oops), message = resources.getString(R.string.survey_app_not_found))
+                                            }
                                         }
                                     }
                                 }
