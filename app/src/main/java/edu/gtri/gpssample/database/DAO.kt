@@ -577,6 +577,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                         ")")
                 db.execSQL(createConnectorTableLocationConfig)
 
+                db.execSQL("ALTER TABLE $TABLE_ENUM_AREA ADD COLUMN $COLUMN_ENUM_AREA_SAMPLE_SIZE INTEGER DEFAULT 0")
+
                 // Update dbVersion in Config
                 val newDbVersion = 326
                 val contentValues = ContentValues().apply {
@@ -1041,6 +1043,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_ENUM_AREA_NAME = "enum_area_name"
         const val COLUMN_ENUM_AREA_MBTILESPATH = "enum_area_mbtilespath"
         const val COLUMN_ENUM_AREA_MBTILESSIZE = "enum_area_mbtilessize"
+        const val COLUMN_ENUM_AREA_SAMPLE_SIZE = "enum_area_sample_size"
 
         // EnumerationTeam Table
         const val TABLE_ENUMERATION_TEAM = "enumeration_team"

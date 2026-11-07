@@ -10,7 +10,6 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
-import android.util.Log
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_COLLECTION_TEAM_UUID
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CONFIG_UUID
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
@@ -18,11 +17,11 @@ import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_TEAM_UUID
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_MBTILESPATH
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_MBTILESSIZE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_NAME
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUM_AREA_SAMPLE_SIZE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STRATA_UUID
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_VERSION
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.database.models.Location
 
 class EnumAreaDAO(private var dao: DAO)
 {
@@ -72,6 +71,7 @@ class EnumAreaDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
         values.put( DAO.COLUMN_ENUM_AREA_MBTILESPATH, enumArea.mbTilesPath )
         values.put( DAO.COLUMN_ENUM_AREA_MBTILESSIZE, enumArea.mbTilesSize )
+        values.put( DAO.COLUMN_ENUM_AREA_SAMPLE_SIZE, enumArea.sampleSize )
         values.put( DAO.COLUMN_ENUMERATION_TEAM_UUID, enumArea.selectedEnumerationTeamUuid )
         values.put( DAO.COLUMN_COLLECTION_TEAM_UUID, enumArea.selectedCollectionTeamUuid )
     }
@@ -87,10 +87,11 @@ class EnumAreaDAO(private var dao: DAO)
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
         val mbTilesPath = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_MBTILESPATH))
         val mbTilesSize = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_MBTILESSIZE))
+        val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_SAMPLE_SIZE))
         val selectedEnumerationTeamUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_UUID))
         val selectedCollectionTeamUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_UUID))
 
-        return EnumArea( uuid, creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, selectedEnumerationTeamUuid, selectedCollectionTeamUuid, version )
+        return EnumArea( uuid, creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, sampleSize, selectedEnumerationTeamUuid, selectedCollectionTeamUuid, version )
     }
 
     fun getEnumArea( uuid: String ): EnumArea?
@@ -265,6 +266,7 @@ class EnumAreaDAO(private var dao: DAO)
             ColumnBinding<EnumArea>(COLUMN_ENUM_AREA_NAME,"TEXT",EnumArea::name ),
             ColumnBinding<EnumArea>(COLUMN_ENUM_AREA_MBTILESPATH,"TEXT",EnumArea::mbTilesPath ),
             ColumnBinding<EnumArea>(COLUMN_ENUM_AREA_MBTILESSIZE,"INTEGER",EnumArea::mbTilesSize ),
+            ColumnBinding<EnumArea>(COLUMN_ENUM_AREA_SAMPLE_SIZE,"INTEGER",EnumArea::sampleSize ),
             ColumnBinding<EnumArea>(COLUMN_ENUMERATION_TEAM_UUID,"TEXT",EnumArea::selectedEnumerationTeamUuid ),
             ColumnBinding<EnumArea>(COLUMN_COLLECTION_TEAM_UUID,"TEXT",EnumArea::selectedCollectionTeamUuid ),
         )

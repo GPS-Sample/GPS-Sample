@@ -300,6 +300,7 @@ class CreateSampleFragment : Fragment()
                             if (sampleSize > 0)
                             {
                                 study.sampleSize = sampleSize
+                                enumArea.sampleSize = sampleSize
                                 binding.progressOverlayView.visibility = View.VISIBLE
                                 samplingViewModel.beginSampling()
                             }

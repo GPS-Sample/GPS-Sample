@@ -31,6 +31,7 @@ data class EnumArea (
     var name: String,
     var mbTilesPath: String,
     var mbTilesSize: Long,
+    var sampleSize: Int,
     var vertices: ArrayList<LatLon>,
     var locations: ArrayList<Location>,
     var enumerationTeams: ArrayList<EnumerationTeam>,
@@ -40,6 +41,7 @@ data class EnumArea (
     var mapTileRegion: MapTileRegion?,
     var breadcrumbs: ArrayList<Breadcrumb>,
     var version: String ) {
+
     constructor(
         uuid: String,
         creationDate: Long,
@@ -48,6 +50,7 @@ data class EnumArea (
         name: String,
         mbTilesPath: String,
         mbTilesSize: Long,
+        sampleSize: Int,
         selectedEnumerationTeamUuid: String,
         selectedCollectionTeamUuid: String,
         version: String
@@ -60,6 +63,7 @@ data class EnumArea (
         name,
         mbTilesPath,
         mbTilesSize,
+        sampleSize,
         ArrayList<LatLon>(),
         ArrayList<Location>(),
         ArrayList<EnumerationTeam>(),
@@ -88,6 +92,7 @@ data class EnumArea (
         name,
         mbTilesPath,
         mbTilesSize,
+        0,
         vertices,
         ArrayList<Location>(),
         ArrayList<EnumerationTeam>(),
@@ -117,6 +122,7 @@ data class EnumArea (
         name,
         mbTilesPath,
         mbTilesSize,
+        0,
         vertices,
         ArrayList<Location>(),
         ArrayList<EnumerationTeam>(),
