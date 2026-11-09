@@ -561,6 +561,8 @@
     <string name="weighted_sample_error_2_3">"خانوارها را نمونه برداری کنید اما شما فقط"</string>
     <string name="weighted_sample_error_3_3">"خانوارها را دارید. لطفاً عددی وارد کنید که مساوی یا کمتر از مجموع خانوارها باشد."</string>
     <string name="create_missing_enumeration_area">"این پیکربندی هیچ ناحیه شمارش مرتبطی ندارد. آیا مایلید همین حالا یکی بسازید؟"</string>
+    <string name="are_these_locations_hhs">"آیا این مکان"</string>
+    <string name="survey_app_not_found">"اپلیکیشن نظرسنجی سازگار یافت نشد."</string>
     <string-array name="forgot_pin_questions">
         <item>"نام میانی پدر"</item>
         <item>"نام خانوادگی مادر پیش از ازدواج"</item>
@@ -602,6 +604,7 @@
         <item>"نمونه گیری خوشه"</item>
         <item>"زیرمجموعه"</item>
         <item>"نمونه گیری طبقه بندی شده"</item>
+        <item>"نمونه گیری با وزن خود"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"روز/ماه/سال"</item>

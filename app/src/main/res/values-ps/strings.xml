@@ -561,6 +561,8 @@
     <string name="weighted_sample_error_2_3">"کورنۍ  نمونه واخلئ خو تاسو یوازې"</string>
     <string name="weighted_sample_error_3_3">"کورنۍ. لرې. مهرباني وکړئ د کورنیو له ټولې شمېرې سره مساوي یا لږ شمېر داخل کړئ."</string>
     <string name="create_missing_enumeration_area">"دا تشکیلات له ځان سره تړلی شمېرنیه ساحه نه لري. ایا تاسو غواړئ چې همدا اوس یو جوړ کړئ؟"</string>
+    <string name="are_these_locations_hhs">"ایا دا ځایونه کورنۍ دي؟"</string>
+    <string name="survey_app_not_found">"یو مطابقت لرونکی سروې اپلیکیشن وموندل شو نه."</string>
     <string-array name="forgot_pin_questions">
         <item>"د پلار منځنی نوم"</item>
         <item>"د مور تخلص د واده څخه مخکې"</item>
@@ -602,6 +604,7 @@
         <item>"ډله"</item>
         <item>"فرعي ټولګي: ممکن تداخل ولري"</item>
         <item>"طبقه بندي شوې نمونه اخیستل"</item>
+        <item>"خپل وزن لرونکی نمونه"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"ورځ/میاشت/کال"</item>

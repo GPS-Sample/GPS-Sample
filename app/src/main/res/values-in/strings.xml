@@ -561,6 +561,8 @@
     <string name="weighted_sample_error_2_3">""rumah tangga, namun Anda hanya memiliki""</string>
     <string name="weighted_sample_error_3_3">"rumah tangga. Harap masukkan angka yang sama dengan atau kurang dari total rumah tangga."</string>
     <string name="create_missing_enumeration_area">"Konfigurasi ini tidak memiliki Area Enumerasi yang terkait dengannya. Apakah Anda ingin membuatnya sekarang?"</string>
+    <string name="are_these_locations_hhs">"Apakah lokasi-lokasi ini merupakan rumah tangga?"</string>
+    <string name="survey_app_not_found">"Aplikasi survei yang kompatibel tidak ditemukan."</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>
@@ -602,6 +604,7 @@
         <item>"Pengambilan Sampel Klaster"</item>
         <item>"Subset: Mungkin Tumpang Tindih"</item>
         <item>"Pengambilan Sampel Berstrata"</item>
+        <item>"Pengambilan Sampel Berbobot Sama"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"dd/mm/yyyy"</item>

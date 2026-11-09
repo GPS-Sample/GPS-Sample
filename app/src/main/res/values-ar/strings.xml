@@ -561,6 +561,8 @@
     <string name="weighted_sample_error_2_3">"ولكن لديك فقط ---"</string>
     <string name="weighted_sample_error_3_3">"من المنازل يرجى إدخال عدد يساوي أو أقل من مجموع عدد المنازل"</string>
     <string name="create_missing_enumeration_area">"لا توجد منطقة تعداد مرتبطة بهذا التكوين المكاني . هل ترغب في إنشاء واحد الآن؟"</string>
+    <string name="are_these_locations_hhs">"هل هذه المواقع عبارة عن أسر؟"</string>
+    <string name="survey_app_not_found">"لم يتم العثور على تطبيق مسح متوافق."</string>
     <string-array name="forgot_pin_questions">
         <item>"الاسم الأوسط للأب"</item>
         <item>"اسم العائلة للأم"</item>
@@ -602,6 +604,7 @@
         <item>"العينة العنقودية"</item>
         <item>"المجموعات الفرعية: قد تتداخل"</item>
         <item>"العينة الطبقية"</item>
+        <item>"أخذ العينات ذات الترجيح الذاتي"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"يوم/شهر/سنة"</item>

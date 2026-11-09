@@ -561,6 +561,8 @@
     <string name="weighted_sample_error_2_3">""agregados familiares, mas só dispõe de""</string>
     <string name="weighted_sample_error_3_3">"agregados familiares. Introduza um número igual ou inferior ao total de agregados familiares."</string>
     <string name="create_missing_enumeration_area">"Esta configuração não tem nenhuma área de recenseamento associada. Gostaria de criar um agora?"</string>
+    <string name="are_these_locations_hhs">"Estes locais são agregados familiares?"</string>
+    <string name="survey_app_not_found">"Não foi encontrado nenhum aplicativo de inquérito compatível."</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>
@@ -602,6 +604,7 @@
         <item>"Amostragem por conglomerados"</item>
         <item>"Subconjuntos: Podem sobrepor-se"</item>
         <item>"Amostragem estratificada"</item>
+        <item>"Amostragem auto-ponderada"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"dd/mm/aaaa"</item>

@@ -561,6 +561,8 @@
     <string name="weighted_sample_error_2_3">"ng mga sambahayan ngunit mayroon ka lamang"</string>
     <string name="weighted_sample_error_3_3">"ng mga sambahayan. Mangyaring maglagay ng numero na katumbas o mas mababa sa kabuuang bilang ng mga sambahayan."</string>
     <string name="create_missing_enumeration_area">"Ang configuration na ito ay walang nauugnay na Enumeration Area. Gusto mo bang gumawa ng isa ngayon?"</string>
+    <string name="are_these_locations_hhs">"Mga kabahayan ba ang mga lokasyong ito?"</string>
+    <string name="survey_app_not_found">"Walang natagpuang compatible na survey app."</string>
     <string-array name="forgot_pin_questions">
         <item>"Panggitnang pangalan ng ama"</item>
         <item>"Pangalan ng dalaga ng ina"</item>
@@ -602,6 +604,7 @@
         <item>"Cluster Sampling"</item>
         <item>"Mga Subset: Maaaring Mag-overlap"</item>
         <item>"Stratified Sampling"</item>
+        <item>"Self-Weighted Sampling"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"araw/buwan/taon"</item>

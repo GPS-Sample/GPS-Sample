@@ -561,6 +561,8 @@
     <string name="weighted_sample_error_2_3">""parmi les ménages, mais vous ne disposez que""</string>
     <string name="weighted_sample_error_3_3">"de ménages. Veuillez saisir un nombre inférieur ou égal au nombre total de ménages."</string>
     <string name="create_missing_enumeration_area">"Aucune zone de recensement n'est associée à cette configuration. Souhaitez-vous en créer un dès maintenant ?"</string>
+    <string name="are_these_locations_hhs">"Ces lieux correspondent-ils à des ménages ?"</string>
+    <string name="survey_app_not_found">"Aucune application d'enquête compatible n'a été trouvée."</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>
@@ -602,6 +604,7 @@
         <item>"Échantillonnage en grappes"</item>
         <item>"Sous-ensembles : peuvent se chevaucher"</item>
         <item>"Échantillonnage stratifié"</item>
+        <item>"Échantillonnage auto-pondéré"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"jj/mm/aaaa"</item>

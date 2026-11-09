@@ -561,6 +561,8 @@
     <string name="weighted_sample_error_2_3">""домохозяйств, но у вас есть только""</string>
     <string name="weighted_sample_error_3_3">""домохозяйства. Пожалуйста, введите число, не превышающее общее количество домохозяйств.""</string>
     <string name="create_missing_enumeration_area">"С этой конфигурацией не связана ни одна зона переписи. Хотите создать его прямо сейчас?"</string>
+    <string name="are_these_locations_hhs">"Являются ли эти точки местоположения домохозяйствами?"</string>
+    <string name="survey_app_not_found">"Не удалось найти совместимое приложение для опроса."</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>
@@ -602,6 +604,7 @@
         <item>"Кластерная выборка"</item>
         <item>"Подмножества: Могут пересекаться"</item>
         <item>"Стратифицированная выборка"</item>
+        <item>"Выборка с учетом собственного веса"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"дд/мм/гггг"</item>

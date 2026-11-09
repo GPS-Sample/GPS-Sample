@@ -556,14 +556,13 @@
     <string name="export_confirmation_2_3">""Unless the Enumerator(s) will be creating the Enumeration Area(s), you should probably select an existing Enumeration Area and export the configuration from either the Enumeration or Data Collection page.""</string>
     <string name="export_confirmation_3_3">"Are you sure you want to export this configuration to an Enumerator or Data Collector?"</string>
     <string name="weighted_sampling">"Self Weighted Sampling"</string>
-    <string name="enter_sample_weight">"Enter the # of HH's to sample"</string>
+    <string name="enter_sample_weight">"Enter the number of households to sample"</string>
     <string name="weighted_sample_error_1_3">"You wanted to sample"</string>
     <string name="weighted_sample_error_2_3">"households but you only have"</string>
     <string name="weighted_sample_error_3_3">"households. Please enter a number equal to or less than the total households."</string>
     <string name="create_missing_enumeration_area">"This configuration does not have an Enumeration Area associated with it.  Would you like to create one now?"</string>
-    <string name="are_these_locations_hhs">"Are these locations HH's?"</string>q
+    <string name="are_these_locations_hhs">"Are these locations households?"</string>
     <string name="survey_app_not_found">"A compatible survey app was not found."</string>
-
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
