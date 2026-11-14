@@ -8,6 +8,7 @@
 package edu.gtri.gpssample.fragments.manage_collection_teams
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -41,6 +42,7 @@ class ManageCollectionTeamsFragment : Fragment()
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
     private var _binding: FragmentManageCollectionTeamsBinding? = null
     private val binding get() = _binding!!
+    private val savedLocations = ArrayList<Location>()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -120,20 +122,21 @@ class ManageCollectionTeamsFragment : Fragment()
             }
         }
 
-        // Get ALL locations for this EA, NOTE! enumArea.locations is cleared of locations
-        // that are not a part of the team when a team is selected for enumeration
+        // Reset EA locations, enumArea.locations is cleared of locations
+        // that are not a part of the team when a team is selected for collection
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            binding.progressOverlayView.visibility = View.VISIBLE
+        binding.progressOverlayView.visibility = View.VISIBLE
 
-            withContext(Dispatchers.IO)
-            {
-                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
-            }
-
-            // back on the main thread...
-            binding.progressOverlayView.visibility = View.GONE
+        if (savedLocations.isEmpty())
+        {
+            savedLocations.addAll(enumArea.locations )
         }
+        else
+        {
+            enumArea.locations = ArrayList(savedLocations )
+        }
+
+        binding.progressOverlayView.visibility = View.GONE
     }
 
     override fun onResume()
@@ -151,19 +154,24 @@ class ManageCollectionTeamsFragment : Fragment()
 
         binding.progressOverlayView.visibility = View.VISIBLE
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            withContext(Dispatchers.IO)
+        enumArea.locations.clear()
+
+        for (locationUuid in collectionTeam.locationUuids)
+        {
+            for (location in savedLocations)
             {
-                enumArea.locations = DAO.locationDAO.getLocations( collectionTeam.locationUuids )
-
-                enumArea.locations.addAll(DAO.locationDAO.getLandmarks( enumArea ))
+                if (location.uuid == locationUuid)
+                {
+                    enumArea.locations.add( location )
+                }
             }
-
-            // back on the main thread...
-            binding.progressOverlayView.visibility = View.GONE
-
-            findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment )
         }
+
+        enumArea.locations.addAll(DAO.locationDAO.getLandmarks( enumArea ))
+
+        binding.progressOverlayView.visibility = View.GONE
+
+        findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment )
     }
 
     fun shouldDeleteTeam(collectionTeam: CollectionTeam)
