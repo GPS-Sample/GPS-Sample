@@ -177,6 +177,11 @@ class CreateStudyFragment : Fragment()
                 return@setOnClickListener
             }
 
+            if (study.samplingMethod != SamplingMethod.Structure)
+            {
+                study.maxReplacements = 0
+            }
+
             study.version = UUID.randomUUID().toString()
 
             sharedViewModel.addStudy()
