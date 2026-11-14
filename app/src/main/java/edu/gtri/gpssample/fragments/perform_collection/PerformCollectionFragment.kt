@@ -304,7 +304,7 @@ class PerformCollectionFragment : Fragment(),
                 var locationAdded = false
                 for (enumurationItem in location.enumerationItems)
                 {
-                    if (enumurationItem.samplingState == SamplingState.Sampled || enumurationItem.subsetSamplingState == SamplingState.Sampled)
+                    if (enumurationItem.samplingState == SamplingState.Sampled || enumurationItem.samplingState == SamplingState.SampledSpare || enumurationItem.subsetSamplingState == SamplingState.Sampled)
                     {
                         if (!locationAdded)
                         {
@@ -1227,34 +1227,131 @@ class PerformCollectionFragment : Fragment(),
     private fun didSelectItem( item: Any )
     {
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+            sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                if (item is Location)
+                {
+                    sharedViewModel.currentLocationUuid = item.uuid
+                    findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+                }
+                else if (item is EnumerationItem)
+                {
+                    val enumerationItem = item as EnumerationItem
 
-            if (item is Location)
-            {
-                sharedViewModel.currentLocationUuid = item.uuid
-                findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-            }
-            else if (item is EnumerationItem)
-            {
-                enumArea.locations.find { it.uuid == item.locationUuid }?.let { location: Location ->
-                    sharedViewModel.currentLocationUuid = item.locationUuid
-                    sharedViewModel.currentEnumerationItemUuid = item.uuid
+                    enumArea.locations.find { it.uuid == enumerationItem.locationUuid }?.let { location: Location ->
+                        sharedViewModel.currentLocationUuid = enumerationItem.locationUuid
+                        sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
 
-                    (requireActivity().application as? MainApplication)?.currentEnumerationItemUUID = item.uuid
-                    (requireActivity().application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
-                    (requireActivity().application as? MainApplication)?.currentSubAddress = item.subAddress
+                        (requireActivity().application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
+                        (requireActivity().application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+                        (requireActivity().application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
 
-                    val bundle = Bundle()
-                    bundle.putBoolean( Keys.kEditMode.value, false )
-                    bundle.putBoolean( Keys.kCollectionMode.value, true )
-                    bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
-                    bundle.putBoolean( Keys.kCollectionEditMode.value, gpsLocationIsGood(location))
+                        val bundle = Bundle()
+                        bundle.putBoolean( Keys.kEditMode.value, false )
+                        bundle.putBoolean( Keys.kCollectionMode.value, true )
+                        bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
+                        bundle.putBoolean( Keys.kCollectionEditMode.value, gpsLocationIsGood( location ))
 
-                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
-                } ?: run {isHandlingTapEvent = false}
-            }
-            else
-            {
-                isHandlingTapEvent = false
+                        if (study.samplingMethod == SamplingMethod.Structure && enumerationItem.collectionState != CollectionState.Complete)
+                        {
+                            var replacement: EnumerationItem? = null
+
+                            for (location in collectionTeamLocations)
+                            {
+                                val ei = location.enumerationItems.firstOrNull() ?: continue
+
+                                if (ei.uuid != enumerationItem.uuid && ei.samplingState == SamplingState.SampledSpare)
+                                {
+                                    replacement = ei
+                                    break
+                                }
+                            }
+
+                            if (replacement == null)
+                            {
+                                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
+                            }
+                            else
+                            {
+                                composableConfirmationDialogHost.show(
+                                    title = resources.getString(R.string.please_confirm),
+                                    message = "Is this a valid Household?",
+                                    leftButtonText = resources.getString(R.string.no),
+                                    rightButtonText = resources.getString(R.string.yes),
+                                    cancelable = false,
+                                ) { selection ->
+                                    if (selection == resources.getString(R.string.yes))
+                                    {
+                                        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
+                                    }
+                                    else
+                                    {
+                                        val items = ArrayList<String>()
+                                        items.add( "No eligible child" )
+                                        items.add( "Not a household" )
+                                        items.add( "No structure" )
+                                        items.add( "Refused to participate" )
+                                        items.add( "Nobody home" )
+                                        composableCheckboxDialogHost.show(
+                                            title = "Why is this structure invalid?",
+                                            items = items,
+                                            isChecked = listOf( false, false, false, false, false )
+                                        ) { selections ->
+                                            if (selections.isEmpty())
+                                            {
+                                                Toast.makeText(requireActivity().applicationContext,  "You must select why it is invalid", Toast.LENGTH_SHORT).show()
+                                            }
+                                            else
+                                            {
+                                                var reason = ""
+
+                                                for (selection in selections)
+                                                {
+                                                    reason += if (reason.isEmpty()) selection else ", $selection"
+                                                }
+
+                                                enumerationItem.replacementReason = reason
+                                                enumerationItem.replacedBy = replacement.uuid
+                                                enumerationItem.samplingState = SamplingState.SampledSkipped
+
+                                                replacement.samplingState = SamplingState.Sampled
+                                                replacement.replacementFor = enumerationItem.uuid
+
+                                                DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, enumerationItem.version)
+                                                DAO.enumerationItemDAO.createOrUpdateEnumerationItem(replacement, replacement.version)
+
+                                                enumerationItems.clear()
+
+                                                for (location in collectionTeamLocations)
+                                                {
+                                                    for (enumurationItem in location.enumerationItems)
+                                                    {
+                                                        if (enumurationItem.samplingState == SamplingState.Sampled || enumurationItem.samplingState == SamplingState.SampledSpare || enumurationItem.subsetSamplingState == SamplingState.Sampled)
+                                                        {
+                                                            enumerationItems.add( enumurationItem )
+                                                        }
+                                                    }
+                                                }
+
+                                                performCollectionAdapter.updateItems( enumerationItems, performCollectionAdapter.locations )
+                                                refreshMap()
+                                            }
+
+                                            isHandlingTapEvent = false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
+                        }
+                    } ?: run {isHandlingTapEvent = false}
+                }
+                else
+                {
+                    isHandlingTapEvent = false
+                }
             }
         }
     }

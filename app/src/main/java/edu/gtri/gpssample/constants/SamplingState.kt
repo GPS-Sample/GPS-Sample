@@ -11,8 +11,8 @@ enum class SamplingState(val format : String) {
     None("None"),
     NotSampled("NotSampled"),
     Sampled("Sampled"),
-    Resampled("Resampled"),
-    Invalid("Invalid"),
+    SampledSpare("SampledSpare"),
+    SampledSkipped("SampledSkipped"),
 
 }
 
@@ -23,8 +23,8 @@ object SamplingStateConverter
         {
             0 -> SamplingState.NotSampled.format
             1 -> SamplingState.Sampled.format
-            2 -> SamplingState.Resampled.format
-            3 -> SamplingState.Invalid.format
+            2 -> SamplingState.SampledSpare.format
+            3 -> SamplingState.SampledSkipped.format
             else -> String()
         }
     }
@@ -35,8 +35,8 @@ object SamplingStateConverter
         {
             SamplingState.NotSampled -> 1
             SamplingState.Sampled -> 2
-            SamplingState.Resampled -> 3
-            SamplingState.Invalid -> 4
+            SamplingState.SampledSpare -> 3
+            SamplingState.SampledSkipped -> 4
             else -> 0
         }
     }
@@ -47,8 +47,8 @@ object SamplingStateConverter
         {
             1 -> SamplingState.NotSampled
             2 -> SamplingState.Sampled
-            3 -> SamplingState.Resampled
-            4 -> SamplingState.Invalid
+            3 -> SamplingState.SampledSpare
+            4 -> SamplingState.SampledSkipped
             else -> SamplingState.None
         }
     }
@@ -59,8 +59,8 @@ object SamplingStateConverter
         {
             SamplingState.NotSampled -> 0
             SamplingState.Sampled -> 1
-            SamplingState.Resampled -> 2
-            SamplingState.Invalid -> 3
+            SamplingState.SampledSpare -> 2
+            SamplingState.SampledSkipped -> 3
             else -> 0
         }
     }
@@ -70,8 +70,8 @@ object SamplingStateConverter
         {
             SamplingState.NotSampled.format -> SamplingState.NotSampled
             SamplingState.Sampled.format -> SamplingState.Sampled
-            SamplingState.Resampled.format -> SamplingState.Resampled
-            SamplingState.Invalid.format -> SamplingState.Invalid
+            SamplingState.SampledSpare.format -> SamplingState.SampledSpare
+            SamplingState.SampledSkipped.format -> SamplingState.SampledSkipped
             else -> SamplingState.None
         }
     }

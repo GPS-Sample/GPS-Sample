@@ -116,59 +116,118 @@
                 android:contentDescription="@string/sampling_method"/>
         </FrameLayout>
 
-        <TextView
-            android:id="@+id/sample_size_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:gravity="start|center_vertical"
-            android:textAlignment="viewStart"
-            android:textSize="17sp"
-            android:textColor="@color/primary_textcolor"
-            android:text="asdf adsf asdf adsf asdf asdf asdf asdf adsf asdf adfs "
-            android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}" />
-
         <LinearLayout
-            android:id="@+id/sample_size_layout"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}">
 
-            <EditText
-                android:id="@+id/sample_size_edit_text"
-                android:gravity="center"
-                android:inputType="number"
-                android:imeOptions="actionDone"
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="20dp"
-                android:text="@={viewModel.createStudyModel.currentSampleSize}"
-                android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}" />
-
-            <FrameLayout
+            <TextView
+                android:id="@+id/sample_size_text_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                android:background="@drawable/spinner_frame"
+                android:gravity="start|center_vertical"
+                android:textAlignment="viewStart"
+                android:textSize="17sp"
+                android:textColor="@color/primary_textcolor"
+                android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}" />
+
+            <LinearLayout
+                android:id="@+id/sample_size_layout"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
                 android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}">
 
-                <Spinner
-                    android:id="@+id/sampling_type_spinner"
+                <EditText
+                    android:id="@+id/sample_size_edit_text"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:imeOptions="actionDone"
+                    android:layout_width="140dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:text="@={viewModel.createStudyModel.currentSampleSize}"
+                    android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}" />
+
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textAlignment="viewStart"
-                    android:entries="@{viewModel.createStudyModel.SampleTypes}"
-                    android:selectedItemPosition="@={viewModel.createStudyModel.samplingTypePosition}"
-                    android:onItemSelected="@{viewModel.createStudyModel::onSampleTypeSelected}"
-                    android:contentDescription="@string/sampling_type"/>
-            </FrameLayout>
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/spinner_frame"
+                    android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}">
+
+                    <Spinner
+                        android:id="@+id/sampling_type_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textAlignment="viewStart"
+                        android:entries="@{viewModel.createStudyModel.SampleTypes}"
+                        android:selectedItemPosition="@={viewModel.createStudyModel.samplingTypePosition}"
+                        android:onItemSelected="@{viewModel.createStudyModel::onSampleTypeSelected}"
+                        android:contentDescription="@string/sampling_type"/>
+                </FrameLayout>
+            </LinearLayout>
         </LinearLayout>
 
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="@{viewModel.createStudyModel.structureVisibility ? View.VISIBLE : View.GONE}">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:gravity="start|center_vertical"
+                android:textAlignment="viewStart"
+                android:text="@string/max_number_of_replacements"
+                android:textSize="17sp"
+                android:textColor="@color/primary_textcolor"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+
+                <EditText
+                    android:id="@+id/max_replacement_edit_text"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:imeOptions="actionDone"
+                    android:layout_width="140dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:text="@={viewModel.createStudyModel.maxReplacementsText}"/>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/spinner_frame">
+
+                    <Spinner
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textAlignment="viewStart"
+                        android:entries="@{viewModel.createStudyModel.SampleTypes}"
+                        android:selectedItemPosition="@={viewModel.createStudyModel.samplingTypePosition}"
+                        android:onItemSelected="@{viewModel.createStudyModel::onSampleTypeSelected}"
+                        android:contentDescription="@string/sampling_type"/>
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
+        
         <LinearLayout
             android:visibility="gone"
             android:orientation="horizontal"

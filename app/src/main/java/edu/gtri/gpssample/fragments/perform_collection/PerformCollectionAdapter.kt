@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mapbox.maps.extension.style.expressions.dsl.generated.distance
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.CollectionState
+import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.EnumerationItem
@@ -62,7 +63,7 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var 
 
         for (enumerationItem in enumerationItems)
         {
-            if (enumerationItem.isVisible)
+            if (enumerationItem.isVisible && enumerationItem.samplingState == SamplingState.Sampled)
             {
                 filteredEnumerationItems.add( enumerationItem )
             }

@@ -10,6 +10,7 @@ package edu.gtri.gpssample.fragments.create_sample
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -150,6 +151,24 @@ class CreateSampleFragment : Fragment()
             MapManager.instance().centerMap(enumArea.vertices, binding.mapboxMapView )
         }
 
+        if (study.samplingMethod == SamplingMethod.Structure)
+        {
+            if (enumArea.locations.firstOrNull()?.enumerationItems.isNullOrEmpty())
+            {
+                var i = 0
+
+                for (location in enumArea.locations)
+                {
+                    i += 1
+                    val enumerationItem = EnumerationItem()
+                    enumerationItem.subAddress = i.toString()
+                    enumerationItem.enumerationState = EnumerationState.Enumerated
+                    location.enumerationItems.add( enumerationItem )
+                    DAO.locationDAO.createOrUpdateLocation( location, enumArea, location.version )
+                }
+            }
+        }
+
         binding.progressOverlayView.visibility = View.VISIBLE
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -181,6 +200,7 @@ class CreateSampleFragment : Fragment()
             SamplingMethod.Cluster -> binding.titleTextView.text = resources.getString(R.string.cluster_sampling)
             SamplingMethod.SelfWeighted -> binding.titleTextView.text = resources.getString(R.string.weighted_sampling)
             SamplingMethod.Strata -> binding.titleTextView.text = resources.getString(R.string.strata_exclusive)
+            SamplingMethod.Structure -> binding.titleTextView.text = resources.getString(R.string.structure)
             SamplingMethod.None -> TODO()
         }
 
@@ -217,8 +237,33 @@ class CreateSampleFragment : Fragment()
                                     SamplingViewModel.SampleState.Idle -> {}
 
                                     SamplingViewModel.SampleState.SampleGenerated -> {
-                                        binding.progressOverlayView.visibility = View.GONE
+                                        if (study.samplingMethod == SamplingMethod.Structure)
+                                        {
+                                            // mark the last n samples as spares
+
+                                            val sampledItems = ArrayList<EnumerationItem>()
+
+                                            for (location in enumArea.locations)
+                                            {
+                                                val enumerationItem = location.enumerationItems.firstOrNull() ?: continue
+
+                                                if (enumerationItem.samplingState == SamplingState.Sampled)
+                                                {
+                                                    sampledItems.add( enumerationItem )
+                                                }
+                                            }
+
+                                            val replacements = sampledItems.shuffled().take(study.maxReplacements )
+
+                                            for (replacement in replacements)
+                                            {
+                                                replacement.samplingState = SamplingState.SampledSpare
+                                            }
+                                        }
+
                                         saveSample()
+
+                                        binding.progressOverlayView.visibility = View.GONE
                                         samplingViewModel.setSamplePageState( SamplingViewModel.SamplePageState.SampleGeneratedPage )
                                         refreshMap()
                                     }
@@ -369,7 +414,7 @@ class CreateSampleFragment : Fragment()
                 }
             }
         }
-        else if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata || study.samplingMethod == SamplingMethod.SelfWeighted)
+        else
         {
             for (location in enumArea.locations)
             {
@@ -655,7 +700,7 @@ class CreateSampleFragment : Fragment()
 
         for (enumArea in config.enumAreas)
         {
-            if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata || study.samplingMethod == SamplingMethod.SelfWeighted)
+            if (study.samplingMethod != SamplingMethod.SimpleRandom)
             {
                 if (enumArea.uuid != config.selectedEnumAreaUuid)
                 {
@@ -748,7 +793,7 @@ class CreateSampleFragment : Fragment()
 
         for (enumArea in config.enumAreas)
         {
-            if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata || study.samplingMethod == SamplingMethod.SelfWeighted)
+            if (study.samplingMethod != SamplingMethod.SimpleRandom)
             {
                 if (enumArea.uuid != config.selectedEnumAreaUuid)
                 {

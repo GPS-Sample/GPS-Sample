@@ -563,6 +563,19 @@
     <string name="create_missing_enumeration_area">"This configuration does not have an Enumeration Area associated with it.  Would you like to create one now?"</string>
     <string name="are_these_locations_hhs">"Are these locations households?"</string>
     <string name="survey_app_not_found">"A compatible survey app was not found."</string>
+
+    <string name="structure">"Structure Based Sampling"</string>
+    <string name="max_number_of_replacements">Maximum number of replacements</string>
+
+    <string-array name="sampling_methods">
+        <item>"Simple Random Sampling"</item>
+        <item>"Cluster Sampling"</item>
+        <item>"Subsets: May Overlap"</item>
+        <item>"Stratified Sampling"</item>
+        <item>"Self Weighted Sampling"</item>
+        <item>"Structure Based Sampling"</item>
+    </string-array>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
@@ -598,13 +611,6 @@
         <item>"AND"</item>
         <item>"OR"</item>
         <item>"NOT"</item>
-    </string-array>
-    <string-array name="sampling_methods">
-        <item>"Simple Random Sampling"</item>
-        <item>"Cluster Sampling"</item>
-        <item>"Subsets: May Overlap"</item>
-        <item>"Stratified Sampling"</item>
-        <item>"Self Weighted Sampling"</item>
     </string-array>
     <string-array name="date_formats">
         <item>"dd/mm/yyyy"</item>

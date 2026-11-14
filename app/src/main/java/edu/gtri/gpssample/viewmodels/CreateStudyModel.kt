@@ -33,6 +33,7 @@ class CreateStudyModel
     var samplingMethod : LiveData<SamplingMethod> = _samplingMethod
     var sampleTypesVisibility : ObservableBoolean = ObservableBoolean(true)
     var strataVisibility : ObservableBoolean = ObservableBoolean(false)
+    var structureVisibility : ObservableBoolean = ObservableBoolean(false)
     val samplingMethodPosition : MutableLiveData<Int>
         get() = _samplingMethodPosition
     val samplingTypePosition : MutableLiveData<Int>
@@ -49,6 +50,7 @@ class CreateStudyModel
                     1 -> MainApplication.getContext().getString(R.string.simple_random)
                     2 -> MainApplication.getContext().getString(R.string.strata_exclusive)
                     3 -> MainApplication.getContext().getString(R.string.weighted_sampling)
+                    4 -> MainApplication.getContext().getString(R.string.structure)
                     else -> String()
                 }
             }
@@ -93,6 +95,22 @@ class CreateStudyModel
                         study.sampleSize = size
                     }
                 } ?: run{ study.sampleSize = 0
+                }
+            }
+        }
+
+    var  maxReplacementsText : String
+        get(){
+            currentStudy?.value?.let{ study ->
+                return study.maxReplacements.toString()
+            }
+            return ""
+        }
+        set(value){
+            currentStudy?.value?.let{ study ->
+                value.toIntOrNull()?.let {size ->
+                    study.maxReplacements = size
+                } ?: run{ study.maxReplacements = 0
                 }
             }
         }
@@ -182,6 +200,7 @@ class CreateStudyModel
                 _samplingTypes.clear()
 
                 strataVisibility.set(false)
+                structureVisibility.set(false)
                 sampleTypesVisibility.set(false)
 
                 when(study.samplingMethod)
@@ -197,6 +216,10 @@ class CreateStudyModel
                     }
                     SamplingMethod.SelfWeighted -> {
                         ;
+                    }
+                    SamplingMethod.Structure -> {
+                        structureVisibility.set(true)
+                        sampleTypesVisibility.set(true)
                     }
                     else -> {}
                 }

@@ -16,17 +16,19 @@ enum class SamplingMethod(val format : String) {
     Cluster("Cluster Sampling"),
     SelfWeighted("Self Weighted Sampling"),
     Strata("Strata: Mutually Exclusive"),
+    Structure("Structure Based Sampling"),
 }
 
 object SamplingMethodConverter
 {
-    val array : Array<String> = Array(4 ){ i ->
+    val array : Array<String> = Array(5 ){ i ->
         when(i)
         {
             0 -> SamplingMethod.Cluster.format
             1 -> SamplingMethod.SimpleRandom.format
             2 -> SamplingMethod.Strata.format
             3 -> SamplingMethod.SelfWeighted.format
+            4 -> SamplingMethod.Structure.format
             else -> String()
         }
     }
@@ -40,6 +42,7 @@ object SamplingMethodConverter
             SamplingMethod.Cluster      -> 2
             SamplingMethod.SelfWeighted -> 3
             SamplingMethod.Strata       -> 4
+            SamplingMethod.Structure    -> 5
         }
     }
 
@@ -52,6 +55,7 @@ object SamplingMethodConverter
             2 -> SamplingMethod.Cluster
             3 -> SamplingMethod.SelfWeighted
             4 -> SamplingMethod.Strata
+            5 -> SamplingMethod.Structure
             else -> SamplingMethod.None
         }
     }
@@ -64,6 +68,7 @@ object SamplingMethodConverter
             1 -> SamplingMethod.SimpleRandom
             2 -> SamplingMethod.Strata
             3 -> SamplingMethod.SelfWeighted
+            4 -> SamplingMethod.Structure
             else -> SamplingMethod.None
         }
     }
@@ -76,6 +81,7 @@ object SamplingMethodConverter
             SamplingMethod.SimpleRandom -> 1
             SamplingMethod.Strata       -> 2
             SamplingMethod.SelfWeighted -> 3
+            SamplingMethod.Structure    -> 4
             else -> 0
         }
     }

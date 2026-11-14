@@ -10,7 +10,6 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
-import android.util.Log
 import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.ReviewStatus
@@ -31,8 +30,11 @@ import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ENUMERA
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_EXCLUSION_NOTES
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_EXCLUSION_REASON
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_REPLACED_BY
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_REPLACEMENT_FOR
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_REVIEW_STATUS
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_SAMPLING_STATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_REPLACEMENT_REASON
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_SUBSET_SAMPLING_STATE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_LOCATION_UUID
@@ -86,6 +88,9 @@ class EnumerationItemDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUMERATION_ITEM_REVIEW_STATUS, enumerationItem.reviewStatus.format )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_EXCLUSION_REASON, enumerationItem.exclusionReason )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_EXCLUSION_NOTES, enumerationItem.exclusionNotes )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_REPLACED_BY, enumerationItem.replacedBy )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_REPLACEMENT_FOR, enumerationItem.replacementFor )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_REPLACEMENT_REASON, enumerationItem.replacementReason )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI, enumerationItem.odkRecordUri )
     }
 
@@ -113,6 +118,9 @@ class EnumerationItemDAO(private var dao: DAO)
         val reviewStatus = ReviewStatus.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_REVIEW_STATUS)))
         val exclusionReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_EXCLUSION_REASON))
         val exclusionNotes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_EXCLUSION_NOTES))
+        val replacedBy = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_REPLACED_BY))
+        val replacementFor = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_REPLACEMENT_FOR))
+        val replacementReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_REPLACEMENT_REASON))
         val odkInstanceUri = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI))
 
         val fieldDataList = ArrayList<FieldData>()
@@ -141,6 +149,9 @@ class EnumerationItemDAO(private var dao: DAO)
             reviewStatus,
             exclusionReason,
             exclusionNotes,
+            replacedBy,
+            replacementFor,
+            replacementReason,
             fieldDataList,
             locationUuid,
             odkInstanceUri,
@@ -228,6 +239,9 @@ class EnumerationItemDAO(private var dao: DAO)
             ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_REVIEW_STATUS,"TEXT",EnumerationItem::reviewStatus ),
             ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_EXCLUSION_REASON,"TEXT",EnumerationItem::exclusionReason ),
             ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_EXCLUSION_NOTES,"TEXT",EnumerationItem::exclusionNotes ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_REPLACED_BY,"TEXT",EnumerationItem::replacedBy ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_REPLACEMENT_FOR,"TEXT",EnumerationItem::replacementFor ),
+            ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_REPLACEMENT_REASON,"TEXT",EnumerationItem::replacementReason ),
             ColumnBinding<EnumerationItem>(COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI,"TEXT",EnumerationItem::odkRecordUri ),
         )
     }

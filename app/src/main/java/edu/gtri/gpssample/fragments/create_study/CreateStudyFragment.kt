@@ -24,6 +24,7 @@ import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.constants.SamplingMethod
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldOption
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
@@ -112,7 +113,8 @@ class CreateStudyFragment : Fragment()
                 SamplingMethod.SimpleRandom -> {
                     binding.sampleSizeTextView.text = resources.getString(R.string.simple_random_sampling_label)
                 }
-                SamplingMethod.Cluster -> {
+                SamplingMethod.Cluster,
+                SamplingMethod.Structure -> {
                     binding.sampleSizeTextView.text = resources.getString(R.string.cluster_sampling_label)
                 }
                 else -> {

@@ -13,6 +13,7 @@ import android.database.Cursor
 import edu.gtri.gpssample.constants.SampleTypeConverter
 import edu.gtri.gpssample.constants.SamplingMethodConverter
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_CREATION_DATE
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_MAX_REPLACEMENTS
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_NAME
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SAMPLE_SIZE
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_STUDY_SAMPLE_SIZE_INDEX
@@ -91,6 +92,7 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_VERSION, study.version )
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
+        values.put( DAO.COLUMN_STUDY_MAX_REPLACEMENTS, study.maxReplacements )
         values.put( DAO.COLUMN_STUDY_SUBSET_SAMPLE_SIZE, study.subsetSampleSize )
 
         if (study.subsetSampleName.isNotEmpty())
@@ -122,6 +124,7 @@ class StudyDAO(private var dao: DAO)
         val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX))
         val subsetSampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SUBSET_SAMPLE_SIZE))
         val subsetSampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SUBSET_SAMPLE_SIZE_INDEX))
+        val maxReplacements = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_MAX_REPLACEMENTS))
 
         // convert enum to int.  Maybe not do this and have look up tables?
         val sampleType = SampleTypeConverter.fromIndex(sampleSizeIndex)
@@ -133,7 +136,7 @@ class StudyDAO(private var dao: DAO)
             subsetSampleName = ""
         }
 
-        val study = Study( uuid, creationDate, name, samplingMethod, sampleSize, sampleType, subsetSampleName, subsetSampleSize, subsetSampleType, ArrayList<Strata>(), ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), version )
+        val study = Study( uuid, creationDate, name, samplingMethod, sampleSize, sampleType, subsetSampleName, subsetSampleSize, subsetSampleType, maxReplacements, ArrayList<Strata>(), ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), version )
 
         return study
     }
@@ -211,6 +214,7 @@ class StudyDAO(private var dao: DAO)
             ColumnBinding<Study>(COLUMN_STUDY_SUBSET_SAMPLE_NAME,"TEXT",Study::subsetSampleName ),
             ColumnBinding<Study>(COLUMN_STUDY_SUBSET_SAMPLE_SIZE,"INTEGER",Study::subsetSampleSize ),
             ColumnBinding<Study>(COLUMN_STUDY_SUBSET_SAMPLE_SIZE_INDEX,"INTEGER",{SampleTypeConverter.toIndex(it.subsetSampleType)} ),
+            ColumnBinding<Study>(COLUMN_STUDY_MAX_REPLACEMENTS,"INTEGER",Study::maxReplacements ),
         )
     }
 }

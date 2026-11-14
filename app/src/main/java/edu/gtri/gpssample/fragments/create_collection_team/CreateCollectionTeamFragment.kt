@@ -346,7 +346,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
                     {
                         val sampledItem = location.enumerationItems[0]
 
-                        if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
+                        if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.samplingState == SamplingState.SampledSpare || sampledItem.subsetSamplingState == SamplingState.Sampled)
                         {
                             if (!locationBelongsToTeam( location ))
                             {
@@ -359,7 +359,7 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
                     {
                         for (sampledItem in location.enumerationItems)
                         {
-                            if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
+                            if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.samplingState == SamplingState.SampledSpare || sampledItem.subsetSamplingState == SamplingState.Sampled)
                             {
                                 if (!locationBelongsToTeam( location ))
                                 {

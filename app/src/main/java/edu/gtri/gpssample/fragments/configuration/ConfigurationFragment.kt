@@ -41,6 +41,7 @@ import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.constants.ResultCode
+import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.database.ConfigDAO
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.EnumAreaDAO
@@ -631,18 +632,25 @@ class ConfigurationFragment : Fragment(), View.OnTouchListener
                         config.selectedStudyUuid = study.uuid
                         sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
 
-                        composableSelectionDialogHost.show(
-                            title = resources.getString(R.string.select_task),
-                            message = "",
-                            items = listOf(resources.getString(R.string.client), resources.getString(R.string.survey)),
-                        ) { selection ->
-                            if (selection == resources.getString(R.string.client))
-                            {
-                                findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamsFragment )
-                            }
-                            else if (selection == resources.getString(R.string.survey))
-                            {
-                                findNavController().navigate( R.id.action_navigate_to_CreateSampleFragment )
+                        if (study.samplingMethod == SamplingMethod.Structure)
+                        {
+                            findNavController().navigate( R.id.action_navigate_to_CreateSampleFragment )
+                        }
+                        else
+                        {
+                            composableSelectionDialogHost.show(
+                                title = resources.getString(R.string.select_task),
+                                message = "",
+                                items = listOf(resources.getString(R.string.client), resources.getString(R.string.survey)),
+                            ) { selection ->
+                                if (selection == resources.getString(R.string.client))
+                                {
+                                    findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamsFragment )
+                                }
+                                else if (selection == resources.getString(R.string.survey))
+                                {
+                                    findNavController().navigate( R.id.action_navigate_to_CreateSampleFragment )
+                                }
                             }
                         }
                     }

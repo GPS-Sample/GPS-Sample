@@ -354,11 +354,8 @@ class SamplingViewModel : ViewModel()
                     }
                 }
 
-                SamplingMethod.Cluster ->
-                {
-                    performClusterSampling()
-                }
-
+                SamplingMethod.Cluster,
+                SamplingMethod.Structure,
                 SamplingMethod.SelfWeighted ->
                 {
                     performClusterSampling()
@@ -661,7 +658,10 @@ class SamplingViewModel : ViewModel()
             }
 
             currentStudy?.value?.let { study ->
-                val numSamples = performSimpleRandomSampling( study.sampleSize, study.sampleType )
+                var numSamples = study.sampleSize + study.maxReplacements
+
+                numSamples = performSimpleRandomSampling( numSamples, study.sampleType )
+
                 val numSubsetSamples = performSimpleRandomSamplingForSubset( study.subsetSampleSize, study.subsetSampleType )
 
                 if (numSamples + numSubsetSamples > 0)

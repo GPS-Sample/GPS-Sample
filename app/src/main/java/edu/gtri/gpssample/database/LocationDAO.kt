@@ -302,6 +302,11 @@ class LocationDAO(private var dao: DAO)
 
     fun delete( location: Location )
     {
+        for (enumerationItem in location.enumerationItems)
+        {
+            DAO.enumerationItemDAO.delete( enumerationItem )
+        }
+
         if (location.imageUuid.isNotEmpty())
         {
             ImageDAO.instance().delete( location.imageUuid )

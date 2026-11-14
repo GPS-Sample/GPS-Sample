@@ -577,7 +577,15 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                         ")")
                 db.execSQL(createConnectorTableLocationConfig)
 
+                // Add column for SelfWeighted SampleSize
                 db.execSQL("ALTER TABLE $TABLE_ENUM_AREA ADD COLUMN $COLUMN_ENUM_AREA_SAMPLE_SIZE INTEGER DEFAULT 0")
+
+                // add columns for StructuredSampling
+                db.execSQL("ALTER TABLE $TABLE_STUDY ADD COLUMN $COLUMN_STUDY_MAX_REPLACEMENTS INTEGER DEFAULT 0")
+
+                db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_ENUMERATION_ITEM_REPLACED_BY TEXT DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_ENUMERATION_ITEM_REPLACEMENT_FOR TEXT DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_ENUMERATION_ITEM_REPLACEMENT_REASON TEXT DEFAULT ''")
 
                 // Update dbVersion in Config
                 val newDbVersion = 326
@@ -991,6 +999,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_STUDY_SUBSET_SAMPLE_NAME = "study_subset_sample_name"
         const val COLUMN_STUDY_SUBSET_SAMPLE_SIZE = "study_subset_sample_size"
         const val COLUMN_STUDY_SUBSET_SAMPLE_SIZE_INDEX = "study_subset_sample_size_index"
+        const val COLUMN_STUDY_MAX_REPLACEMENTS = "study_max_replacements"
 
         // Strata table
         const val TABLE_STRATA = "strata"
@@ -1087,6 +1096,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_ENUMERATION_ITEM_REVIEW_STATUS = "enumeration_item_review_status"
         const val COLUMN_ENUMERATION_ITEM_EXCLUSION_REASON = "enumeration_item_exclusion_reason"
         const val COLUMN_ENUMERATION_ITEM_EXCLUSION_NOTES = "enumeration_item_exclusion_notes"
+        const val COLUMN_ENUMERATION_ITEM_REPLACED_BY = "enumeration_item_replaced_by"
+        const val COLUMN_ENUMERATION_ITEM_REPLACEMENT_FOR = "enumeration_item_replacement_for"
+        const val COLUMN_ENUMERATION_ITEM_REPLACEMENT_REASON = "enumeration_item_replacement_reason"
         const val COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI = "enumeration_item_odk_record_uri"
 
         const val TABLE_FIELD_DATA = "field_data"
@@ -1262,8 +1274,39 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             }
 
 //            logSchema()
+//            logTables()
 
             return _instance!!
+        }
+
+        fun logTables()
+        {
+            val db = instance().writableDatabase
+
+            val cursor = db.rawQuery(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
+                null
+            )
+
+            cursor.use { tables ->
+                while (tables.moveToNext())
+                {
+                    val tableName = tables.getString(0)
+
+                    Log.d("xxx", "===== TABLE: $tableName =====")
+
+                    db.rawQuery("SELECT * FROM `$tableName`", null).use { rows ->
+                        while (rows.moveToNext())
+                        {
+                            val row = (0 until rows.columnCount).joinToString(" | ") { i ->
+                                "${rows.getColumnName(i)}=${rows.getString(i)}"
+                            }
+
+                            Log.d("xxx", row)
+                        }
+                    }
+                }
+            }
         }
 
         fun logSchema()
