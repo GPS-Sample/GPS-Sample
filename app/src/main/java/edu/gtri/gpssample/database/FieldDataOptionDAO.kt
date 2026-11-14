@@ -206,8 +206,13 @@ class FieldDataOptionDAO(private var dao: DAO)
 
     fun delete( fieldDataOption: FieldDataOption)
     {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args = arrayOf(fieldDataOption.uuid)
+        var whereClause = "${DAO.COLUMN_FIELD_DATA_OPTION_UUID} = ?"
+        var args = arrayOf(fieldDataOption.uuid)
+
+        dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION, whereClause, args)
+
+        whereClause = "${DAO.COLUMN_UUID} = ?"
+        args = arrayOf(fieldDataOption.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_FIELD_DATA_OPTION, whereClause, args)
     }

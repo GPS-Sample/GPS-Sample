@@ -227,6 +227,11 @@ class FieldDAO(private var dao: DAO)
             }
         }
 
+        for (fieldOption in field.fieldOptions)
+        {
+            DAO.fieldOptionDAO.deleteFieldOption( fieldOption )
+        }
+
         val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args = arrayOf(field.uuid)
 
