@@ -393,8 +393,7 @@ class ManageConfigurationsFragment : Fragment()
         ) { selection ->
             if (selection == resources.getString(R.string.yes))
             {
-                config.isArchived = true
-                DAO.configDAO.createOrUpdateConfig( config, config.version )
+                DAO.configDAO.archiveConfig( config )
                 minimalConfigurations.remove(config)
                 manageConfigurationsAdapter.updateConfigurations( minimalConfigurations )
                 binding.archivesButton.visibility = View.VISIBLE

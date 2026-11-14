@@ -196,10 +196,15 @@ class StudyDAO(private var dao: DAO)
             DAO.fieldDAO.deleteField( field )
         }
 
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args = arrayOf(study.uuid)
+        var whereClause = "${DAO.COLUMN_UUID} = ?"
+        var args = arrayOf(study.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_STUDY, whereClause, args)
+
+        whereClause = "${DAO.COLUMN_STUDY_UUID} = ?"
+        args = arrayOf(study.uuid)
+
+        dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_CONFIG__STUDY, whereClause, args )
     }
 
     companion object

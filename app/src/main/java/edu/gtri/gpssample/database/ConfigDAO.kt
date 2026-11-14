@@ -74,6 +74,19 @@ class ConfigDAO(private var dao: DAO)
         dao.writableDatabase.endTransaction()
     }
 
+    fun archiveConfig( config: Config )
+    {
+        dao.writableDatabase.beginTransaction()
+
+        val values = ContentValues()
+        values.put( DAO.COLUMN_UUID, config.uuid )
+        values.put( DAO.COLUMN_CONFIG_IS_ARCHIVED, true )
+        dao.upsert( DAO.TABLE_CONFIG, values )
+
+        dao.writableDatabase.setTransactionSuccessful()
+        dao.writableDatabase.endTransaction()
+    }
+
     fun nameExists(config: Config): Boolean
     {
         val cursor = dao.writableDatabase.rawQuery("SELECT 1 FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_CONFIG_NAME} = ? AND ${DAO.COLUMN_UUID} != ? LIMIT 1", arrayOf(config.name, config.uuid))

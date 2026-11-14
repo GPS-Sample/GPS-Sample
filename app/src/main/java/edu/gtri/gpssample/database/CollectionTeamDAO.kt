@@ -113,10 +113,20 @@ class CollectionTeamDAO(private var dao: DAO)
 
     fun deleteTeam(collectionTeam: CollectionTeam)
     {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args = arrayOf(collectionTeam.uuid)
+        for (latLon in collectionTeam.polygon)
+        {
+            DAO.latLonDAO.delete( latLon )
+        }
+
+        var whereClause = "${DAO.COLUMN_UUID} = ?"
+        var args = arrayOf(collectionTeam.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_COLLECTION_TEAM, whereClause, args)
+
+        whereClause = "${DAO.COLUMN_COLLECTION_TEAM_UUID} = ?"
+        args = arrayOf(collectionTeam.uuid)
+
+        dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON, whereClause, args )
     }
 
     companion object
