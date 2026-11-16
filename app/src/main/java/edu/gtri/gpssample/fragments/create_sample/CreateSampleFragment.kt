@@ -239,7 +239,7 @@ class CreateSampleFragment : Fragment()
                                     SamplingViewModel.SampleState.SampleGenerated -> {
                                         if (study.samplingMethod == SamplingMethod.Structure)
                                         {
-                                            // mark the last n samples as spares
+                                            // create a list of sampledItems
 
                                             val sampledItems = ArrayList<EnumerationItem>()
 
@@ -253,11 +253,14 @@ class CreateSampleFragment : Fragment()
                                                 }
                                             }
 
-                                            val replacements = sampledItems.shuffled().take(study.maxReplacements )
+                                            val validSamples = sampledItems.shuffled().take(study.sampleSize )
 
-                                            for (replacement in replacements)
-                                            {
-                                                replacement.samplingState = SamplingState.SampledSpare
+                                            // mark any leftovers as spare
+
+                                            sampledItems.forEach { sampledItem ->
+                                                if (validSamples.none { it.uuid == sampledItem.uuid }) {
+                                                    sampledItem.samplingState = SamplingState.SampledSpare
+                                                }
                                             }
                                         }
 

@@ -1255,11 +1255,11 @@ class PerformCollectionFragment : Fragment(),
                         {
                             var replacement: EnumerationItem? = null
 
-                            for (location in collectionTeamLocations)
+                            for (location in collectionTeamLocations.shuffled())
                             {
                                 val ei = location.enumerationItems.firstOrNull() ?: continue
 
-                                if (ei.uuid != enumerationItem.uuid && ei.samplingState == SamplingState.SampledSpare)
+                                if (ei.samplingState == SamplingState.SampledSpare)
                                 {
                                     replacement = ei
                                     break
