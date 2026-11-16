@@ -119,14 +119,23 @@ class ReviewEnumerationFragment : Fragment()
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
             enumArea = it
-            enumArea.locations = DAO.locationDAO.getLocations( enumArea )
         }
 
         (requireActivity().application as? MainApplication)?.user?.let {
             user = it
         }
 
-        performEnumerationAdapter = PerformEnumerationAdapter( enumArea.locations, enumArea.name )
+        val filteredLocations = ArrayList<Location>()
+
+        for (enumerationTeam in enumArea.enumerationTeams) {
+            for (locationUuid in enumerationTeam.locationUuids) {
+                enumArea.locations.find { it.uuid == locationUuid }?.let { location ->
+                    filteredLocations.add( location )
+                }
+            }
+        }
+
+        performEnumerationAdapter = PerformEnumerationAdapter( filteredLocations, enumArea.name )
         performEnumerationAdapter.didSelectLocation = this::didSelectLocation
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -376,48 +385,41 @@ class ReviewEnumerationFragment : Fragment()
 
         val markerProperties = ArrayList<MapManager.MarkerProperty>()
 
-        for (location in enumArea.locations)
+        for (location in performEnumerationAdapter.locations)
         {
-            if (location.isLandmark)
-            {
-                markerProperties.add( MapManager.MarkerProperty( location, R.drawable.location_blue, location.description ))
-            }
-            else
-            {
-                var resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_black else R.drawable.home_black
+            var resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_black else R.drawable.home_black
 
-                var numComplete = 0
+            var numComplete = 0
 
-                for (item in location.enumerationItems)
+            for (item in location.enumerationItems)
+            {
+                val enumerationItem = item as EnumerationItem?
+                if(enumerationItem != null)
                 {
-                    val enumerationItem = item as EnumerationItem?
-                    if(enumerationItem != null)
+                    if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                     {
-                        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                        {
-                            resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_red else R.drawable.home_red
-                            break
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                        {
-                            numComplete++
-                        }
+                        resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_red else R.drawable.home_red
+                        break
+                    }
+                    else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                    {
+                        numComplete++
                     }
                 }
-
-                if (numComplete > 0 && numComplete == location.enumerationItems.size)
-                {
-                    resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_green else R.drawable.home_green
-                }
-
-                var title = ""
-                if (location.enumerationItems.isNotEmpty())
-                {
-                    title = location.enumerationItems[0].subAddress
-                }
-
-                markerProperties.add( MapManager.MarkerProperty( location, resourceId, title ))
             }
+
+            if (numComplete > 0 && numComplete == location.enumerationItems.size)
+            {
+                resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_green else R.drawable.home_green
+            }
+
+            var title = ""
+            if (location.enumerationItems.isNotEmpty())
+            {
+                title = location.enumerationItems[0].subAddress
+            }
+
+            markerProperties.add( MapManager.MarkerProperty( location, resourceId, title ))
         }
 
         if (isShowingBreadcrumbs && selectedBreadcrumbs.isNotEmpty())
@@ -430,42 +432,22 @@ class ReviewEnumerationFragment : Fragment()
         }
     }
 
-    fun navigateToAddHouseholdFragment()
-    {
-        enumArea.locations.find { it.uuid == sharedViewModel.currentLocationUuid }?.let { location: Location ->
-            location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
-                val bundle = Bundle()
-                bundle.putBoolean( Keys.kEditMode.value, false)
-                bundle.putInt( Keys.kStartSubaddress.value, 0 )
-
-                if (location.enumerationItems.size == 1)
-                {
-                    sharedViewModel.currentEnumerationItemUuid = location.enumerationItems[0].uuid
-                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
-                }
-                else
-                {
-                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment, bundle)
-                }
-            }
-        }
-    }
-
     private fun didSelectLocation( location: Location )
     {
         sharedViewModel.currentLocationUuid = location.uuid
-        if (location.enumerationItems.isNotEmpty())
+
+        val bundle = Bundle()
+        bundle.putBoolean( Keys.kEditMode.value, false)
+        bundle.putInt( Keys.kStartSubaddress.value, 0 )
+
+        if (location.enumerationItems.size == 1)
         {
             sharedViewModel.currentEnumerationItemUuid = location.enumerationItems.first().uuid
-        }
-
-        if (location.isLandmark)
-        {
-            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
         }
         else
         {
-            navigateToAddHouseholdFragment()
+            findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment, bundle)
         }
     }
 
@@ -501,7 +483,7 @@ class ReviewEnumerationFragment : Fragment()
             {
                 lastLocationUpdateTime = Date().time
 
-                for (loc in enumArea.locations)
+                for (loc in performEnumerationAdapter.locations)
                 {
                     val currentLatLng = LatLng( point.latitude(), point.longitude())
                     val itemLatLng = LatLng( loc.latitude, loc.longitude )
@@ -534,7 +516,7 @@ class ReviewEnumerationFragment : Fragment()
                     }
                 }
 
-                performEnumerationAdapter.updateLocations( enumArea.locations )
+                performEnumerationAdapter.updateLocations( performEnumerationAdapter.locations )
             }
         }
     }

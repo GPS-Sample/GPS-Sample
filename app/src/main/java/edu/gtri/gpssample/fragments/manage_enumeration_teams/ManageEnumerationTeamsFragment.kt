@@ -27,6 +27,7 @@ import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.EnumerationTeam
 import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamsBinding
+import edu.gtri.gpssample.extensions.setOnSingleClickListener
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableDropdownDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -96,7 +97,11 @@ class ManageEnumerationTeamsFragment : Fragment()
 
         binding.titleTextView.text = enumArea.name + " " + resources.getString(R.string.teams)
 
-        binding.addButton.setOnClickListener {
+        binding.addButton.setOnSingleClickListener {
+            binding.progressOverlayView.visibility = View.VISIBLE
+            enumArea.locations = DAO.locationDAO.getLocations( enumArea )
+            binding.progressOverlayView.visibility = View.GONE
+
             if (study.samplingMethod == SamplingMethod.Strata && enumArea.strataUuid.isEmpty())
             {
                 composableDropdownDialogHost.showStrata(title = resources.getString(R.string.select_strata), strataList = study.stratas) { strata ->
@@ -123,11 +128,17 @@ class ManageEnumerationTeamsFragment : Fragment()
             }
         }
 
-        binding.reviewAllTeamsButton.setOnClickListener {
-            if (enumArea.enumerationTeams.isNotEmpty())
-            {
-                findNavController().navigate(R.id.action_navigate_to_ReviewEnumerationFragment)
-            }
+        if (enumArea.enumerationTeams.isEmpty())
+        {
+            binding.reviewAllTeamsButton.visibility = View.GONE
+        }
+
+        binding.reviewAllTeamsButton.setOnSingleClickListener {
+            binding.progressOverlayView.visibility = View.VISIBLE
+            enumArea.locations = DAO.locationDAO.getLocations( enumArea )
+            binding.progressOverlayView.visibility = View.GONE
+
+            findNavController().navigate(R.id.action_navigate_to_ReviewEnumerationFragment)
         }
     }
 
@@ -140,24 +151,18 @@ class ManageEnumerationTeamsFragment : Fragment()
 
     fun didSelectTeam( enumerationTeam: EnumerationTeam )
     {
+        binding.progressOverlayView.visibility = View.VISIBLE
+
         enumArea.selectedCollectionTeamUuid = ""
         enumArea.selectedEnumerationTeamUuid = enumerationTeam.uuid
         sharedViewModel.currentEnumerationTeamUuid = enumerationTeam.uuid
 
-        binding.progressOverlayView.visibility = View.VISIBLE
+        enumArea.locations = DAO.locationDAO.getLocations( enumerationTeam.locationUuids )
+        enumArea.locations.addAll(DAO.locationDAO.getLandmarks( enumArea ))
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            withContext(Dispatchers.IO)
-            {
-                enumArea.locations = DAO.locationDAO.getLocations( enumerationTeam.locationUuids )
-                enumArea.locations.addAll(DAO.locationDAO.getLandmarks( enumArea ))
-            }
+        binding.progressOverlayView.visibility = View.GONE
 
-            // back on the main thread...
-            binding.progressOverlayView.visibility = View.GONE
-
-            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment )
-        }
+        findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment )
     }
 
     private fun shouldDeleteTeam(enumerationTeam: EnumerationTeam)

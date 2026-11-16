@@ -25,6 +25,7 @@ import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentManageCollectionTeamsBinding
+import edu.gtri.gpssample.extensions.setOnSingleClickListener
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
@@ -42,7 +43,6 @@ class ManageCollectionTeamsFragment : Fragment()
     private lateinit var composableConfirmationDialogHost: ComposableConfirmationDialogHost
     private var _binding: FragmentManageCollectionTeamsBinding? = null
     private val binding get() = _binding!!
-    private val savedLocations = ArrayList<Location>()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -111,32 +111,26 @@ class ManageCollectionTeamsFragment : Fragment()
 
         binding.titleTextView.text = getString(R.string.collection_teams)
 
-        binding.addButton.setOnClickListener {
+        binding.addButton.setOnSingleClickListener {
+            binding.progressOverlayView.visibility = View.VISIBLE
+            enumArea.locations = DAO.locationDAO.getLocations( enumArea )
+            binding.progressOverlayView.visibility = View.GONE
+
             findNavController().navigate(R.id.action_navigate_to_CreateCollectionTeamFragment)
         }
 
-        binding.reviewAllTeamsButton.setOnClickListener {
-            if (enumArea.collectionTeams.isNotEmpty())
-            {
-                findNavController().navigate(R.id.action_navigate_to_ReviewCollectionFragment)
-            }
-        }
-
-        // Reset EA locations, enumArea.locations is cleared of locations
-        // that are not a part of the team when a team is selected for collection
-
-        binding.progressOverlayView.visibility = View.VISIBLE
-
-        if (savedLocations.isEmpty())
+        if (enumArea.collectionTeams.isEmpty())
         {
-            savedLocations.addAll(enumArea.locations )
-        }
-        else
-        {
-            enumArea.locations = ArrayList(savedLocations )
+            binding.reviewAllTeamsButton.visibility = View.GONE
         }
 
-        binding.progressOverlayView.visibility = View.GONE
+        binding.reviewAllTeamsButton.setOnSingleClickListener {
+            binding.progressOverlayView.visibility = View.VISIBLE
+            enumArea.locations = DAO.locationDAO.getLocations( enumArea )
+            binding.progressOverlayView.visibility = View.GONE
+
+            findNavController().navigate(R.id.action_navigate_to_ReviewCollectionFragment)
+        }
     }
 
     override fun onResume()
@@ -146,26 +140,15 @@ class ManageCollectionTeamsFragment : Fragment()
         (requireActivity().application as? MainApplication)?.currentFragment = FragmentNumber.ManageCollectionTeamsFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    fun didSelectTeam(collectionTeam: CollectionTeam)
+    fun didSelectTeam( collectionTeam: CollectionTeam )
     {
+        binding.progressOverlayView.visibility = View.VISIBLE
+
         enumArea.selectedEnumerationTeamUuid = ""
         enumArea.selectedCollectionTeamUuid = collectionTeam.uuid
         sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
 
-        binding.progressOverlayView.visibility = View.VISIBLE
-
-        enumArea.locations.clear()
-
-        for (locationUuid in collectionTeam.locationUuids)
-        {
-            for (location in savedLocations)
-            {
-                if (location.uuid == locationUuid)
-                {
-                    enumArea.locations.add( location )
-                }
-            }
-        }
+        enumArea.locations = DAO.locationDAO.getLocations( collectionTeam.locationUuids )
 
         enumArea.locations.addAll(DAO.locationDAO.getLandmarks( enumArea ))
 

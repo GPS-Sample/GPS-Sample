@@ -73,7 +73,6 @@ class ReviewCollectionFragment : Fragment()
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
-    private var landmarkLocations = ArrayList<Location>()
     private var _binding: FragmentReviewCollectionBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -119,7 +118,6 @@ class ReviewCollectionFragment : Fragment()
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
             enumArea = it
-            enumArea.locations = DAO.locationDAO.getLocations( enumArea )
         }
 
         val _user = (requireActivity().application as? MainApplication)?.user
@@ -128,35 +126,21 @@ class ReviewCollectionFragment : Fragment()
             this.user = user
         }
 
-        val enumerationItems = ArrayList<EnumerationItem>()
-
-        for (location in enumArea.locations)
-        {
-            for (enumurationItem in location.enumerationItems)
-            {
-                if (enumurationItem.samplingState == SamplingState.Sampled)
-                {
-                    enumerationItems.add( enumurationItem )
-                }
-            }
-        }
-
-        landmarkLocations.clear()
-
-        for (location in enumArea.locations)
-        {
-            if (location.isLandmark)
-            {
-                landmarkLocations.add( location )
-            }
-        }
-
         val filteredLocations = ArrayList<Location>()
-        for (location in enumArea.locations)
+
+        for (collectionTeam in enumArea.collectionTeams)
         {
-            if (location.enumerationItems.isNotEmpty() && location.enumerationItems.first().reviewStatus != ReviewStatus.Exclude)
+            for (locationUuid in collectionTeam.locationUuids)
             {
-                filteredLocations.add( location )
+                enumArea.locations.find{ it.uuid == locationUuid } ?.let { location ->
+                    for (sampledItem in location.enumerationItems)
+                    {
+                        if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
+                        {
+                            filteredLocations.add( location )
+                        }
+                    }
+                }
             }
         }
 
@@ -355,19 +339,6 @@ class ReviewCollectionFragment : Fragment()
     {
         MapManager.instance().clearMap( mapView )
 
-//        sharedViewModel.currentConfiguration?.value?.let { config ->
-//            for (enumArea in config.enumAreas)
-//            {
-//                for (location in enumArea.locations)
-//                {
-//                    if (location.isLandmark)
-//                    {
-//                        MapManager.instance().createMarker( requireActivity(), mapView, location, R.drawable.location_blue, "" )
-//                    }
-//                }
-//            }
-//        }
-
         var points = java.util.ArrayList<Point>()
         var pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
@@ -432,14 +403,9 @@ class ReviewCollectionFragment : Fragment()
 
         val markerProperties = ArrayList<MapManager.MarkerProperty>()
 
-        for (location in enumArea.locations)
+        for (location in performCollectionAdapter.locations)
         {
-            if (location.isLandmark)
-            {
-                markerProperties.add( MapManager.MarkerProperty( location, R.drawable.location_blue, location.description ))
-            }
-
-            if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+            if (location.enumerationItems.isNotEmpty())
             {
                 var resourceId = 0
 
@@ -513,29 +479,19 @@ class ReviewCollectionFragment : Fragment()
 
     private fun didSelectLocation( location: Location )
     {
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+        sharedViewModel.currentLocationUuid = location.uuid
 
-            sharedViewModel.currentLocationUuid = location.uuid
+        val bundle = Bundle()
+        bundle.putBoolean( Keys.kEditMode.value, false )
 
-            if (location.isLandmark)
-            {
-                findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-            }
-            else
-            {
-                val bundle = Bundle()
-                bundle.putBoolean( Keys.kEditMode.value, false )
-
-                if (location.enumerationItems.size > 1)
-                {
-                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle)
-                }
-                else
-                {
-                    sharedViewModel.currentEnumerationItemUuid = location.enumerationItems.first().uuid
-                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
-                }
-            }
+        if (location.enumerationItems.size > 1)
+        {
+            findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle)
+        }
+        else
+        {
+            sharedViewModel.currentEnumerationItemUuid = location.enumerationItems.first().uuid
+            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
         }
     }
 
@@ -548,23 +504,6 @@ class ReviewCollectionFragment : Fragment()
         }
 
         return false
-    }
-
-    private fun gpsLocationIsGood( location: Location ) : Boolean
-    {
-        var editMode = false
-
-        if (gpsAccuracyIsGood())
-        {
-            currentGPSLocation?.let { point ->
-                val distance = GeoUtils.distanceBetween( LatLng( location.latitude, location.longitude ), LatLng( point.latitude(), point.longitude()))
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    editMode = distance <= config.minGpsPrecision
-                }
-            }
-        }
-
-        return editMode
     }
 
     private var lastLocationUpdateTime: Long = 0
@@ -599,7 +538,7 @@ class ReviewCollectionFragment : Fragment()
             {
                 lastLocationUpdateTime = Date().time
 
-                for (loc in enumArea.locations)
+                for (loc in performCollectionAdapter.locations)
                 {
                     val currentLatLng = LatLng( point.latitude(), point.longitude())
                     val itemLatLng = LatLng( loc.latitude, loc.longitude )

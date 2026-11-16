@@ -346,12 +346,20 @@ class CreateCollectionTeamFragment : Fragment(), View.OnTouchListener
                     {
                         val sampledItem = location.enumerationItems[0]
 
-                        if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.samplingState == SamplingState.SampledSpare || sampledItem.subsetSamplingState == SamplingState.Sampled)
+                        if (sampledItem.samplingState == SamplingState.Sampled
+                            || sampledItem.samplingState == SamplingState.SampledSpare
+                            || sampledItem.subsetSamplingState == SamplingState.Sampled)
                         {
                             if (!locationBelongsToTeam( location ))
                             {
-                                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                markerProperties.add( MapManager.MarkerProperty( location, R.drawable.home_light_blue, sampledItem.subAddress ))
+                                if (sampledItem.samplingState == SamplingState.SampledSpare)
+                                {
+                                    markerProperties.add( MapManager.MarkerProperty( location, R.drawable.home_black, sampledItem.subAddress ))
+                                }
+                                else
+                                {
+                                    markerProperties.add( MapManager.MarkerProperty( location, R.drawable.home_light_blue, sampledItem.subAddress ))
+                                }
                             }
                         }
                     }
