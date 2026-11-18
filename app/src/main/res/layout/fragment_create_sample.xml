@@ -30,48 +30,49 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/title"
+                android:id="@+id/title_text_view"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="15dp"
-                android:paddingHorizontal="10dp"
-                android:layout_marginTop="10dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="15dp"
                 android:gravity="start|center_vertical"
                 android:textAlignment="viewStart"
-                android:text="@string/create_sample"
-                android:textColor="@color/primary_textcolor"
-                android:textSize="20sp"
-                android:textStyle="bold"/>
+                android:textSize="22sp" />
 
-            <FrameLayout
-                android:id="@+id/sampling_method"
-                android:layout_marginBottom="2dp"
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_margin="5dp"
                 android:layout_width="match_parent"
-                android:layout_height="50dp">
+                android:layout_height="40dp">
 
                 <TextView
-                    android:id="@+id/title_text_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="15dp"
-                    android:gravity="start|center_vertical"
-                    android:textAlignment="viewStart"
-                    android:textSize="22sp" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:textColor="@color/primary_textcolor"
+                    android:text="@string/view"
+                    android:textSize="17sp"
+                    android:textStyle="normal" />
 
-                <ImageView
-                    android:visibility="gone"
-                    android:id="@+id/info_button"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="25dp"
-                    android:src="@drawable/info" />
-            </FrameLayout>
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/spinner_frame">
+
+                    <Spinner
+                        android:id="@+id/showSpinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </FrameLayout>
+            </LinearLayout>
 
             <FrameLayout
+                android:id="@+id/map_layout"
                 android:layout_weight="1"
-                android:layout_marginTop="0dp"
-                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="0dp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp">
 
@@ -147,13 +148,17 @@
                 </LinearLayout>
             </FrameLayout>
 
-            <TextView
-                android:id="@+id/begin_review_text_view"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="@string/begin_sample_review"
-                android:textAlignment="center"
-                android:textSize="22sp" />
+                android:layout_weight="1"
+                android:layout_height="0dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="20dp">
+            </View>
 
             <Button
                 android:id="@+id/generate_sample_button"

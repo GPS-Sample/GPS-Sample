@@ -89,14 +89,6 @@
             app:destination="@id/PerformCollectionFragment" />
 
         <action
-            android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
-            app:destination="@id/NetworkConnectionDialogFragment" />
-
-        <action
-            android:id="@+id/action_navigate_to_ClientFragment"
-            app:destination="@id/ClientFragment" />
-
-        <action
             android:id="@+id/action_navigate_to_MapFragment"
             app:destination="@id/MapFragment" />
 
@@ -157,9 +149,6 @@
         <action
             android:id="@+id/action_navigate_to_CreateSampleFragment"
             app:destination="@id/CreateSampleFragment" />
-        <action
-            android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
-            app:destination="@id/NetworkConnectionDialogFragment" />
     </fragment>
 
     <!--CreateConfigurationFragment-->
@@ -475,14 +464,6 @@
             app:destination="@id/MainFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_HotspotFragment"
-            app:destination="@id/HotspotFragment" />
-
-        <action
-            android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
-            app:destination="@id/NetworkConnectionDialogFragment" />
-
-        <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:popUpTo="@id/ManageConfigurationsFragment"/>
 
@@ -529,10 +510,6 @@
         <action
             android:id="@+id/action_navigate_to_MainFragment"
             app:destination="@id/MainFragment"/>
-
-        <action
-            android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
-            app:destination="@id/NetworkConnectionDialogFragment" />
 
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
@@ -640,18 +617,6 @@
     </fragment>
 
     <fragment
-        android:id="@+id/ClientFragment"
-        android:name="edu.gtri.gpssample.fragments.networkconnectiondialog.ClientConnectFragment"
-        tools:layout="@layout/fragment_client_connect">
-    </fragment>
-
-    <fragment
-        android:id="@+id/HotspotFragment"
-        android:name="edu.gtri.gpssample.fragments.hotspot.HotspotFragment"
-        tools:layout="@layout/fragment_hotspot">
-    </fragment>
-
-    <fragment
         android:id="@+id/MapFragment"
         android:name="edu.gtri.gpssample.fragments.map.MapFragment"
         tools:layout="@layout/fragment_map">
@@ -712,16 +677,6 @@
         android:name="edu.gtri.gpssample.dialogs.SelectRuleDialogFragment"
         android:label="dialog_select_rule"
         tools:layout="@layout/dialog_select_rule" />
-
-    <dialog
-        android:id="@+id/NetworkConnectionDialogFragment"
-        android:name="edu.gtri.gpssample.dialogs.NetworkConnectionDialogFragment"
-        android:label="dialog_network_connection"
-        tools:layout="@layout/dialog_network_connection" >
-        <action
-            android:id="@+id/action_navigate_to_HotspotFragment"
-            app:destination="@id/HotspotFragment" />
-    </dialog>
 
     <dialog
         android:id="@+id/SamplingInfoDialogFragment"
