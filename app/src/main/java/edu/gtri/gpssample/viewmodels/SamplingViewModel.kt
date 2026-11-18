@@ -478,24 +478,9 @@ class SamplingViewModel : ViewModel()
                 else -> {}
             }
 
-            if (sampleSize > 0)
-            {
-                val sampledIndices = ArrayList<Int>()
-
-                for (i in 0 until sampleSize)
-                {
-                    var rnds = (0 until validSamples.size).random()
-
-                    while(sampledIndices.contains(rnds))
-                    {
-                        rnds = (0 until validSamples.size).random()
-                    }
-
-                    sampledIndices.add(rnds)
-                    validSamples[rnds].samplingState = SamplingState.Sampled
-                    validSamples[rnds].version = UUID.randomUUID().toString()
-                }
-            }
+            validSamples.shuffled()
+                .take(sampleSize )
+                .forEach { it.samplingState = SamplingState.Sampled }
         }
 
         return sampleSize
@@ -614,24 +599,9 @@ class SamplingViewModel : ViewModel()
                 else -> {}
             }
 
-            if (sampleSize > 0)
-            {
-                val sampledIndices = ArrayList<Int>()
-
-                for (i in 0 until sampleSize)
-                {
-                    var rnds = (0 until validSamples.size).random()
-
-                    while(sampledIndices.contains(rnds))
-                    {
-                        rnds = (0 until validSamples.size).random()
-                    }
-
-                    sampledIndices.add(rnds)
-                    validSamples[rnds].version = UUID.randomUUID().toString()
-                    validSamples[rnds].subsetSamplingState = SamplingState.Sampled
-                }
-            }
+            validSamples.shuffled()
+                .take(sampleSize )
+                .forEach { it.samplingState = SamplingState.Sampled }
         }
 
         return sampleSize
