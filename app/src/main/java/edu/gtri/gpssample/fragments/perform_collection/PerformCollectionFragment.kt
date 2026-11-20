@@ -304,7 +304,7 @@ class PerformCollectionFragment : Fragment(),
                 var locationAdded = false
                 for (enumurationItem in location.enumerationItems)
                 {
-                    if (enumurationItem.samplingState == SamplingState.Sampled || enumurationItem.samplingState == SamplingState.SampledSpare || enumurationItem.subsetSamplingState == SamplingState.Sampled)
+                    if (enumurationItem.samplingState == SamplingState.Sampled || enumurationItem.samplingState == SamplingState.SampledSpare || enumurationItem.samplingState == SamplingState.SampledSkipped || enumurationItem.subsetSamplingState == SamplingState.Sampled)
                     {
                         if (!locationAdded)
                         {
@@ -416,6 +416,12 @@ class PerformCollectionFragment : Fragment(),
                                 }
                                 else
                                 {
+                                    if (location.enumerationItems.size == 1 && location.enumerationItems.first().samplingState == SamplingState.SampledSkipped)
+                                    {
+                                        isHandlingTapEvent = false
+                                        return@collect
+                                    }
+
                                     sharedViewModel.currentLocationUuid = location.uuid
 
                                     if (location.enumerationItems.size > 1)
@@ -1158,7 +1164,11 @@ class PerformCollectionFragment : Fragment(),
                     {
                         val sampledItem = location.enumerationItems[0]
 
-                        if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
+                        if (sampledItem.samplingState == SamplingState.SampledSkipped)
+                        {
+                            resourceId = R.drawable.home_black
+                        }
+                        else if (sampledItem.samplingState == SamplingState.Sampled || sampledItem.subsetSamplingState == SamplingState.Sampled)
                         {
                             when( sampledItem.collectionState )
                             {
@@ -1253,90 +1263,115 @@ class PerformCollectionFragment : Fragment(),
 
                         if (study.samplingMethod == SamplingMethod.Structure && enumerationItem.collectionState != CollectionState.Complete)
                         {
-                            var replacement: EnumerationItem? = null
+                            val field = DAO.fieldDAO.getField( study.skipFieldUuid )
 
-                            for (location in collectionTeamLocations.shuffled())
-                            {
-                                val ei = location.enumerationItems.firstOrNull() ?: continue
-
-                                if (ei.samplingState == SamplingState.SampledSpare)
-                                {
-                                    replacement = ei
-                                    break
-                                }
-                            }
-
-                            if (replacement == null)
+                            if (field == null || field.fieldOptions.isEmpty())
                             {
                                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                             }
                             else
                             {
-                                composableConfirmationDialogHost.show(
-                                    title = resources.getString(R.string.please_confirm),
-                                    message = "Is this a valid Household?",
-                                    leftButtonText = resources.getString(R.string.no),
-                                    rightButtonText = resources.getString(R.string.yes),
-                                    cancelable = false,
-                                ) { selection ->
-                                    if (selection == resources.getString(R.string.yes))
+                                var replacement: EnumerationItem? = null
+
+                                for (location in collectionTeamLocations.shuffled())
+                                {
+                                    val ei = location.enumerationItems.firstOrNull() ?: continue
+
+                                    if (ei.samplingState == SamplingState.SampledSpare)
                                     {
-                                        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
+                                        replacement = ei
+                                        break
                                     }
-                                    else
-                                    {
-                                        val items = ArrayList<String>()
-                                        items.add( "No eligible child" )
-                                        items.add( "Not a household" )
-                                        items.add( "No structure" )
-                                        items.add( "Refused to participate" )
-                                        items.add( "Nobody home" )
-                                        composableCheckboxDialogHost.show(
-                                            title = "Why is this structure invalid?",
-                                            items = items,
-                                            isChecked = listOf( false, false, false, false, false )
-                                        ) { selections ->
-                                            if (selections.isEmpty())
+                                }
+
+                                if (replacement == null)
+                                {
+                                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
+                                }
+                                else
+                                {
+                                    composableConfirmationDialogHost.show(
+                                        title = resources.getString(R.string.please_confirm),
+                                        message = "Is this a valid Household?",
+                                        leftButtonText = resources.getString(R.string.no),
+                                        rightButtonText = resources.getString(R.string.yes),
+                                        cancelable = true,
+                                    ) { selection ->
+                                        if (selection.isEmpty())
+                                        {
+                                            isHandlingTapEvent = false
+                                        }
+                                        else if (selection == resources.getString(R.string.yes))
+                                        {
+                                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
+                                        }
+                                        else if (selection == resources.getString(R.string.no))
+                                        {
+                                            val field = DAO.fieldDAO.getField( study.skipFieldUuid )
+
+                                            if (field == null || field.fieldOptions.isEmpty())
                                             {
-                                                Toast.makeText(requireActivity().applicationContext,  "You must select why it is invalid", Toast.LENGTH_SHORT).show()
+                                                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                                             }
                                             else
                                             {
-                                                var reason = ""
+                                                isHandlingTapEvent = false
 
-                                                for (selection in selections)
+                                                val items = ArrayList<String>()
+                                                val checked = ArrayList<Boolean>()
+
+                                                for (fieldOption in field.fieldOptions)
                                                 {
-                                                    reason += if (reason.isEmpty()) selection else ", $selection"
+                                                    items.add( fieldOption.name )
+                                                    checked.add( false )
                                                 }
 
-                                                enumerationItem.replacementReason = reason
-                                                enumerationItem.replacedBy = replacement.uuid
-                                                enumerationItem.samplingState = SamplingState.SampledSkipped
-
-                                                replacement.samplingState = SamplingState.Sampled
-                                                replacement.replacementFor = enumerationItem.uuid
-
-                                                DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, enumerationItem.version)
-                                                DAO.enumerationItemDAO.createOrUpdateEnumerationItem(replacement, replacement.version)
-
-                                                enumerationItems.clear()
-
-                                                for (location in collectionTeamLocations)
-                                                {
-                                                    for (enumurationItem in location.enumerationItems)
+                                                composableCheckboxDialogHost.show(
+                                                    title = field.name,
+                                                    items = items,
+                                                    isChecked = checked
+                                                ) { selections ->
+                                                    if (selections.isEmpty())
                                                     {
-                                                        if (enumurationItem.samplingState == SamplingState.Sampled || enumurationItem.samplingState == SamplingState.SampledSpare || enumurationItem.subsetSamplingState == SamplingState.Sampled)
+                                                        Toast.makeText(requireActivity().applicationContext,  "You must select why it is invalid", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                    else
+                                                    {
+                                                        var reason = ""
+
+                                                        for (selection in selections)
                                                         {
-                                                            enumerationItems.add( enumurationItem )
+                                                            reason += if (reason.isEmpty()) selection else ", $selection"
                                                         }
+
+                                                        enumerationItem.replacementReason = reason
+                                                        enumerationItem.replacedBy = replacement.uuid
+                                                        enumerationItem.samplingState = SamplingState.SampledSkipped
+
+                                                        replacement.samplingState = SamplingState.Sampled
+                                                        replacement.replacementFor = enumerationItem.uuid
+
+                                                        DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, enumerationItem.version)
+                                                        DAO.enumerationItemDAO.createOrUpdateEnumerationItem(replacement, replacement.version)
+
+                                                        enumerationItems.clear()
+
+                                                        for (location in collectionTeamLocations)
+                                                        {
+                                                            for (enumurationItem in location.enumerationItems)
+                                                            {
+                                                                if (enumurationItem.samplingState == SamplingState.Sampled || enumurationItem.samplingState == SamplingState.SampledSpare || enumurationItem.subsetSamplingState == SamplingState.Sampled)
+                                                                {
+                                                                    enumerationItems.add( enumurationItem )
+                                                                }
+                                                            }
+                                                        }
+
+                                                        performCollectionAdapter.updateItems( enumerationItems, performCollectionAdapter.locations )
+                                                        refreshMap()
                                                     }
                                                 }
-
-                                                performCollectionAdapter.updateItems( enumerationItems, performCollectionAdapter.locations )
-                                                refreshMap()
                                             }
-
-                                            isHandlingTapEvent = false
                                         }
                                     }
                                 }

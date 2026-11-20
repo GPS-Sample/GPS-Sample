@@ -656,12 +656,14 @@
     <LinearLayout
         android:id="@+id/bottom_bar"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:layout_width="match_parent"
         android:layout_height="90dp"
         android:layout_gravity="bottom">
 
         <Button
             android:id="@+id/cancel_button"
+            android:gravity="center"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="50dp"
@@ -679,6 +681,7 @@
         <Button
             android:visibility="gone"
             android:id="@+id/launch_survey_button"
+            android:gravity="center"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="50dp"
@@ -695,6 +698,7 @@
 
         <Button
             android:id="@+id/save_button"
+            android:gravity="center"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="50dp"

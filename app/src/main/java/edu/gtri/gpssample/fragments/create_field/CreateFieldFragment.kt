@@ -23,6 +23,7 @@ import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.SamplingMethod
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldOption
@@ -77,7 +78,7 @@ class CreateFieldFragment : Fragment()
         sharedViewModel.createFieldModel.fieldTypes = fieldTypes
 
         sharedViewModel.createFieldModel.currentField?.value?.type?.let { fieldType ->
-            sharedViewModel.createFieldModel.fieldTypePosition?.value = FieldTypeConverter.toIndex( fieldType )
+            sharedViewModel.createFieldModel.fieldTypePosition.value = FieldTypeConverter.toIndex( fieldType )
         }
     }
 
@@ -174,6 +175,7 @@ class CreateFieldFragment : Fragment()
         createFieldCheckboxAdapter.shouldDeleteCheckboxFieldOption = this::shouldDeleteCheckboxFieldOption
         checkboxRecyclerView.adapter = createFieldCheckboxAdapter
         checkboxRecyclerView.layoutManager = LinearLayoutManager(activity)
+        checkboxRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
         dropdownLayout = view.findViewById(R.id.layout_field_dropdown)
         dropdownRecyclerView = dropdownLayout.findViewById<RecyclerView>( R.id.dropdown_recycler_view )
@@ -182,6 +184,7 @@ class CreateFieldFragment : Fragment()
         dropdownRecyclerView.adapter = createFieldDropdownAdapter
         dropdownRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
         dropdownRecyclerView.layoutManager = LinearLayoutManager(activity)
+        dropdownRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
         val minimumNumberCheckBox = view.findViewById<CheckBox>(R.id.minimum_number_checkBox)
         val maximumNumberCheckBox = view.findViewById<CheckBox>(R.id.maximum_number_checkBox)
@@ -434,6 +437,15 @@ class CreateFieldFragment : Fragment()
             }
         })
 
+        if (study.samplingMethod == SamplingMethod.Structure && field.uuid == study.skipFieldUuid)
+        {
+            sharedViewModel.createFieldModel.onFieldTypeSelected(null,null, 3, 0)
+            binding.deleteImageView.visibility = View.GONE
+            binding.fieldTypeLayout.visibility = View.GONE
+            checkboxLayout.findViewById<CheckBox>(R.id.pii_checkBox).visibility = View.GONE
+            checkboxLayout.findViewById<CheckBox>(R.id.required_checkBox).visibility = View.GONE
+        }
+
         val checkboxAddAnotherButton = checkboxLayout.findViewById<Button>(R.id.add_another_button)
 
         checkboxAddAnotherButton.setOnClickListener {
@@ -469,6 +481,13 @@ class CreateFieldFragment : Fragment()
         }
 
         binding.saveButton.setOnClickListener {
+            if (study.samplingMethod == SamplingMethod.Structure && field.uuid == study.skipFieldUuid)
+            {
+                DAO.fieldDAO.createOrUpdateField( field, field.version )
+                findNavController().popBackStack()
+                return@setOnClickListener
+            }
+
             if (field.type == FieldType.Date && !field.date && !field.time)
             {
                 Toast.makeText(requireActivity().applicationContext, resources.getString( R.string.select_date_type), Toast.LENGTH_LONG).show()

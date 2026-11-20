@@ -566,6 +566,7 @@
 
     <string name="structure">"Structure Based Sampling"</string>
     <string name="max_number_of_replacements">Maximum number of replacements</string>
+    <string name="skip_reasons">"Skip Reasons"</string>
 
     <string-array name="sampling_methods">
         <item>"Simple Random Sampling"</item>

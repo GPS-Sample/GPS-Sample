@@ -80,33 +80,40 @@
                         android:inputType="textCapSentences" />
                 </LinearLayout>
 
-                <TextView
-                    android:layout_marginTop="20dp"
+                <LinearLayout
+                    android:id="@+id/field_type_layout"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="20dp"
-                    android:gravity="start|center_vertical"
-                    android:textAlignment="viewStart"
-                    android:text="@string/field_type"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
+                    android:layout_height="wrap_content">
 
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:background="@drawable/spinner_frame">
-
-                    <Spinner
-                        android:id="@+id/field_type_spinner"
-                        android:textAlignment="viewStart"
+                    <TextView
+                        android:layout_marginTop="20dp"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:entries="@{viewModel.createFieldModel.fieldTypes}"
-                        android:selectedItemPosition="@={viewModel.createFieldModel.fieldTypePosition}"
-                        android:onItemSelected="@{viewModel.createFieldModel::onFieldTypeSelected}"/>
-                </FrameLayout>
+                        android:layout_height="30dp"
+                        android:layout_marginStart="20dp"
+                        android:gravity="start|center_vertical"
+                        android:textAlignment="viewStart"
+                        android:text="@string/field_type"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:background="@drawable/spinner_frame">
+
+                        <Spinner
+                            android:id="@+id/field_type_spinner"
+                            android:textAlignment="viewStart"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:entries="@{viewModel.createFieldModel.fieldTypes}"
+                            android:selectedItemPosition="@={viewModel.createFieldModel.fieldTypePosition}"
+                            android:onItemSelected="@{viewModel.createFieldModel::onFieldTypeSelected}"/>
+                    </FrameLayout>
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/field_block_container_layout"

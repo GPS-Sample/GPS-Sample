@@ -9,6 +9,7 @@ package edu.gtri.gpssample.fragments.primary_sample
 
 import android.os.Bundle
 import android.view.*
+import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -21,6 +22,8 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.SamplingMethod
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.Rule
@@ -54,7 +57,11 @@ class PrimarySampleFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        primarySampleAdapter = PrimarySampleAdapter(requireContext())
+        sharedViewModel.createStudyModel.currentStudy?.value?.let { study->
+            this.study = study
+        }
+
+        primarySampleAdapter = PrimarySampleAdapter(requireContext(), study.samplingMethod )
         primarySampleAdapter.didSelectField = this::didSelectField
         primarySampleAdapter.didSelectRule = this::didSelectRule
         primarySampleAdapter.didSelectFilter = this::didSelectFilter
@@ -64,10 +71,7 @@ class PrimarySampleFragment : Fragment()
         primarySampleAdapter.shouldAddRule = this::shouldAddRule
         primarySampleAdapter.shouldAddFilter = this::shouldAddFilter
 
-        sharedViewModel.createStudyModel.currentStudy?.value?.let { study->
-            this.study = study
-            primarySampleAdapter.updateStudy( study )
-        }
+        primarySampleAdapter.updateStudy( study )
 
         binding.apply {
             lifecycleOwner = viewLifecycleOwner
@@ -78,6 +82,12 @@ class PrimarySampleFragment : Fragment()
         {
             binding.subsetSampleButton.visibility = View.VISIBLE
             binding.enableSubsetCheckbox.isChecked = true
+        }
+
+        if (study.samplingMethod == SamplingMethod.Structure)
+        {
+            binding.subsetLayout.visibility = View.GONE
+            binding.skipReasonButton.visibility = View.VISIBLE
         }
 
         val callback = object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0)
@@ -128,6 +138,30 @@ class PrimarySampleFragment : Fragment()
 
         binding.subsetSampleButton.setOnClickListener {
             findNavController().navigate( R.id.action_navigate_to_SubsetSampleFragment )
+        }
+
+        var skipReasonCount = 0
+        DAO.fieldDAO.getField( study.skipFieldUuid )?.let {
+            skipReasonCount = it.fieldOptions.count()
+        }
+
+        binding.skipReasonButton.setText( resources.getString(R.string.skip_reasons ) + " (${skipReasonCount})" )
+
+        binding.skipReasonButton.setOnClickListener {
+            if (study.skipFieldUuid.isEmpty())
+            {
+                val field = Field( null, 1,"Skip Reasons", FieldType.Checkbox, false, false, false, false, false, false, null, null,"" )
+                study.skipFieldUuid = field.uuid
+                sharedViewModel.createFieldModel.setCurrentField( field )
+            }
+            else
+            {
+                DAO.fieldDAO.getField( study.skipFieldUuid )?.let { field ->
+                    sharedViewModel.createFieldModel.setCurrentField( field )
+                }
+            }
+
+            findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
         }
 
         binding.saveButton.setOnClickListener {

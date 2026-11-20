@@ -8,11 +8,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.database.models.*
 
-class PrimarySampleAdapter(
-    private val context: Context
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>()
+class PrimarySampleAdapter( private val context: Context, private val samplingMethod: SamplingMethod ) : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 {
     companion object
     {
@@ -103,41 +102,48 @@ class PrimarySampleAdapter(
     {
         rows.clear()
 
-        // ---------------------------------------------------------
-        // Enumeration Fields
-        // ---------------------------------------------------------
+        var topSpacing = 20
 
-        rows.add(PrimaryRow.Title(text = context.getString(
-                    R.string.enumeration_fields
-                )))
-
-        // Fields
-        rows.add(PrimaryRow.Header(group = GROUP_FIELDS, expanded = expandedStates[GROUP_FIELDS]))
-
-        if (expandedStates[GROUP_FIELDS])
+        if (samplingMethod != SamplingMethod.Structure)
         {
-            fields.forEach {
-                rows.add(PrimaryRow.FieldRow(it))
+            topSpacing += 20
+
+            // ---------------------------------------------------------
+            // Enumeration Fields
+            // ---------------------------------------------------------
+
+            rows.add(PrimaryRow.Title(text = context.getString(
+                R.string.enumeration_fields
+            )))
+
+            // Fields
+            rows.add(PrimaryRow.Header(group = GROUP_FIELDS, expanded = expandedStates[GROUP_FIELDS]))
+
+            if (expandedStates[GROUP_FIELDS])
+            {
+                fields.forEach {
+                    rows.add(PrimaryRow.FieldRow(it))
+                }
             }
-        }
 
-        // Rules
-        rows.add(PrimaryRow.Header(group = GROUP_RULES, expanded = expandedStates[GROUP_RULES]))
+            // Rules
+            rows.add(PrimaryRow.Header(group = GROUP_RULES, expanded = expandedStates[GROUP_RULES]))
 
-        if (expandedStates[GROUP_RULES])
-        {
-            rules.forEach {
-                rows.add(PrimaryRow.RuleRow(it))
+            if (expandedStates[GROUP_RULES])
+            {
+                rules.forEach {
+                    rows.add(PrimaryRow.RuleRow(it))
+                }
             }
-        }
 
-        // Filters
-        rows.add(PrimaryRow.Header(group = GROUP_FILTERS, expanded = expandedStates[GROUP_FILTERS]))
+            // Filters
+            rows.add(PrimaryRow.Header(group = GROUP_FILTERS, expanded = expandedStates[GROUP_FILTERS]))
 
-        if (expandedStates[GROUP_FILTERS])
-        {
-            filters.forEach {
-                rows.add(PrimaryRow.FilterRow(it))
+            if (expandedStates[GROUP_FILTERS])
+            {
+                filters.forEach {
+                    rows.add(PrimaryRow.FilterRow(it))
+                }
             }
         }
 
@@ -147,7 +153,7 @@ class PrimarySampleAdapter(
 
         rows.add(PrimaryRow.Title(text = context.getString(
                     R.string.collection_fields
-                ), topSpacing = 40))
+                ), topSpacing = topSpacing ))
 
         // Fields
         rows.add(PrimaryRow.Header(group = GROUP_COLLECTION_FIELDS, expanded = expandedStates[GROUP_COLLECTION_FIELDS]))
