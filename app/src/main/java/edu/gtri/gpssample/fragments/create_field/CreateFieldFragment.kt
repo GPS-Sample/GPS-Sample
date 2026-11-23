@@ -173,6 +173,7 @@ class CreateFieldFragment : Fragment()
         createFieldCheckboxAdapter = CreateFieldCheckboxAdapter( field.fieldOptions )
         createFieldCheckboxAdapter.shouldDeleteCheckboxFieldOption = this::shouldDeleteCheckboxFieldOption
         checkboxRecyclerView.adapter = createFieldCheckboxAdapter
+        checkboxRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
         checkboxRecyclerView.layoutManager = LinearLayoutManager(activity)
 
         dropdownLayout = view.findViewById(R.id.layout_field_dropdown)
