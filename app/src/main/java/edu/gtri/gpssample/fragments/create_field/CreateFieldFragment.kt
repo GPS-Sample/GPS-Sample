@@ -184,7 +184,6 @@ class CreateFieldFragment : Fragment()
         dropdownRecyclerView.adapter = createFieldDropdownAdapter
         dropdownRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
         dropdownRecyclerView.layoutManager = LinearLayoutManager(activity)
-        dropdownRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
         val minimumNumberCheckBox = view.findViewById<CheckBox>(R.id.minimum_number_checkBox)
         val maximumNumberCheckBox = view.findViewById<CheckBox>(R.id.maximum_number_checkBox)
