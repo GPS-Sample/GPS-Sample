@@ -287,6 +287,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                     message = null,
                     items = listOf(resources.getString(R.string.set_boundary),resources.getString(R.string.set_location)),
                 ) { selection ->
+                    droppedPoints.clear()
+
                     if (selection == resources.getString(R.string.set_boundary))
                     {
                         currentTapType = TapType.CreateEnumAreaBoundary
@@ -298,7 +300,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(), View.OnTouchListener, MapMa
                     else if (selection == resources.getString(R.string.set_location))
                     {
                         currentTapType = TapType.CreateEnumAreaLocation
-                        droppedPoints.clear()
                         binding.mapOverlayView.visibility = View.VISIBLE
                         binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                         Toast.makeText(requireActivity().applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
