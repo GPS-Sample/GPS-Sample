@@ -58,3 +58,17 @@ fun View.setOnSingleClickListener( onClick: (View) -> Unit )
         }
     }
 }
+
+fun View.setOnDebouncedClickListener( debounceTime: Long = 500L, onClick: (View) -> Unit)
+{
+    var lastClickTime = 0L
+
+    setOnClickListener { view ->
+        val currentTime = SystemClock.elapsedRealtime()
+
+        if (currentTime - lastClickTime >= debounceTime) {
+            lastClickTime = currentTime
+            onClick(view)
+        }
+    }
+}

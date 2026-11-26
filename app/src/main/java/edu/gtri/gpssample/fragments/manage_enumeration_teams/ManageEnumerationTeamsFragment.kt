@@ -8,12 +8,10 @@
 package edu.gtri.gpssample.fragments.manage_enumeration_teams
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,15 +23,12 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.EnumerationTeam
-import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamsBinding
+import edu.gtri.gpssample.extensions.setOnDebouncedClickListener
 import edu.gtri.gpssample.extensions.setOnSingleClickListener
 import edu.gtri.gpssample.ui.compose.ComposableConfirmationDialogHost
 import edu.gtri.gpssample.ui.compose.ComposableDropdownDialogHost
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class ManageEnumerationTeamsFragment : Fragment()
 {
@@ -97,7 +92,7 @@ class ManageEnumerationTeamsFragment : Fragment()
 
         binding.titleTextView.text = enumArea.name + " " + resources.getString(R.string.teams)
 
-        binding.addButton.setOnSingleClickListener {
+        binding.addButton.setOnDebouncedClickListener {
             binding.progressOverlayView.visibility = View.VISIBLE
             enumArea.locations = DAO.locationDAO.getLocations( enumArea )
             binding.progressOverlayView.visibility = View.GONE

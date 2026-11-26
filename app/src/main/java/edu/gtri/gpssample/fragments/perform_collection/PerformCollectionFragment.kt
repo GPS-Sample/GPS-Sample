@@ -1236,10 +1236,13 @@ class PerformCollectionFragment : Fragment(),
 
     private fun didSelectItem( item: Any )
     {
+        var didNavigate = false
+
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
             sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
                 if (item is Location)
                 {
+                    didNavigate = true
                     sharedViewModel.currentLocationUuid = item.uuid
                     findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
                 }
@@ -1267,6 +1270,7 @@ class PerformCollectionFragment : Fragment(),
 
                             if (field == null || field.fieldOptions.isEmpty())
                             {
+                                didNavigate = true
                                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                             }
                             else
@@ -1286,6 +1290,7 @@ class PerformCollectionFragment : Fragment(),
 
                                 if (replacement == null)
                                 {
+                                    didNavigate = true
                                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                                 }
                                 else
@@ -1297,12 +1302,9 @@ class PerformCollectionFragment : Fragment(),
                                         rightButtonText = resources.getString(R.string.yes),
                                         cancelable = true,
                                     ) { selection ->
-                                        if (selection.isEmpty())
+                                        if (selection == resources.getString(R.string.yes))
                                         {
-                                            isHandlingTapEvent = false
-                                        }
-                                        else if (selection == resources.getString(R.string.yes))
-                                        {
+                                            didNavigate = true
                                             findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                                         }
                                         else if (selection == resources.getString(R.string.no))
@@ -1311,12 +1313,11 @@ class PerformCollectionFragment : Fragment(),
 
                                             if (field == null || field.fieldOptions.isEmpty())
                                             {
+                                                didNavigate = true
                                                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                                             }
                                             else
                                             {
-                                                isHandlingTapEvent = false
-
                                                 val items = ArrayList<String>()
                                                 val checked = ArrayList<Boolean>()
 
@@ -1379,15 +1380,17 @@ class PerformCollectionFragment : Fragment(),
                         }
                         else
                         {
+                            didNavigate = true
                             findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                         }
-                    } ?: run {isHandlingTapEvent = false}
-                }
-                else
-                {
-                    isHandlingTapEvent = false
+                    }
                 }
             }
+        }
+
+        if (!didNavigate)
+        {
+            isHandlingTapEvent = false
         }
     }
 

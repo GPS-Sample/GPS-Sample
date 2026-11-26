@@ -400,6 +400,8 @@ class CreateSampleFragment : Fragment()
                         mapManager.markerTapped.collect { location ->
                             if (!isHandlingTapEvent)
                             {
+                                isHandlingTapEvent = true
+
                                 val bundle = Bundle()
 
                                 if ((samplingViewModel.samplePageState.value == SamplingViewModel.SamplePageState.DuplicatePage)
@@ -414,8 +416,6 @@ class CreateSampleFragment : Fragment()
 
                                 sharedViewModel.currentLocationUuid = location.uuid
                                 sharedViewModel.currentEnumerationItemUuid = location.enumerationItems.first().uuid
-
-                                isHandlingTapEvent = true
 
                                 if (samplingViewModel.samplePageState.value == SamplingViewModel.SamplePageState.DuplicatePage)
                                 {
