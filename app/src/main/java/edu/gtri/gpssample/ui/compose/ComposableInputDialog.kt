@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -117,12 +120,43 @@ fun ComposableInputDialog(
                         }
                     }
 
+                    var passwordVisible by remember { mutableStateOf(false) }
+
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = textValue,
-                        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, capitalization = capitalization),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = keyboardType,
+                            capitalization = capitalization
+                        ),
                         textStyle = MaterialTheme.typography.bodyLarge,
-                        visualTransformation = if (isPassword) { PasswordVisualTransformation() } else { VisualTransformation.None },
+                        visualTransformation = if (isPassword && !passwordVisible) {
+                            PasswordVisualTransformation()
+                        } else {
+                            VisualTransformation.None
+                        },
+                        trailingIcon = {
+                            if (isPassword) {
+                                IconButton(
+                                    onClick = {
+                                        passwordVisible = !passwordVisible
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = if (passwordVisible) {
+                                            Icons.Default.VisibilityOff
+                                        } else {
+                                            Icons.Default.Visibility
+                                        },
+                                        contentDescription = if (passwordVisible) {
+                                            "Hide password"
+                                        } else {
+                                            "Show password"
+                                        }
+                                    )
+                                }
+                            }
+                        },
                         onValueChange = {
                             textValue = it
                         }
