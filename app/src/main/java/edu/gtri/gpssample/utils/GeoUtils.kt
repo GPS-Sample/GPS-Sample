@@ -240,23 +240,36 @@ object GeoUtils {
         return null
     }
 
-    fun distance( point: Point, enumArea: EnumArea ) : Double
+    fun distance( point: Point, vertices: ArrayList<LatLon> ) : Double
     {
         // convert point and enumArea from degrees to meters from the centroid
         // so that the distance will be computed in meters
 
-        val latLngBounds = findGeobounds(enumArea.vertices)
+        val latLngBounds = findGeobounds(vertices)
         val center = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
 
         val refLat = center.latitude()
         val refLon = center.longitude()
 
-        val metersPerDegreeLat = 111320.0
-        val metersPerDegreeLon = metersPerDegreeLat * cos(Math.toRadians(refLat))
+        val a = 6378137.0
+        val f = 1.0 / 298.257223563
+        val e2 = f * (2.0 - f)
+
+        val latRad = Math.toRadians(refLat)
+        val sinLat = sin(latRad)
+
+        val denom = sqrt(1.0 - e2 * sinLat * sinLat)
+
+        val radiusPrimeVertical = a / denom
+
+        val radiusMeridian = a * (1.0 - e2) / (denom * denom * denom)
+
+        val metersPerDegreeLon = radiusPrimeVertical * cos(latRad) * Math.PI / 180.0
+        val metersPerDegreeLat = radiusMeridian * Math.PI / 180.0
 
         val xyPoints = ArrayList<Coordinate>()
 
-        for (vertice in enumArea.vertices)
+        for (vertice in vertices)
         {
             val x = (vertice.longitude - refLon) * metersPerDegreeLon
             val y = (vertice.latitude - refLat) * metersPerDegreeLat
@@ -281,6 +294,11 @@ object GeoUtils {
         {
             return xyPolygon.distance(xyPoint )
         }
+    }
+
+    fun distance( point: Point, enumArea: EnumArea ) : Double
+    {
+        return distance( point, enumArea.vertices )
     }
 
     private data class XYPoint(val x: Double, val y: Double)

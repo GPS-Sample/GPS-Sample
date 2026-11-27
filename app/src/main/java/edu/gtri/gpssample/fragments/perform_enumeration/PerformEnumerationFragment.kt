@@ -1895,7 +1895,7 @@ class PerformEnumerationFragment : Fragment(),
     {
         if (config.geofenceIsEnabled)
         {
-            var distance = GeoUtils.distance( point, enumArea )
+            var distance = GeoUtils.distance( point,enumerationTeam.polygon )
 
             if (config.distanceFormat == DistanceFormat.Feet)
             {
