@@ -580,10 +580,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 // Add column for SelfWeighted SampleSize
                 db.execSQL("ALTER TABLE $TABLE_ENUM_AREA ADD COLUMN $COLUMN_ENUM_AREA_SAMPLE_SIZE INTEGER DEFAULT 0")
 
-                // add columns for StructuredSampling
+                // Add new columns to the Study
                 db.execSQL("ALTER TABLE $TABLE_STUDY ADD COLUMN $COLUMN_STUDY_MAX_REPLACEMENTS INTEGER DEFAULT 0")
                 db.execSQL("ALTER TABLE $TABLE_STUDY ADD COLUMN $COLUMN_STUDY_SKIP_FIELD_UUID TEXT DEFAULT ''")
+                db.execSQL("ALTER TABLE $TABLE_STUDY ADD COLUMN $COLUMN_STUDY_COLLECTION_APP TEXT DEFAULT ''")
 
+                // Add new columns to the EnumerationItem
                 db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_ENUMERATION_ITEM_REPLACED_BY TEXT DEFAULT ''")
                 db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_ENUMERATION_ITEM_REPLACEMENT_FOR TEXT DEFAULT ''")
                 db.execSQL("ALTER TABLE $TABLE_ENUMERATION_ITEM ADD COLUMN $COLUMN_ENUMERATION_ITEM_REPLACEMENT_REASON TEXT DEFAULT ''")
@@ -1002,6 +1004,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_STUDY_SUBSET_SAMPLE_SIZE_INDEX = "study_subset_sample_size_index"
         const val COLUMN_STUDY_MAX_REPLACEMENTS = "study_max_replacements"
         const val COLUMN_STUDY_SKIP_FIELD_UUID = "study_skip_field_uuid"
+        const val COLUMN_STUDY_COLLECTION_APP = "study_collection_app"
 
         // Strata table
         const val TABLE_STRATA = "strata"

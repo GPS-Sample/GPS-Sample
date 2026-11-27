@@ -259,7 +259,6 @@
     <string name="incomplete_enumeration">"Incomplete Enumeration"</string>
     <string name="dismiss">"Dismiss"</string>
     <string name="delete">"Delete"</string>
-    <string name="launching_odk_collect_application">"Launching ODK Collect Application..."</string>
     <string name="new_location">"Identify Location"</string>
     <string name="delete_configuration">"The current configuration will be replaced by the import.  Would you like to proceed?"</string>
     <string name="total_population">"Total Population Size"</string>
@@ -567,6 +566,13 @@
     <string name="structure">"Structure Based Sampling"</string>
     <string name="max_number_of_replacements">Maximum number of replacements</string>
     <string name="skip_reasons">"Skip Reasons"</string>
+    <string name="launching_odk_collect_application">"Launching Survey Application..."</string>
+    <string name="collection_app_hint">"Select the collection app that will be used for the survey."</string>
+
+    <string-array name="collection_apps">
+        <item>"ODK Collect"</item>
+        <item>"Kobo Collect"</item>
+    </string-array>
 
     <string-array name="sampling_methods">
         <item>"Simple Random Sampling"</item>

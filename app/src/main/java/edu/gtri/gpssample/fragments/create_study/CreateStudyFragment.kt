@@ -101,10 +101,26 @@ class CreateStudyFragment : Fragment()
             binding.samplingMethodSpinner.adapter = adapter
         }
 
+        ArrayAdapter.createFromResource(
+            requireActivity(),
+            R.array.collection_apps,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.collectionAppSpinner.adapter = adapter
+        }
+
         sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
             this.study = study
         } ?: run {
             binding.deleteImageView.visibility = View.GONE
+        }
+
+        resources.getStringArray(R.array.collection_apps ).forEachIndexed { i, app ->
+            if (study.collectionApp == app)
+            {
+                binding.collectionAppSpinner.setSelection(i)
+            }
         }
 
         sharedViewModel.createStudyModel.samplingMethod.observe( viewLifecycleOwner, androidx.lifecycle.Observer { samplingMethod ->
@@ -121,6 +137,10 @@ class CreateStudyFragment : Fragment()
                 }
             }
         })
+
+        binding.collectionAppTip.setOnClickListener {
+            composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.collection_app_hint))
+        }
 
         binding.samplingMethodTip.setOnClickListener {
             var samplingHint = resources.getString( R.string.sampling_hint_1_11 ) + "\n\n"
@@ -175,6 +195,10 @@ class CreateStudyFragment : Fragment()
             {
                 Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.sample_size_error), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
+            }
+
+            binding.collectionAppSpinner.selectedItem?.let {
+                study.collectionApp = it.toString()
             }
 
             if (study.samplingMethod != SamplingMethod.Structure)
