@@ -9,6 +9,7 @@ package edu.gtri.gpssample.fragments.sign_up
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.text.InputFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -90,20 +91,6 @@ class SignUpFragment : Fragment()
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
             {
                 binding.otherQuestionEditText.visibility = if (position == 6) View.VISIBLE else View.GONE
-
-//                if (position == 6)
-//                {
-//                    InputDialog( activity!!, false, resources.getString(R.string.enter_other_question), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
-//                        when (action) {
-//                            InputDialog.Action.DidCancel -> {}
-//                            InputDialog.Action.DidEnterText -> {
-//                                binding.otherQuestionTextView.text = text
-//                                binding.otherQuestionTextView.visibility = View.VISIBLE
-//                            }
-//                            InputDialog.Action.DidPressQRButton -> {}
-//                        }
-//                    }
-//                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>)
@@ -114,6 +101,28 @@ class SignUpFragment : Fragment()
         binding.pinTip.setOnClickListener {
             composableNotificationDialogHost.show(title = resources.getString(R.string.info), message = resources.getString(R.string.pin_hint))
         }
+
+        binding.pin1EditText.filters = arrayOf(
+            InputFilter { source, start, end, dest, dstart, dend ->
+                val newValue = dest.replaceRange(dstart, dend, source.subSequence(start, end).toString())
+                if (newValue.length > 6 || (dstart == 0 && source.startsWith("0"))) {
+                    ""
+                } else {
+                    null
+                }
+            }
+        )
+
+        binding.pin2EditText.filters = arrayOf(
+            InputFilter { source, start, end, dest, dstart, dend ->
+                val newValue = dest.replaceRange(dstart, dend, source.subSequence(start, end).toString())
+                if (newValue.length > 6 || (dstart == 0 && source.startsWith("0"))) {
+                    ""
+                } else {
+                    null
+                }
+            }
+        )
 
         binding.nextButton.setOnClickListener {
 
@@ -154,13 +163,6 @@ class SignUpFragment : Fragment()
                 if (question.length == 0)
                 {
                     Toast.makeText(requireActivity().applicationContext, resources.getString(R.string.enter_forgot_pin_question), Toast.LENGTH_SHORT).show()
-//                    InputDialog( activity!!, false, resources.getString(R.string.enter_other_question), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
-//                        when (action) {
-//                            InputDialog.Action.DidCancel -> {}
-//                            InputDialog.Action.DidEnterText -> {}
-//                            InputDialog.Action.DidPressQRButton -> {}
-//                        }
-//                    }
                     return@setOnClickListener
                 }
             }
